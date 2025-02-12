@@ -22,6 +22,7 @@ project "Kerberos"
 	
 	includedirs
 	{
+		"%{prj.name}/src",
 		"%{prj.name}/vendor"
 	}
 	

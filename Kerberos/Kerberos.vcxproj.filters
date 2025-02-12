@@ -4,6 +4,9 @@
     <Filter Include="Kerberos">
       <UniqueIdentifier>{226FC922-0E3C-242E-3755-12D6238159BC}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Kerberos\Events">
+      <UniqueIdentifier>{C6802ABE-320C-9882-3B1D-1B77A727F482}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Kerberos.h" />
@@ -15,6 +18,18 @@
     </ClInclude>
     <ClInclude Include="src\Kerberos\EntryPoint.h">
       <Filter>Kerberos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Events\ApplicationEvent.h">
+      <Filter>Kerberos\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Events\Event.h">
+      <Filter>Kerberos\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Events\KeyEvent.h">
+      <Filter>Kerberos\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Events\MouseEvent.h">
+      <Filter>Kerberos\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Log.h">
       <Filter>Kerberos</Filter>
