@@ -13,6 +13,9 @@ project "Kerberos"
 	
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	pchheader "kbrpch.h"
+	pchsource "Kerberos/src/kbrpch.cpp"
 	
 	files
 	{

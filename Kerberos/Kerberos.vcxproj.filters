@@ -34,6 +34,7 @@
     <ClInclude Include="src\Kerberos\Log.h">
       <Filter>Kerberos</Filter>
     </ClInclude>
+    <ClInclude Include="src\kbrpch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -42,5 +43,6 @@
     <ClCompile Include="src\Kerberos\Log.cpp">
       <Filter>Kerberos</Filter>
     </ClCompile>
+    <ClCompile Include="src\kbrpch.cpp" />
   </ItemGroup>
 </Project>
