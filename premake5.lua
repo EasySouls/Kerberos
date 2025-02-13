@@ -53,7 +53,7 @@ project "Kerberos"
 			"KBR_PLATFORM_WINDOWS",
 			"KBR_BUILD_DLL",
 			"KBR_ENABLE_ASSERTS",
-			"GLFW_INCLUDE_NONE",
+			-- "GLFW_INCLUDE_NONE",
 			"_WINDLL"
 		}
 		

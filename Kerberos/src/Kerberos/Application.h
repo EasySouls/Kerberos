@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "Window.h"
+#include "Kerberos/Events/ApplicationEvent.h"
 
 namespace Kerberos
 {
@@ -11,9 +12,13 @@ namespace Kerberos
 		Application();
 		virtual ~Application();
 
-		void Run();
+		void Run() const;
+
+		void OnEvent(Event& e);
 
 	private:
+		bool OnWindowClosed(const WindowCloseEvent& e);
+
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
 	};
