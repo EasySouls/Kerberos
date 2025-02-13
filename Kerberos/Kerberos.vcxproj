@@ -152,6 +152,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Kerberos\LayerStack.h" />
+    <ClInclude Include="src\Kerberos\Layer.h" />
     <ClInclude Include="src\Kerberos.h" />
     <ClInclude Include="src\Kerberos\Application.h" />
     <ClInclude Include="src\Kerberos\Core.h" />
@@ -166,6 +168,8 @@
     <ClInclude Include="src\kbrpch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Kerberos\LayerStack.cpp" />
+    <ClCompile Include="src\Kerberos\Layer.cpp" />
     <ClCompile Include="src\Kerberos\Application.cpp" />
     <ClCompile Include="src\Kerberos\Log.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />

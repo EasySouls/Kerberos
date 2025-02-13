@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "Window.h"
+#include "Kerberos/LayerStack.h"
 #include "Kerberos/Events/ApplicationEvent.h"
 
 namespace Kerberos
@@ -12,15 +13,19 @@ namespace Kerberos
 		Application();
 		virtual ~Application();
 
-		void Run() const;
+		void Run();
 
 		void OnEvent(Event& e);
+
+		void PushLayer(Layer* layer);
+		void PushOverlay(Layer* overlay);
 
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& e);
 
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
+		LayerStack m_LayerStack;
 	};
 
 	// To be defined in client
