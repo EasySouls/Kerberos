@@ -6,6 +6,13 @@ workspace "Kerberos"
 	
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- Include directories relative to the solution directory
+IncludeDir = {}
+IncludeDir["GLFW"] = "%{wks.location}/Kerberos/vendor/GLFW/include"
+
+-- Include GLFW premake file
+include "Kerberos/vendor/GLFW"
+
 project "Kerberos"
 	location "Kerberos"
 	kind "SharedLib"
@@ -20,29 +27,39 @@ project "Kerberos"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
 	}
 	
 	includedirs
 	{
 		"%{prj.name}/src",
-		"%{prj.name}/vendor"
+		"%{prj.name}/vendor",
+		IncludeDir.GLFW
+	}
+
+	links
+	{
+		"GLFW",
+		"opengl32.lib"
 	}
 	
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
+		staticruntime "off"
 		systemversion "latest"
 		
 		defines
 		{
 			"KBR_PLATFORM_WINDOWS",
 			"KBR_BUILD_DLL",
+			"KBR_ENABLE_ASSERTS",
+			"GLFW_INCLUDE_NONE",
 			"_WINDLL"
 		}
 		
 		postbuildcommands
 		{
+			-- ("{COPY} %{prj.name}/vendor/glfw/lib/glfw3.dll ../bin/" .. outputdir .. "/Sandbox"),
 			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
 		}
 		
@@ -80,7 +97,7 @@ project "Sandbox"
 	
 	links
 	{
-		"Kerberos"
+		"Kerberos",
 	}
 	
 	filter "system:windows"

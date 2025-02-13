@@ -1,0 +1,3 @@
+[submodule "Kerberos/vendor/GLFW"]
+	path = Kerberos/vendor/GLFW
+	url = https://github.com/EasySouls/glfw
