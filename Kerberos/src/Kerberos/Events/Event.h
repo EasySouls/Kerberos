@@ -55,11 +55,6 @@ namespace Kerberos
 		}
 
 		bool Handled = false;
-
-		friend std::ostream& operator<<(std::ostream& os, const Event& e)
-		{
-			return os << e.ToString();
-		}
 	};
 
 	class EventDispatcher
@@ -87,4 +82,9 @@ namespace Kerberos
 	private:
 		Event& _event;
 	};
+
+	inline std::ostream& operator<<(std::ostream& os, const Event& e)
+	{
+		return os << e.ToString();
+	}
 }

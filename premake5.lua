@@ -65,14 +65,17 @@ project "Kerberos"
 		
 	filter "configurations:Debug"
 		defines "KBR_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 		
 	filter "configurations:Release"
 		defines "KB_RELEASE"
+		buildoptions "/MD"
 		optimize "On"
 		
 	filter "configurations:Dist"
 		defines "KB_DIST"
+		buildoptions "/MD"
 		optimize "On"
 
 project "Sandbox"

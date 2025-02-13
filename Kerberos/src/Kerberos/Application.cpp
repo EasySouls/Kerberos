@@ -19,7 +19,6 @@ namespace Kerberos
 	void Application::Run() 
 	{
 		const WindowResizeEvent e(1280, 720);
-		KBR_CORE_TRACE(e.ToString());
 
 		while (m_Running) 
 		{
