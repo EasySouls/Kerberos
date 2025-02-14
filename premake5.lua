@@ -10,10 +10,12 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "%{wks.location}/Kerberos/vendor/GLFW/include"
 IncludeDir["Glad"] = "%{wks.location}/Kerberos/vendor/glad/include"
+IncludeDir["ImGui"] = "%{wks.location}/Kerberos/vendor/imgui"
 
 -- Include GLFW premake file
 include "Kerberos/vendor/GLFW"
 include "Kerberos/vendor/glad"
+include "Kerberos/vendor/imgui"
 
 project "Kerberos"
 	location "Kerberos"
@@ -37,13 +39,15 @@ project "Kerberos"
 		"%{prj.name}/src",
 		"%{prj.name}/vendor",
 		IncludeDir.GLFW,
-		IncludeDir.Glad
+		IncludeDir.Glad,
+		IncludeDir.ImGui
 	}
 
 	links
 	{
 		"GLFW",
 		"Glad",
+		"ImGui",
 		"opengl32.lib"
 	}
 	

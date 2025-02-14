@@ -1,3 +1,7 @@
 [submodule "Kerberos/vendor/GLFW"]
 	path = Kerberos/vendor/GLFW
 	url = https://github.com/EasySouls/glfw
+[submodule "Kerberos/vendor/imgui"]
+	path = Kerberos/vendor/imgui
+	url = https://github.com/EasySouls/imgui.git
+	branch = docking
