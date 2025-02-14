@@ -37,6 +37,12 @@
     <ClInclude Include="src\Kerberos\Events\MouseEvent.h">
       <Filter>Kerberos\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Layer.h">
+      <Filter>Kerberos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\LayerStack.h">
+      <Filter>Kerberos</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Log.h">
       <Filter>Kerberos</Filter>
     </ClInclude>
@@ -50,6 +56,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
+      <Filter>Kerberos</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Layer.cpp">
+      <Filter>Kerberos</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\LayerStack.cpp">
       <Filter>Kerberos</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Log.cpp">

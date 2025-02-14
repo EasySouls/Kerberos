@@ -9,9 +9,11 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to the solution directory
 IncludeDir = {}
 IncludeDir["GLFW"] = "%{wks.location}/Kerberos/vendor/GLFW/include"
+IncludeDir["Glad"] = "%{wks.location}/Kerberos/vendor/glad/include"
 
 -- Include GLFW premake file
 include "Kerberos/vendor/GLFW"
+include "Kerberos/vendor/glad"
 
 project "Kerberos"
 	location "Kerberos"
@@ -34,17 +36,19 @@ project "Kerberos"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor",
-		IncludeDir.GLFW
+		IncludeDir.GLFW,
+		IncludeDir.Glad
 	}
 
 	links
 	{
 		"GLFW",
+		"Glad",
 		"opengl32.lib"
 	}
 	
 	filter "system:windows"
-		cppdialect "C++17"
+		cppdialect "C++20"
 		staticruntime "off"
 		systemversion "latest"
 		
@@ -53,7 +57,7 @@ project "Kerberos"
 			"KBR_PLATFORM_WINDOWS",
 			"KBR_BUILD_DLL",
 			"KBR_ENABLE_ASSERTS",
-			-- "GLFW_INCLUDE_NONE",
+			"GLFW_INCLUDE_NONE",
 			"_WINDLL"
 		}
 		
@@ -105,7 +109,7 @@ project "Sandbox"
 	
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
+		staticruntime "off"
 		systemversion "latest"
 		
 		defines

@@ -5,6 +5,9 @@
 #include "Kerberos/Events/MouseEvent.h"
 #include "Kerberos/Events/KeyEvent.h"
 
+#include <glad/glad.h>
+
+
 namespace Kerberos
 {
 	static bool s_GLFWInitialized = false;
@@ -49,6 +52,11 @@ namespace Kerberos
 
 		m_Window = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Data.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);
+
+		const int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		KBR_CORE_ASSERT(status, "Failed to initialize Glad!");
+		KBR_CORE_INFO("Loaded OpenGL");
+
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 
 		SetVSync(true);
