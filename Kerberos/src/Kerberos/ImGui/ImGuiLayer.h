@@ -13,20 +13,13 @@ namespace Kerberos
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		void OnAttach() override;
-		void OnDetach() override;
-		void OnUpdate() override;
-		void OnEvent(Event& event) override;
+		virtual void OnAttach() override;
+		virtual void OnDetach() override;
 
-	private:
-		bool OnMouseButtonPressedEvent(const MouseButtonPressedEvent& event);
-		bool OnMouseButtonReleasedEvent(const MouseButtonReleasedEvent& event);
-		bool OnMouseMovedEvent(const MouseMovedEvent& event);
-		bool OnMouseScrolledEvent(const MouseScrolledEvent& event);
-		bool OnKeyPressedEvent(const KeyPressedEvent& event);
-		bool OnKeyReleasedEvent(const KeyReleasedEvent& event);
-		bool OnKeyTypedEvent(const KeyTypedEvent& event);
-		bool OnWindowResizedEvent(const WindowResizeEvent& event);
+		virtual void OnImGuiRender() override;
+
+		void Begin();
+		void End();
 
 	private:
 		float m_Time = 0.0f;

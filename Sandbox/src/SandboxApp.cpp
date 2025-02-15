@@ -28,13 +28,9 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		PushOverlay(new Kerberos::ImGuiLayer());
 	}
 
-	~Sandbox()
-	{
-
-	}
+	~Sandbox() = default;
 };
 
 Kerberos::Application* Kerberos::CreateApplication()

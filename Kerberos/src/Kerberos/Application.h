@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "Window.h"
+#include "ImGui/ImGuiLayer.h"
 #include "Kerberos/LayerStack.h"
 #include "Kerberos/Events/ApplicationEvent.h"
 
@@ -27,6 +28,7 @@ namespace Kerberos
 
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
+		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
 
 		static Application* s_Instance;
