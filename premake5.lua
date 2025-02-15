@@ -62,7 +62,8 @@ project "Kerberos"
 			"KBR_BUILD_DLL",
 			"KBR_ENABLE_ASSERTS",
 			"GLFW_INCLUDE_NONE",
-			"_WINDLL"
+			"_WINDLL",
+			"IMGUI_DOCKING_BRANCH"
 		}
 		
 		postbuildcommands
@@ -112,7 +113,7 @@ project "Sandbox"
 	}
 	
 	filter "system:windows"
-		cppdialect "C++17"
+		cppdialect "C++20"
 		staticruntime "off"
 		systemversion "latest"
 		

@@ -5,6 +5,7 @@
 #include "Kerberos/Application.h"
 #include "Kerberos/Log.h"
 #include "Kerberos/Layer.h"
+#include "Kerberos/ImGui/ImGuiLayer.h"
 #include "Kerberos/Events/Event.h"
 
 
