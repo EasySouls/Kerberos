@@ -12,7 +12,7 @@ namespace Kerberos
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
-		KeyEvent(int keycode)
+		explicit KeyEvent(const int keycode)
 			: _keyCode(keycode)
 		{
 		}
@@ -20,10 +20,10 @@ namespace Kerberos
 		int _keyCode;
 	};
 
-	class KERBEROS_API KeyPressedEvent : public KeyEvent
+	class KERBEROS_API KeyPressedEvent final : public KeyEvent
 	{
 	public:
-		KeyPressedEvent(int keycode, int repeatCount)
+		KeyPressedEvent(const int keycode, const int repeatCount)
 			: KeyEvent(keycode), _repeatCount(repeatCount)
 		{
 		}
@@ -42,10 +42,10 @@ namespace Kerberos
 		int _repeatCount;
 	};
 
-	class KERBEROS_API KeyReleasedEvent : public KeyEvent
+	class KERBEROS_API KeyReleasedEvent final : public KeyEvent
 	{
 	public:
-		KeyReleasedEvent(int keycode)
+		explicit KeyReleasedEvent(int keycode)
 			: KeyEvent(keycode)
 		{
 		}
@@ -60,10 +60,10 @@ namespace Kerberos
 		EVENT_CLASS_TYPE(KeyReleased)
 	};
 
-	class KERBEROS_API KeyTypedEvent : public KeyEvent
+	class KERBEROS_API KeyTypedEvent final : public KeyEvent
 	{
 	public:
-		KeyTypedEvent(int keycode)
+		explicit KeyTypedEvent(const int keycode)
 			: KeyEvent(keycode)
 		{
 		}

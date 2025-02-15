@@ -3,7 +3,6 @@
 
 #include <glad/glad.h>
 
-
 namespace Kerberos
 {
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
@@ -23,10 +22,11 @@ namespace Kerberos
 
 	void Application::Run() 
 	{
-		const WindowResizeEvent e(1280, 720);
-
 		while (m_Running) 
 		{
+			glClearColor(0.1f, 0.1f, 0.1f, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
+
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
 

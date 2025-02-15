@@ -9,7 +9,7 @@ public:
 	}
 	void OnUpdate() override
 	{
-		KBR_INFO("ExampleLayer::Update");
+		//KBR_INFO("ExampleLayer::Update");
 	}
 	void OnEvent(Kerberos::Event& event) override
 	{

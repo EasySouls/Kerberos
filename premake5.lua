@@ -68,8 +68,7 @@ project "Kerberos"
 		
 		postbuildcommands
 		{
-			-- ("{COPY} %{prj.name}/vendor/glfw/lib/glfw3.dll ../bin/" .. outputdir .. "/Sandbox"),
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+			("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\")
 		}
 		
 	filter "configurations:Debug"
