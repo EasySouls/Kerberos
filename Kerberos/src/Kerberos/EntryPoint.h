@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 	KBR_CORE_INFO("Core logger initialized");
 	KBR_INFO("Client logger initialized");
 
-	auto app = Kerberos::CreateApplication();
+	const auto app = Kerberos::CreateApplication();
 	app->Run();
 	delete app;
 }

@@ -7,6 +7,9 @@
 #include "Kerberos/Layer.h"
 #include "Kerberos/ImGui/ImGuiLayer.h"
 #include "Kerberos/Events/Event.h"
+#include "Kerberos/Events/ApplicationEvent.h"
+#include "Kerberos/Events/KeyEvent.h"
+#include "Kerberos/Events/MouseEvent.h"
 
 #include "Kerberos/Input.h"
 #include "Kerberos/KeyCodes.h"

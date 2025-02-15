@@ -5,7 +5,7 @@
 namespace Kerberos
 {
 
-	class KERBEROS_API WindowResizeEvent : public Event
+	class WindowResizeEvent : public Event
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
@@ -29,7 +29,7 @@ namespace Kerberos
 		unsigned int _width, _height;
 	};
 
-	class KERBEROS_API WindowCloseEvent : public Event
+	class WindowCloseEvent : public Event
 	{
 	public:
 		WindowCloseEvent() = default;
@@ -38,7 +38,7 @@ namespace Kerberos
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class KERBEROS_API AppTickEvent : public Event
+	class AppTickEvent : public Event
 	{
 	public:
 		AppTickEvent() = default;
@@ -47,7 +47,7 @@ namespace Kerberos
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class KERBEROS_API AppUpdateEvent : public Event
+	class AppUpdateEvent : public Event
 	{
 	public:
 		AppUpdateEvent() = default;
@@ -56,7 +56,7 @@ namespace Kerberos
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class KERBEROS_API AppRenderEvent : public Event
+	class AppRenderEvent : public Event
 	{
 	public:
 		AppRenderEvent() = default;

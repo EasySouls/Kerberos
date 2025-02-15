@@ -5,7 +5,7 @@
 namespace Kerberos
 {
 
-	class KERBEROS_API MouseMovedEvent : public Event
+	class MouseMovedEvent : public Event
 	{
 	public:
 		MouseMovedEvent(float x, float y)
@@ -29,7 +29,7 @@ namespace Kerberos
 		float _mouseX, _mouseY;
 	};
 
-	class KERBEROS_API MouseScrolledEvent : public Event
+	class MouseScrolledEvent : public Event
 	{
 	public:
 		MouseScrolledEvent(float x, float y)
@@ -53,7 +53,7 @@ namespace Kerberos
 		float _offsetX, _offsetY;
 	};
 
-	class KERBEROS_API MouseButtonEvent : public Event
+	class MouseButtonEvent : public Event
 	{
 	public:
 		int GetMouseButton() const { return _button; }
@@ -68,7 +68,7 @@ namespace Kerberos
 		int _button;
 	};
 
-	class KERBEROS_API MouseButtonPressedEvent : public MouseButtonEvent
+	class MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonPressedEvent(int button)
@@ -86,7 +86,7 @@ namespace Kerberos
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class KERBEROS_API MouseButtonReleasedEvent : public MouseButtonEvent
+	class MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonReleasedEvent(int button)

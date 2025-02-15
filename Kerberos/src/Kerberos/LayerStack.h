@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Kerberos/Core.h"
 #include "Layer.h"
 
 namespace Kerberos
 {
-	class KERBEROS_API LayerStack
+	class LayerStack
 	{
 	public:
 		LayerStack();

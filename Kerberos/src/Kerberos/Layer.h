@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Kerberos/Core.h"
 #include "Kerberos/Events/Event.h"
 
 namespace Kerberos
 {
-	class KERBEROS_API Layer
+	class Layer
 	{
 	public:
 		explicit Layer(std::string name = "Layer");

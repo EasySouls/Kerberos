@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Kerberos/Core.h"
-
 namespace Kerberos
 {
-	class KERBEROS_API Input
+	class Input
 	{
 	public:
 		static bool IsKeyPressed(const int keycode) { return s_Instance->IsKeyPressedImpl(keycode); }

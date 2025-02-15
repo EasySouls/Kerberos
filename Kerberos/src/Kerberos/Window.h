@@ -1,8 +1,6 @@
 #pragma once
 
 #include "kbrpch.h"
-
-#include "Kerberos/Core.h"
 #include "Kerberos/Events/Event.h"
 
 namespace Kerberos
@@ -21,7 +19,7 @@ namespace Kerberos
 		}
 	};
 
-	class KERBEROS_API Window
+	class Window
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;

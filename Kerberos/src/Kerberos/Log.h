@@ -4,11 +4,10 @@
 
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
-#include "Core.h"
 
 namespace Kerberos
 {
-	class KERBEROS_API Log
+	class Log
 	{
 	public:
 		static void Init();

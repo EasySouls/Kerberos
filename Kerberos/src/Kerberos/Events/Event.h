@@ -1,12 +1,12 @@
 #pragma once 
 
-//#include "kbrpch.h"
-#include "Kerberos/Core.h"
-
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <functional>
+
+#include "spdlog/spdlog.h"
+#include "spdlog/fmt/ostr.h"
 
 namespace Kerberos
 {
@@ -37,7 +37,7 @@ namespace Kerberos
 
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
-	class KERBEROS_API Event
+	class Event
 	{
 		friend class EventDispatcher;
 

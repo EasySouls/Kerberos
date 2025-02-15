@@ -4,6 +4,7 @@
 #include "Kerberos/Events/ApplicationEvent.h"
 #include "Kerberos/Events/MouseEvent.h"
 #include "Kerberos/Events/KeyEvent.h"
+#include "Kerberos/Core.h"
 
 #include <glad/glad.h>
 

@@ -29,8 +29,11 @@ namespace Kerberos
 		const auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		double xPos, yPos;
 		glfwGetCursorPos(window, &xPos, &yPos);
+		
+		float xPosF = static_cast<float>(xPos);
+		float yPosF = static_cast<float>(yPos);
 
-		return { xPos, yPos };
+		return { xPosF, yPosF };
 	}
 
 	float WindowsInput::GetMouseXImpl() 
