@@ -165,9 +165,11 @@
     <ClInclude Include="src\Kerberos\Events\MouseEvent.h" />
     <ClInclude Include="src\Kerberos\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Kerberos\Input.h" />
+    <ClInclude Include="src\Kerberos\KeyCodes.h" />
     <ClInclude Include="src\Kerberos\Layer.h" />
     <ClInclude Include="src\Kerberos\LayerStack.h" />
     <ClInclude Include="src\Kerberos\Log.h" />
+    <ClInclude Include="src\Kerberos\MouseButtonCodes.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
     <ClInclude Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />

@@ -9,11 +9,16 @@ public:
 	}
 	void OnUpdate() override
 	{
-		//KBR_INFO("ExampleLayer::Update");
+		if (Kerberos::Input::IsKeyPressed(KBR_KEY_TAB))
+			KBR_TRACE("Tab key is pressed!");
 	}
 	void OnEvent(Kerberos::Event& event) override
 	{
-		KBR_TRACE("{0}", event.ToString());
+		if (event.GetEventType() == Kerberos::EventType::KeyPressed)
+		{
+			const Kerberos::KeyPressedEvent& e = dynamic_cast<Kerberos::KeyPressedEvent&>(event);
+			KBR_TRACE("{0}", static_cast<char>(e.GetKeyCode()));
+		}
 	}
 };
 

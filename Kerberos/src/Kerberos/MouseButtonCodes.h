@@ -1,0 +1,14 @@
+#pragma once
+
+#define KBR_MOUSE_BUTTON_1         0
+#define KBR_MOUSE_BUTTON_2         1
+#define KBR_MOUSE_BUTTON_3         2
+#define KBR_MOUSE_BUTTON_4         3
+#define KBR_MOUSE_BUTTON_5         4
+#define KBR_MOUSE_BUTTON_6         5
+#define KBR_MOUSE_BUTTON_7         6
+#define KBR_MOUSE_BUTTON_8         7
+#define KBR_MOUSE_BUTTON_LAST      KBR_MOUSE_BUTTON_8
+#define KBR_MOUSE_BUTTON_LEFT      KBR_MOUSE_BUTTON_1
+#define KBR_MOUSE_BUTTON_RIGHT     KBR_MOUSE_BUTTON_2
+#define KBR_MOUSE_BUTTON_MIDDLE    KBR_MOUSE_BUTTON_3
