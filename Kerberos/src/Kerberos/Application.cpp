@@ -1,5 +1,6 @@
 #include "kbrpch.h"
 #include "Application.h"
+#include "Kerberos/Input.h"
 
 #include <glad/glad.h>
 

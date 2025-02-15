@@ -120,7 +120,7 @@ namespace Kerberos
 
 		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, const int button, const int action, const int mods)
 			{
-				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+				const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 				switch (action)
 				{
 					case GLFW_PRESS:
@@ -142,14 +142,14 @@ namespace Kerberos
 
 		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, const double xOffset, const double yOffset)
 			{
-				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+				const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 				MouseScrolledEvent event(static_cast<float>(xOffset), static_cast<float>(yOffset));
 				data.EventCallback(event);
 			});
 
 		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, const double xPos, const double yPos)
 			{
-				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+				const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 				MouseMovedEvent event(static_cast<float>(xPos), static_cast<float>(yPos));
 				data.EventCallback(event);
 			});
