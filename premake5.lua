@@ -11,6 +11,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "%{wks.location}/Kerberos/vendor/GLFW/include"
 IncludeDir["Glad"] = "%{wks.location}/Kerberos/vendor/glad/include"
 IncludeDir["ImGui"] = "%{wks.location}/Kerberos/vendor/imgui"
+IncludeDir["glm"] = "%{wks.location}/Kerberos/vendor/glm"
 
 -- Include GLFW premake file
 include "Kerberos/vendor/GLFW"
@@ -40,7 +41,8 @@ project "Kerberos"
 		"%{prj.name}/vendor",
 		IncludeDir.GLFW,
 		IncludeDir.Glad,
-		IncludeDir.ImGui
+		IncludeDir.ImGui,
+		IncludeDir.glm
 	}
 
 	links
@@ -103,7 +105,8 @@ project "Sandbox"
 	includedirs
 	{
 		"Kerberos/vendor",
-		"Kerberos/src"
+		"Kerberos/src",
+		IncludeDir.glm
 	}
 	
 	links
