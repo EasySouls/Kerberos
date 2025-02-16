@@ -6,6 +6,7 @@
 #include "Kerberos/Events/ApplicationEvent.h"
 #include "Kerberos/Renderer/Shader.h"
 #include "Kerberos/Renderer/VertexArray.h"
+#include "Kerberos/Renderer/OrthographicCamera.h"
 
 namespace Kerberos
 {
@@ -36,6 +37,8 @@ namespace Kerberos
 		std::shared_ptr<VertexArray> m_VertexArray;
 		std::shared_ptr<Shader> m_BlueShader;
 		std::shared_ptr<VertexArray> m_SquareVA;
+
+		OrthographicCamera m_Camera;
 
 		static Application* s_Instance;
 	};

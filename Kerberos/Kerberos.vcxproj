@@ -143,6 +143,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Kerberos\Renderer\OrthographicCamera.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
     <ClInclude Include="src\Kerberos.h" />
     <ClInclude Include="src\Kerberos\Application.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="src\kbrpch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Kerberos\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
     <ClCompile Include="src\Kerberos\Application.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <glm/glm.hpp>
 
 namespace Kerberos
 {
@@ -13,6 +14,7 @@ namespace Kerberos
 		virtual void Bind() const;
 		virtual void Unbind() const;
 
+		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const;
 	private:
 		uint32_t m_RendererID;
 	};
