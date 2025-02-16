@@ -5,7 +5,7 @@
 #include "Kerberos/LayerStack.h"
 #include "Kerberos/Events/ApplicationEvent.h"
 #include "Kerberos/Renderer/Shader.h"
-#include "Kerberos/Renderer/Buffer.h"
+#include "Kerberos/Renderer/VertexArray.h"
 
 namespace Kerberos
 {
@@ -32,10 +32,10 @@ namespace Kerberos
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
 
-		unsigned int m_VertexArray;
-		std::unique_ptr<Shader> m_Shader;
-		std::unique_ptr<VertexBuffer> m_VertexBuffer;
-		std::unique_ptr<IndexBuffer> m_IndexBuffer;
+		std::shared_ptr<Shader> m_Shader;
+		std::shared_ptr<VertexArray> m_VertexArray;
+		std::shared_ptr<Shader> m_BlueShader;
+		std::shared_ptr<VertexArray> m_SquareVA;
 
 		static Application* s_Instance;
 	};

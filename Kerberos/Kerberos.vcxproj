@@ -165,9 +165,11 @@
     <ClInclude Include="src\Kerberos\MouseButtonCodes.h" />
     <ClInclude Include="src\Kerberos\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\kbrpch.h" />
+    <ClInclude Include="src\Kerberos\Renderer\VertexArray.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Renderer\Renderer.cpp" />
@@ -181,11 +183,13 @@
     <ClCompile Include="src\Kerberos\Layer.cpp" />
     <ClCompile Include="src\Kerberos\LayerStack.cpp" />
     <ClCompile Include="src\Kerberos\Log.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\kbrpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">
