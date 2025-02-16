@@ -10,14 +10,14 @@ namespace Kerberos
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::None:    
+			case RendererAPI::API::None:    
 				KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); 
 				return nullptr;
 
-			case RendererAPI::OpenGL:  
+			case RendererAPI::API::OpenGL:  
 				return new OpenGLVertexArray();
 		
-			case RendererAPI::Vulkan:
+			case RendererAPI::API::Vulkan:
 				KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
 				return nullptr;
 		}

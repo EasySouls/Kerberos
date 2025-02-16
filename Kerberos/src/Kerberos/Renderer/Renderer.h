@@ -1,20 +1,21 @@
 #pragma once
 
+#include "RenderCommand.h"
+
 namespace Kerberos
 {
-	enum class RendererAPI : uint8_t
-	{
-		None = 0, 
-		OpenGL = 1,
-		Vulkan = 2
-	};
-
 	class Renderer
 	{
 	public:
-		inline static RendererAPI GetAPI() { return s_API; }
+		static void BeginScene();
+		static void EndScene();
 
-	private:
-		static RendererAPI s_API;
+		/// <summary>
+		/// Binds the vertex array and submits it to the renderer
+		/// </summary>
+		/// <param name="vertexArray">The vertex array to be drawed with</param>
+		static void Submit(const std::shared_ptr<VertexArray>& vertexArray);
+
+		static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }	
 	};
 }

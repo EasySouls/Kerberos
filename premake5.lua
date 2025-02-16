@@ -6,12 +6,22 @@ workspace "Kerberos"
 	
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+VULKAN_DIR = os.getenv("VULKAN_SDK")
+
 -- Include directories relative to the solution directory
 IncludeDir = {}
 IncludeDir["GLFW"] = "%{wks.location}/Kerberos/vendor/GLFW/include"
 IncludeDir["Glad"] = "%{wks.location}/Kerberos/vendor/glad/include"
 IncludeDir["ImGui"] = "%{wks.location}/Kerberos/vendor/imgui"
 IncludeDir["glm"] = "%{wks.location}/Kerberos/vendor/glm"
+IncludeDir["VulkanSDK"] = "%{VULKAN_DIR}/Include"
+
+LibraryDir = {}
+LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
+
+Library = {}
+Library["Vulkan"] = "%{LibraryDir.VulkanSDK}/vulkan-1.lib"
+Library["VulkanUtils"] = "%{LibraryDir.VulkanSDK}/VkLayer_utils.lib"
 
 -- Include GLFW premake file
 include "Kerberos/vendor/GLFW"
@@ -45,7 +55,8 @@ project "Kerberos"
 		IncludeDir.GLFW,
 		IncludeDir.Glad,
 		IncludeDir.ImGui,
-		IncludeDir.glm
+		IncludeDir.glm,
+		IncludeDir.VulkanSDK
 	}
 
 	links
