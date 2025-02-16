@@ -1,5 +1,8 @@
 #include "kbrpch.h"
 #include "Application.h"
+
+#include "KeyCodes.h"
+#include "Events/KeyEvent.h"
 #include "Kerberos/Core.h"
 #include "Kerberos/Renderer/Renderer.h"
 #include "Kerberos/Renderer/RenderCommand.h"
@@ -143,8 +146,8 @@ namespace Kerberos
 			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 			RenderCommand::Clear();
 
-			m_Camera.SetRotation(15.0f);
-			m_Camera.SetPosition({ 0.25f, 0.25f, 0 });
+			//m_Camera.SetRotation(15.0f);
+			//m_Camera.SetPosition({ 0.25f, 0.25f, 0 });
 
 			Renderer::BeginScene(m_Camera);
 
@@ -176,6 +179,36 @@ namespace Kerberos
 			(*--it)->OnEvent(e);
 			if (e.Handled)
 				break;
+
+			if (e.GetEventType() == EventType::KeyPressed)
+			{
+				KeyPressedEvent& event = dynamic_cast<KeyPressedEvent&>(e);
+				
+				if (event.GetKeyCode() == KBR_KEY_W)
+				{
+					m_Camera.SetPosition(m_Camera.GetPosition() + glm::vec3(0.0f, 0.05f, 0.0f));
+				}
+				else if (event.GetKeyCode() == KBR_KEY_A)
+				{
+					m_Camera.SetPosition(m_Camera.GetPosition() + glm::vec3(-0.05f, 0.0f, 0.0f));
+				}
+				else if (event.GetKeyCode() == KBR_KEY_S)
+				{
+					m_Camera.SetPosition(m_Camera.GetPosition() + glm::vec3(0.0f, -0.05f, 0.0f));
+				}
+				else if (event.GetKeyCode() == KBR_KEY_D)
+				{
+					m_Camera.SetPosition(m_Camera.GetPosition() + glm::vec3(0.05f, 0.0f, 0.0f));
+				}
+				else if (event.GetKeyCode() == KBR_KEY_Q)
+				{
+					m_Camera.SetRotation(m_Camera.GetRotation() + 1.0f);
+				}
+				else if (event.GetKeyCode() == KBR_KEY_E)
+				{
+					m_Camera.SetRotation(m_Camera.GetRotation() - 1.0f);
+				}
+			}
 		}
 	}
 
