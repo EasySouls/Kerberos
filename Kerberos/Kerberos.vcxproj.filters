@@ -19,6 +19,12 @@
     <Filter Include="Platform">
       <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Platform\D3D11">
+      <UniqueIdentifier>{96155E93-82E3-5199-6B77-C2BF57E42DFE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\DirectX11">
+      <UniqueIdentifier>{6EE5EAC0-5AC9-AB16-C329-A669AF2C9698}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Platform\OpenGL">
       <UniqueIdentifier>{1E7D2C1D-8A08-9AE1-9319-1DD6FF23F6E1}</UniqueIdentifier>
     </Filter>
@@ -100,6 +106,12 @@
     <ClInclude Include="src\Kerberos\Window.h">
       <Filter>Kerberos</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\D3D11\D3D11Context.h">
+      <Filter>Platform\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\DirectX11\DirectX11Context.h">
+      <Filter>Platform\DirectX11</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h">
       <Filter>Platform\OpenGL</Filter>
     </ClInclude>
@@ -162,6 +174,12 @@
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp">
       <Filter>Kerberos\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp">
+      <Filter>Platform\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\DirectX11\DirectX11Context.cpp">
+      <Filter>Platform\DirectX11</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp">
       <Filter>Platform\OpenGL</Filter>

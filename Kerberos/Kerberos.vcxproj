@@ -172,6 +172,7 @@
     <ClInclude Include="src\Kerberos\Renderer\VertexArray.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11Context.h" />
+    <ClInclude Include="src\Platform\DirectX11\DirectX11Context.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="src\Kerberos\Renderer\Shader.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp" />
+    <ClCompile Include="src\Platform\DirectX11\DirectX11Context.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
