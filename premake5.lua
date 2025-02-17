@@ -113,9 +113,9 @@ project "Kerberos"
 			"odbccp32.lib",
 			"Vulkan",
 			"VulkanUtils"]]--
-			"d3d11",
-			"dxgi",
-			"d3dcompiler"
+			"d3d11.lib",
+			"dxgi.lib",
+			"d3dcompiler.lib"
 		}
 		
 	filter "configurations:Debug"

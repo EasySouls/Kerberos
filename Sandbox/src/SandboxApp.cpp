@@ -1,7 +1,9 @@
 #include <Kerberos.h>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.inl>
 
 #include "imgui/imgui.h"
+#include "Platform/OpenGL/OpenGLShader.h"
 
 class ExampleLayer : public Kerberos::Layer
 {
@@ -91,7 +93,7 @@ public:
 			}
 		)";
 
-		m_Shader.reset(new Kerberos::Shader(vertexSrc, fragmentSrc));
+		m_Shader.reset(Kerberos::Shader::Create(vertexSrc, fragmentSrc));
 
 		const std::string blueShaderVertexSrc = R"(
 			#version 330 core
@@ -114,18 +116,23 @@ public:
 			#version 330 core
 			
 			layout(location = 0) out vec4 color;
+
+			uniform vec4 u_Color;
+
 			in vec3 v_Position;
+
 			void main()
 			{
-				color = vec4(0.2, 0.3, 0.8, 1.0);
+				color = u_Color;
 			}
 		)";
-		m_BlueShader.reset(new Kerberos::Shader(blueShaderVertexSrc, blueShaderFragmentSrc));
+		m_FlatColorShader.reset(Kerberos::Shader::Create(blueShaderVertexSrc, blueShaderFragmentSrc));
 	}
 
 	void OnUpdate(const Kerberos::Timestep deltaTime) override
 	{
-		KBR_TRACE("Delta time: {0}s ({1}ms)", deltaTime.GetSeconds(), deltaTime.GetMilliseconds());
+		m_Fps = static_cast<float>(1) / deltaTime;
+		//KBR_TRACE("Delta time: {0}s ({1}ms)", deltaTime.GetSeconds(), deltaTime.GetMilliseconds());
 
 		/// Move the camera in the x axis
 		if (Kerberos::Input::IsKeyPressed(KBR_KEY_A))
@@ -165,9 +172,12 @@ public:
 
 		Kerberos::Renderer::BeginScene(m_Camera);
 
+		m_FlatColorShader->Bind();
+		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat4("u_Color", m_SquareColor);
+
 		const glm::mat4 transform = glm::translate({ 1.0f }, m_SquarePosition);
 
-		Kerberos::Renderer::Submit(m_BlueShader, m_SquareVA, transform);
+		Kerberos::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
 		Kerberos::Renderer::Submit(m_Shader, m_VertexArray);
 
 		Kerberos::Renderer::EndScene();
@@ -175,6 +185,16 @@ public:
 
 	void OnImGuiRender() override
 	{
+		ImGui::Begin("Frame Data");
+		ImGui::Text("FPS: %f", m_Fps);
+		ImGui::Text("Camera Position: x=%f, y=%f, z=%f", m_CameraPosition.x, m_CameraPosition.y, m_CameraPosition.z);
+		ImGui::Text("Camera Rotation: %f", m_CameraRotation);
+		ImGui::Text("Square Position: x=%f, y=%f, z=%f", m_SquarePosition.x, m_SquarePosition.y, m_SquarePosition.z);
+		ImGui::End();
+
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
+		ImGui::End();
 	}
 
 	void OnEvent(Kerberos::Event& event) override
@@ -193,8 +213,10 @@ public:
 private:
 	std::shared_ptr<Kerberos::Shader> m_Shader;
 	std::shared_ptr<Kerberos::VertexArray> m_VertexArray;
-	std::shared_ptr<Kerberos::Shader> m_BlueShader;
+	std::shared_ptr<Kerberos::Shader> m_FlatColorShader;
 	std::shared_ptr<Kerberos::VertexArray> m_SquareVA;
+
+	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 
 	Kerberos::OrthographicCamera m_Camera;
 	glm::vec3 m_CameraPosition;
@@ -205,6 +227,8 @@ private:
 
 	glm::vec3 m_SquarePosition;
 	float m_SquareMoveSpeed = 3.0f;
+
+	float m_Fps = 0;
 };
 
 class Sandbox : public Kerberos::Application
@@ -215,7 +239,7 @@ public:
 		PushLayer(new ExampleLayer());
 	}
 
-	~Sandbox() = default;
+	~Sandbox() override = default;
 };
 
 Kerberos::Application* Kerberos::CreateApplication()
