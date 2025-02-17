@@ -77,6 +77,46 @@ project "Kerberos"
 			"_WINDLL",
 			"IMGUI_DOCKING_BRANCH"
 		}
+
+		local windowsSdkDir = os.getenv("WindowsSdkDir")
+		print(windowsSdkDir)
+		if windowsSdkDir == nil then
+			windowsSdkDir = os.getenv("ProgramFiles(x86)") .. "/Windows Kits/10"
+		end
+
+		local windowsSdkIncludeDir = windowsSdkDir .. "/Include/10.0.22621.0/um"
+		local windowsSdkLibDir = windowsSdkDir .. "/Lib/10.0.22621.0/um/x64"
+
+		includedirs
+		{
+			windowsSdkIncludeDir
+		}
+
+		libdirs
+		{
+			windowsSdkLibDir
+		}
+
+		links
+		{
+			--[["User32.lib",
+			"kernel32.lib",
+			"gdi32.lib",
+			"winspool.lib",
+			"comdlg32.lib",
+			"advapi32.lib",
+			"shell32.lib",
+			"ole32.lib",
+			"oleaut32.lib",
+			"uuid.lib",
+			"odbc32.lib",
+			"odbccp32.lib",
+			"Vulkan",
+			"VulkanUtils"]]--
+			"d3d11",
+			"dxgi",
+			"d3dcompiler"
+		}
 		
 	filter "configurations:Debug"
 		defines "KBR_DEBUG"
