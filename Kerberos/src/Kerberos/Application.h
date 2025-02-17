@@ -4,9 +4,7 @@
 #include "ImGui/ImGuiLayer.h"
 #include "Kerberos/LayerStack.h"
 #include "Kerberos/Events/ApplicationEvent.h"
-#include "Kerberos/Renderer/Shader.h"
 #include "Kerberos/Renderer/VertexArray.h"
-#include "Kerberos/Renderer/OrthographicCamera.h"
 
 namespace Kerberos
 {
@@ -32,13 +30,6 @@ namespace Kerberos
 		std::unique_ptr<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
-
-		std::shared_ptr<Shader> m_Shader;
-		std::shared_ptr<VertexArray> m_VertexArray;
-		std::shared_ptr<Shader> m_BlueShader;
-		std::shared_ptr<VertexArray> m_SquareVA;
-
-		OrthographicCamera m_Camera;
 
 		static Application* s_Instance;
 	};

@@ -18,3 +18,4 @@
 #endif
 
 #define KBR_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+#define KBR_BIND_FN(fn) [this]<typename T0>(T0&& PH1) { return fn(std::forward<T0>(PH1)); }
