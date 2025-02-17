@@ -1,4 +1,5 @@
 #include <Kerberos.h>
+#include <glm/ext/matrix_transform.hpp>
 
 #include "imgui/imgui.h"
 
@@ -6,7 +7,7 @@ class ExampleLayer : public Kerberos::Layer
 {
 public:
 	ExampleLayer()
-		: Layer("Example"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPosition(0.0f)
+		: Layer("Example"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPosition(0.0f), m_SquarePosition(0.0f)
 	{
 		m_VertexArray.reset(Kerberos::VertexArray::Create());
 
@@ -65,6 +66,7 @@ public:
 			layout(location=1) in vec4 a_Color;
 
 			uniform mat4 u_ViewProjection;
+			uniform mat4 u_Transform;
 
 			out vec3 v_Pos;
 			out vec4 v_Color;
@@ -72,7 +74,7 @@ public:
 			void main() {
 				v_Pos = a_Pos;
 				v_Color = a_Color;
-				gl_Position = u_ViewProjection * vec4(a_Pos, 1.0);
+				gl_Position = u_ViewProjection * u_Transform * vec4(a_Pos, 1.0);
 			}
 		)";
 
@@ -97,13 +99,14 @@ public:
 			layout(location = 0) in vec3 a_Position;
 
 			uniform mat4 u_ViewProjection;
+			uniform mat4 u_Transform;
 
 			out vec3 v_Position;
 
 			void main()
 			{
 				v_Position = a_Position;
-				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);	
+				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);	
 			}
 		)";
 
@@ -120,24 +123,39 @@ public:
 		m_BlueShader.reset(new Kerberos::Shader(blueShaderVertexSrc, blueShaderFragmentSrc));
 	}
 
-	void OnUpdate(Kerberos::Timestep deltaTime) override
+	void OnUpdate(const Kerberos::Timestep deltaTime) override
 	{
 		KBR_TRACE("Delta time: {0}s ({1}ms)", deltaTime.GetSeconds(), deltaTime.GetMilliseconds());
 
+		/// Move the camera in the x axis
 		if (Kerberos::Input::IsKeyPressed(KBR_KEY_A))
 			m_CameraPosition.x -= m_CameraMoveSpeed * deltaTime;
 		else if (Kerberos::Input::IsKeyPressed(KBR_KEY_D))
 			m_CameraPosition.x += m_CameraMoveSpeed * deltaTime;
 
+		/// Move the camera in the y axis
 		if (Kerberos::Input::IsKeyPressed(KBR_KEY_W))
 			m_CameraPosition.y += m_CameraMoveSpeed * deltaTime;
 		else if (Kerberos::Input::IsKeyPressed(KBR_KEY_S))
 			m_CameraPosition.y -= m_CameraMoveSpeed * deltaTime;
 
+		/// Rotate the camera
 		if (Kerberos::Input::IsKeyPressed(KBR_KEY_Q))
 			m_CameraRotation += m_CameraRotationSpeed * deltaTime;
 		else if (Kerberos::Input::IsKeyPressed(KBR_KEY_E))
 			m_CameraRotation -= m_CameraRotationSpeed * deltaTime;
+
+		/// Move the square in the x axis
+		if (Kerberos::Input::IsKeyPressed(KBR_KEY_H))
+			m_SquarePosition.x -= m_SquareMoveSpeed * deltaTime;
+		else if (Kerberos::Input::IsKeyPressed(KBR_KEY_K))
+			m_SquarePosition.x += m_SquareMoveSpeed * deltaTime;
+
+		/// Move the square in the y axis
+		if (Kerberos::Input::IsKeyPressed(KBR_KEY_U))
+			m_SquarePosition.y += m_SquareMoveSpeed * deltaTime;
+		else if (Kerberos::Input::IsKeyPressed(KBR_KEY_J))
+			m_SquarePosition.y -= m_SquareMoveSpeed * deltaTime;
 
 		Kerberos::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Kerberos::RenderCommand::Clear();
@@ -147,7 +165,9 @@ public:
 
 		Kerberos::Renderer::BeginScene(m_Camera);
 
-		Kerberos::Renderer::Submit(m_BlueShader, m_SquareVA);
+		const glm::mat4 transform = glm::translate({ 1.0f }, m_SquarePosition);
+
+		Kerberos::Renderer::Submit(m_BlueShader, m_SquareVA, transform);
 		Kerberos::Renderer::Submit(m_Shader, m_VertexArray);
 
 		Kerberos::Renderer::EndScene();
@@ -182,6 +202,9 @@ private:
 
 	float m_CameraMoveSpeed = 1.0f;
 	float m_CameraRotationSpeed = 45.0f;
+
+	glm::vec3 m_SquarePosition;
+	float m_SquareMoveSpeed = 3.0f;
 };
 
 class Sandbox : public Kerberos::Application

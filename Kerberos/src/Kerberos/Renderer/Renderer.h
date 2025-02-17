@@ -17,7 +17,8 @@ namespace Kerberos
 		/// </summary>
 		/// <param name="shader">The shader to use when rendering</param>
 		/// <param name="vertexArray">The vertex array to draw with</param>
-		static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray);
+		/// <param name="transform">The transformation matrix to apply to the vertex array</param>
+		static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
 
 		static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }	
 
