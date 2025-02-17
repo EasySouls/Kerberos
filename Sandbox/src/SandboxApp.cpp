@@ -19,7 +19,7 @@ public:
 			 0.0f,  0.5f, 0.0f, 0.9f, 0.3f, 1.0f, 1.0f,
 		};
 
-		std::shared_ptr<Kerberos::VertexBuffer> vertexBuffer;
+		Kerberos::Ref<Kerberos::VertexBuffer> vertexBuffer;
 		vertexBuffer.reset(Kerberos::VertexBuffer::Create(vertices, sizeof(vertices)));
 
 		Kerberos::BufferLayout layout = {
@@ -32,7 +32,7 @@ public:
 
 		constexpr uint32_t indices[3] = { 0, 1, 2 };
 
-		std::shared_ptr<Kerberos::IndexBuffer> indexBuffer;
+		Kerberos::Ref<Kerberos::IndexBuffer> indexBuffer;
 		indexBuffer.reset(Kerberos::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
@@ -45,7 +45,7 @@ public:
 			   -0.75f,  0.75f, 0.0f
 		};
 
-		std::shared_ptr<Kerberos::VertexBuffer> squareVB;
+		Kerberos::Ref<Kerberos::VertexBuffer> squareVB;
 		squareVB.reset(Kerberos::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
 
 		squareVB->SetLayout({
@@ -56,7 +56,7 @@ public:
 
 		constexpr uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
 
-		std::shared_ptr<Kerberos::IndexBuffer> squareIB;
+		Kerberos::Ref<Kerberos::IndexBuffer> squareIB;
 		squareIB.reset(Kerberos::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
 
 		m_SquareVA->SetIndexBuffer(squareIB);
@@ -211,10 +211,10 @@ public:
 	}
 
 private:
-	std::shared_ptr<Kerberos::Shader> m_Shader;
-	std::shared_ptr<Kerberos::VertexArray> m_VertexArray;
-	std::shared_ptr<Kerberos::Shader> m_FlatColorShader;
-	std::shared_ptr<Kerberos::VertexArray> m_SquareVA;
+	Kerberos::Ref<Kerberos::Shader> m_Shader;
+	Kerberos::Ref<Kerberos::VertexArray> m_VertexArray;
+	Kerberos::Ref<Kerberos::Shader> m_FlatColorShader;
+	Kerberos::Ref<Kerberos::VertexArray> m_SquareVA;
 
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 

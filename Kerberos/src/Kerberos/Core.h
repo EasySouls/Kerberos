@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #ifdef KBR_PLATFORM_WINDOWS
 #else
 	#error Kerberos only supports Windows
@@ -19,3 +21,12 @@
 
 #define KBR_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
 #define KBR_BIND_FN(fn) [this]<typename T0>(T0&& PH1) { return fn(std::forward<T0>(PH1)); }
+
+namespace Kerberos
+{
+	template<typename T>
+	using Scope = std::unique_ptr<T>;
+
+	template<typename T>
+	using Ref = std::shared_ptr<T>;
+}

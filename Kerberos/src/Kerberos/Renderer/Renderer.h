@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Kerberos/Core.h"
 #include "RenderCommand.h"
 #include "OrthographicCamera.h"
 #include "Shader.h"
@@ -18,7 +19,7 @@ namespace Kerberos
 		/// <param name="shader">The shader to use when rendering</param>
 		/// <param name="vertexArray">The vertex array to draw with</param>
 		/// <param name="transform">The transformation matrix to apply to the vertex array</param>
-		static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
+		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
 
 		static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }	
 
