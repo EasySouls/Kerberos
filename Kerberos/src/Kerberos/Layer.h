@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Kerberos/Events/Event.h"
+#include "Kerberos/Core/Timestep.h"
 
 namespace Kerberos
 {
@@ -12,7 +13,7 @@ namespace Kerberos
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(Timestep deltaTime) {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 

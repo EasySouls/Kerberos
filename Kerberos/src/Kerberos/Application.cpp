@@ -5,6 +5,8 @@
 #include "Kerberos/Core.h"
 #include "Kerberos/Renderer/Renderer.h"
 
+#include <GLFW/glfw3.h>
+
 namespace Kerberos
 {
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
@@ -29,8 +31,13 @@ namespace Kerberos
 	{
 		while (m_Running)
 		{
+			// TODO: Move this to platform specific code
+			const float time = static_cast<float>(glfwGetTime());
+			const Timestep deltaTime = time - m_LastFrameTime;
+			m_LastFrameTime = time;
+
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate();
+				layer->OnUpdate(deltaTime);
 
 			// TODO: Execute this on the render thread
 			m_ImGuiLayer->Begin();

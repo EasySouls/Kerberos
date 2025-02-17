@@ -7,6 +7,8 @@
 #include "Kerberos/Log.h"
 #include "Kerberos/Layer.h"
 
+#include "Kerberos/Core/Timestep.h"
+
 #include "Kerberos/ImGui/ImGuiLayer.h"
 
 /// ---- Events ---------------------

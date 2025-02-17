@@ -5,6 +5,7 @@
 #include "Kerberos/LayerStack.h"
 #include "Kerberos/Events/ApplicationEvent.h"
 #include "Kerberos/Renderer/VertexArray.h"
+#include "Kerberos/Core/Timestep.h"
 
 namespace Kerberos
 {
@@ -26,7 +27,10 @@ namespace Kerberos
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& e);
 
+	private:
 		bool m_Running = true;
+		float m_LastFrameTime = 0;;
+
 		std::unique_ptr<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;

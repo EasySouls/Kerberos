@@ -120,22 +120,24 @@ public:
 		m_BlueShader.reset(new Kerberos::Shader(blueShaderVertexSrc, blueShaderFragmentSrc));
 	}
 
-	void OnUpdate() override
+	void OnUpdate(Kerberos::Timestep deltaTime) override
 	{
+		KBR_TRACE("Delta time: {0}s ({1}ms)", deltaTime.GetSeconds(), deltaTime.GetMilliseconds());
+
 		if (Kerberos::Input::IsKeyPressed(KBR_KEY_A))
-			m_CameraPosition.x -= m_CameraMoveSpeed;
+			m_CameraPosition.x -= m_CameraMoveSpeed * deltaTime;
 		else if (Kerberos::Input::IsKeyPressed(KBR_KEY_D))
-			m_CameraPosition.x += m_CameraMoveSpeed;
+			m_CameraPosition.x += m_CameraMoveSpeed * deltaTime;
 
 		if (Kerberos::Input::IsKeyPressed(KBR_KEY_W))
-			m_CameraPosition.y += m_CameraMoveSpeed;
+			m_CameraPosition.y += m_CameraMoveSpeed * deltaTime;
 		else if (Kerberos::Input::IsKeyPressed(KBR_KEY_S))
-			m_CameraPosition.y -= m_CameraMoveSpeed;
+			m_CameraPosition.y -= m_CameraMoveSpeed * deltaTime;
 
 		if (Kerberos::Input::IsKeyPressed(KBR_KEY_Q))
-			m_CameraRotation += m_CameraRotationSpeed;
+			m_CameraRotation += m_CameraRotationSpeed * deltaTime;
 		else if (Kerberos::Input::IsKeyPressed(KBR_KEY_E))
-			m_CameraRotation -= m_CameraRotationSpeed;
+			m_CameraRotation -= m_CameraRotationSpeed * deltaTime;
 
 		Kerberos::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Kerberos::RenderCommand::Clear();
@@ -178,8 +180,8 @@ private:
 	glm::vec3 m_CameraPosition;
 	float m_CameraRotation = 0.0f;
 
-	float m_CameraMoveSpeed = 0.1f;
-	float m_CameraRotationSpeed = 10.0f;
+	float m_CameraMoveSpeed = 1.0f;
+	float m_CameraRotationSpeed = 45.0f;
 };
 
 class Sandbox : public Kerberos::Application
