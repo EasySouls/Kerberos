@@ -1,207 +1,240 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Kerberos">
-      <UniqueIdentifier>{226FC922-0E3C-242E-3755-12D6238159BC}</UniqueIdentifier>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Kerberos\Core">
-      <UniqueIdentifier>{BA58CF87-2619-4BBE-EF53-943B5BD38F9A}</UniqueIdentifier>
+    <Filter Include="src\Kerberos">
+      <UniqueIdentifier>{19724353-05D5-D2F7-AE5A-0BAE9A9C9E7A}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Kerberos\Events">
-      <UniqueIdentifier>{C6802ABE-320C-9882-3B1D-1B77A727F482}</UniqueIdentifier>
+    <Filter Include="src\Kerberos\Core">
+      <UniqueIdentifier>{11CE04FF-7DE4-0295-C65B-8EB632B1D31C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Kerberos\ImGui">
-      <UniqueIdentifier>{CC352582-B803-1988-A197-89AE8D04F5EC}</UniqueIdentifier>
+    <Filter Include="src\Kerberos\Events">
+      <UniqueIdentifier>{DDA792D8-4909-70E6-D276-B6983ED7A6A5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Kerberos\Renderer">
-      <UniqueIdentifier>{08D9C8E9-74EF-C67F-BD66-52A129BC9707}</UniqueIdentifier>
+    <Filter Include="src\Kerberos\ImGui">
+      <UniqueIdentifier>{035609E0-EF39-CA35-589A-C488449DB4B7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Platform">
-      <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
+    <Filter Include="src\Kerberos\Renderer">
+      <UniqueIdentifier>{DF21D73E-4B8E-9239-1482-2A9780ADB4A1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Platform\D3D11">
-      <UniqueIdentifier>{96155E93-82E3-5199-6B77-C2BF57E42DFE}</UniqueIdentifier>
+    <Filter Include="src\Platform">
+      <UniqueIdentifier>{21CA02E5-0D2D-9289-B6B2-CA3FA2F45D0C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Platform\DirectX11">
-      <UniqueIdentifier>{6EE5EAC0-5AC9-AB16-C329-A669AF2C9698}</UniqueIdentifier>
+    <Filter Include="src\Platform\D3D11">
+      <UniqueIdentifier>{CD3542F1-B919-0347-227A-FD990E7DEDC8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Platform\OpenGL">
-      <UniqueIdentifier>{1E7D2C1D-8A08-9AE1-9319-1DD6FF23F6E1}</UniqueIdentifier>
+    <Filter Include="src\Platform\DirectX11">
+      <UniqueIdentifier>{2549C2B7-1143-EB09-FAAF-811AE6485176}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Platform\Windows">
-      <UniqueIdentifier>{64FBD71A-50F4-F66C-7926-DCF1657ED678}</UniqueIdentifier>
+    <Filter Include="src\Platform\OpenGL">
+      <UniqueIdentifier>{35A49437-A105-7245-2A73-B8F796D3A804}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Platform\Windows">
+      <UniqueIdentifier>{5B054582-4794-CE4B-F0B2-E246DC20DFF1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor">
+      <UniqueIdentifier>{B3738122-9F15-ACF8-88D0-BF4C74113349}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\stb_image">
+      <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Kerberos.h" />
+    <ClInclude Include="src\Kerberos.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Application.h">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Core.h">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Core\Timestep.h">
-      <Filter>Kerberos\Core</Filter>
+      <Filter>src\Kerberos\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\EntryPoint.h">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Events\ApplicationEvent.h">
-      <Filter>Kerberos\Events</Filter>
+      <Filter>src\Kerberos\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Events\Event.h">
-      <Filter>Kerberos\Events</Filter>
+      <Filter>src\Kerberos\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Events\KeyEvent.h">
-      <Filter>Kerberos\Events</Filter>
+      <Filter>src\Kerberos\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Events\MouseEvent.h">
-      <Filter>Kerberos\Events</Filter>
+      <Filter>src\Kerberos\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\ImGui\ImGuiLayer.h">
-      <Filter>Kerberos\ImGui</Filter>
+      <Filter>src\Kerberos\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Input.h">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\KeyCodes.h">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Layer.h">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\LayerStack.h">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Log.h">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\MouseButtonCodes.h">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\GraphicsContext.h">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\OrthographicCamera.h">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\RenderCommand.h">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Renderer.h">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\RendererAPI.h">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Shader.h">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Texture.h">
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\VertexArray.h">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Window.h">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\D3D11\D3D11Context.h">
-      <Filter>Platform\D3D11</Filter>
+      <Filter>src\Platform\D3D11</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\DirectX11\DirectX11Context.h">
-      <Filter>Platform\DirectX11</Filter>
+      <Filter>src\Platform\DirectX11</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h">
-      <Filter>Platform\OpenGL</Filter>
+      <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h">
-      <Filter>Platform\OpenGL</Filter>
+      <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h">
-      <Filter>Platform\OpenGL</Filter>
+      <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h">
-      <Filter>Platform\OpenGL</Filter>
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h">
+      <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h">
-      <Filter>Platform\OpenGL</Filter>
+      <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsInput.h">
-      <Filter>Platform\Windows</Filter>
+      <Filter>src\Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
-      <Filter>Platform\Windows</Filter>
+      <Filter>src\Platform\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="src\kbrpch.h" />
+    <ClInclude Include="src\kbrpch.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\stb_image\stb_image.h">
+      <Filter>vendor\stb_image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp">
-      <Filter>Kerberos\ImGui</Filter>
+      <Filter>src\Kerberos\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp">
-      <Filter>Kerberos\ImGui</Filter>
+      <Filter>src\Kerberos\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Layer.cpp">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\LayerStack.cpp">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Log.cpp">
-      <Filter>Kerberos</Filter>
+      <Filter>src\Kerberos</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Buffer.cpp">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\OrthographicCamera.cpp">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\RenderCommand.cpp">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Renderer.cpp">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\RendererAPI.cpp">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Shader.cpp">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Renderer\Texture.cpp">
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp">
-      <Filter>Kerberos\Renderer</Filter>
+      <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp">
-      <Filter>Platform\D3D11</Filter>
+      <Filter>src\Platform\D3D11</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\DirectX11\DirectX11Context.cpp">
-      <Filter>Platform\DirectX11</Filter>
+      <Filter>src\Platform\DirectX11</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp">
-      <Filter>Platform\OpenGL</Filter>
+      <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp">
-      <Filter>Platform\OpenGL</Filter>
+      <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp">
-      <Filter>Platform\OpenGL</Filter>
+      <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp">
-      <Filter>Platform\OpenGL</Filter>
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp">
-      <Filter>Platform\OpenGL</Filter>
+      <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
-      <Filter>Platform\Windows</Filter>
+      <Filter>src\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
-      <Filter>Platform\Windows</Filter>
+      <Filter>src\Platform\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="src\kbrpch.cpp" />
+    <ClCompile Include="src\kbrpch.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\stb_image\stb_image.cpp">
+      <Filter>vendor\stb_image</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

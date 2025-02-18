@@ -14,6 +14,7 @@ IncludeDir["GLFW"] = "%{wks.location}/Kerberos/vendor/GLFW/include"
 IncludeDir["Glad"] = "%{wks.location}/Kerberos/vendor/glad/include"
 IncludeDir["ImGui"] = "%{wks.location}/Kerberos/vendor/imgui"
 IncludeDir["glm"] = "%{wks.location}/Kerberos/vendor/glm"
+IncludeDir["stb_image"] = "%{wks.location}/Kerberos/vendor/stb_image"
 IncludeDir["VulkanSDK"] = "%{VULKAN_DIR}/Include"
 
 LibraryDir = {}
@@ -46,6 +47,9 @@ project "Kerberos"
 	{
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
+
+		"%{prj.name}/vendor/stb_image/**.h",
+		"%{prj.name}/vendor/stb_image/**.cpp"
 	}
 	
 	includedirs
@@ -56,6 +60,7 @@ project "Kerberos"
 		IncludeDir.Glad,
 		IncludeDir.ImGui,
 		IncludeDir.glm,
+		IncludeDir.stb_image,
 		IncludeDir.VulkanSDK
 	}
 

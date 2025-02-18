@@ -38,19 +38,21 @@ public:
 
 		m_SquareVA.reset(Kerberos::VertexArray::Create());
 
-		constexpr float squareVertices[3 * 4] = {
-			   -0.75f, -0.75f, 0.0f,
-				0.75f, -0.75f, 0.0f,
-				0.75f,  0.75f, 0.0f,
-			   -0.75f,  0.75f, 0.0f
+		/// 3 positions, 2 texture coordinates
+		constexpr float squareVertices[5 * 4] = {
+			   -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+				0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+				0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			   -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 		};
 
 		Kerberos::Ref<Kerberos::VertexBuffer> squareVB;
 		squareVB.reset(Kerberos::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
 
 		squareVB->SetLayout({
-			{ Kerberos::ShaderDataType::Float3, "a_Position" }
-			});
+			{ Kerberos::ShaderDataType::Float3, "a_Position" },
+			{ Kerberos::ShaderDataType::Float2, "a_TexCoord" }
+		});
 
 		m_SquareVA->AddVertexBuffer(squareVB);
 
@@ -95,7 +97,7 @@ public:
 
 		m_Shader.reset(Kerberos::Shader::Create(vertexSrc, fragmentSrc));
 
-		const std::string blueShaderVertexSrc = R"(
+		const std::string flatColorShaderVertexSrc = R"(
 			#version 330 core
 			
 			layout(location = 0) in vec3 a_Position;
@@ -112,7 +114,7 @@ public:
 			}
 		)";
 
-		const std::string blueShaderFragmentSrc = R"(
+		const std::string flatColorShaderFragmentSrc = R"(
 			#version 330 core
 			
 			layout(location = 0) out vec4 color;
@@ -126,7 +128,47 @@ public:
 				color = u_Color;
 			}
 		)";
-		m_FlatColorShader.reset(Kerberos::Shader::Create(blueShaderVertexSrc, blueShaderFragmentSrc));
+
+		m_FlatColorShader.reset(Kerberos::Shader::Create(flatColorShaderVertexSrc, flatColorShaderFragmentSrc));
+
+		const std::string textureShaderVertexSrc = R"(
+			#version 330 core
+			
+			layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec2 a_TexCoord;
+
+			uniform mat4 u_ViewProjection;
+			uniform mat4 u_Transform;
+
+			out vec2 v_TexCoord;
+
+			void main()
+			{
+				v_TexCoord = a_TexCoord;
+				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);	
+			}
+		)";
+
+		const std::string textureShaderFragmentSrc = R"(
+			#version 330 core
+			
+			layout(location = 0) out vec4 color;
+
+			in vec2 v_TexCoord;
+
+			uniform sampler2D u_Texture;
+
+			void main()
+			{
+				color = texture(u_Texture, v_TexCoord);
+			}
+		)";
+
+		m_TextureShader.reset(Kerberos::Shader::Create(textureShaderVertexSrc, textureShaderFragmentSrc));
+
+		m_Texture = Kerberos::Texture2D::Create("assets/textures/y2k_ice_texture.png");
+		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_TextureShader)->Bind();
+		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(const Kerberos::Timestep deltaTime) override
@@ -172,13 +214,26 @@ public:
 
 		Kerberos::Renderer::BeginScene(m_Camera);
 
-		m_FlatColorShader->Bind();
+		const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_FlatColorShader)->Bind();
 		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat4("u_Color", m_SquareColor);
 
-		const glm::mat4 transform = glm::translate({ 1.0f }, m_SquarePosition);
+		for (size_t y = 0; y < 20; y++)
+		{
+			for (size_t x = 0; x < 20; x++)
+			{
+				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
+				Kerberos::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
+			}
+		}
 
-		Kerberos::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
-		Kerberos::Renderer::Submit(m_Shader, m_VertexArray);
+		m_Texture->Bind();
+		Kerberos::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+
+		// Triangle
+		//Kerberos::Renderer::Submit(m_Shader, m_VertexArray);
 
 		Kerberos::Renderer::EndScene();
 	}
@@ -213,8 +268,12 @@ public:
 private:
 	Kerberos::Ref<Kerberos::Shader> m_Shader;
 	Kerberos::Ref<Kerberos::VertexArray> m_VertexArray;
+
 	Kerberos::Ref<Kerberos::Shader> m_FlatColorShader;
+	Kerberos::Ref<Kerberos::Shader> m_TextureShader;
 	Kerberos::Ref<Kerberos::VertexArray> m_SquareVA;
+
+	Kerberos::Ref<Kerberos::Texture2D> m_Texture;
 
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 

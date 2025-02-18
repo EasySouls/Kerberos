@@ -24,6 +24,7 @@
 #include "Kerberos/Renderer/OrthographicCamera.h"
 #include "Kerberos/Renderer/Buffer.h"
 #include "Kerberos/Renderer/Shader.h"
+#include "Kerberos/Renderer/Texture.h"
 #include "Kerberos/Renderer/VertexArray.h"
 /// ---------------------------------
 
