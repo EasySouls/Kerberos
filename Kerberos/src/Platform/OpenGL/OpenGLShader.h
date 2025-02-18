@@ -1,14 +1,16 @@
 #pragma once
 
 #include "Kerberos/Renderer/Shader.h"
-
+#include <unordered_map>
 #include <glm/glm.hpp>
+
 
 namespace Kerberos
 {
 	class OpenGLShader : public Shader
 	{
 	public:
+		OpenGLShader(const std::string& filepath);
 		OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
 		~OpenGLShader() override;
 
@@ -24,6 +26,10 @@ namespace Kerberos
 
 		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const;
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const;
+	private:
+		std::string ReadFile(const std::string& filepath);
+		std::unordered_map<unsigned int, std::string> Preprocess(const std::string& shaderSource);
+		void Compile(const std::unordered_map<unsigned int, std::string>& shaderSources);
 	private:
 		uint32_t m_RendererID;
 	};
