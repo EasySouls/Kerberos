@@ -10,7 +10,13 @@ namespace Kerberos
 	class Renderer
 	{
 	public:
+		static void Init();
+
+		/**
+		* Transfers all the uniforms to the shaders
+		*/
 		static void BeginScene(const OrthographicCamera& camera);
+
 		static void EndScene();
 
 		/// <summary>

@@ -11,6 +11,10 @@ namespace Kerberos
 	class Application
 	{
 	public:
+
+		/**
+		 * Initializes the window, the renderer, and creates the ImGuiLayer.
+		 */
 		Application();
 		virtual ~Application();
 

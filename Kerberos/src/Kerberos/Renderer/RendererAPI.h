@@ -17,6 +17,8 @@ namespace Kerberos
 			Vulkan = 2
 		};
 
+		virtual void Init() = 0;
+
 		virtual void SetClearColor(const glm::vec4& color) = 0;
 		virtual void Clear() = 0;
 

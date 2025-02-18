@@ -7,7 +7,11 @@ namespace Kerberos
 {
 	Renderer::SceneData* Renderer::s_SceneData = new SceneData;
 
-	/// Transfers all the uniforms to the shaders
+	void Renderer::Init() 
+	{
+		RenderCommand::Init();
+	}
+
 	void Renderer::BeginScene(const OrthographicCamera& camera)
 	{
 		s_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
