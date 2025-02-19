@@ -24,10 +24,11 @@ Library = {}
 Library["Vulkan"] = "%{LibraryDir.VulkanSDK}/vulkan-1.lib"
 Library["VulkanUtils"] = "%{LibraryDir.VulkanSDK}/VkLayer_utils.lib"
 
--- Include GLFW premake file
-include "Kerberos/vendor/GLFW"
-include "Kerberos/vendor/glad"
-include "Kerberos/vendor/imgui"
+group "Dependencies"
+	include "Kerberos/vendor/GLFW"
+	include "Kerberos/vendor/glad"
+	include "Kerberos/vendor/imgui"
+group ""
 
 project "Kerberos"
 	location "Kerberos"
@@ -71,6 +72,12 @@ project "Kerberos"
 		"ImGui",
 		"opengl32.lib"
 	}
+
+	defines {
+		"_CRT_SECURE_NO_WARNINGS",
+		"GLFW_INCLUDE_NONE",
+		"IMGUI_DOCKING_BRANCH"
+	}
 	
 	filter "system:windows"
 		systemversion "latest"
@@ -78,9 +85,7 @@ project "Kerberos"
 		defines
 		{
 			"KBR_PLATFORM_WINDOWS",
-			"GLFW_INCLUDE_NONE",
 			"_WINDLL",
-			"IMGUI_DOCKING_BRANCH"
 		}
 
 		local windowsSdkDir = os.getenv("WindowsSdkDir")
@@ -122,6 +127,9 @@ project "Kerberos"
 			"dxgi.lib",
 			"d3dcompiler.lib"
 		}
+
+		filter "system:linux"
+		systemversion "latest"
 		
 	filter "configurations:Debug"
 		defines "KBR_DEBUG"

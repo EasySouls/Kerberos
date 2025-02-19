@@ -123,6 +123,9 @@
     <ClInclude Include="src\Platform\D3D11\D3D11Context.h">
       <Filter>src\Platform\D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\D3D11\D3D11RendererAPI.h">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\DirectX11\DirectX11Context.h">
       <Filter>src\Platform\DirectX11</Filter>
     </ClInclude>
@@ -156,7 +159,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Platform\D3D11\D3D11RendererAPI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -204,6 +206,9 @@
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp">
       <Filter>src\Platform\D3D11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\D3D11\D3D11RendererAPI.cpp">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\DirectX11\DirectX11Context.cpp">
       <Filter>src\Platform\DirectX11</Filter>
     </ClCompile>
@@ -237,6 +242,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Platform\D3D11\D3D11RendererAPI.cpp" />
   </ItemGroup>
 </Project>
