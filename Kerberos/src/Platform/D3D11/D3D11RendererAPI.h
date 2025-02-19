@@ -1,10 +1,13 @@
 #pragma once
 
+#include "Kerberos/Core.h"
 #include "Kerberos/Renderer/RendererAPI.h"
+
+#include <d3d11.h>
 
 namespace Kerberos
 {
-	class D3DRendererAPI : public RendererAPI
+	class D3D11RendererAPI : public RendererAPI
 	{
 	public:
 		void Init() override;
@@ -13,5 +16,9 @@ namespace Kerberos
 		void Clear() override;
 
 		void DrawIndexed(const Ref<VertexArray>& vertexArray) override;
+	private:
+		Ref<ID3D11DeviceContext> m_Context;
+		Ref<ID3D11RenderTargetView> m_Target;
+		Ref<ID3D11DepthStencilView> m_DepthStencilView;
 	};
 }

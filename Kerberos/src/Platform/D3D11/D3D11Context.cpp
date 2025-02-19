@@ -12,10 +12,22 @@ namespace Kerberos
 
 	D3D11Context::~D3D11Context()
 	{
-		m_SwapChain->Release();
-		m_Device->Release();
-		m_DeviceContext->Release();
-		m_RenderTargetView->Release();
+		if (m_SwapChain)
+		{
+			m_SwapChain->Release();
+		}
+		if (m_Device)
+		{
+			m_Device->Release();
+		}
+		if (m_DeviceContext)
+		{
+			m_DeviceContext->Release();
+		}
+		if (m_RenderTargetView)
+		{
+			m_RenderTargetView->Release();
+		}
 	}
 
 	void D3D11Context::Init()
@@ -39,18 +51,21 @@ namespace Kerberos
 
 		constexpr UINT createDeviceFlags = 0;
 
+		D3D_FEATURE_LEVEL featureLevel;
+		constexpr D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
+
 		const HRESULT hr = D3D11CreateDeviceAndSwapChain(
 			nullptr,
 			D3D_DRIVER_TYPE_HARDWARE,
 			nullptr,
 			createDeviceFlags,
-			nullptr,
+			featureLevels,
 			0,
 			D3D11_SDK_VERSION,
 			&sd,
 			&m_SwapChain,
 			&m_Device,
-			nullptr,
+			&featureLevel,
 			&m_DeviceContext
 		);
 
@@ -59,10 +74,15 @@ namespace Kerberos
 			KBR_CORE_ERROR("Failed to create device and swap chain!");
 			return;
 		}
+
+		ID3D11Resource* backBuffer = nullptr;
+		m_SwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&backBuffer));
+		m_Device->CreateRenderTargetView(backBuffer, nullptr, &m_RenderTargetView);
+		backBuffer->Release();
 	}
 
 	void D3D11Context::SwapBuffers()
 	{
-		
+		m_SwapChain->Present(1, 0);
 	}
 }
