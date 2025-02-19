@@ -95,15 +95,15 @@ public:
 			}
 		)";
 
-		m_Shader.reset(Kerberos::Shader::Create(vertexSrc, fragmentSrc));
+		m_Shader = Kerberos::Shader::Create("basic", vertexSrc, fragmentSrc);
 
-		m_FlatColorShader.reset(Kerberos::Shader::Create("assets/shaders/flatcolor.glsl"));
+		m_FlatColorShader = Kerberos::Shader::Create("assets/shaders/flatcolor.glsl");
 
-		m_TextureShader.reset(Kerberos::Shader::Create("assets/shaders/texture.glsl"));
+		auto textureShader = m_ShaderLib.Load("assets/shaders/texture.glsl");
 
 		m_Texture = Kerberos::Texture2D::Create("assets/textures/y2k_ice_texture.png");
-		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_TextureShader)->Bind();
-		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
+		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(textureShader)->Bind();
+		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(const Kerberos::Timestep deltaTime) override
@@ -164,8 +164,9 @@ public:
 			}
 		}
 
+		auto textureShader = m_ShaderLib.Get("texture");
 		m_Texture->Bind();
-		Kerberos::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Kerberos::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		// Triangle
 		//Kerberos::Renderer::Submit(m_Shader, m_VertexArray);
@@ -201,11 +202,11 @@ public:
 	}
 
 private:
+	Kerberos::ShaderLibrary m_ShaderLib;
 	Kerberos::Ref<Kerberos::Shader> m_Shader;
 	Kerberos::Ref<Kerberos::VertexArray> m_VertexArray;
 
 	Kerberos::Ref<Kerberos::Shader> m_FlatColorShader;
-	Kerberos::Ref<Kerberos::Shader> m_TextureShader;
 	Kerberos::Ref<Kerberos::VertexArray> m_SquareVA;
 
 	Kerberos::Ref<Kerberos::Texture2D> m_Texture;

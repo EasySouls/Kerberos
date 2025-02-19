@@ -3,9 +3,11 @@
 
 #include "Kerberos/Core.h"
 
-#include <glad/glad.h>
 #include <fstream>
+#include <filesystem>
 #include <glm/gtc/type_ptr.hpp>
+#include <glad/glad.h>
+
 
 namespace Kerberos
 {
@@ -24,9 +26,13 @@ namespace Kerberos
 		const std::string source = ReadFile(filepath);
 		const auto shaderSources = Preprocess(source);
 		Compile(shaderSources);
+
+		const std::filesystem::path path = filepath;
+		m_Name = path.stem().string();
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
+	OpenGLShader::OpenGLShader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc)
+		: m_Name(std::move(name))
 	{
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
@@ -93,7 +99,7 @@ namespace Kerberos
 
 	std::string OpenGLShader::ReadFile(const std::string& filepath) 
 	{
-		std::ifstream in(filepath, std::ios::in, std::ios::binary);
+		std::ifstream in(filepath, std::ios::in | std::ios::binary);
 
 		if (!in)
 		{
@@ -146,9 +152,11 @@ namespace Kerberos
 	{
 		// Create a shader program
 		const GLuint program = glCreateProgram();
+		KBR_CORE_ASSERT(shaderSources.size() <= 2, "Only 2 shaders in a file is supported for now!");
 
-		std::vector<GLenum> glShaderIDs;
+		std::array<GLenum, 2> glShaderIDs;
 
+		int glShaderIDIndex = 0;
 		for (const auto& [shaderType, source] : shaderSources)
 		{
 			const GLuint shader = glCreateShader(shaderType);
@@ -178,7 +186,7 @@ namespace Kerberos
 			// Attach the shader to our program
 			glAttachShader(program, shader);
 
-			glShaderIDs.push_back(shader);
+			glShaderIDs[glShaderIDIndex++] = shader;
 		}
 
 		// Link our program
