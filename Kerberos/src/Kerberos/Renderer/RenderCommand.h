@@ -14,6 +14,9 @@ namespace Kerberos
 
 		inline static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray) { s_RendererAPI->DrawIndexed(vertexArray); }
 
+		//static void SetupRendererAPI() { s_RendererAPI = RendererAPI::Create(); }
+		static void SetupRendererAPI();
+
 	private:
 		static RendererAPI* s_RendererAPI;
 	};

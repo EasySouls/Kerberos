@@ -9,6 +9,7 @@ namespace Kerberos
 
 	void Renderer::Init() 
 	{
+		RenderCommand::SetupRendererAPI();
 		RenderCommand::Init();
 	}
 
