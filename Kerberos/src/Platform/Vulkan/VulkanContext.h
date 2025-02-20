@@ -1,0 +1,78 @@
+#pragma once
+
+#define GLFW_INCLUDE_VULKAN
+
+#include "Kerberos/Renderer/GraphicsContext.h"
+
+#include <optional>
+
+#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.h>
+
+namespace Kerberos
+{
+	class VulkanContext : public GraphicsContext
+	{
+	public:
+		struct QueueFamilyIndices
+		{
+			std::optional<uint32_t> graphicsFamily;
+			std::optional<uint32_t> presentFamily;
+
+			bool IsComplete() const
+			{
+				return graphicsFamily.has_value() && presentFamily.has_value();
+			}
+		};
+
+		struct SwapChainSupportDetails
+		{
+			VkSurfaceCapabilitiesKHR capabilities;
+			std::vector<VkSurfaceFormatKHR> formats;
+			std::vector<VkPresentModeKHR> presentModes;
+		};
+
+		VulkanContext(GLFWwindow* windowHandle);
+		~VulkanContext();
+
+		void Init() override;
+		void SwapBuffers() override;
+
+	private:
+		void CreateInstance();
+		void SetupDebugMessenger();
+		void CreateSurface();
+		void PickPhysicalDevice();
+		void CreateLogicalDevice();
+		void CreateSwapChain();
+
+		static std::vector<const char*> GetRequiredExtensions();
+		static bool CheckValidationLayerSupport();
+		static void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+		bool IsDeviceSuitable(VkPhysicalDevice device) const;
+		static bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
+		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) const;
+		SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device) const;
+
+		static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+		static VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const;
+
+	private:
+		GLFWwindow* m_WindowHandle;
+
+		VkInstance m_Instance = VK_NULL_HANDLE;
+		VkDebugUtilsMessengerEXT m_DebugMessenger = VK_NULL_HANDLE;
+		VkSurfaceKHR m_Surface = VK_NULL_HANDLE;
+		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
+		VkDevice m_Device = VK_NULL_HANDLE;
+
+		VkQueue m_GraphicsQueue = VK_NULL_HANDLE;
+		VkQueue m_PresentQueue = VK_NULL_HANDLE;
+
+		VkSwapchainKHR m_SwapChain = VK_NULL_HANDLE;
+		std::vector<VkImage> m_SwapChainImages;
+		VkFormat m_SwapChainImageFormat;
+		VkExtent2D m_SwapChainExtent;
+	};
+}
