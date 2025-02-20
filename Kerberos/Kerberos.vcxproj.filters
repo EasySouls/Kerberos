@@ -51,6 +51,9 @@
     <ClInclude Include="src\Kerberos\Core.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Core\Timer.h">
+      <Filter>src\Kerberos\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Core\Timestep.h">
       <Filter>src\Kerberos\Core</Filter>
     </ClInclude>
