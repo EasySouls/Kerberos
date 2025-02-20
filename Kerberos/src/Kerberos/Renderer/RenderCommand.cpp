@@ -3,6 +3,7 @@
 
 #include "RendererAPI.h"
 #include "Platform/OpenGL/OpenGLRendererAPI.h"
+#include "Platform/Vulkan/VulkanRendererAPI.h"
 
 namespace Kerberos
 {
@@ -10,8 +11,7 @@ namespace Kerberos
 
 	void RenderCommand::SetupRendererAPI()
 	{
-		const auto api = RendererAPI::GetAPI();
-		switch (api)
+		switch (const auto api = RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
@@ -20,8 +20,12 @@ namespace Kerberos
 			s_RendererAPI = new OpenGLRendererAPI();
 			return;
 		case RendererAPI::API::Vulkan:
-			KBR_CORE_ASSERT(false, "RendererAPI::Vulkan is currently not supported!");
+			{
+			const auto rendererApi = new VulkanRendererAPI();
+			rendererApi->SetupPipeline();
+			s_RendererAPI = rendererApi;
 			return;
+			}
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI in RenderCommand::SetupRendererAPI")

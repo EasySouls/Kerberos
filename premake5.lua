@@ -22,7 +22,6 @@ LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
 
 Library = {}
 Library["Vulkan"] = "%{LibraryDir.VulkanSDK}/vulkan-1.lib"
-Library["VulkanUtils"] = "%{LibraryDir.VulkanSDK}/VkLayer_utils.lib"
 
 group "Dependencies"
 	include "Kerberos/vendor/GLFW"
@@ -65,12 +64,18 @@ project "Kerberos"
 		IncludeDir.VulkanSDK
 	}
 
+	libdirs 
+	{
+		LibraryDir.VulkanSDK
+	}
+
 	links
 	{
 		"GLFW",
 		"Glad",
 		"ImGui",
-		"opengl32.lib"
+		"opengl32.lib",
+		Library.Vulkan,
 	}
 
 	defines {
@@ -120,15 +125,13 @@ project "Kerberos"
 			"oleaut32.lib",
 			"uuid.lib",
 			"odbc32.lib",
-			"odbccp32.lib",
-			"Vulkan",
-			"VulkanUtils"]]--
+			"odbccp32.lib"]]--
 			"d3d11.lib",
 			"dxgi.lib",
 			"d3dcompiler.lib"
 		}
 
-		filter "system:linux"
+	filter "system:linux"
 		systemversion "latest"
 		
 	filter "configurations:Debug"
