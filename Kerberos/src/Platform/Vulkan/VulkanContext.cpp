@@ -86,7 +86,7 @@ namespace Kerberos
 
 	void VulkanContext::SwapBuffers()
 	{
-		glfwSwapBuffers(m_WindowHandle);
+		// TODO: Implement
 	}
 
 	void VulkanContext::CreateInstance()
@@ -96,7 +96,7 @@ namespace Kerberos
 			throw std::runtime_error("validation layers requested, but not available!");
 		}
 
-		glfwMakeContextCurrent(m_WindowHandle);
+		//glfwMakeContextCurrent(m_WindowHandle);
 
 		VkApplicationInfo appInfo{};
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -104,7 +104,7 @@ namespace Kerberos
 		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.pEngineName = "Kerberos Engine";
 		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-		appInfo.apiVersion = VK_API_VERSION_1_4;
+		appInfo.apiVersion = VK_API_VERSION_1_0;
 
 		VkInstanceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -432,6 +432,15 @@ namespace Kerberos
 		{
 			details.formats.resize(formatCount);
 			vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_Surface, &formatCount, details.formats.data());
+		}
+
+		uint32_t presentModeCount;
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_Surface, &presentModeCount, nullptr);
+
+		if (presentModeCount != 0)
+		{
+			details.presentModes.resize(presentModeCount);
+			vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_Surface, &presentModeCount, details.presentModes.data());
 		}
 
 		return details;

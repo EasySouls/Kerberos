@@ -14,7 +14,7 @@ namespace Kerberos
 		{
 			None = 0, 
 			OpenGL = 1, 
-			Vulkan = 2
+			Vulkan = 2,
 		};
 
 		virtual void Init() = 0;

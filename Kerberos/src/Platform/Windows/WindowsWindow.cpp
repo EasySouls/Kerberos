@@ -5,7 +5,9 @@
 #include "Kerberos/Events/MouseEvent.h"
 #include "Kerberos/Events/KeyEvent.h"
 #include "Kerberos/Core.h"
+#include "Kerberos/Renderer/RendererAPI.h"
 #include "Platform/OpenGL/OpenGLContext.h"
+#include "Platform/Vulkan/VulkanContext.h"
 
 
 namespace Kerberos
@@ -50,9 +52,26 @@ namespace Kerberos
 			s_GLFWInitialized = true;
 		}
 
+		const auto context = RendererAPI::GetAPI();
+		if (context == RendererAPI::API::Vulkan)
+		{
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		}
+
 		m_Window = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Data.Title.c_str(), nullptr, nullptr);
 
-		m_Context = new OpenGLContext(m_Window);
+		switch (context)
+		{
+		case RendererAPI::API::None:
+			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			break;
+		case RendererAPI::API::OpenGL:
+			m_Context = new OpenGLContext(m_Window);
+			break;
+		case RendererAPI::API::Vulkan:
+			m_Context = new VulkanContext(m_Window);
+			break;
+		}
 		m_Context->Init();
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
@@ -166,6 +185,9 @@ namespace Kerberos
 
 	void WindowsWindow::SetVSync(const bool enabled) 
 	{
+		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+			return;
+
 		if (enabled)
 		{
 			glfwSwapInterval(1);

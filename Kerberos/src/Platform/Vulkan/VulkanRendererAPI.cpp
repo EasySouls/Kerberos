@@ -2,8 +2,6 @@
 
 #include "VulkanRendererAPI.h"
 
-#include <vulkan/vulkan.h>
-
 namespace Kerberos
 {
 	void VulkanRendererAPI::Init()
@@ -18,8 +16,6 @@ namespace Kerberos
 	void VulkanRendererAPI::SetClearColor(const glm::vec4& color)
 	{
 		// TODO: I am really not sure about this
-		VkCommandBuffer m_CommandBuffer = VK_NULL_HANDLE;
-		VkImage m_Image = VK_NULL_HANDLE;
 
 		VkClearValue clearValue;
 		clearValue.color = { { color.r, color.g, color.b, color.a } };
@@ -53,8 +49,6 @@ namespace Kerberos
 	void VulkanRendererAPI::Clear()
 	{
 		// TODO: I am really not sure about this
-
-		VkCommandBuffer m_CommandBuffer = VK_NULL_HANDLE;
 
 		std::vector<VkClearValue> clearValues(2);
 		clearValues[0].color = { { 0.2f, 0.4f, 0.6f, 1.0f } };
