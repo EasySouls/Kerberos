@@ -45,6 +45,7 @@ namespace Kerberos
 		void PickPhysicalDevice();
 		void CreateLogicalDevice();
 		void CreateSwapChain();
+		void CreateImageViews();
 
 		static std::vector<const char*> GetRequiredExtensions();
 		static bool CheckValidationLayerSupport();
@@ -74,5 +75,6 @@ namespace Kerberos
 		std::vector<VkImage> m_SwapChainImages;
 		VkFormat m_SwapChainImageFormat;
 		VkExtent2D m_SwapChainExtent;
+		std::vector<VkImageView> m_SwapChainImageViews;
 	};
 }
