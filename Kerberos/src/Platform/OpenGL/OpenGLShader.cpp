@@ -236,8 +236,6 @@ namespace Kerberos
 
 	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
-		GLuint program = glCreateProgram();
-
 		shaderc::Compiler compiler;
 		shaderc::CompileOptions options;
 		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
@@ -377,11 +375,11 @@ namespace Kerberos
 
 		glLinkProgram(program);
 
-		GLint isLinked = 0;
+		GLint isLinked;
 		glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
 		if (isLinked == GL_FALSE)
 		{
-			GLint maxLength = 0;
+			GLint maxLength;
 			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 
 			std::vector<GLchar> infoLog(maxLength);
@@ -391,7 +389,7 @@ namespace Kerberos
 			for (const auto id : shaderIDs)
 				glDeleteShader(id);
 
-			KBR_CORE_ERROR("{0}", infoLog.data());
+			KBR_CORE_ERROR("Shader linking failed ({0}):\n\t{1}", m_FilePath, infoLog.data());
 			KBR_CORE_ASSERT(false, "Shader link failure!");
 			return;
 		}
