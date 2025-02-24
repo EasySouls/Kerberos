@@ -263,7 +263,7 @@ namespace Kerberos
 
 				auto& data = shaderData[stage];
 				data.resize(size / sizeof(uint32_t));
-				in.read(reinterpret_cast<char*>(data.data()), size);
+				in.read(reinterpret_cast<char*>(data.data()), static_cast<std::streamsize>(size));
 			}
 			else
 			{
@@ -279,12 +279,12 @@ namespace Kerberos
 				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
 				if (out.is_open())
 				{
-					out.write(reinterpret_cast<const char*>(shaderData[stage].data()), shaderData[stage].size() * sizeof(uint32_t));
+					out.write(reinterpret_cast<const char*>(shaderData[stage].data()), static_cast<std::streamsize>(shaderData[stage].size() * sizeof(uint32_t)));
 				}
 				else
 				{
 					auto& data = shaderData[stage];
-					out.write(reinterpret_cast<char*>(data.data()), data.size() * sizeof(uint32_t));
+					out.write(reinterpret_cast<char*>(data.data()), static_cast<std::streamsize>(data.size() * sizeof(uint32_t)));
 					out.flush();
 					out.close();
 				}
