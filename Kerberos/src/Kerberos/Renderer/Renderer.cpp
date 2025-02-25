@@ -6,16 +6,22 @@
 namespace Kerberos
 {
 	Renderer::SceneData* Renderer::s_SceneData = new SceneData;
+	Ref<UniformBuffer> Renderer::s_CameraBuffer = nullptr;
 
 	void Renderer::Init() 
 	{
 		RenderCommand::SetupRendererAPI();
 		RenderCommand::Init();
+
+		s_CameraBuffer = UniformBuffer::Create(sizeof(SceneData), 0);
+		s_CameraBuffer->SetData(s_SceneData, sizeof(SceneData));
 	}
 
 	void Renderer::BeginScene(const OrthographicCamera& camera)
 	{
 		s_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+
+		s_CameraBuffer->SetData(&s_SceneData->ViewProjectionMatrix, sizeof(SceneData));
 	}
 
 	void Renderer::EndScene() 

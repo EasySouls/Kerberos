@@ -4,6 +4,7 @@
 #include "RenderCommand.h"
 #include "OrthographicCamera.h"
 #include "Shader.h"
+#include "UniformBuffer.h"
 
 namespace Kerberos
 {
@@ -36,5 +37,7 @@ namespace Kerberos
 		};
 
 		static SceneData* s_SceneData;
+
+		static Ref<UniformBuffer> s_CameraBuffer;
 	};
 }

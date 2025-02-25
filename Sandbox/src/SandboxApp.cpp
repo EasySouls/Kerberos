@@ -63,13 +63,15 @@ public:
 
 		m_SquareVA->SetIndexBuffer(squareIB);
 
-		//m_FlatColorShader = Kerberos::Shader::Create("assets/shaders/flatcolor.glsl");
+		m_FlatColorShader = Kerberos::Shader::Create("assets/shaders/flatcolor.glsl");
 
 		auto textureShader = m_ShaderLib.Load("assets/shaders/texture.glsl");
 
 		m_Texture = Kerberos::Texture2D::Create("assets/textures/y2k_ice_texture.png");
 		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(textureShader)->Bind();
 		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+
+
 	}
 
 	void OnUpdate(const Kerberos::Timestep deltaTime) override
@@ -115,27 +117,27 @@ public:
 
 		Kerberos::Renderer::BeginScene(m_Camera);
 
-		//const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+		const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-		//std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_FlatColorShader)->Bind();
-		//std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat4("u_Color", m_SquareColor);
+		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_FlatColorShader)->Bind();
+		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat4("u_Color", m_SquareColor);
 
-		//for (size_t y = 0; y < 20; y++)
-		//{
-		//	for (size_t x = 0; x < 20; x++)
-		//	{
-		//		glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
-		//		glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
-		//		Kerberos::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
-		//	}
-		//}
+		for (size_t y = 0; y < 20; y++)
+		{
+			for (size_t x = 0; x < 20; x++)
+			{
+				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
+				Kerberos::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
+			}
+		}
 
-		auto textureShader = m_ShaderLib.Get("texture");
+		const auto textureShader = m_ShaderLib.Get("texture");
 		m_Texture->Bind();
 		Kerberos::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		// Triangle
-		//Kerberos::Renderer::Submit(m_Shader, m_VertexArray);
+		/*Kerberos::Renderer::Submit(m_Shader, m_VertexArray);*/
 
 		Kerberos::Renderer::EndScene();
 	}
