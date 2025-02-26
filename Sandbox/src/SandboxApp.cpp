@@ -3,13 +3,14 @@
 #include <glm/gtc/type_ptr.inl>
 
 #include "imgui/imgui.h"
+#include "Kerberos/OrthographicCameraController.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
 class ExampleLayer : public Kerberos::Layer
 {
 public:
 	ExampleLayer()
-		: Layer("Example"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPosition(0.0f), m_SquarePosition(0.0f)
+		: Layer("Example"), m_CameraController(1280.0f / 720.0f), m_SquarePosition(0.0f)
 	{
 		m_VertexArray.reset(Kerberos::VertexArray::Create());
 
@@ -111,23 +112,7 @@ public:
 		m_Fps = static_cast<float>(1) / deltaTime;
 		//KBR_TRACE("Delta time: {0}s ({1}ms)", deltaTime.GetSeconds(), deltaTime.GetMilliseconds());
 
-		/// Move the camera in the x axis
-		if (Kerberos::Input::IsKeyPressed(KBR_KEY_A))
-			m_CameraPosition.x -= m_CameraMoveSpeed * deltaTime;
-		else if (Kerberos::Input::IsKeyPressed(KBR_KEY_D))
-			m_CameraPosition.x += m_CameraMoveSpeed * deltaTime;
-
-		/// Move the camera in the y axis
-		if (Kerberos::Input::IsKeyPressed(KBR_KEY_W))
-			m_CameraPosition.y += m_CameraMoveSpeed * deltaTime;
-		else if (Kerberos::Input::IsKeyPressed(KBR_KEY_S))
-			m_CameraPosition.y -= m_CameraMoveSpeed * deltaTime;
-
-		/// Rotate the camera
-		if (Kerberos::Input::IsKeyPressed(KBR_KEY_Q))
-			m_CameraRotation += m_CameraRotationSpeed * deltaTime;
-		else if (Kerberos::Input::IsKeyPressed(KBR_KEY_E))
-			m_CameraRotation -= m_CameraRotationSpeed * deltaTime;
+		m_CameraController.OnUpdate(deltaTime);
 
 		/// Move the square in the x axis
 		if (Kerberos::Input::IsKeyPressed(KBR_KEY_H))
@@ -144,10 +129,7 @@ public:
 		Kerberos::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Kerberos::RenderCommand::Clear();
 
-		m_Camera.SetPosition(m_CameraPosition);
-		m_Camera.SetRotation(m_CameraRotation);
-
-		Kerberos::Renderer::BeginScene(m_Camera);
+		Kerberos::Renderer::BeginScene(m_CameraController.GetCamera());
 
 		const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -164,7 +146,7 @@ public:
 			}
 		}
 
-		auto textureShader = m_ShaderLib.Get("texture");
+		const auto textureShader = m_ShaderLib.Get("texture");
 		m_Texture->Bind();
 		Kerberos::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
@@ -176,10 +158,12 @@ public:
 
 	void OnImGuiRender() override
 	{
+		const auto cam = m_CameraController.GetCamera();
+
 		ImGui::Begin("Frame Data");
 		ImGui::Text("FPS: %f", m_Fps);
-		ImGui::Text("Camera Position: x=%f, y=%f, z=%f", m_CameraPosition.x, m_CameraPosition.y, m_CameraPosition.z);
-		ImGui::Text("Camera Rotation: %f", m_CameraRotation);
+		ImGui::Text("Camera Position: x=%f, y=%f, z=%f", cam.GetPosition().x, cam.GetPosition().y, cam.GetPosition().z);
+		ImGui::Text("Camera Rotation: %f", cam.GetRotation());
 		ImGui::Text("Square Position: x=%f, y=%f, z=%f", m_SquarePosition.x, m_SquarePosition.y, m_SquarePosition.z);
 		ImGui::End();
 
@@ -190,6 +174,8 @@ public:
 
 	void OnEvent(Kerberos::Event& event) override
 	{
+		m_CameraController.OnEvent(event);
+
 		Kerberos::EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<Kerberos::KeyPressedEvent>(KBR_BIND_FN(OnKeyPressedEvent));
 	}
@@ -213,12 +199,7 @@ private:
 
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 
-	Kerberos::OrthographicCamera m_Camera;
-	glm::vec3 m_CameraPosition;
-	float m_CameraRotation = 0.0f;
-
-	float m_CameraMoveSpeed = 1.0f;
-	float m_CameraRotationSpeed = 45.0f;
+	Kerberos::OrthographicCameraController m_CameraController;
 
 	glm::vec3 m_SquarePosition;
 	float m_SquareMoveSpeed = 3.0f;
