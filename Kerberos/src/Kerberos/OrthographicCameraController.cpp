@@ -44,8 +44,8 @@ namespace Kerberos
 	void OrthographicCameraController::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<MouseScrolledEvent>(KBR_BIND_EVENT_FN(OrthographicCameraController::OnMouseScrolled));
-		dispatcher.Dispatch<WindowResizeEvent>(KBR_BIND_EVENT_FN(OrthographicCameraController::OnWindowResized));
+		dispatcher.Dispatch<MouseScrolledEvent>(KBR_BIND_FN(OrthographicCameraController::OnMouseScrolled));
+		dispatcher.Dispatch<WindowResizeEvent>(KBR_BIND_FN(OrthographicCameraController::OnWindowResized));
 	}
 
 	bool OrthographicCameraController::OnMouseScrolled(const MouseScrolledEvent& e)
