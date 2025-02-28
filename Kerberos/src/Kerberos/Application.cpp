@@ -38,10 +38,12 @@ namespace Kerberos
 			const Timestep deltaTime = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
-			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate(deltaTime);
-
 			// TODO: Execute this on the render thread
+			if (!m_Minimized)
+			{
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(deltaTime);
+			}
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
 				layer->OnImGuiRender();
@@ -55,6 +57,7 @@ namespace Kerberos
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClosed));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResize));
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
 		{
@@ -78,5 +81,19 @@ namespace Kerberos
 	{
 		m_Running = false;
 		return true;
+	}
+
+	bool Application::OnWindowResize(const WindowResizeEvent& e) 
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			m_Minimized = true;
+			return false;
+		}
+
+		m_Minimized = false;
+		Renderer::OnWindowResized(e.GetWidth(), e.GetHeight());
+
+		return false;
 	}
 }

@@ -25,14 +25,16 @@ namespace Kerberos
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
-		inline static Application& Get() { return *s_Instance; }
-		inline Window& GetWindow() const { return *m_Window; }
+		static Application& Get() { return *s_Instance; }
+		Window& GetWindow() const { return *m_Window; }
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& e);
+		bool OnWindowResize(const WindowResizeEvent& e);
 
 	private:
 		bool m_Running = true;
-		float m_LastFrameTime = 0;;
+		bool m_Minimized = false;
+		float m_LastFrameTime = 0;
 
 		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;

@@ -9,6 +9,8 @@ namespace Kerberos
 	public:
 		void Init() override;
 
+		void SetViewport(const uint32_t x, const uint32_t y, const uint32_t width, const uint32_t height) override;
+
 		void SetClearColor(const glm::vec4& color) override;
 		void Clear() override;
 

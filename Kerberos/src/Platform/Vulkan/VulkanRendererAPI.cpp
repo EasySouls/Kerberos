@@ -13,6 +13,20 @@ namespace Kerberos
 
 	}
 
+	void VulkanRendererAPI::SetViewport(const uint32_t x, const uint32_t y, const uint32_t width,
+		const uint32_t height) 
+	{
+		VkViewport viewport = {};
+		viewport.x = static_cast<float>(x);
+		viewport.y = static_cast<float>(y);
+		viewport.width = static_cast<float>(width);
+		viewport.height = static_cast<float>(height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+
+		vkCmdSetViewport(m_CommandBuffer, 0, 1, &viewport);
+	}
+
 	void VulkanRendererAPI::SetClearColor(const glm::vec4& color)
 	{
 		// TODO: I am really not sure about this

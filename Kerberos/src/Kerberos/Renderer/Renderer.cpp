@@ -7,10 +7,15 @@ namespace Kerberos
 {
 	Renderer::SceneData* Renderer::s_SceneData = new SceneData;
 
-	void Renderer::Init() 
+	void Renderer::Init()
 	{
 		RenderCommand::SetupRendererAPI();
 		RenderCommand::Init();
+	}
+
+	void Renderer::OnWindowResized(const uint32_t width, const uint32_t height)
+	{
+		RenderCommand::SetViewport(0, 0, width, height);
 	}
 
 	void Renderer::BeginScene(const OrthographicCamera& camera)
@@ -18,9 +23,9 @@ namespace Kerberos
 		s_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
 	}
 
-	void Renderer::EndScene() 
+	void Renderer::EndScene()
 	{
-	
+
 	}
 
 	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform)
