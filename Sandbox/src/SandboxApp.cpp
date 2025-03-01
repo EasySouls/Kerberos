@@ -1,7 +1,10 @@
 #include <Kerberos.h>
+#include <Kerberos/EntryPoint.h>
+
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.inl>
 
+#include "Sandbox2D.h"
 #include "imgui/imgui.h"
 #include "Kerberos/OrthographicCameraController.h"
 #include "Platform/OpenGL/OpenGLShader.h"
@@ -12,7 +15,7 @@ public:
 	ExampleLayer()
 		: Layer("Example"), m_CameraController(1280.0f / 720.0f), m_SquarePosition(0.0f)
 	{
-		m_VertexArray.reset(Kerberos::VertexArray::Create());
+		m_VertexArray = Kerberos::VertexArray::Create();
 
 		constexpr float vertices[3 * 7] = {
 			-0.5f, -0.5f, 0.0f, 0.9f, 0.3f, 1.0f, 1.0f,
@@ -37,7 +40,7 @@ public:
 		indexBuffer.reset(Kerberos::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
-		m_SquareVA.reset(Kerberos::VertexArray::Create());
+		m_SquareVA = Kerberos::VertexArray::Create();
 
 		/// 3 positions, 2 texture coordinates
 		constexpr float squareVertices[5 * 4] = {
@@ -100,7 +103,7 @@ public:
 
 		m_FlatColorShader = Kerberos::Shader::Create("assets/shaders/flatcolor.glsl");
 
-		auto textureShader = m_ShaderLib.Load("assets/shaders/texture.glsl");
+		const auto textureShader = m_ShaderLib.Load("assets/shaders/texture.glsl");
 
 		m_Texture = Kerberos::Texture2D::Create("assets/textures/y2k_ice_texture.png");
 		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(textureShader)->Bind();
@@ -212,7 +215,8 @@ class Sandbox : public Kerberos::Application
 public:
 	Sandbox()
 	{
-		PushLayer(new ExampleLayer());
+		//PushLayer(new ExampleLayer());
+		PushLayer(new Sandbox2D());
 	}
 
 	~Sandbox() override = default;

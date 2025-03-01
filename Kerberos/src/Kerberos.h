@@ -32,8 +32,5 @@
 #include "Kerberos/Input.h"
 #include "Kerberos/KeyCodes.h"
 #include "Kerberos/MouseButtonCodes.h"
+#include "Kerberos/OrthographicCameraController.h"
 /// ---------------------------------
-
-/// ---- Entry point ----
-#include "Kerberos/EntryPoint.h"
-/// ---------------------
