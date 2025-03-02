@@ -1,6 +1,7 @@
 #include "kbrpch.h"
 #include "Renderer.h"
 
+#include "Renderer2D.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
 namespace Kerberos
@@ -11,6 +12,7 @@ namespace Kerberos
 	{
 		RenderCommand::SetupRendererAPI();
 		RenderCommand::Init();
+		Renderer2D::Init();
 	}
 
 	void Renderer::OnWindowResized(const uint32_t width, const uint32_t height)

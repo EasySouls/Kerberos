@@ -17,10 +17,6 @@ public:
 private:
 	Kerberos::OrthographicCameraController m_CameraController;
 
-	Kerberos::Ref<Kerberos::VertexArray> m_VertexArray;
-	Kerberos::Ref<Kerberos::Shader> m_Shader;
-	Kerberos::Ref<Kerberos::Texture2D> m_Texture;
-
-	glm::vec3 m_SquareColor = { 0.8f, 0.3f, 0.2f };
+	glm::vec4 m_SquareColor = { 0.8f, 0.3f, 0.2f, 1.0f };
 };
 

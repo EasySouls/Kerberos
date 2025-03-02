@@ -20,6 +20,7 @@
 
 /// ---- Renderer -------------------
 #include "Kerberos/Renderer/Renderer.h"
+#include "Kerberos/Renderer/Renderer2D.h"
 #include "Kerberos/Renderer/RenderCommand.h"
 #include "Kerberos/Renderer/OrthographicCamera.h"
 #include "Kerberos/Renderer/Buffer.h"

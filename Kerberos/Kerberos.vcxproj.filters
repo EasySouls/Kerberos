@@ -166,6 +166,7 @@
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
+    <ClInclude Include="src\Kerberos\Renderer\Renderer2D.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -256,5 +257,6 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\Renderer2D.cpp" />
   </ItemGroup>
 </Project>
