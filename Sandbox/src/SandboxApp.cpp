@@ -106,8 +106,8 @@ public:
 		const auto textureShader = m_ShaderLib.Load("assets/shaders/texture.glsl");
 
 		m_Texture = Kerberos::Texture2D::Create("assets/textures/y2k_ice_texture.png");
-		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(textureShader)->Bind();
-		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+		textureShader->Bind();
+		textureShader->SetInt("u_Texture", 0);
 	}
 
 	void OnUpdate(const Kerberos::Timestep deltaTime) override
@@ -136,8 +136,8 @@ public:
 
 		const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_FlatColorShader)->Bind();
-		std::dynamic_pointer_cast<Kerberos::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat4("u_Color", m_SquareColor);
+		m_FlatColorShader->Bind();
+		m_FlatColorShader->SetFloat4("u_Color", m_SquareColor);
 
 		for (size_t y = 0; y < 20; y++)
 		{
