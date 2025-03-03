@@ -13,7 +13,8 @@ namespace Kerberos
 	struct Renderer2DStorage
 	{
 		Ref<VertexArray> VertexArray;
-		Ref<Shader> Shader;
+		Ref<Shader> FlatColorShader;
+		Ref<Shader> TextureShader;
 		Ref<Texture2D> Texture;
 		glm::mat4 ViewProjectionMatrix;
 	};
@@ -51,11 +52,12 @@ namespace Kerberos
 
 		s_Data->VertexArray->SetIndexBuffer(squareIB);
 
-		s_Data->Shader = Shader::Create("assets/shaders/texture.glsl");
+		s_Data->FlatColorShader = Shader::Create("assets/shaders/flatcolor.glsl");
+		s_Data->TextureShader = Shader::Create("assets/shaders/texture.glsl");
 
 		s_Data->Texture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
-		s_Data->Shader->Bind();
-		s_Data->Shader->SetInt("u_Texture", 0);
+		s_Data->TextureShader->Bind();
+		s_Data->TextureShader->SetInt("u_Texture", 0);
 	}
 
 	void Renderer2D::Shutdown() 
@@ -65,10 +67,14 @@ namespace Kerberos
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera) 
 	{
-		s_Data->Shader->Bind();
 		const auto viewProjection = camera.GetViewProjectionMatrix();
 		s_Data->ViewProjectionMatrix = viewProjection;
-		s_Data->Shader->SetMat4("u_ViewProjection", viewProjection);
+
+		s_Data->FlatColorShader->Bind();
+		s_Data->FlatColorShader->SetMat4("u_ViewProjection", viewProjection);
+
+		s_Data->TextureShader->Bind();
+		s_Data->TextureShader->SetMat4("u_ViewProjection", viewProjection);
 	}
 
 	void Renderer2D::EndScene() 
@@ -83,15 +89,36 @@ namespace Kerberos
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color) 
 	{
-		s_Data->Shader->Bind();
-		s_Data->Shader->SetFloat4("u_Color", color);
+		s_Data->FlatColorShader->Bind();
+		s_Data->FlatColorShader->SetFloat4("u_Color", color);
 
 		s_Data->Texture->Bind();
 		s_Data->VertexArray->Bind();
 
 		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_Data->Shader->SetMat4("u_Transform", transform);
+		s_Data->FlatColorShader->SetMat4("u_Transform", transform);
+
+		RenderCommand::DrawIndexed(s_Data->VertexArray);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture) 
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture);
+	}
+	
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture) 
+	{
+		s_Data->TextureShader->Bind();
+
+		if (texture) texture->Bind();
+		else s_Data->Texture->Bind();
+
+		s_Data->VertexArray->Bind();
+
+		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_Data->TextureShader->SetMat4("u_Transform", transform);
 
 		RenderCommand::DrawIndexed(s_Data->VertexArray);
 	}
