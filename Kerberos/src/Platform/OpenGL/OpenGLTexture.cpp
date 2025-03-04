@@ -58,6 +58,11 @@ namespace Kerberos
 		stbi_image_free(data);
 	}
 
+	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height) 
+	{
+		
+	}
+
 	OpenGLTexture2D::~OpenGLTexture2D() 
 	{
 		glDeleteTextures(1, &m_RendererID);
@@ -66,5 +71,10 @@ namespace Kerberos
 	void OpenGLTexture2D::Bind(const uint32_t slot) const 
 	{
 		glBindTextureUnit(slot, m_RendererID);
+	}
+
+	void OpenGLTexture2D::SetData(void* data, uint32_t size) 
+	{
+	
 	}
 }

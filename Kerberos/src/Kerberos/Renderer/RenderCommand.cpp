@@ -22,7 +22,7 @@ namespace Kerberos
 		case RendererAPI::API::Vulkan:
 			{
 			const auto rendererApi = new VulkanRendererAPI();
-			rendererApi->SetupPipeline();
+			rendererApi->Init();
 			s_RendererAPI = rendererApi;
 			return;
 			}

@@ -137,7 +137,7 @@ namespace Kerberos
 	void VulkanRendererAPI::CreateGraphicsPipeline()
 	{
 		// TODO: Load shaders before creating the pipeline
-		VkPipelineShaderStageCreateInfo shaderStages[] = {};
+		VkPipelineShaderStageCreateInfo shaderStages[2] = {};
 
 		std::vector<VkDynamicState> dynamicStateEnables = {
 			VK_DYNAMIC_STATE_VIEWPORT,
@@ -242,7 +242,7 @@ namespace Kerberos
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
 		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		pipelineInfo.stageCount = 2;
-		pipelineInfo.pStages = m_ShaderStages;
+		pipelineInfo.pStages = shaderStages;
 		pipelineInfo.pVertexInputState = &vertexInputInfo;
 		pipelineInfo.pInputAssemblyState = &inputAssembly;
 		pipelineInfo.pViewportState = &viewportState;
