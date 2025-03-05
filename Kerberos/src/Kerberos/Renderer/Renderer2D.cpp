@@ -120,17 +120,17 @@ namespace Kerberos
 		RenderCommand::DrawIndexed(s_Data->VertexArray);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Ref<Texture2D>& texture, const float tilingFactor)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Ref<Texture2D>& texture, const float tilingFactor, const glm::vec4& tintColor)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tilingFactor);
+		DrawQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tilingFactor, tintColor);
 	}
 	
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Ref<Texture2D>& texture, const float tilingFactor)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Ref<Texture2D>& texture, const float tilingFactor, const glm::vec4& tintColor)
 	{
 		KBR_PROFILE_FUNCTION();
 
 		s_Data->Shader->Bind();
-		s_Data->Shader->SetFloat4("u_Color", glm::vec4(1.0f));
+		s_Data->Shader->SetFloat4("u_Color", tintColor);
 		s_Data->Shader->SetFloat("u_TilingFactor", tilingFactor);
 
 		texture->Bind();
