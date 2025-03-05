@@ -9,6 +9,7 @@
 
 #ifdef KBR_DEBUG
 	#define KBR_ENABLE_ASSERTS
+	#define KBR_PROFILE
 #endif
 
 #ifdef KBR_ENABLE_ASSERTS

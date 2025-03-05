@@ -23,10 +23,10 @@ void Sandbox2D::OnDetach()
 
 void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 {
-	PROFILE_SCOPE("Sandbox2D::OnUpdate");
+	KBR_PROFILE_FUNCTION();
 
 	{
-		PROFILE_SCOPE("CameraController::OnUpdate");
+		KBR_PROFILE_SCOPE("CameraController::OnUpdate");
 		m_CameraController.OnUpdate(deltaTime);
 	}
 
@@ -34,7 +34,7 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 	Kerberos::RenderCommand::Clear();
 
 	{
-		PROFILE_SCOPE("Renderer2D Draw");
+		KBR_PROFILE_SCOPE("Renderer2D Draw");
 		Kerberos::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
 		Kerberos::Renderer2D::DrawQuad({ -0.5f, 0.0f, 0.1f }, { 1.0f, 1.0f }, m_SquareColor);
