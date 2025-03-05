@@ -2,7 +2,6 @@
 #include "OpenGLTexture.h"
 
 #include "stb_image.h"
-#include <glad/glad.h>
 
 namespace Kerberos
 {
@@ -35,7 +34,10 @@ namespace Kerberos
 			dataFormat = GL_RGB;
 		}
 
-		KBR_ASSERT(internalFormat & dataFormat, "Format not supported!");
+		KBR_ASSERT(internalFormat & dataFormat, "Format not supported!")
+
+		m_InternalFormat = internalFormat;
+		m_DataFormat = dataFormat;
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, internalFormat, static_cast<int>(m_Width), static_cast<int>(m_Height));
@@ -58,9 +60,23 @@ namespace Kerberos
 		stbi_image_free(data);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height) 
+	OpenGLTexture2D::OpenGLTexture2D(const uint32_t width, const uint32_t height)
+		: m_Width(width), m_Height(height)
 	{
-		
+		/// Internal format is how OpenGl will store the texture data internally (in the GPU)
+		constexpr GLenum internalFormat = GL_RGBA8;
+		/// Data format is the format of the texture data we provide to OpenGL
+		constexpr GLenum dataFormat = GL_RGBA;
+
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
+		glTextureStorage2D(m_RendererID, 1, internalFormat, static_cast<int>(m_Width), static_cast<int>(m_Height));
+
+		m_InternalFormat = internalFormat;
+		m_DataFormat = dataFormat;
+
+		/// Set the texture wrapping/filtering options (on the currently bound texture object)
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D() 
@@ -75,6 +91,9 @@ namespace Kerberos
 
 	void OpenGLTexture2D::SetData(void* data, uint32_t size) 
 	{
-	
+		const uint32_t bytesPerPixel = m_DataFormat == GL_RGBA ? 4 : 3;
+		KBR_CORE_ASSERT(size == m_Width * m_Height * bytesPerPixel, "Data must be the entire texture!");
+
+		glTextureSubImage2D(m_RendererID, 0, 0, 0, static_cast<int>(m_Width), static_cast<int>(m_Height), m_DataFormat, GL_UNSIGNED_BYTE, data);
 	}
 }

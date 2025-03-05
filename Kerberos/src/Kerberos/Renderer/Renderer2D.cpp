@@ -16,7 +16,8 @@ namespace Kerberos
 		Ref<Shader> FlatColorShader; /// Not currently used
 		Ref<Shader> TextureShader;	 /// Not currently used
 		Ref<Shader> Shader;
-		Ref<Texture2D> Texture;
+		Ref<Texture2D> Texture;		 /// Not currently used
+		Ref<Texture2D> WhiteTexture;
 		glm::mat4 ViewProjectionMatrix;
 	};
 
@@ -55,7 +56,10 @@ namespace Kerberos
 
 		s_Data->Shader = Shader::Create("assets/shaders/shader2d.glsl");
 
-		s_Data->Texture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
+		s_Data->WhiteTexture = Texture2D::Create(1, 1);
+		uint32_t whiteTextureData = 0xffffffff;
+		s_Data->WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+
 		s_Data->Shader->Bind();
 		s_Data->Shader->SetInt("u_Texture", 0);
 	}
@@ -89,7 +93,7 @@ namespace Kerberos
 		s_Data->Shader->Bind();
 		s_Data->Shader->SetFloat4("u_Color", color);
 
-		s_Data->Texture->Bind();
+		s_Data->WhiteTexture->Bind();
 		s_Data->VertexArray->Bind();
 
 		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
@@ -109,7 +113,7 @@ namespace Kerberos
 		s_Data->Shader->Bind();
 		s_Data->Shader->SetFloat4("u_Color", glm::vec4(1.0f));
 
-		s_Data->Texture->Bind();
+		texture->Bind();
 
 		s_Data->VertexArray->Bind();
 

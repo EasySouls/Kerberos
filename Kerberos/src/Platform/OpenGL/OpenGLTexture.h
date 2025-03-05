@@ -1,3 +1,6 @@
+#pragma once
+
+#include "glad/glad.h"
 #include "Kerberos/Renderer/Texture.h"
 
 namespace Kerberos
@@ -20,6 +23,8 @@ namespace Kerberos
 		std::string m_Path;
 		uint32_t m_Width;
 		uint32_t m_Height;
+		GLenum m_InternalFormat;
+		GLenum m_DataFormat;
 		uint32_t m_RendererID;
 	};
 }
