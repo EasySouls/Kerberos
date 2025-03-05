@@ -19,23 +19,29 @@ namespace Kerberos
 		KBR_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	Window* Window::Create(const WindowProps& props)
+	Scope<Window> Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return CreateScope<WindowsWindow>(props);
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& props) 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		WindowsWindow::Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow() 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		WindowsWindow::Shutdown();
 	};
 
 	void WindowsWindow::Init(const WindowProps& props) 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
@@ -176,17 +182,23 @@ namespace Kerberos
 
 	void WindowsWindow::Shutdown() 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(m_Window);
 	}
 
 	void WindowsWindow::OnUpdate() 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		glfwPollEvents();
 		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(const bool enabled) 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
 			return;
 

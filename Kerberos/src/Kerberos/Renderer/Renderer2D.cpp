@@ -25,6 +25,8 @@ namespace Kerberos
 
 	void Renderer2D::Init() 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		s_Data = new Renderer2DStorage();
 
 		s_Data->VertexArray = VertexArray::Create();
@@ -66,11 +68,15 @@ namespace Kerberos
 
 	void Renderer2D::Shutdown() 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		delete s_Data;
 	}
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera) 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		const auto viewProjection = camera.GetViewProjectionMatrix();
 		s_Data->ViewProjectionMatrix = viewProjection;
 
@@ -80,7 +86,7 @@ namespace Kerberos
 
 	void Renderer2D::EndScene() 
 	{
-	
+		KBR_PROFILE_FUNCTION();
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color) 
@@ -90,6 +96,8 @@ namespace Kerberos
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color) 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		s_Data->Shader->Bind();
 		s_Data->Shader->SetFloat4("u_Color", color);
 
@@ -110,6 +118,8 @@ namespace Kerberos
 	
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture) 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		s_Data->Shader->Bind();
 		s_Data->Shader->SetFloat4("u_Color", glm::vec4(1.0f));
 
