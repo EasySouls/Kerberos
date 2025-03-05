@@ -23,11 +23,12 @@ layout(location = 0) out vec4 color;
 in vec2 v_TexCoord;
 
 uniform vec4 u_Color;
+uniform float u_TilingFactor;
 uniform sampler2D u_Texture;
 
 void main()
 {
 	// If we want to scale the texture, we can multiply the texture coordinates.
 	// We can tint the texture by multiplying the color with a color.
-	color = texture(u_Texture, v_TexCoord) * u_Color;
+	color = texture(u_Texture, v_TexCoord * u_TilingFactor) * u_Color;
 }
