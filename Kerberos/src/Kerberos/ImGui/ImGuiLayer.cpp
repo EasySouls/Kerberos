@@ -43,7 +43,7 @@ namespace Kerberos
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-		Application& application = Application::Get();
+		const Application& application = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(application.GetWindow().GetNativeWindow());
 
 
@@ -61,7 +61,7 @@ namespace Kerberos
 
 	void ImGuiLayer::OnImGuiRender()
 	{
-		static bool show = true;
+		static bool show = false;
 		ImGui::ShowDemoWindow(&show);
 	}
 

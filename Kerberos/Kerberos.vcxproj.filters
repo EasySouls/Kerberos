@@ -167,6 +167,7 @@
     </ClInclude>
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
     <ClInclude Include="src\Kerberos\Renderer\Renderer2D.h" />
+    <ClInclude Include="src\Kerberos\Core\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">

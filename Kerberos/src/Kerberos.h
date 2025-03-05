@@ -8,6 +8,7 @@
 #include "Kerberos/Layer.h"
 
 #include "Kerberos/Core/Timestep.h"
+#include "Kerberos/Core/Timer.h"
 
 #include "Kerberos/ImGui/ImGuiLayer.h"
 
