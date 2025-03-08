@@ -16,37 +16,39 @@
 
 namespace Kerberos
 {
-	struct Renderer2DStorage
+	struct Renderer2DData
 	{
+		uint32_t MaxQuads = 10000;
+		uint32_t MaxVertices = MaxQuads * 4;
+		uint32_t MaxIndices = MaxQuads * 6;
+
 		Ref<VertexArray> VertexArray;
-		Ref<Shader> FlatColorShader; /// Not currently used
-		Ref<Shader> TextureShader;	 /// Not currently used
 		Ref<Shader> Shader;
 		Ref<Texture2D> Texture;		 /// Not currently used
 		Ref<Texture2D> WhiteTexture;
 		glm::mat4 ViewProjectionMatrix;
 	};
 
-	static Renderer2DStorage* s_Data;
+	static Renderer2DData* s_Data;
+
+	struct QuadVertex
+	{
+		glm::vec3 Position;
+		glm::vec4 Color;
+		glm::vec2 TexCoord;
+		float TexIndex;
+		float TilingFactor;
+	};
 
 	void Renderer2D::Init() 
 	{
 		KBR_PROFILE_FUNCTION();
 
-		s_Data = new Renderer2DStorage();
+		s_Data = new Renderer2DData();
 
 		s_Data->VertexArray = VertexArray::Create();
 
-		/// 3 positions, 2 texture coordinates
-		constexpr float squareVertices[5 * 4] = {
-			   -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-				0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-				0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-			   -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
-		};
-
-		Ref<VertexBuffer> squareVB;
-		squareVB.reset(VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+		const Ref<VertexBuffer> squareVB = VertexBuffer::Create(s_Data->MaxVertices * sizeof(QuadVertex));
 
 		squareVB->SetLayout({
 			{ ShaderDataType::Float3, "a_Position" },

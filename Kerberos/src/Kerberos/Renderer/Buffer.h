@@ -114,7 +114,8 @@ namespace Kerberos
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 		virtual const BufferLayout& GetLayout() const = 0;
 
-		static VertexBuffer* Create(const float* vertices, uint32_t size);
+		static Ref<VertexBuffer> Create(const float* vertices, uint32_t size);
+		static Ref<VertexBuffer> Create(uint32_t size);
 	};
 
 	class IndexBuffer

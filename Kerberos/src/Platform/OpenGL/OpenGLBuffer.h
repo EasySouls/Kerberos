@@ -8,6 +8,7 @@ namespace Kerberos
 	{
 	public:
 		OpenGLVertexBuffer(const float* vertices, uint32_t size);
+		OpenGLVertexBuffer(uint32_t size);
 		~OpenGLVertexBuffer() override;
 
 		void Bind() const override;
