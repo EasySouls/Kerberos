@@ -22,5 +22,7 @@ namespace Kerberos
 	public:
 		static Ref<Texture2D> Create(const std::string& path);
 		static Ref<Texture2D> Create(uint32_t width, uint32_t height);
+
+		virtual bool operator== (const Texture2D& other) const = 0;
 	};
 }

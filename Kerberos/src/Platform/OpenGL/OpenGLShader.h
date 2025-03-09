@@ -20,6 +20,7 @@ namespace Kerberos
 		const std::string& GetName() const override { return m_Name; }
 
 		void SetInt(const std::string& name, int value) override;
+		void SetIntArray(const std::string& name, int* values, uint32_t count) override;
 		void SetFloat(const std::string& name, float value) override;
 		void SetFloat3(const std::string& name, const glm::vec3& value) override;
 		void SetFloat4(const std::string& name, const glm::vec4& value) override;
@@ -27,6 +28,7 @@ namespace Kerberos
 
 	private:
 		void UploadUniformInt(const std::string& name, int value) const;
+		void UploadUniformIntArray(const std::string& name, const int* values, uint32_t count) const;
 
 		void UploadUniformFloat(const std::string& name, float value) const;
 		void UploadUniformFloat2(const std::string& name, const glm::vec2& vector) const;
