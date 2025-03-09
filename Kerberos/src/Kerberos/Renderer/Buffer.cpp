@@ -46,7 +46,7 @@ namespace Kerberos
 		return nullptr;
 	}
 
-	IndexBuffer* IndexBuffer::Create(const uint32_t* indices, const uint32_t count)
+	Ref<IndexBuffer> IndexBuffer::Create(const uint32_t* indices, const uint32_t count)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -55,7 +55,7 @@ namespace Kerberos
 				return nullptr;
 
 			case RendererAPI::API::OpenGL:
-				return new OpenGLIndexBuffer(indices, count);
+				return CreateRef<OpenGLIndexBuffer>(indices, count);
 
 			case RendererAPI::API::Vulkan:
 				KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");

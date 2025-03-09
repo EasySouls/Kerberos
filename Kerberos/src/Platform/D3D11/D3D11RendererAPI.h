@@ -15,7 +15,7 @@ namespace Kerberos
 		void SetClearColor(const glm::vec4& color) override;
 		void Clear() override;
 
-		void DrawIndexed(const Ref<VertexArray>& vertexArray) override;
+		void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) override;
 	private:
 		Ref<ID3D11DeviceContext> m_Context;
 		Ref<ID3D11RenderTargetView> m_Target;

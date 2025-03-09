@@ -26,7 +26,7 @@ namespace Kerberos
 		m_Context->ClearDepthStencilView(m_DepthStencilView.get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, clearDepth, clearStencil);
 	}
 
-	void D3D11RendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray)
+	void D3D11RendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
 		
 	}

@@ -34,6 +34,14 @@ namespace Kerberos
 		glDeleteBuffers(1, &m_RendererID);
 	}
 
+	void OpenGLVertexBuffer::SetData(const void* data, const uint32_t size)
+	{
+		KBR_PROFILE_FUNCTION();
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+	}
+
 	void OpenGLVertexBuffer::Bind() const 
 	{
 		KBR_PROFILE_FUNCTION();

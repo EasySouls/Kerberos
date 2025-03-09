@@ -111,6 +111,8 @@ namespace Kerberos
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
+		virtual void SetData(const void* data, uint32_t size) = 0;
+
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 		virtual const BufferLayout& GetLayout() const = 0;
 
@@ -128,6 +130,6 @@ namespace Kerberos
 
 		virtual uint32_t GetCount() const = 0;
 
-		static IndexBuffer* Create(const uint32_t* indices, uint32_t count);
+		static Ref<IndexBuffer> Create(const uint32_t* indices, uint32_t count);
 	};;
 }

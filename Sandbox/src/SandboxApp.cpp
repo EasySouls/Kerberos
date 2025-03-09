@@ -23,10 +23,9 @@ public:
 			 0.0f,  0.5f, 0.0f, 0.9f, 0.3f, 1.0f, 1.0f,
 		};
 
-		Kerberos::Ref<Kerberos::VertexBuffer> vertexBuffer;
-		vertexBuffer.reset(Kerberos::VertexBuffer::Create(vertices, sizeof(vertices)));
+		Kerberos::Ref<Kerberos::VertexBuffer> vertexBuffer = Kerberos::VertexBuffer::Create(vertices, sizeof(vertices));
 
-		Kerberos::BufferLayout layout = {
+		const Kerberos::BufferLayout layout = {
 			{ Kerberos::ShaderDataType::Float3, "a_Position" },
 			{ Kerberos::ShaderDataType::Float4, "a_Color" }
 		};
@@ -36,8 +35,7 @@ public:
 
 		constexpr uint32_t indices[3] = { 0, 1, 2 };
 
-		Kerberos::Ref<Kerberos::IndexBuffer> indexBuffer;
-		indexBuffer.reset(Kerberos::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+		const Kerberos::Ref<Kerberos::IndexBuffer> indexBuffer = Kerberos::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
 		m_SquareVA = Kerberos::VertexArray::Create();
@@ -50,8 +48,7 @@ public:
 			   -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 		};
 
-		Kerberos::Ref<Kerberos::VertexBuffer> squareVB;
-		squareVB.reset(Kerberos::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+		Kerberos::Ref<Kerberos::VertexBuffer> squareVB = Kerberos::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
 
 		squareVB->SetLayout({
 			{ Kerberos::ShaderDataType::Float3, "a_Position" },
@@ -62,8 +59,7 @@ public:
 
 		constexpr uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
 
-		Kerberos::Ref<Kerberos::IndexBuffer> squareIB;
-		squareIB.reset(Kerberos::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+		const Kerberos::Ref<Kerberos::IndexBuffer> squareIB = Kerberos::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 
 		m_SquareVA->SetIndexBuffer(squareIB);
 
