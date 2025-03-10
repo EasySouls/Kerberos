@@ -169,6 +169,7 @@
     <ClInclude Include="src\Kerberos\Renderer\Renderer2D.h" />
     <ClInclude Include="src\Kerberos\Core\Timer.h" />
     <ClInclude Include="src\Kerberos\Debug\Instrumentor.h" />
+    <ClInclude Include="src\Platform\Vulkan\VulkanHelpers.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">

@@ -2,16 +2,28 @@
 
 #include "VulkanRendererAPI.h"
 
+#include "VulkanHelpers.h"
+
 namespace Kerberos
 {
 	void VulkanRendererAPI::Init()
 	{
 		CreateRenderPass();
 		CreateGraphicsPipeline();
+		CreateFramebuffers();
+		CreateCommandPool();
+		CreateCommandBuffer();
 	}
 
 	void VulkanRendererAPI::Cleanup() const
 	{
+		vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+
+		for (const auto framebuffer : m_SwapChainFramebuffers)
+		{
+			vkDestroyFramebuffer(m_Device, framebuffer, nullptr);
+		}
+
 		vkDestroyPipeline(m_Device, m_GraphicsPipeline, nullptr);
 		vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
 		vkDestroyRenderPass(m_Device, m_RenderPass, nullptr);
@@ -99,6 +111,64 @@ namespace Kerberos
 	void VulkanRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
 	}
+
+	void VulkanRendererAPI::RecordCommandBuffer(const VkCommandBuffer commandBuffer, const uint32_t imageIndex) 
+	{
+		constexpr VkCommandBufferBeginInfo beginInfo {
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+		};
+
+		if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to begin recording command buffer!");
+		}
+
+		VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+
+		const VkRenderPassBeginInfo renderPassInfo{
+			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+			.renderPass = m_RenderPass,
+			.framebuffer = m_SwapChainFramebuffers[imageIndex],
+			.renderArea = {
+				.offset = { 0, 0 },
+				.extent = m_SwapChainExtent
+			},
+			.clearValueCount = 1,
+			.pClearValues = &clearColor
+		};
+
+		vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
+
+		VkViewport viewport;
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(m_SwapChainExtent.width);
+		viewport.height = static_cast<float>(m_SwapChainExtent.height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+		VkRect2D scissor;
+		scissor.offset = { 0, 0 };
+		scissor.extent = m_SwapChainExtent;
+		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+		vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+
+		vkCmdEndRenderPass(commandBuffer);
+
+		if (const VkResult result = vkEndCommandBuffer(commandBuffer); result != VK_SUCCESS)
+		{
+			KBR_CORE_ASSERT(false, "Failed to record command buffer! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to record command buffer!");
+		}
+	}
+
+	//////////////////////////////////////////////////////////
+	//////////////// INITIALIZATION FUNCTIONS ////////////////
+	//////////////////////////////////////////////////////////
 
 	void VulkanRendererAPI::CreateRenderPass() 
 	{
@@ -263,6 +333,70 @@ namespace Kerberos
 		if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create graphics pipeline!");
+		}
+	}
+
+	void VulkanRendererAPI::CreateFramebuffers() 
+	{
+		m_SwapChainFramebuffers.resize(m_SwapChainImageViews.size());
+
+		for (size_t i = 0; i < m_SwapChainImageViews.size(); ++i)
+		{
+			VkImageView attachments[] = {
+				m_SwapChainImageViews[i]
+			};
+
+			VkFramebufferCreateInfo framebufferInfo {
+				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+				.renderPass = m_RenderPass,
+				.attachmentCount = 1,
+				.pAttachments = attachments,
+				.width = m_SwapChainExtent.width,
+				.height = m_SwapChainExtent.height,
+				.layers = 1
+			};
+
+			if (vkCreateFramebuffer(m_Device, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]) != VK_SUCCESS)
+			{
+				throw std::runtime_error("failed to create framebuffer!");
+			}
+		}
+	}
+
+	void VulkanRendererAPI::CreateCommandPool() 
+	{
+		const auto [graphicsFamily, presentFamily] = m_Context->FindQueueFamilies();
+
+		if (!graphicsFamily.has_value())
+		{
+			throw std::runtime_error("failed to find graphics queue family!");
+		}
+
+		VkCommandPoolCreateInfo poolInfo {
+			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+			.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, // Optional
+			.queueFamilyIndex = graphicsFamily.value(),
+		};
+
+		if (vkCreateCommandPool(m_Device, &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to create command pool!");
+		}
+	}
+
+	void VulkanRendererAPI::CreateCommandBuffer() 
+	{
+		const VkCommandBufferAllocateInfo allocInfo {
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+			.pNext = nullptr,
+			.commandPool = m_CommandPool,
+			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+			.commandBufferCount = 1,
+		};
+
+		if (const VkResult result = vkAllocateCommandBuffers(m_Device, &allocInfo, &m_CommandBuffer); result != VK_SUCCESS)
+		{
+			KBR_ASSERT(false, "Failed to allocate command buffers! Result: {0}", VulkanHelpers::VkResultToString(result))
 		}
 	}
 }

@@ -5,6 +5,7 @@
 
 #include <cstring>
 
+
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
 };
@@ -31,28 +32,6 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 	return VK_FALSE;
 }
 
-static VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
-{
-	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-	if (func != nullptr)
-	{
-		return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-	}
-	else
-	{
-		return VK_ERROR_EXTENSION_NOT_PRESENT;
-	}
-}
-
-void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
-{
-	auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-	if (func != nullptr)
-	{
-		func(instance, debugMessenger, pAllocator);
-	}
-}
-
 namespace Kerberos
 {
 	VulkanContext::VulkanContext(GLFWwindow* windowHandle)
@@ -63,7 +42,7 @@ namespace Kerberos
 
 	VulkanContext::~VulkanContext()
 	{
-		for (auto imageView : m_SwapChainImageViews)
+		for (const auto imageView : m_SwapChainImageViews)
 		{
 			vkDestroyImageView(m_Device, imageView, nullptr);
 		}
@@ -75,7 +54,7 @@ namespace Kerberos
 
 		if (enableValidationLayers)
 		{
-			DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
+			VulkanHelpers::DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
 		}
 	}
 
@@ -110,7 +89,7 @@ namespace Kerberos
 		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.pEngineName = "Kerberos Engine";
 		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-		appInfo.apiVersion = VK_API_VERSION_1_0;
+		appInfo.apiVersion = VK_API_VERSION_1_3;
 
 		VkInstanceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -149,7 +128,7 @@ namespace Kerberos
 		VkDebugUtilsMessengerCreateInfoEXT createInfo;
 		PopulateDebugMessengerCreateInfo(createInfo);
 
-		if (CreateDebugUtilsMessengerEXT(m_Instance, &createInfo, nullptr, &m_DebugMessenger) != VK_SUCCESS)
+		if (VulkanHelpers::CreateDebugUtilsMessengerEXT(m_Instance, &createInfo, nullptr, &m_DebugMessenger) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to set up debug messenger!");
 		}
@@ -188,6 +167,39 @@ namespace Kerberos
 		{
 			throw std::runtime_error("failed to find a suitable GPU!");
 		}
+
+		/// List the properties of the physical device
+		VkPhysicalDeviceProperties deviceProperties;
+		vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
+
+		const char* deviceType;
+		switch (deviceProperties.deviceType)
+		{
+		case VK_PHYSICAL_DEVICE_TYPE_OTHER:
+			deviceType = "Other";
+			break;
+		case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+			deviceType = "Integrated GPU";
+			break;
+		case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+			deviceType = "Discrete GPU";
+			break;
+		case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+			deviceType = "Virtual GPU";
+			break;
+		case VK_PHYSICAL_DEVICE_TYPE_CPU:
+			deviceType = "CPU";
+			break;
+		case VK_PHYSICAL_DEVICE_TYPE_MAX_ENUM:
+			KBR_CORE_ASSERT(false, "Invalid device type!");
+			break;
+		}
+
+		KBR_CORE_INFO("Vulkan Physical Device Properties:");
+		KBR_CORE_INFO("\tVulkan Device: {0}", deviceProperties.deviceName);
+		KBR_CORE_INFO("\tVulkan Device Type: {0}", deviceType);
+		KBR_CORE_INFO("\tVulkan Driver Version: {0}", deviceProperties.driverVersion);
+		KBR_CORE_INFO("\tVulkan API Version: {0}.{1}.{2}", VK_VERSION_MAJOR(deviceProperties.apiVersion), VK_VERSION_MINOR(deviceProperties.apiVersion), VK_VERSION_PATCH(deviceProperties.apiVersion));
 	}
 
 	void VulkanContext::CreateLogicalDevice()
@@ -245,7 +257,7 @@ namespace Kerberos
 		const SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(m_PhysicalDevice);
 
 		const VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
-		VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
+		const VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
 		const VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
 
 		uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
@@ -418,7 +430,12 @@ namespace Kerberos
 		return requiredExtensions.empty();
 	}
 
-	VulkanContext::QueueFamilyIndices VulkanContext::FindQueueFamilies(const VkPhysicalDevice device) const
+	QueueFamilyIndices VulkanContext::FindQueueFamilies() const 
+	{
+		return FindQueueFamilies(m_PhysicalDevice);
+	}
+
+	QueueFamilyIndices VulkanContext::FindQueueFamilies(const VkPhysicalDevice device) const
 	{
 		QueueFamilyIndices indices;
 

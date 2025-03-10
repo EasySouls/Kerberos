@@ -185,6 +185,7 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanContext.h" />
+    <ClInclude Include="src\Platform\Vulkan\VulkanHelpers.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanRendererAPI.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanShader.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
