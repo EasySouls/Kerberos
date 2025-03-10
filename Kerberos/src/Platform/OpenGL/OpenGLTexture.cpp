@@ -102,7 +102,7 @@ namespace Kerberos
 		glBindTextureUnit(slot, m_RendererID);
 	}
 
-	void OpenGLTexture2D::SetData(void* data, uint32_t size) 
+	void OpenGLTexture2D::SetData(void* data, const uint32_t size) 
 	{
 		KBR_PROFILE_FUNCTION();
 

@@ -109,10 +109,6 @@ namespace Kerberos
 
 		// Set first texture slot to the white texture
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
-
-		// Set all remaining texture slots to 0 by default
-		for (uint32_t i = 1; i < Renderer2DData::MaxTextureSlots; i++)
-			s_Data.TextureSlots[i] = nullptr;
 	}
 
 	void Renderer2D::Shutdown() 
@@ -129,7 +125,6 @@ namespace Kerberos
 
 		s_Data.Shader->Bind();
 		s_Data.Shader->SetMat4("u_ViewProjection", viewProjection);
-		s_Data.Shader->SetFloat("u_TilingFactor", 1.0f);
 
 		s_Data.QuadIndexCount = 0;
 		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
@@ -141,8 +136,7 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		const uint32_t dataSize = static_cast<uint32_t>(reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferPtr) - reinterpret_cast<uint8_t*>(s_Data.
-			QuadVertexBufferBase));
+		const uint32_t dataSize = static_cast<uint32_t>(reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferPtr) - reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferBase));
 		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
 		Flush();
@@ -238,7 +232,7 @@ namespace Kerberos
 		// Check if the texture is already in the texture slots
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 		{
-			if (s_Data.TextureSlots[i].get() == texture.get())
+			if (*s_Data.TextureSlots[i].get() == *texture.get())
 			{
 				textureIndex = static_cast<float>(i);
 				break;

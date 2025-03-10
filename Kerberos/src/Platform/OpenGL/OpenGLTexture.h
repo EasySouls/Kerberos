@@ -19,7 +19,7 @@ namespace Kerberos
 
 		void SetData(void* data, uint32_t size) override;
 
-		bool operator==(const Texture2D& other) const override
+		bool operator==(const Texture& other) const override
 		{
 			return m_RendererID == dynamic_cast<const OpenGLTexture2D&>(other).m_RendererID;
 		}
