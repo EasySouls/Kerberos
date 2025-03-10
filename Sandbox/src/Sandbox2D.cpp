@@ -34,12 +34,15 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 	Kerberos::RenderCommand::Clear();
 
 	{
+		static float rotation = 0.0f;
+		rotation += deltaTime * 20.0f;
+
 		KBR_PROFILE_SCOPE("Renderer2D Draw");
 		Kerberos::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-		Kerberos::Renderer2D::DrawQuad({ -0.5f, 0.0f, 1.0f }, { 1.0f, 1.0f }, 17.0f, m_SquareColor);
+		Kerberos::Renderer2D::DrawQuad({ -0.1f, 0.0f, 1.0f }, { 1.0f, 1.0f }, 10.0f, m_SquareColor);
 		Kerberos::Renderer2D::DrawQuad({ 1.0f, 0.0f, 0.9f }, { 1.2f, 1.2f }, 0.0f, { 0.2f, 0.3f, 0.8f, 1.0f });
-		Kerberos::Renderer2D::DrawQuad({ -2.5f, -2.5f, -0.9 }, { 5.0f, 5.0f }, 0.0f, m_Texture, 5);
+		Kerberos::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.99f }, { 5.0f, 5.0f }, rotation, m_Texture, 5);
 
 		Kerberos::Renderer2D::EndScene();
 	}

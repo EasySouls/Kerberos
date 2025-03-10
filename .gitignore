@@ -5,3 +5,6 @@ bin-int/
 
 # Cached shaders
 Sandbox/assets/shadercache/
+
+# Profiling stats
+Sandbox/*.json
