@@ -54,19 +54,19 @@ namespace Kerberos
 		};
 	};
 
-	static Renderer2DData* s_Data;
+	static Renderer2DData s_Data;
 
 	void Renderer2D::Init() 
 	{
 		KBR_PROFILE_FUNCTION();
 
-		s_Data = new Renderer2DData();
+		s_Data = Renderer2DData();
 
-		s_Data->QuadVertexArray = VertexArray::Create();
+		s_Data.QuadVertexArray = VertexArray::Create();
 
-		s_Data->QuadVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(QuadVertex));
+		s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
 
-		s_Data->QuadVertexBuffer->SetLayout({
+		s_Data.QuadVertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color"},
 			{ ShaderDataType::Float2, "a_TexCoord" },
@@ -74,13 +74,13 @@ namespace Kerberos
 			{ ShaderDataType::Float, "a_TilingFactor" }
 			});
 
-		s_Data->QuadVertexArray->AddVertexBuffer(s_Data->QuadVertexBuffer);
+		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
-		s_Data->QuadVertexBufferBase = new QuadVertex[s_Data->MaxVertices];
+		s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices];
 
-		uint32_t* quadIndices = new uint32_t[s_Data->MaxIndices];
+		uint32_t* quadIndices = new uint32_t[s_Data.MaxIndices];
 
-		for (uint32_t i = 0, offset = 0; i < s_Data->MaxIndices; i += 6, offset += 4)
+		for (uint32_t i = 0, offset = 0; i < s_Data.MaxIndices; i += 6, offset += 4)
 		{
 			quadIndices[i + 0] = offset + 0;
 			quadIndices[i + 1] = offset + 1;
@@ -91,35 +91,33 @@ namespace Kerberos
 			quadIndices[i + 5] = offset + 0;
 		}
 
-		const Ref<IndexBuffer> quadIndexBuffer = IndexBuffer::Create(quadIndices, s_Data->MaxIndices);
-		s_Data->QuadVertexArray->SetIndexBuffer(quadIndexBuffer);
+		const Ref<IndexBuffer> quadIndexBuffer = IndexBuffer::Create(quadIndices, s_Data.MaxIndices);
+		s_Data.QuadVertexArray->SetIndexBuffer(quadIndexBuffer);
 		delete[] quadIndices;
 
-		s_Data->WhiteTexture = Texture2D::Create(1, 1);
+		s_Data.WhiteTexture = Texture2D::Create(1, 1);
 		uint32_t whiteTextureData = 0xffffffff;
-		s_Data->WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
 		int32_t samplers[Renderer2DData::MaxTextureSlots];
 		for (int32_t i = 0; i < Renderer2DData::MaxTextureSlots; i++)
 			samplers[i] = i;
 
-		s_Data->Shader = Shader::Create("assets/shaders/shader2d.glsl");
-		s_Data->Shader->Bind();
-		s_Data->Shader->SetIntArray("u_Textures", samplers, Renderer2DData::MaxTextureSlots);
+		s_Data.Shader = Shader::Create("assets/shaders/shader2d.glsl");
+		s_Data.Shader->Bind();
+		s_Data.Shader->SetIntArray("u_Textures", samplers, Renderer2DData::MaxTextureSlots);
 
 		// Set first texture slot to the white texture
-		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
+		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
 		// Set all remaining texture slots to 0 by default
 		for (uint32_t i = 1; i < Renderer2DData::MaxTextureSlots; i++)
-			s_Data->TextureSlots[i] = nullptr;
+			s_Data.TextureSlots[i] = nullptr;
 	}
 
 	void Renderer2D::Shutdown() 
 	{
 		KBR_PROFILE_FUNCTION();
-
-		delete s_Data;
 	}
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera) 
@@ -127,25 +125,25 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		const auto& viewProjection = camera.GetViewProjectionMatrix();
-		s_Data->ViewProjectionMatrix = viewProjection;
+		s_Data.ViewProjectionMatrix = viewProjection;
 
-		s_Data->Shader->Bind();
-		s_Data->Shader->SetMat4("u_ViewProjection", viewProjection);
-		s_Data->Shader->SetFloat("u_TilingFactor", 1.0f);
+		s_Data.Shader->Bind();
+		s_Data.Shader->SetMat4("u_ViewProjection", viewProjection);
+		s_Data.Shader->SetFloat("u_TilingFactor", 1.0f);
 
-		s_Data->QuadIndexCount = 0;
-		s_Data->QuadVertexBufferPtr = s_Data->QuadVertexBufferBase;
+		s_Data.QuadIndexCount = 0;
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
-		s_Data->TextureSlotIndex = 1;
+		s_Data.TextureSlotIndex = 1;
 	}
 
 	void Renderer2D::EndScene() 
 	{
 		KBR_PROFILE_FUNCTION();
 
-		const uint32_t dataSize = static_cast<uint32_t>(reinterpret_cast<uint8_t*>(s_Data->QuadVertexBufferPtr) - reinterpret_cast<uint8_t*>(s_Data->
+		const uint32_t dataSize = static_cast<uint32_t>(reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferPtr) - reinterpret_cast<uint8_t*>(s_Data.
 			QuadVertexBufferBase));
-		s_Data->QuadVertexBuffer->SetData(s_Data->QuadVertexBufferBase, dataSize);
+		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
 		Flush();
 	}
@@ -155,10 +153,10 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		// Bind textures
-		for (uint32_t i = 0; i < s_Data->TextureSlotIndex; i++)
-			s_Data->TextureSlots[i]->Bind(i);
+		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
+			s_Data.TextureSlots[i]->Bind(i);
 
-		RenderCommand::DrawIndexed(s_Data->QuadVertexArray, s_Data->QuadIndexCount);
+		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const glm::vec4& color)
@@ -177,50 +175,50 @@ namespace Kerberos
 			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[0];
-		s_Data->QuadVertexBufferPtr->Color = color;
-		s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-		s_Data->QuadVertexBufferPtr->TexIndex = whiteTexIndex;
-		s_Data->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_Data->QuadVertexBufferPtr++;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
+		s_Data.QuadVertexBufferPtr->Color = color;
+		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
+		s_Data.QuadVertexBufferPtr->TexIndex = whiteTexIndex;
+		s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+		s_Data.QuadVertexBufferPtr++;
 
-		s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[1];
-		s_Data->QuadVertexBufferPtr->Color = color;
-		s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-		s_Data->QuadVertexBufferPtr->TexIndex = whiteTexIndex;
-		s_Data->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_Data->QuadVertexBufferPtr++;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
+		s_Data.QuadVertexBufferPtr->Color = color;
+		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
+		s_Data.QuadVertexBufferPtr->TexIndex = whiteTexIndex;
+		s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+		s_Data.QuadVertexBufferPtr++;
 
-		s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[2];
-		s_Data->QuadVertexBufferPtr->Color = color;
-		s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-		s_Data->QuadVertexBufferPtr->TexIndex = whiteTexIndex;
-		s_Data->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_Data->QuadVertexBufferPtr++;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
+		s_Data.QuadVertexBufferPtr->Color = color;
+		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
+		s_Data.QuadVertexBufferPtr->TexIndex = whiteTexIndex;
+		s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+		s_Data.QuadVertexBufferPtr++;
 
-		s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[3];
-		s_Data->QuadVertexBufferPtr->Color = color;
-		s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-		s_Data->QuadVertexBufferPtr->TexIndex = whiteTexIndex;
-		s_Data->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_Data->QuadVertexBufferPtr++;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
+		s_Data.QuadVertexBufferPtr->Color = color;
+		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
+		s_Data.QuadVertexBufferPtr->TexIndex = whiteTexIndex;
+		s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+		s_Data.QuadVertexBufferPtr++;
 
-		s_Data->QuadIndexCount += 6;
+		s_Data.QuadIndexCount += 6;
 
 #if NO_BATCHING
-		s_Data->Shader->Bind();
-		s_Data->Shader->SetFloat4("u_Color", color);
+		s_Data.Shader->Bind();
+		s_Data.Shader->SetFloat4("u_Color", color);
 
-		s_Data->WhiteTexture->Bind();
-		s_Data->QuadVertexArray->Bind();
+		s_Data.WhiteTexture->Bind();
+		s_Data.QuadVertexArray->Bind();
 
 		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) 
 			* glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f }) 
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_Data->Shader->SetMat4("u_Transform", transform);
+		s_Data.Shader->SetMat4("u_Transform", transform);
 
-		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
+		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);
 #endif
 	}
 
@@ -238,9 +236,9 @@ namespace Kerberos
 		float textureIndex = 0.0f; /// White texture
 
 		// Check if the texture is already in the texture slots
-		for (uint32_t i = 1; i < s_Data->TextureSlotIndex; i++)
+		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 		{
-			if (*s_Data->TextureSlots[i] == *texture)
+			if (s_Data.TextureSlots[i].get() == texture.get())
 			{
 				textureIndex = static_cast<float>(i);
 				break;
@@ -249,61 +247,61 @@ namespace Kerberos
 
 		if (textureIndex == 0.0f)
 		{
-			textureIndex = static_cast<float>(s_Data->TextureSlotIndex);
-			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
-			s_Data->TextureSlotIndex++;
+			textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
+			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+			s_Data.TextureSlotIndex++;
 		}
 
 		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[0];
-		s_Data->QuadVertexBufferPtr->Color = defaultColor;
-		s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-		s_Data->QuadVertexBufferPtr->TexIndex = textureIndex;
-		s_Data->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_Data->QuadVertexBufferPtr++;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[0];
+		s_Data.QuadVertexBufferPtr->Color = defaultColor;
+		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
+		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+		s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+		s_Data.QuadVertexBufferPtr++;
 
-		s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[1];
-		s_Data->QuadVertexBufferPtr->Color = defaultColor;						 
-		s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };			 
-		s_Data->QuadVertexBufferPtr->TexIndex = textureIndex;					 
-		s_Data->QuadVertexBufferPtr->TilingFactor = tilingFactor;				 
-		s_Data->QuadVertexBufferPtr++;											 
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[1];
+		s_Data.QuadVertexBufferPtr->Color = defaultColor;						 
+		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };			 
+		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;					 
+		s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;				 
+		s_Data.QuadVertexBufferPtr++;											 
 																				 
-		s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[2];
-		s_Data->QuadVertexBufferPtr->Color = defaultColor;						 
-		s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };			 
-		s_Data->QuadVertexBufferPtr->TexIndex = textureIndex;					 
-		s_Data->QuadVertexBufferPtr->TilingFactor = tilingFactor;				 
-		s_Data->QuadVertexBufferPtr++;											 
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[2];
+		s_Data.QuadVertexBufferPtr->Color = defaultColor;						 
+		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };			 
+		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;					 
+		s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;				 
+		s_Data.QuadVertexBufferPtr++;											 
 																				 
-		s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[3];
-		s_Data->QuadVertexBufferPtr->Color = defaultColor;
-		s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-		s_Data->QuadVertexBufferPtr->TexIndex = textureIndex;
-		s_Data->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_Data->QuadVertexBufferPtr++;
+		s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[3];
+		s_Data.QuadVertexBufferPtr->Color = defaultColor;
+		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
+		s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+		s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+		s_Data.QuadVertexBufferPtr++;
 
-		s_Data->QuadIndexCount += 6;
+		s_Data.QuadIndexCount += 6;
 
 #if NO_BATCHING
-		s_Data->Shader->Bind();
-		s_Data->Shader->SetFloat4("u_Color", tintColor);
-		s_Data->Shader->SetFloat("u_TilingFactor", tilingFactor);
+		s_Data.Shader->Bind();
+		s_Data.Shader->SetFloat4("u_Color", tintColor);
+		s_Data.Shader->SetFloat("u_TilingFactor", tilingFactor);
 
 		texture->Bind();
 
-		s_Data->QuadVertexArray->Bind();
+		s_Data.QuadVertexArray->Bind();
 
 		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) 
 			* glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f }) 
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_Data->Shader->SetMat4("u_Transform", transform);
+		s_Data.Shader->SetMat4("u_Transform", transform);
 
-		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
+		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);
 #endif
 	}
 }

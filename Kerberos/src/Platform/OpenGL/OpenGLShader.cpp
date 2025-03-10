@@ -251,7 +251,7 @@ namespace Kerberos
 		// Detach shaders after a successful link
 		for (const auto id : glShaderIDs)
 		{
-			glDetachShader(m_RendererID, id);
+			glDetachShader(program, id);
 		}
 
 		// Assign the programId to the class member only when compilation succeded
