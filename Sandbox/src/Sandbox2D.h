@@ -26,6 +26,8 @@ private:
 		float Time;
 	};
 
+	float m_Fps = 0;
+
 	std::vector<ProfileResult> m_ProfileResults;
 };
 

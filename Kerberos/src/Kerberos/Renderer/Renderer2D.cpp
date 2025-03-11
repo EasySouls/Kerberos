@@ -52,6 +52,8 @@ namespace Kerberos
 			{ 0.5f, 0.5f, 0.0f, 1.0f },
 			{ -0.5f, 0.5f, 0.0f, 1.0f }
 		};
+
+		Renderer2D::Statistics Stats;
 	};
 
 	static Renderer2DData s_Data;
@@ -151,6 +153,18 @@ namespace Kerberos
 			s_Data.TextureSlots[i]->Bind(i);
 
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+
+		s_Data.Stats.DrawCalls++;
+	}
+
+	void Renderer2D::FlushAndReset()
+	{
+		EndScene();
+
+		s_Data.QuadIndexCount = 0;
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+		s_Data.TextureSlotIndex = 1;
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const glm::vec4& color)
@@ -161,6 +175,11 @@ namespace Kerberos
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const glm::vec4& color)
 	{
 		KBR_PROFILE_FUNCTION();
+
+		if (s_Data.QuadIndexCount >= s_Data.MaxIndices)
+		{
+			FlushAndReset();
+		}
 
 		constexpr float whiteTexIndex = 0.0f;
 		constexpr float tilingFactor = 1.0f;
@@ -199,6 +218,8 @@ namespace Kerberos
 
 		s_Data.QuadIndexCount += 6;
 
+		s_Data.Stats.QuadCount++;
+
 #if NO_BATCHING
 		s_Data.Shader->Bind();
 		s_Data.Shader->SetFloat4("u_Color", color);
@@ -224,6 +245,11 @@ namespace Kerberos
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Ref<Texture2D>& texture, const float tilingFactor, const glm::vec4& tintColor)
 	{
 		KBR_PROFILE_FUNCTION();
+
+		if (s_Data.QuadIndexCount >= s_Data.MaxIndices)
+		{
+			FlushAndReset();
+		}
 
 		constexpr glm::vec4 defaultColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -280,6 +306,8 @@ namespace Kerberos
 
 		s_Data.QuadIndexCount += 6;
 
+		s_Data.Stats.QuadCount++;
+
 #if NO_BATCHING
 		s_Data.Shader->Bind();
 		s_Data.Shader->SetFloat4("u_Color", tintColor);
@@ -297,5 +325,15 @@ namespace Kerberos
 
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);
 #endif
+	}
+
+	Renderer2D::Statistics Renderer2D::GetStatistics()
+	{
+		return s_Data.Stats;
+	}
+
+	void Renderer2D::ResetStatistics()
+	{
+		memset(&s_Data.Stats, 0, sizeof(Statistics));
 	}
 }
