@@ -64,6 +64,8 @@ namespace Kerberos
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		}
 
+		//glfwWindowHint(GLFW_DEPTH_BITS, 32);
+
 		m_Window = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Data.Title.c_str(), nullptr, nullptr);
 
 		switch (context)
