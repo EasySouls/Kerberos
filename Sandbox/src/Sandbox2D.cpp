@@ -9,11 +9,23 @@
 Sandbox2D::Sandbox2D()
 	: Layer("Sandbox2D"), m_CameraController(1280.0f / 720.0f)
 {
-	m_Texture = Kerberos::Texture2D::Create("assets/textures/y2k_ice_texture.png");
 }
 
 void Sandbox2D::OnAttach()
 {
+	KBR_PROFILE_FUNCTION();
+
+	m_Texture = Kerberos::Texture2D::Create("assets/textures/y2k_ice_texture.png");
+
+	m_Particle = ParticleProps{
+		.Position = { 0.0f, 0.0f },
+		.Velocity = { 0.0f, 0.0f },
+		.VelocityVariation = { 1.0f, 0.5f },
+		.ColorBegin = { 0.8f, 0.3f, 0.2f, 1.0f },
+		.ColorEnd = { 0.2f, 0.3f, 0.8f, 1.0f },
+		.SizeBegin = 0.5f,
+		.SizeEnd = 0.1f,
+	};
 }
 
 void Sandbox2D::OnDetach()
@@ -61,6 +73,23 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 		}
 
 		Kerberos::Renderer2D::EndScene();
+	}
+
+	if (Kerberos::Input::IsMouseButtonPressed(KBR_MOUSE_BUTTON_LEFT))
+	{
+		auto [x, y] = Kerberos::Input::GetMousePosition();
+
+		auto width = Kerberos::Application::Get().GetWindow().GetWidth();
+		auto height = Kerberos::Application::Get().GetWindow().GetHeight();
+		auto bounds = m_CameraController.GetBounds();
+
+		auto pos = m_CameraController.GetCamera().GetPosition();
+		x = bounds.Left + x * (bounds.Right - bounds.Left) / width;
+		y = bounds.Bottom + (height - y) * (bounds.Top - bounds.Bottom) / height;
+
+		m_Particle.Position = { x, y };
+		for (int i = 0; i < 100; i++)
+			m_ParticleSystem.Emit(m_Particle);
 	}
 }
 

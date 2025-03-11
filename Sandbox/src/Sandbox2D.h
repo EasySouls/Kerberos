@@ -1,6 +1,8 @@
 #pragma once
 #include <Kerberos.h>
 
+#include "ParticleSystem.h"
+
 
 class Sandbox2D : public Kerberos::Layer
 {
@@ -29,5 +31,8 @@ private:
 	float m_Fps = 0;
 
 	std::vector<ProfileResult> m_ProfileResults;
+
+	ParticleSystem m_ParticleSystem;
+	ParticleProps m_Particle;
 };
 
