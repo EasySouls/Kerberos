@@ -10,6 +10,9 @@
     <Filter Include="src\Kerberos\Core">
       <UniqueIdentifier>{11CE04FF-7DE4-0295-C65B-8EB632B1D31C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Kerberos\Debug">
+      <UniqueIdentifier>{4FEBAADF-3BCF-6B35-A42F-6688903256B7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Kerberos\Events">
       <UniqueIdentifier>{DDA792D8-4909-70E6-D276-B6983ED7A6A5}</UniqueIdentifier>
     </Filter>
@@ -51,8 +54,14 @@
     <ClInclude Include="src\Kerberos\Core.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Core\Timer.h">
+      <Filter>src\Kerberos\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Core\Timestep.h">
       <Filter>src\Kerberos\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Debug\Instrumentor.h">
+      <Filter>src\Kerberos\Debug</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\EntryPoint.h">
       <Filter>src\Kerberos</Filter>
@@ -90,6 +99,9 @@
     <ClInclude Include="src\Kerberos\MouseButtonCodes.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\OrthographicCameraController.h">
+      <Filter>src\Kerberos</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
@@ -103,6 +115,9 @@
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Renderer.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Renderer2D.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\RendererAPI.h">
@@ -147,6 +162,9 @@
     <ClInclude Include="src\Platform\Vulkan\VulkanContext.h">
       <Filter>src\Platform\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\Vulkan\VulkanHelpers.h">
+      <Filter>src\Platform\Vulkan</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\Vulkan\VulkanRendererAPI.h">
       <Filter>src\Platform\Vulkan</Filter>
     </ClInclude>
@@ -165,11 +183,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
-    <ClInclude Include="src\Kerberos\Renderer\Renderer2D.h" />
-    <ClInclude Include="src\Kerberos\Core\Timer.h" />
-    <ClInclude Include="src\Kerberos\Debug\Instrumentor.h" />
-    <ClInclude Include="src\Platform\Vulkan\VulkanHelpers.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -190,6 +203,9 @@
     <ClCompile Include="src\Kerberos\Log.cpp">
       <Filter>src\Kerberos</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp">
+      <Filter>src\Kerberos</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Buffer.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
@@ -200,6 +216,9 @@
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Renderer.cpp">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Renderer\Renderer2D.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\RendererAPI.cpp">
@@ -259,7 +278,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp" />
-    <ClCompile Include="src\Kerberos\Renderer\Renderer2D.cpp" />
   </ItemGroup>
 </Project>

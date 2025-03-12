@@ -59,7 +59,7 @@ namespace Kerberos
 			0, 
 			0, 
 			static_cast<int>(m_Width), 
-			static_cast<int>(m_Width), 
+			static_cast<int>(m_Height), 
 			dataFormat, 
 			GL_UNSIGNED_BYTE, 
 			data);

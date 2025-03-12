@@ -55,7 +55,7 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 	Kerberos::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 	Kerberos::RenderCommand::Clear();
 
-#if 1
+#if 0
 	{
 		static float rotation = 0.0f;
 		rotation += deltaTime * 20.0f;
@@ -81,13 +81,13 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 	}
 #endif
 
-	//{
-	//	Kerberos::Renderer2D::BeginScene(m_CameraController.GetCamera());
+	{
+		Kerberos::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-	//	Kerberos::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.8f }, { 1.0f, 1.0f }, 0.0f, m_SpriteSheet);
+		Kerberos::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.8f }, { 1.0f, 1.0f }, 0.0f, m_SpriteSheet);
 
-	//	Kerberos::Renderer2D::EndScene();
-	//}
+		Kerberos::Renderer2D::EndScene();
+	}
 
 	if (Kerberos::Input::IsMouseButtonPressed(KBR_MOUSE_BUTTON_LEFT))
 	{

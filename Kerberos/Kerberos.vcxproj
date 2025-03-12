@@ -146,13 +146,12 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Kerberos\Core\Timer.h" />
-    <ClInclude Include="src\Kerberos\Debug\Instrumentor.h" />
-    <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
     <ClInclude Include="src\Kerberos.h" />
     <ClInclude Include="src\Kerberos\Application.h" />
     <ClInclude Include="src\Kerberos\Core.h" />
+    <ClInclude Include="src\Kerberos\Core\Timer.h" />
     <ClInclude Include="src\Kerberos\Core\Timestep.h" />
+    <ClInclude Include="src\Kerberos\Debug\Instrumentor.h" />
     <ClInclude Include="src\Kerberos\EntryPoint.h" />
     <ClInclude Include="src\Kerberos\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Kerberos\Events\Event.h" />
@@ -165,6 +164,7 @@
     <ClInclude Include="src\Kerberos\LayerStack.h" />
     <ClInclude Include="src\Kerberos\Log.h" />
     <ClInclude Include="src\Kerberos\MouseButtonCodes.h" />
+    <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h" />
     <ClInclude Include="src\Kerberos\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Kerberos\Renderer\OrthographicCamera.h" />
@@ -194,13 +194,13 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Kerberos\Application.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Kerberos\Layer.cpp" />
     <ClCompile Include="src\Kerberos\LayerStack.cpp" />
     <ClCompile Include="src\Kerberos\Log.cpp" />
+    <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\RenderCommand.cpp" />
