@@ -251,6 +251,9 @@ namespace Kerberos
 			FlushAndReset();
 		}
 
+		float x = 2;
+		float y = 3;
+
 		constexpr glm::vec4 defaultColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 		float textureIndex = 0.0f; /// White texture
