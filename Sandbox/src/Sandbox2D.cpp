@@ -20,11 +20,13 @@ void Sandbox2D::OnAttach()
 	m_Particle = ParticleProps{
 		.Position = { 0.0f, 0.0f },
 		.Velocity = { 0.0f, 0.0f },
-		.VelocityVariation = { 1.0f, 0.5f },
+		.VelocityVariation = { 3.0f, 1.0f },
 		.ColorBegin = { 0.8f, 0.3f, 0.2f, 1.0f },
 		.ColorEnd = { 0.2f, 0.3f, 0.8f, 1.0f },
-		.SizeBegin = 0.5f,
-		.SizeEnd = 0.1f,
+		.SizeBegin = 0.2f,
+		.SizeEnd = 0.0f,
+		.SizeVariation = 0.3f,
+		.LifeTime = 1.0f
 	};
 }
 
@@ -83,14 +85,14 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 		const auto height = Kerberos::Application::Get().GetWindow().GetHeight();
 		const auto bounds = m_CameraController.GetBounds();
 
-		auto pos = m_CameraController.GetCamera().GetPosition();
+		const auto pos = m_CameraController.GetCamera().GetPosition();
 
 		x = (x / static_cast<float>(width)) * bounds.GetWidth() * 0.5f;
 		y = bounds.GetHeight() * 0.5f - (y / static_cast<float>(height)) * bounds.GetHeight();
 
 		m_Particle.Position = { x + pos.x, y + pos.y };
 
-		for (int i = 0; i < 100; i++)
+		for (int i = 0; i < 50; i++)
 			m_ParticleSystem.Emit(m_Particle);
 	}
 

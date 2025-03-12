@@ -46,7 +46,6 @@ namespace Kerberos
 		float m_CameraRotationSpeed = 90.0f;
 
 		OrthographicCameraBounds m_Bounds;
-
 		OrthographicCamera m_Camera;
 	};
 }

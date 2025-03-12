@@ -29,9 +29,10 @@ private:
 std::mt19937 Random::s_RandomEngine;
 std::uniform_int_distribution<std::mt19937::result_type> Random::s_Distribution;
 
-ParticleSystem::ParticleSystem()
+ParticleSystem::ParticleSystem(const uint32_t maxParticles)
+	: m_PoolIndex(maxParticles - 1)
 {
-	m_ParticlePool.resize(1000);
+	m_ParticlePool.resize(maxParticles);
 }
 
 void ParticleSystem::OnUpdate(const Kerberos::Timestep ts)
@@ -67,7 +68,7 @@ void ParticleSystem::OnRender(const Kerberos::OrthographicCamera& camera)
 		// Fade away particles
 		const float life = particle.LifeRemaining / particle.LifeTime;
 		glm::vec4 color = glm::lerp(particle.ColorEnd, particle.ColorBegin, life);
-		color.a = color.a * life;
+		//color.a = color.a * life;
 
 		float size = glm::lerp(particle.SizeEnd, particle.SizeBegin, life);
 

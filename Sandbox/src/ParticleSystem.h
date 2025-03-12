@@ -14,7 +14,7 @@ struct ParticleProps
 class ParticleSystem
 {
 public:
-	explicit ParticleSystem();
+	explicit ParticleSystem(uint32_t maxParticles = 10000);
 
 
 	void OnUpdate(Kerberos::Timestep ts);
@@ -39,5 +39,5 @@ private:
 	};
 
 	std::vector<Particle> m_ParticlePool;
-	uint32_t m_PoolIndex = 999;
+	uint32_t m_PoolIndex;
 };
