@@ -71,7 +71,7 @@ void ParticleSystem::OnRender(const Kerberos::OrthographicCamera& camera)
 
 		float size = glm::lerp(particle.SizeEnd, particle.SizeBegin, life);
 
-		Kerberos::Renderer2D::DrawQuad({ particle.Position.x, particle.Position.y, 0.0f }, { size, size }, particle.Rotation, color);
+		Kerberos::Renderer2D::DrawQuad({ particle.Position.x, particle.Position.y, 1.0f }, { size, size }, particle.Rotation, color);
 	}
 	Kerberos::Renderer2D::EndScene();
 }

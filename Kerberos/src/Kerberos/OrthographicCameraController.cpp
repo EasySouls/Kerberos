@@ -9,7 +9,8 @@
 namespace Kerberos
 {
 	OrthographicCameraController::OrthographicCameraController(const float aspectRatio, const bool rotation)
-		: m_AspectRatio(aspectRatio), m_RotationEnabled(rotation), m_Camera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio* m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel)
+		: m_AspectRatio(aspectRatio), m_RotationEnabled(rotation), m_Bounds({ .Left = -m_AspectRatio * m_ZoomLevel, .Right = m_AspectRatio * m_ZoomLevel, .Bottom = -m_ZoomLevel, .Top = m_ZoomLevel }),
+		  m_Camera(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top)
 	{
 	}
 
@@ -55,7 +56,9 @@ namespace Kerberos
 		// / Clamp the zoom level
 		m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
 
-		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+		m_Bounds = { .Left = -m_AspectRatio * m_ZoomLevel, .Right = m_AspectRatio * m_ZoomLevel, .Bottom = -m_ZoomLevel, .Top = m_ZoomLevel };
+
+		m_Camera.SetProjection(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top);
 
 		return false;
 	}
@@ -63,7 +66,10 @@ namespace Kerberos
 	bool OrthographicCameraController::OnWindowResized(const WindowResizeEvent& e)
 	{
 		m_AspectRatio = static_cast<float>(e.GetWidth()) / static_cast<float>(e.GetHeight());
-		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+
+		m_Bounds = { .Left = -m_AspectRatio * m_ZoomLevel, .Right = m_AspectRatio * m_ZoomLevel, .Bottom = -m_ZoomLevel, .Top = m_ZoomLevel };
+
+		m_Camera.SetProjection(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top);
 
 		return false;
 	}

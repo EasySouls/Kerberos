@@ -8,16 +8,26 @@
 
 namespace Kerberos
 {
+	struct OrthographicCameraBounds
+	{
+		float Left, Right;
+		float Bottom, Top;
+
+		float GetWidth() const { return Right - Left; }
+		float GetHeight() const { return Top - Bottom; }
+	};
+
 	class OrthographicCameraController
 	{
 	public:
-		OrthographicCameraController(float aspectRatio, bool rotation = false);
+		explicit OrthographicCameraController(float aspectRatio, bool rotation = false);
 
 		void OnUpdate(Timestep deltaTime);
 		void OnEvent(Event& e);
 
 		OrthographicCamera& GetCamera() { return m_Camera; }
 		const OrthographicCamera& GetCamera() const { return m_Camera; }
+		const OrthographicCameraBounds& GetBounds() const { return m_Bounds; }
 
 	private:
 		bool OnMouseScrolled(const MouseScrolledEvent& e);
@@ -34,6 +44,8 @@ namespace Kerberos
 
 		float m_CameraMoveSpeed = 5.0f;
 		float m_CameraRotationSpeed = 90.0f;
+
+		OrthographicCameraBounds m_Bounds;
 
 		OrthographicCamera m_Camera;
 	};

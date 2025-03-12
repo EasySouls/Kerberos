@@ -79,18 +79,23 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 	{
 		auto [x, y] = Kerberos::Input::GetMousePosition();
 
-		auto width = Kerberos::Application::Get().GetWindow().GetWidth();
-		auto height = Kerberos::Application::Get().GetWindow().GetHeight();
-		auto bounds = m_CameraController.GetBounds();
+		const auto width = Kerberos::Application::Get().GetWindow().GetWidth();
+		const auto height = Kerberos::Application::Get().GetWindow().GetHeight();
+		const auto bounds = m_CameraController.GetBounds();
 
 		auto pos = m_CameraController.GetCamera().GetPosition();
-		x = bounds.Left + x * (bounds.Right - bounds.Left) / width;
-		y = bounds.Bottom + (height - y) * (bounds.Top - bounds.Bottom) / height;
 
-		m_Particle.Position = { x, y };
+		x = (x / static_cast<float>(width)) * bounds.GetWidth() * 0.5f;
+		y = bounds.GetHeight() * 0.5f - (y / static_cast<float>(height)) * bounds.GetHeight();
+
+		m_Particle.Position = { x + pos.x, y + pos.y };
+
 		for (int i = 0; i < 100; i++)
 			m_ParticleSystem.Emit(m_Particle);
 	}
+
+	m_ParticleSystem.OnUpdate(deltaTime);
+	m_ParticleSystem.OnRender(m_CameraController.GetCamera());
 }
 
 void Sandbox2D::OnImGuiRender()
