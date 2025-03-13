@@ -27,6 +27,7 @@
 #include "Kerberos/Renderer/Buffer.h"
 #include "Kerberos/Renderer/Shader.h"
 #include "Kerberos/Renderer/Texture.h"
+#include "Kerberos/Renderer/SubTexture2D.h"
 #include "Kerberos/Renderer/VertexArray.h"
 /// ---------------------------------
 

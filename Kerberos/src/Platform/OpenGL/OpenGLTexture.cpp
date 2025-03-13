@@ -20,7 +20,7 @@ namespace Kerberos
 			data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 		}
 	
-		KBR_ASSERT(data, "Failed to load image!");
+		KBR_ASSERT(data, "Failed to load image!")
 
 		m_Width = static_cast<unsigned int>(width);
 		m_Height = static_cast<unsigned int>(height);

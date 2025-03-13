@@ -19,6 +19,10 @@ void Sandbox2D::OnAttach()
 
 	m_SpriteSheet = Kerberos::Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
 
+	m_TextureStairs = Kerberos::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 7, 6 }, { 128, 128 }, { 1, 1 });
+	m_TextureBarrel = Kerberos::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 8, 3 }, { 128, 128 }, { 1, 1 });
+	m_TextureTree = Kerberos::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 2, 1 }, { 128, 128 }, { 1, 2 });
+
 	m_Particle = ParticleProps{
 		.Position = { 0.0f, 0.0f },
 		.Velocity = { 0.0f, 0.0f },
@@ -84,7 +88,9 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 	{
 		Kerberos::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-		Kerberos::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.8f }, { 1.0f, 1.0f }, 0.0f, m_SpriteSheet);
+		Kerberos::Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, 0.1f }, { 1.0f, 1.0f }, 0.0f, m_TextureStairs);
+		Kerberos::Renderer2D::DrawTexturedQuad({ 1.0f, 0.0f, 0.1f }, { 1.0f, 1.0f }, 0.0f, m_TextureBarrel);
+		Kerberos::Renderer2D::DrawTexturedQuad({ -1.0f, 0.0f, 0.1f }, { 1.0f, 2.0f }, 0.0f, m_TextureTree);
 
 		Kerberos::Renderer2D::EndScene();
 	}
@@ -99,8 +105,11 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 
 		const auto pos = m_CameraController.GetCamera().GetPosition();
 
-		x = (x / static_cast<float>(width)) * bounds.GetWidth() * 0.5f;
-		y = bounds.GetHeight() * 0.5f - (y / static_cast<float>(height)) * bounds.GetHeight();
+		const float halfWidth = static_cast<float>(width) * 0.5f;
+		const float halfHeight = static_cast<float>(height) * 0.5f;
+
+		x = ((x - halfWidth) / static_cast<float>(width)) * bounds.GetWidth();
+		y = ((halfHeight - y) / static_cast<float>(height)) * bounds.GetHeight();
 
 		m_Particle.Position = { x + pos.x, y + pos.y };
 
