@@ -80,7 +80,9 @@
       <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.304.1\Include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -106,6 +108,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -132,6 +135,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -146,8 +150,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h" />
-    <ClInclude Include="src\Kerberos\Renderer\Framebuffer.h" />
     <ClInclude Include="src\Kerberos.h" />
     <ClInclude Include="src\Kerberos\Application.h" />
     <ClInclude Include="src\Kerberos\Core.h" />
@@ -168,6 +170,7 @@
     <ClInclude Include="src\Kerberos\MouseButtonCodes.h" />
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h" />
+    <ClInclude Include="src\Kerberos\Renderer\Framebuffer.h" />
     <ClInclude Include="src\Kerberos\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Kerberos\Renderer\OrthographicCamera.h" />
     <ClInclude Include="src\Kerberos\Renderer\RenderCommand.h" />
@@ -175,6 +178,7 @@
     <ClInclude Include="src\Kerberos\Renderer\Renderer2D.h" />
     <ClInclude Include="src\Kerberos\Renderer\RendererAPI.h" />
     <ClInclude Include="src\Kerberos\Renderer\Shader.h" />
+    <ClInclude Include="src\Kerberos\Renderer\SubTexture2D.h" />
     <ClInclude Include="src\Kerberos\Renderer\Texture.h" />
     <ClInclude Include="src\Kerberos\Renderer\VertexArray.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
@@ -182,6 +186,7 @@
     <ClInclude Include="src\Platform\D3D11\D3D11RendererAPI.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h" />
@@ -193,12 +198,9 @@
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\kbrpch.h" />
-    <ClInclude Include="src\Kerberos\Renderer\SubTexture2D.h" />
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp" />
-    <ClCompile Include="src\Kerberos\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Kerberos\Application.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp" />
@@ -207,18 +209,21 @@
     <ClCompile Include="src\Kerberos\Log.cpp" />
     <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Renderer2D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\SubTexture2D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Texture.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11RendererAPI.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp" />
@@ -231,7 +236,6 @@
     <ClCompile Include="src\kbrpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Renderer\SubTexture2D.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>

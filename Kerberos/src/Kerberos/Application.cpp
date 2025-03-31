@@ -13,14 +13,15 @@ namespace Kerberos
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application()
+	Application::Application(const std::string& name)
 	{
 		KBR_PROFILE_FUNCTION();
 
 		KBR_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		m_Window = Window::Create();
+		const WindowProps props{ name, 1280, 720 };
+		m_Window = Window::Create(props);
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();

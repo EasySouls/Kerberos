@@ -15,7 +15,7 @@ namespace Kerberos
 		/**
 		 * Initializes the window, the renderer, and creates the ImGuiLayer.
 		 */
-		Application();
+		explicit Application(const std::string& name);
 		virtual ~Application();
 
 		void Run();

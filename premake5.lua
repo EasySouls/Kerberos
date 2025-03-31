@@ -2,7 +2,12 @@ workspace "Kerberos"
 	architecture "x64"
 	configurations { "Debug", "Release", "Dist" }
 
-	startproject "Sandbox"
+	startproject "KerberosEditor"
+
+	flags
+	{
+		"MultiProcessorCompile"
+	}
 	
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -167,8 +172,58 @@ project "Sandbox"
 	
 	includedirs
 	{
-		"Kerberos/vendor",
 		"Kerberos/src",
+		"Kerberos/vendor",
+		"Kerberos/vendor/spdlog/include",
+		IncludeDir.glm
+	}
+	
+	links
+	{
+		"Kerberos",
+	}
+	
+	filter "system:windows"
+		systemversion "latest"
+		
+		defines
+		{
+			"KBR_PLATFORM_WINDOWS"
+		}
+		
+	filter "configurations:Debug"
+		defines "KBR_DEBUG"
+		symbols "on"
+		
+	filter "configurations:Release"
+		defines "KBR_RELEASE"
+		optimize "on"
+		
+	filter "configurations:Dist"
+		defines "KBR_DIST"
+		optimize "on"
+
+project "KerberosEditor"
+	location "KerberosEditor"
+	kind "ConsoleApp"
+	staticruntime "on"
+	language "C++"
+	cppdialect "C++20"
+	
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+	
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
+	
+	includedirs
+	{
+		"Kerberos/src",
+		"Kerberos/vendor",
+		"Kerberos/vendor/spdlog/include",
 		IncludeDir.glm
 	}
 	
