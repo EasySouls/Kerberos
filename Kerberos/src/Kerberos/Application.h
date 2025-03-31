@@ -19,6 +19,7 @@ namespace Kerberos
 		virtual ~Application();
 
 		void Run();
+		void Close();
 
 		void OnEvent(Event& e);
 
