@@ -56,9 +56,7 @@ namespace Kerberos
 		// / Clamp the zoom level
 		m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
 
-		m_Bounds = { .Left = -m_AspectRatio * m_ZoomLevel, .Right = m_AspectRatio * m_ZoomLevel, .Bottom = -m_ZoomLevel, .Top = m_ZoomLevel };
-
-		m_Camera.SetProjection(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top);
+		CalculateView();
 
 		return false;
 	}
@@ -67,10 +65,14 @@ namespace Kerberos
 	{
 		m_AspectRatio = static_cast<float>(e.GetWidth()) / static_cast<float>(e.GetHeight());
 
-		m_Bounds = { .Left = -m_AspectRatio * m_ZoomLevel, .Right = m_AspectRatio * m_ZoomLevel, .Bottom = -m_ZoomLevel, .Top = m_ZoomLevel };
-
-		m_Camera.SetProjection(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top);
+		CalculateView();
 
 		return false;
+	}
+
+	void OrthographicCameraController::CalculateView() 
+	{
+		m_Bounds = { .Left = -m_AspectRatio * m_ZoomLevel, .Right = m_AspectRatio * m_ZoomLevel, .Bottom = -m_ZoomLevel, .Top = m_ZoomLevel };
+		m_Camera.SetProjection(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top);
 	}
 }

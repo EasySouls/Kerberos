@@ -25,6 +25,8 @@ namespace Kerberos
 		void OnUpdate(Timestep deltaTime);
 		void OnEvent(Event& e);
 
+		void SetZoomLevel(const float level) { m_ZoomLevel = level; CalculateView(); }
+
 		OrthographicCamera& GetCamera() { return m_Camera; }
 		const OrthographicCamera& GetCamera() const { return m_Camera; }
 		const OrthographicCameraBounds& GetBounds() const { return m_Bounds; }
@@ -32,6 +34,8 @@ namespace Kerberos
 	private:
 		bool OnMouseScrolled(const MouseScrolledEvent& e);
 		bool OnWindowResized(const WindowResizeEvent& e);
+
+		void CalculateView();
 
 	private:
 		float m_AspectRatio;

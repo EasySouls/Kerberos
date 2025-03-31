@@ -3,7 +3,6 @@
 
 #include "ParticleSystem.h"
 
-
 class Sandbox2D : public Kerberos::Layer
 {
 public:
@@ -23,7 +22,7 @@ private:
 
 	Kerberos::Ref<Kerberos::Texture2D> m_Texture;
 	Kerberos::Ref<Kerberos::Texture2D> m_SpriteSheet;
-	Kerberos::Ref<Kerberos::SubTexture2D> m_TextureStairs, m_TextureBarrel, m_TextureTree;
+	Kerberos::Ref<Kerberos::SubTexture2D> m_TextureStairs, m_TextureBarrel, m_TextureTree, m_TextureGrass, m_TextureDirt, m_TextureWater;
 
 	struct ProfileResult
 	{
@@ -37,5 +36,9 @@ private:
 
 	ParticleSystem m_ParticleSystem;
 	ParticleProps m_Particle;
+
+	std::unordered_map<char, Kerberos::Ref<Kerberos::SubTexture2D>> m_TileMap;
+	size_t m_MapWidth = 32;
+	size_t m_MapHeight = 16;
 };
 
