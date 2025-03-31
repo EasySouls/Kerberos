@@ -27,12 +27,16 @@ static const char* s_Map =
 
 Sandbox2D::Sandbox2D()
 	: Layer("Sandbox2D"), m_CameraController(1280.0f / 720.0f)
-{
-}
+{}
 
 void Sandbox2D::OnAttach()
 {
 	KBR_PROFILE_FUNCTION();
+
+	Kerberos::FramebufferSpecification frameBuferSpec;
+	frameBuferSpec.Width = 1280;
+	frameBuferSpec.Height = 720;
+	m_Framebuffer = Kerberos::Framebuffer::Create(frameBuferSpec);
 
 	m_Texture = Kerberos::Texture2D::Create("assets/textures/y2k_ice_texture.png");
 
@@ -82,9 +86,14 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 	}
 
 	Kerberos::Renderer2D::ResetStatistics();
+	{
+		KBR_PROFILE_SCOPE("Renderer Prep");
 
-	Kerberos::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-	Kerberos::RenderCommand::Clear();
+		m_Framebuffer->Bind();
+
+		Kerberos::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		Kerberos::RenderCommand::Clear();
+	}
 
 #if 0
 	{
@@ -138,6 +147,8 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 		}
 
 		Kerberos::Renderer2D::EndScene();
+
+		m_Framebuffer->Unbind();
 	}
 
 	if (Kerberos::Input::IsMouseButtonPressed(KBR_MOUSE_BUTTON_LEFT))
@@ -170,74 +181,106 @@ void Sandbox2D::OnImGuiRender()
 {
 	KBR_PROFILE_FUNCTION();
 
-	static bool dockspaceOpen = true;
-	static bool optFullscreenPersistent = true;
-	static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
+	static bool isDockingEnabled = true;
 
-	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-
-	if (optFullscreenPersistent)
+	if (isDockingEnabled)
 	{
-		const ImGuiViewport* viewport = ImGui::GetMainViewport();
-		ImGui::SetNextWindowPos(viewport->Pos);
-		ImGui::SetNextWindowSize(viewport->Size);
-		ImGui::SetNextWindowViewport(viewport->ID);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-		windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-	}
-	
-	if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
-		windowFlags |= ImGuiWindowFlags_NoBackground;
+		static bool dockspaceOpen = true;
+		static bool optFullscreenPersistent = true;
+		static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
-	ImGui::PopStyleVar();
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 
-	if (optFullscreenPersistent)
-		ImGui::PopStyleVar(2);
-
-	const ImGuiIO& io = ImGui::GetIO();
-	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-	{
-		const ImGuiID dockspaceId = ImGui::GetID("MyDockSpace");
-		ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
-	}
-
-	if (ImGui::BeginMenuBar())
-	{
-		if (ImGui::BeginMenu("File"))
+		if (optFullscreenPersistent)
 		{
-			if (ImGui::MenuItem("Exit")) Kerberos::Application::Get().Close();
-			ImGui::EndMenu();
+			const ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->Pos);
+			ImGui::SetNextWindowSize(viewport->Size);
+			ImGui::SetNextWindowViewport(viewport->ID);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 		}
-		ImGui::EndMenuBar();
+
+		if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
+			windowFlags |= ImGuiWindowFlags_NoBackground;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
+		ImGui::PopStyleVar();
+
+		if (optFullscreenPersistent)
+			ImGui::PopStyleVar(2);
+
+		const ImGuiIO& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+		{
+			const ImGuiID dockspaceId = ImGui::GetID("MyDockSpace");
+			ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
+		}
+
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Exit")) Kerberos::Application::Get().Close();
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
+
+
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
+
+		const auto stats = Kerberos::Renderer2D::GetStatistics();
+		ImGui::Text("Renderer2D Stats");
+		ImGui::Text("Draw Calls: %u", stats.DrawCalls);
+		ImGui::Text("Quads: %u", stats.QuadCount);
+		ImGui::Text("Vertices: %u", stats.GetTotalVertexCount());
+		ImGui::Text("Indices: %u", stats.GetTotalIndexCount());
+
+		for (const auto& [Name, Time] : m_ProfileResults)
+		{
+			const auto fmt = "%s %.3fms";
+			ImGui::Text(fmt, Name, Time);
+		}
+		m_ProfileResults.clear();
+
+		ImGui::Text("FPS: %.2f", m_Fps);
+
+		const uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+		ImGui::Image(textureID, ImVec2{ 1280.0f, 720.0f }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		ImGui::End();
+
+		ImGui::End();
+
 	}
-
-
-	ImGui::Begin("Settings");
-	ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
-
-	const auto stats = Kerberos::Renderer2D::GetStatistics();
-	ImGui::Text("Renderer2D Stats");
-	ImGui::Text("Draw Calls: %u", stats.DrawCalls);
-	ImGui::Text("Quads: %u", stats.QuadCount);
-	ImGui::Text("Vertices: %u", stats.GetTotalVertexCount());
-	ImGui::Text("Indices: %u", stats.GetTotalIndexCount());
-
-	for (const auto& [Name, Time] : m_ProfileResults)
+	else
 	{
-		const auto fmt = "%s %.3fms";
-		ImGui::Text(fmt, Name, Time);
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
+
+		const auto stats = Kerberos::Renderer2D::GetStatistics();
+		ImGui::Text("Renderer2D Stats");
+		ImGui::Text("Draw Calls: %u", stats.DrawCalls);
+		ImGui::Text("Quads: %u", stats.QuadCount);
+		ImGui::Text("Vertices: %u", stats.GetTotalVertexCount());
+		ImGui::Text("Indices: %u", stats.GetTotalIndexCount());
+
+		for (const auto& [Name, Time] : m_ProfileResults)
+		{
+			const auto fmt = "%s %.3fms";
+			ImGui::Text(fmt, Name, Time);
+		}
+		m_ProfileResults.clear();
+
+		ImGui::Text("FPS: %.2f", m_Fps);
+
+		ImGui::End();
 	}
-	m_ProfileResults.clear();
-
-	ImGui::Text("FPS: %.2f", m_Fps);	
-
-	ImGui::End();
-
-	ImGui::End();
 }
 
 void Sandbox2D::OnEvent(Kerberos::Event& event)

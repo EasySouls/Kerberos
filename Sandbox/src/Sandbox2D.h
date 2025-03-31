@@ -24,6 +24,8 @@ private:
 	Kerberos::Ref<Kerberos::Texture2D> m_SpriteSheet;
 	Kerberos::Ref<Kerberos::SubTexture2D> m_TextureStairs, m_TextureBarrel, m_TextureTree, m_TextureGrass, m_TextureDirt, m_TextureWater;
 
+	Kerberos::Ref<Kerberos::Framebuffer> m_Framebuffer;
+
 	struct ProfileResult
 	{
 		const char* Name;

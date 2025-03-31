@@ -146,6 +146,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h" />
+    <ClInclude Include="src\Kerberos\Renderer\Framebuffer.h" />
     <ClInclude Include="src\Kerberos.h" />
     <ClInclude Include="src\Kerberos\Application.h" />
     <ClInclude Include="src\Kerberos\Core.h" />
@@ -195,6 +197,8 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Kerberos\Application.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp" />
