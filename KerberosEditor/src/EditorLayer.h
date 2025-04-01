@@ -19,14 +19,15 @@ namespace Kerberos
 
 	private:
 		OrthographicCameraController m_CameraController;
+		Ref<Framebuffer> m_Framebuffer;
+
+		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 
 		glm::vec4 m_SquareColor = { 0.8f, 0.3f, 0.2f, 1.0f };
 
 		Ref<Texture2D> m_Texture;
 		Ref<Texture2D> m_SpriteSheet;
 		Ref<SubTexture2D> m_TextureStairs, m_TextureBarrel, m_TextureTree, m_TextureGrass, m_TextureDirt, m_TextureWater;
-
-		Ref<Framebuffer> m_Framebuffer;
 
 		struct ProfileResult
 		{

@@ -49,6 +49,13 @@ namespace Kerberos
 		dispatcher.Dispatch<WindowResizeEvent>(KBR_BIND_FN(OrthographicCameraController::OnWindowResized));
 	}
 
+	void OrthographicCameraController::OnResize(const float width, const float height) 
+	{
+		m_AspectRatio = width / height;
+
+		CalculateView();
+	}
+
 	bool OrthographicCameraController::OnMouseScrolled(const MouseScrolledEvent& e)
 	{
 		m_ZoomLevel -= e.GetYOffset() * 0.25f;

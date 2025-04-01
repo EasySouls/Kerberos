@@ -8,14 +8,14 @@ namespace Kerberos
 	{
 	public:
 		explicit OpenGLFramebuffer(const FramebufferSpecification& spec);
-		~OpenGLFramebuffer() override = default;
+		~OpenGLFramebuffer() override;
 
 		void Invalidate();
 
 		void Bind() override;
 		void Unbind() override;
 
-		//virtual void Resize(uint32_t width, uint32_t height) override;
+		void Resize(uint32_t width, uint32_t height) override;
 
 		uint32_t GetColorAttachmentRendererID() const override { return m_ColorAttachment; }
 		FramebufferSpecification& GetSpecification() override { return m_Specification; }

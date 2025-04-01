@@ -11,8 +11,23 @@ namespace Kerberos
 		Invalidate();
 	}
 
+	OpenGLFramebuffer::~OpenGLFramebuffer() 
+	{
+		glDeleteFramebuffers(1, &m_RendererID);
+		glDeleteTextures(1, &m_ColorAttachment);
+		glDeleteRenderbuffers(1, &m_DepthAttachment);
+	}
+
 	void OpenGLFramebuffer::Invalidate() 
 	{
+		// Check if the framebuffer is already created
+		if (m_RendererID)
+		{
+			glDeleteFramebuffers(1, &m_RendererID);
+			glDeleteTextures(1, &m_ColorAttachment);
+			glDeleteRenderbuffers(1, &m_DepthAttachment);
+		}
+
 		// Create and bind the framebuffer
 		glCreateFramebuffers(1, &m_RendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
@@ -58,10 +73,25 @@ namespace Kerberos
 	void OpenGLFramebuffer::Bind() 
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		glViewport(0, 0, static_cast<int>(m_Specification.Width), static_cast<int>(m_Specification.Height));
 	}
 
 	void OpenGLFramebuffer::Unbind() 
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height) 
+	{
+		if (width == 0 || height == 0)
+		{
+			KBR_CORE_WARN("Attempted to resize framebuffer to {0}, {1}", width, height);
+			return;
+		}
+
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+
+		Invalidate();
 	}
 }
