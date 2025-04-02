@@ -5,20 +5,20 @@
 
 namespace Kerberos
 {
-	class HazelEditorApp : public Application
+	class KerberosEditorApp : public Application
 	{
 	public:
-		HazelEditorApp()
+		KerberosEditorApp()
 			: Application("Kerberos Editor")
 		{
 			PushLayer(new EditorLayer());
 		}
 
-		~HazelEditorApp() override = default;
+		~KerberosEditorApp() override = default;
 	};
 
 	Application* CreateApplication()
 	{
-		return new HazelEditorApp();
+		return new KerberosEditorApp();
 	}
 }

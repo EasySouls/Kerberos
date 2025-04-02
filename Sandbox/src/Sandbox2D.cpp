@@ -96,17 +96,17 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 		KBR_PROFILE_SCOPE("Renderer2D Draw");
 		Kerberos::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-		//Kerberos::Renderer2D::DrawQuad({ -0.1f, 0.0f, 1.0f }, { 1.0f, 1.0f }, 10.0f, m_SquareColor);
-		Kerberos::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.9f }, { 5.0f, 5.0f }, rotation, m_Texture, 5);
-		Kerberos::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.9f }, { 10.0f, 10.0f }, rotation, m_Texture, 1);
-		Kerberos::Renderer2D::DrawQuad({ 1.0f, 0.0f, 0.0f }, { 1.2f, 1.2f }, 0.0f, { 0.2f, 0.3f, 0.8f, 1.0f });
+		//Kerberos::Renderer2D::DrawTexturedQuad({ -0.1f, 0.0f, 1.0f }, { 1.0f, 1.0f }, 10.0f, m_SquareColor);
+		Kerberos::Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, -0.9f }, { 5.0f, 5.0f }, rotation, m_Texture, 5);
+		Kerberos::Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, -0.9f }, { 10.0f, 10.0f }, rotation, m_Texture, 1);
+		Kerberos::Renderer2D::DrawTexturedQuad({ 1.0f, 0.0f, 0.0f }, { 1.2f, 1.2f }, 0.0f, { 0.2f, 0.3f, 0.8f, 1.0f });
 
 		for (float y = -5.0f; y < 5.0f; y += 0.5f)
 		{
 			for (float x = -5.0f; x < 5.0f; x += 0.5f)
 			{
 				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.5f };
-				Kerberos::Renderer2D::DrawQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, 0.0f, color);
+				Kerberos::Renderer2D::DrawTexturedQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, 0.0f, color);
 			}
 		}
 

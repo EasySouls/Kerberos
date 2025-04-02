@@ -167,6 +167,44 @@ namespace Kerberos
 		s_Data.TextureSlotIndex = 1;
 	}
 
+	/// ----------------- PRIMITIVES -----------------
+
+	/// ----------------- Quads ----------------------
+
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	{
+		KBR_PROFILE_FUNCTION();
+
+		if (s_Data.QuadIndexCount >= s_Data.MaxIndices)
+		{
+			FlushAndReset();
+		}
+
+		constexpr glm::vec2 textureCoords[] = {
+		{ 0.0f, 0.0f },
+		{ 1.0f, 0.0f },
+		{ 1.0f, 1.0f },
+		{ 0.0f, 1.0f }
+		};
+
+		for (size_t i = 0; i < 4; ++i)
+		{
+			constexpr float textureIndex = 0.0f; /// White texture
+			constexpr float tilingFactor = 1.0f;
+
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			s_Data.QuadVertexBufferPtr++;
+		}
+
+		s_Data.QuadIndexCount += 6;
+
+		s_Data.Stats.QuadCount++;
+	}
+
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const glm::vec4& color)
 	{
 		DrawQuad({ position.x, position.y, 0.0f }, size, rotation, color);
@@ -176,38 +214,11 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		if (s_Data.QuadIndexCount >= s_Data.MaxIndices)
-		{
-			FlushAndReset();
-		}
-
-		constexpr float whiteTexIndex = 0.0f;
-		constexpr float tilingFactor = 1.0f;
-
-		constexpr glm::vec2 textureCoords[] = {
-			{ 0.0f, 0.0f },
-			{ 1.0f, 0.0f },
-			{ 1.0f, 1.0f },
-			{ 0.0f, 1.0f }
-		};
-
 		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		for (short i = 0; i < 4; ++i)
-		{
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
-			s_Data.QuadVertexBufferPtr->TexIndex = whiteTexIndex;
-			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-			s_Data.QuadVertexBufferPtr++;
-		}
-
-		s_Data.QuadIndexCount += 6;
-
-		s_Data.Stats.QuadCount++;
+		DrawQuad(transform, color);
 
 #if NO_BATCHING
 		s_Data.Shader->Bind();
@@ -226,12 +237,45 @@ namespace Kerberos
 #endif
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Ref<Texture2D>& texture, const float tilingFactor, const glm::vec4& tintColor)
+	/// -------------------------------------------------------
+
+	/// ----------------- Textured Quads ----------------------
+
+	void Renderer2D::DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Ref<Texture2D>& texture, const float tilingFactor, const glm::vec4& tintColor)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tilingFactor, tintColor);
+		DrawTexturedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tilingFactor, tintColor);
 	}
 	
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Ref<Texture2D>& texture, const float tilingFactor, const glm::vec4& tintColor)
+	void Renderer2D::DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Ref<Texture2D>& texture, const float tilingFactor, const glm::vec4& tintColor)
+	{
+		KBR_PROFILE_FUNCTION();
+
+		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		DrawTexturedQuad(transform, texture, tilingFactor, tintColor);
+
+#if NO_BATCHING
+		s_Data.Shader->Bind();
+		s_Data.Shader->SetFloat4("u_Color", tintColor);
+		s_Data.Shader->SetFloat("u_TilingFactor", tilingFactor);
+
+		texture->Bind();
+
+		s_Data.QuadVertexArray->Bind();
+
+		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) 
+			* glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f }) 
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_Data.Shader->SetMat4("u_Transform", transform);
+
+		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);
+#endif
+	}
+
+	void Renderer2D::DrawTexturedQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const float tilingFactor, const glm::vec4& tintColor)
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -268,10 +312,6 @@ namespace Kerberos
 			s_Data.TextureSlotIndex++;
 		}
 
-		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
-			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-
 		for (size_t i = 0; i < 4; ++i)
 		{
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
@@ -285,6 +325,25 @@ namespace Kerberos
 		s_Data.QuadIndexCount += 6;
 
 		s_Data.Stats.QuadCount++;
+	}
+
+	void Renderer2D::DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation,
+	                                  const Ref<SubTexture2D>& subTexture, const float tilingFactor, const glm::vec4& tintColor)
+	{
+		DrawTexturedQuad({ position.x, position.y, 0.0f }, size, rotation, subTexture, tilingFactor, tintColor);
+	}
+
+	void Renderer2D::DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation,
+		const Ref<SubTexture2D>& subTexture, const float tilingFactor, const glm::vec4& tintColor)
+	{
+		KBR_PROFILE_FUNCTION();
+
+		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+
+		DrawTexturedQuad(transform, subTexture, tilingFactor, tintColor);
 
 #if NO_BATCHING
 		s_Data.Shader->Bind();
@@ -295,8 +354,8 @@ namespace Kerberos
 
 		s_Data.QuadVertexArray->Bind();
 
-		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) 
-			* glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f }) 
+		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f })
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		s_Data.Shader->SetMat4("u_Transform", transform);
@@ -305,14 +364,8 @@ namespace Kerberos
 #endif
 	}
 
-	void Renderer2D::DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation,
-		const Ref<SubTexture2D>& subTexture, const float tilingFactor, const glm::vec4& tintColor)
-	{
-		DrawTexturedQuad({ position.x, position.y, 0.0f }, size, rotation, subTexture, tilingFactor, tintColor);
-	}
-
-	void Renderer2D::DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation,
-		const Ref<SubTexture2D>& subTexture, const float tilingFactor, const glm::vec4& tintColor)
+	void Renderer2D::DrawTexturedQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture,
+		const float tilingFactor, const glm::vec4& tintColor)
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -345,10 +398,6 @@ namespace Kerberos
 			s_Data.TextureSlotIndex++;
 		}
 
-		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
-			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-
 		for (size_t i = 0; i < 4; ++i)
 		{
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
@@ -363,6 +412,8 @@ namespace Kerberos
 
 		s_Data.Stats.QuadCount++;
 	}
+
+	/// -------------------------------------------------------
 
 	Renderer2D::Statistics Renderer2D::GetStatistics()
 	{

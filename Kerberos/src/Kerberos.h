@@ -32,6 +32,12 @@
 #include "Kerberos/Renderer/Framebuffer.h"
 /// ---------------------------------
 
+/// ---- Scene ----------------------
+#include "Kerberos/Scene/Scene.h"
+#include "Kerberos/Scene/Components.h"
+//#include "Kerberos/Scene/Entity.h"
+/// ---------------------------------
+
 /// ---- Input ----------------------
 #include "Kerberos/Input.h"
 #include "Kerberos/KeyCodes.h"

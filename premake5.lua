@@ -21,6 +21,7 @@ IncludeDir["ImGui"] = "%{wks.location}/Kerberos/vendor/imgui"
 IncludeDir["glm"] = "%{wks.location}/Kerberos/vendor/glm"
 IncludeDir["stb_image"] = "%{wks.location}/Kerberos/vendor/stb_image"
 IncludeDir["VulkanSDK"] = "%{VULKAN_DIR}/Include"
+IncludeDir["entt"] = "%{wks.location}/Kerberos/vendor/entt/Include"
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
@@ -66,7 +67,8 @@ project "Kerberos"
 		IncludeDir.ImGui,
 		IncludeDir.glm,
 		IncludeDir.stb_image,
-		IncludeDir.VulkanSDK
+		IncludeDir.VulkanSDK,
+		IncludeDir.entt
 	}
 
 	libdirs 
@@ -175,7 +177,8 @@ project "Sandbox"
 		"Kerberos/src",
 		"Kerberos/vendor",
 		"Kerberos/vendor/spdlog/include",
-		IncludeDir.glm
+		IncludeDir.glm,
+		IncludeDir.entt
 	}
 	
 	links
@@ -224,7 +227,8 @@ project "KerberosEditor"
 		"Kerberos/src",
 		"Kerberos/vendor",
 		"Kerberos/vendor/spdlog/include",
-		IncludeDir.glm
+		IncludeDir.glm,
+		IncludeDir.entt
 	}
 	
 	links

@@ -39,6 +39,8 @@ namespace Kerberos
 		frameBuferSpec.Height = 720;
 		m_Framebuffer = Framebuffer::Create(frameBuferSpec);
 
+		m_ActiveScene = CreateRef<Scene>();
+
 		m_ViewportSize = { 1280.0f, 720.0f };
 
 		m_Texture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
@@ -70,6 +72,10 @@ namespace Kerberos
 		};
 
 		m_CameraController.SetZoomLevel(5.0f);
+
+		const auto square = m_ActiveScene->CreateEntity();
+		m_ActiveScene->GetRegistry().emplace<TransformComponent>(square);
+		m_ActiveScene->GetRegistry().emplace<SpriteRendererComponent>(square, glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
 	}
 
 	void EditorLayer::OnDetach()
@@ -108,17 +114,17 @@ namespace Kerberos
 			KBR_PROFILE_SCOPE("Renderer2D Draw");
 			Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-			//Renderer2D::DrawQuad({ -0.1f, 0.0f, 1.0f }, { 1.0f, 1.0f }, 10.0f, m_SquareColor);
-			Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.9f }, { 5.0f, 5.0f }, rotation, m_Texture, 5);
-			Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.9f }, { 10.0f, 10.0f }, rotation, m_Texture, 1);
-			Renderer2D::DrawQuad({ 1.0f, 0.0f, 0.0f }, { 1.2f, 1.2f }, 0.0f, { 0.2f, 0.3f, 0.8f, 1.0f });
+			//Renderer2D::DrawTexturedQuad({ -0.1f, 0.0f, 1.0f }, { 1.0f, 1.0f }, 10.0f, m_SquareColor);
+			Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, -0.9f }, { 5.0f, 5.0f }, rotation, m_Texture, 5);
+			Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, -0.9f }, { 10.0f, 10.0f }, rotation, m_Texture, 1);
+			Renderer2D::DrawTexturedQuad({ 1.0f, 0.0f, 0.0f }, { 1.2f, 1.2f }, 0.0f, { 0.2f, 0.3f, 0.8f, 1.0f });
 
 			for (float y = -5.0f; y < 5.0f; y += 0.5f)
 			{
 				for (float x = -5.0f; x < 5.0f; x += 0.5f)
 				{
 					glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.5f };
-					Renderer2D::DrawQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, 0.0f, color);
+					Renderer2D::DrawTexturedQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, 0.0f, color);
 				}
 			}
 
@@ -129,10 +135,14 @@ namespace Kerberos
 		{
 			Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-			/*Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, 0.4f }, { 1.0f, 1.0f }, 0.0f, m_TextureStairs);
+#if TEXTURE_EXAMPLE
+			Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, 0.4f }, { 1.0f, 1.0f }, 0.0f, m_TextureStairs);
 			Renderer2D::DrawTexturedQuad({ 1.0f, 0.0f, 0.4f }, { 1.0f, 1.0f }, 0.0f, m_TextureBarrel);
-			Renderer2D::DrawTexturedQuad({ -1.0f, 0.0f, 0.4f }, { 1.0f, 2.0f }, 0.0f, m_TextureTree);*/
+			Renderer2D::DrawTexturedQuad({ -1.0f, 0.0f, 0.4f }, { 1.0f, 2.0f }, 0.0f, m_TextureTree);
+#endif
 
+
+#if MAP_EXAMPLE
 			for (size_t y = 0; y < m_MapHeight; y++)
 			{
 				for (size_t x = 0; x < m_MapWidth; x++)
@@ -150,6 +160,9 @@ namespace Kerberos
 					Renderer2D::DrawTexturedQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, 0.0f }, { 1.0f, 1.0f }, 0.0f, texture);
 				}
 			}
+#endif
+
+			m_ActiveScene->OnUpdate(deltaTime);
 
 			Renderer2D::EndScene();
 
