@@ -1,11 +1,15 @@
 #pragma once
 
 #include "Kerberos/Core/Timestep.h"
+#include "Components.h"
 
 #include <entt.hpp>
 
+
 namespace Kerberos
 {
+	class Entity;
+
 	class Scene
 	{
 	public:
@@ -14,11 +18,16 @@ namespace Kerberos
 
 		void OnUpdate(Timestep ts);
 
-		entt::entity CreateEntity();
-
-		entt::registry& GetRegistry() { return m_Registry; }
+		/**
+		 * @brief Create an entity in the scene and assigns it a transform component
+		 *
+		 * @return Entity The entity created
+		 */
+		Entity CreateEntity(const std::string& name = std::string());
 
 	private:
 		entt::registry m_Registry;
+
+		friend class Entity;
 	};
 }

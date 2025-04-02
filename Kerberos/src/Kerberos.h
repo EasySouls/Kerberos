@@ -35,7 +35,7 @@
 /// ---- Scene ----------------------
 #include "Kerberos/Scene/Scene.h"
 #include "Kerberos/Scene/Components.h"
-//#include "Kerberos/Scene/Entity.h"
+#include "Kerberos/Scene/Entity.h"
 /// ---------------------------------
 
 /// ---- Input ----------------------

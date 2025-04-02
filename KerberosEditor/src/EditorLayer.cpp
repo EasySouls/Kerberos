@@ -73,9 +73,8 @@ namespace Kerberos
 
 		m_CameraController.SetZoomLevel(5.0f);
 
-		const auto square = m_ActiveScene->CreateEntity();
-		m_ActiveScene->GetRegistry().emplace<TransformComponent>(square);
-		m_ActiveScene->GetRegistry().emplace<SpriteRendererComponent>(square, glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
+		Entity squareEntity = m_ActiveScene->CreateEntity("Square");
+		squareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
 	}
 
 	void EditorLayer::OnDetach()
@@ -175,9 +174,9 @@ namespace Kerberos
 
 			const auto width = Application::Get().GetWindow().GetWidth();
 			const auto height = Application::Get().GetWindow().GetHeight();
-			const auto bounds = m_CameraController.GetBounds();
+			const auto& bounds = m_CameraController.GetBounds();
 
-			const auto pos = m_CameraController.GetCamera().GetPosition();
+			const auto& pos = m_CameraController.GetCamera().GetPosition();
 
 			const float halfWidth = static_cast<float>(width) * 0.5f;
 			const float halfHeight = static_cast<float>(height) * 0.5f;

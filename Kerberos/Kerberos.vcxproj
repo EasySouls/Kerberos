@@ -182,6 +182,7 @@
     <ClInclude Include="src\Kerberos\Renderer\Texture.h" />
     <ClInclude Include="src\Kerberos\Renderer\VertexArray.h" />
     <ClInclude Include="src\Kerberos\Scene\Components.h" />
+    <ClInclude Include="src\Kerberos\Scene\Entity.h" />
     <ClInclude Include="src\Kerberos\Scene\Scene.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11Context.h" />

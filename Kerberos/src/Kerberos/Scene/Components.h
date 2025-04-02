@@ -2,8 +2,6 @@
 
 #include <glm/glm.hpp>
 
-#include "Kerberos/Core.h"
-
 namespace Kerberos
 {
 	struct TransformComponent
@@ -31,5 +29,19 @@ namespace Kerberos
 		explicit SpriteRendererComponent(const glm::vec4& color)
 			: Color(color)
 		{}
+	};
+
+	struct TagComponent
+	{
+		std::string Tag;
+
+		TagComponent() = default;
+		TagComponent(const TagComponent&) = default;
+
+		explicit TagComponent(std::string tag)
+			: Tag(std::move(tag)) {}
+
+		explicit operator std::string& () { return Tag; }
+		explicit operator const std::string& () const { return Tag; }
 	};
 }
