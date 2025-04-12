@@ -22,6 +22,7 @@ namespace Kerberos
 		Ref<Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
+		Entity m_CameraEntity;
 
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 

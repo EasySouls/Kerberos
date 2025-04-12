@@ -1,5 +1,6 @@
 #include "EditorLayer.h"
 
+#include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.inl>
 #include "imgui/imgui.h"
@@ -75,6 +76,9 @@ namespace Kerberos
 
 		Entity squareEntity = m_ActiveScene->CreateEntity("Square");
 		squareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
+
+		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
+		m_CameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
 	}
 
 	void EditorLayer::OnDetach()
@@ -132,7 +136,7 @@ namespace Kerberos
 #endif
 
 		{
-			Renderer2D::BeginScene(m_CameraController.GetCamera());
+			//Renderer2D::BeginScene(m_CameraController.GetCamera());
 
 #if TEXTURE_EXAMPLE
 			Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, 0.4f }, { 1.0f, 1.0f }, 0.0f, m_TextureStairs);
@@ -163,7 +167,7 @@ namespace Kerberos
 
 			m_ActiveScene->OnUpdate(deltaTime);
 
-			Renderer2D::EndScene();
+			//Renderer2D::EndScene();
 
 			m_Framebuffer->Unbind();
 		}

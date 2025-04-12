@@ -14,12 +14,36 @@ namespace Kerberos
 
 	void Scene::OnUpdate(Timestep ts)
 	{
-		const auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (const auto entity : group)
-		{
-			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+		const Camera* mainCamera = nullptr;
+		const glm::mat4* mainCameraTransform = nullptr;
 
-			Renderer2D::DrawQuad(transform.Transform, sprite.Color);
+		{
+			const auto group = m_Registry.group<CameraComponent>(entt::get<TransformComponent>);
+			for (const auto entity : group)
+			{
+				auto [camera, transform] = group.get<CameraComponent, TransformComponent>(entity);
+				if (camera.IsPrimary)
+				{
+					mainCamera = &camera.Camera;
+					mainCameraTransform = &transform.Transform;
+					break;
+				}
+			}
+		}
+
+		if (mainCamera)
+		{
+			Renderer2D::BeginScene(*mainCamera, *mainCameraTransform);
+
+			const auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (const auto entity : group)
+			{
+				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+				Renderer2D::DrawQuad(transform.Transform, sprite.Color);
+			}
+
+			Renderer2D::EndScene();
 		}
 	}
 

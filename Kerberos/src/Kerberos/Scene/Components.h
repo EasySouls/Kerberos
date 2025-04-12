@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include "Kerberos/Renderer/Camera.h"
+
 namespace Kerberos
 {
 	struct TransformComponent
@@ -43,5 +45,33 @@ namespace Kerberos
 
 		explicit operator std::string& () { return Tag; }
 		explicit operator const std::string& () const { return Tag; }
+	};
+
+	struct CameraComponent
+	{
+		Camera Camera;
+		bool IsPrimary = true;
+
+		explicit CameraComponent(const glm::mat4& projection)
+			: Camera(projection)
+		{}
+
+		explicit CameraComponent(const Kerberos::Camera& camera)
+			: Camera(camera)
+		{}
+		CameraComponent(const CameraComponent&) = default;
+		CameraComponent(CameraComponent&&) = default;
+
+		CameraComponent& operator=(const CameraComponent&) = default;
+		CameraComponent& operator=(CameraComponent&&) = default;
+		CameraComponent& operator=(const Kerberos::Camera& camera)
+		{
+			Camera = camera;
+			return *this;
+		}
+
+		explicit operator Kerberos::Camera& () { return Camera; }
+
+		~CameraComponent() = default;
 	};
 }

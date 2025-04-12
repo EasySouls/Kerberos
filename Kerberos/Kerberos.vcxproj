@@ -170,6 +170,7 @@
     <ClInclude Include="src\Kerberos\MouseButtonCodes.h" />
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h" />
+    <ClInclude Include="src\Kerberos\Renderer\Camera.h" />
     <ClInclude Include="src\Kerberos\Renderer\Framebuffer.h" />
     <ClInclude Include="src\Kerberos\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Kerberos\Renderer\OrthographicCamera.h" />

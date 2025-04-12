@@ -22,6 +22,9 @@
     <Filter Include="src\Kerberos\Renderer">
       <UniqueIdentifier>{DF21D73E-4B8E-9239-1482-2A9780ADB4A1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Kerberos\Scene">
+      <UniqueIdentifier>{F64DB9E0-E231-7A36-4B92-7489379564B8}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Platform">
       <UniqueIdentifier>{21CA02E5-0D2D-9289-B6B2-CA3FA2F45D0C}</UniqueIdentifier>
     </Filter>
@@ -105,6 +108,9 @@
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Camera.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Framebuffer.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
@@ -137,6 +143,15 @@
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\VertexArray.h">
       <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Scene\Components.h">
+      <Filter>src\Kerberos\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Scene\Entity.h">
+      <Filter>src\Kerberos\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Scene\Scene.h">
+      <Filter>src\Kerberos\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Window.h">
       <Filter>src\Kerberos</Filter>
@@ -247,6 +262,9 @@
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Scene\Scene.cpp">
+      <Filter>src\Kerberos\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp">
       <Filter>src\Platform\D3D11</Filter>

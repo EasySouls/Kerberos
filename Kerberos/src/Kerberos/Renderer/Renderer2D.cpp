@@ -134,6 +134,22 @@ namespace Kerberos
 		s_Data.TextureSlotIndex = 1;
 	}
 
+	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
+	{
+		KBR_PROFILE_FUNCTION();
+
+		const auto& viewProjection = camera.GetProjection() * glm::inverse(transform);
+		s_Data.ViewProjectionMatrix = viewProjection;
+
+		s_Data.Shader->Bind();
+		s_Data.Shader->SetMat4("u_ViewProjection", viewProjection);
+
+		s_Data.QuadIndexCount = 0;
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+		s_Data.TextureSlotIndex = 1;
+	}
+
 	void Renderer2D::EndScene() 
 	{
 		KBR_PROFILE_FUNCTION();
