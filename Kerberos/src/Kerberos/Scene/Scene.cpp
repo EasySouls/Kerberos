@@ -58,4 +58,20 @@ namespace Kerberos
 		return entity;
 	}
 
+	void Scene::OnViewportResize(const uint32_t width, const uint32_t height) 
+	{
+		m_ViewportHeight = height;
+		m_ViewportWidth = width;
+
+		/// Resize the non-fixed aspect ratio cameras
+		const auto view = m_Registry.view<CameraComponent>();
+		for (const auto entity : view)
+		{
+			auto& cameraComponent = view.get<CameraComponent>(entity);
+			if (!cameraComponent.FixedAspectRatio)
+			{
+				cameraComponent.Camera.SetViewportSize(width, height);
+			}
+		}
+	}
 }

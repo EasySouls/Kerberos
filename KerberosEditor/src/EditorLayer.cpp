@@ -78,7 +78,11 @@ namespace Kerberos
 		squareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
-		m_CameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+		m_CameraEntity.AddComponent<CameraComponent>();
+
+		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
+		auto& secondCameraComponent = m_SecondCamera.AddComponent<CameraComponent>();
+		secondCameraComponent.IsPrimary = false;
 	}
 
 	void EditorLayer::OnDetach()
@@ -279,12 +283,16 @@ namespace Kerberos
 		ImGui::Begin("Viewport");
 		ImGui::PopStyleVar();
 
+		// TODO: The resizing of the viewport can be moved to OnUpdate
+
 		const glm::vec2 viewportPanelSize = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
 		if (m_ViewportSize != viewportPanelSize && viewportPanelSize.x > 0 && viewportPanelSize.y > 0)
 		{
 			m_ViewportSize = viewportPanelSize;
 			m_Framebuffer->Resize(static_cast<uint32_t>(viewportPanelSize.x), static_cast<uint32_t>(viewportPanelSize.y));
 			m_CameraController.OnResize(viewportPanelSize.x, viewportPanelSize.y);
+
+			m_ActiveScene->OnViewportResize(static_cast<uint32_t>(viewportPanelSize.x), static_cast<uint32_t>(viewportPanelSize.y));
 		}
 
 		const uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();

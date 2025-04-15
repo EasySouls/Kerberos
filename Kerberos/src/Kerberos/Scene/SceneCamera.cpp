@@ -1,0 +1,38 @@
+#include "kbrpch.h"
+#include "SceneCamera.h"
+
+#include <glm/gtc/matrix_transform.hpp>
+
+namespace Kerberos
+{
+	SceneCamera::SceneCamera() 
+	{
+		RecalculateProjection();
+	}
+
+	void SceneCamera::SetOrthographic(const float size, const float nearClip, const float farClip) 
+	{
+		m_OrthoSize = size;
+		m_OrthoNear = nearClip;
+		m_OrthoFar = farClip;
+
+		RecalculateProjection();
+	}
+
+	void SceneCamera::SetViewportSize(const uint32_t width, const uint32_t height) 
+	{
+		m_AspectRatio = static_cast<float>(width) / static_cast<float>(height);
+
+		RecalculateProjection();
+	}
+
+	void SceneCamera::RecalculateProjection() 
+	{
+		const float orthoLeft = -m_OrthoSize * m_AspectRatio * 0.5f;
+		const float orthoRight = m_OrthoSize * m_AspectRatio * 0.5f;
+		const float orthoBottom = -m_OrthoSize * 0.5f;
+		const float orthoTop = m_OrthoSize * 0.5f;
+
+		m_Projection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_OrthoNear, m_OrthoFar);
+	}
+}

@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "Kerberos/Renderer/Camera.h"
+#include "Kerberos/Scene/SceneCamera.h"
 
 namespace Kerberos
 {
@@ -49,14 +49,16 @@ namespace Kerberos
 
 	struct CameraComponent
 	{
-		Camera Camera;
+		SceneCamera Camera;
 		bool IsPrimary = true;
 
-		explicit CameraComponent(const glm::mat4& projection)
-			: Camera(projection)
-		{}
+		/**
+		* If true, the camera will maintain a fixed aspect ratio when the window is resized.
+		*/
+		bool FixedAspectRatio = false;
 
-		explicit CameraComponent(const Kerberos::Camera& camera)
+		CameraComponent() = default;
+		explicit CameraComponent(const SceneCamera& camera)
 			: Camera(camera)
 		{}
 		CameraComponent(const CameraComponent&) = default;
@@ -64,13 +66,13 @@ namespace Kerberos
 
 		CameraComponent& operator=(const CameraComponent&) = default;
 		CameraComponent& operator=(CameraComponent&&) = default;
-		CameraComponent& operator=(const Kerberos::Camera& camera)
+		CameraComponent& operator=(const SceneCamera& camera)
 		{
 			Camera = camera;
 			return *this;
 		}
 
-		explicit operator Kerberos::Camera& () { return Camera; }
+		explicit operator SceneCamera& () { return Camera; }
 
 		~CameraComponent() = default;
 	};
