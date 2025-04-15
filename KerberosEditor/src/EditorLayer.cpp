@@ -98,12 +98,27 @@ namespace Kerberos
 
 		Timer timer("EditorLayer::OnUpdate", [&](const ProfileResult profileResult) { m_ProfileResults.push_back(profileResult); });
 
+		/// Resize the camera if needed
+		if (const FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
+			(spec.Width != static_cast<uint32_t>(m_ViewportSize.x) || spec.Height != static_cast<uint32_t>(m_ViewportSize.y)))
+		{
+			m_Framebuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+
+			m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+		}
+
 		{
 			KBR_PROFILE_SCOPE("CameraController::OnUpdate");
-			m_CameraController.OnUpdate(deltaTime);
+
+			/// Only update the camera when the viewport is focused
+			if (m_ViewportFocused)
+				m_CameraController.OnUpdate(deltaTime);
 		}
 
 		Renderer2D::ResetStatistics();
+
 		{
 			KBR_PROFILE_SCOPE("Renderer Prep");
 
@@ -271,11 +286,27 @@ namespace Kerberos
 
 		ImGui::Text("FPS: %.2f", m_Fps);
 
-		ImGui::Text("Camera Stats");
+		/*ImGui::Text("Camera Stats");
 		const auto& camera = m_CameraController.GetCamera();
 		ImGui::Text("Position: %.1f, %.1f, %.1f", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 		ImGui::Text("Rotation: %.1f", camera.GetRotation());
-		ImGui::Text("Zoom Level: %.1f", m_CameraController.GetZoomLevel());
+		ImGui::Text("Zoom Level: %.1f", m_CameraController.GetZoomLevel());*/
+
+		if (ImGui::Checkbox("Toggle Primary Camera", &m_IsPrimaryCamera))
+		{
+			m_CameraEntity.GetComponent<CameraComponent>().IsPrimary = m_IsPrimaryCamera;
+			m_SecondCamera.GetComponent<CameraComponent>().IsPrimary = !m_IsPrimaryCamera;
+		}
+
+		{
+			auto& camera = m_SecondCamera.GetComponent<CameraComponent>().Camera;
+			float orthoSize = camera.GetOrthographicSize();
+
+			if (ImGui::DragFloat("Second Camera Size", &orthoSize))
+			{
+				camera.SetOrthographicSize(orthoSize);
+			}
+		}
 
 		ImGui::End();
 
@@ -283,17 +314,12 @@ namespace Kerberos
 		ImGui::Begin("Viewport");
 		ImGui::PopStyleVar();
 
-		// TODO: The resizing of the viewport can be moved to OnUpdate
+		m_ViewportFocused = ImGui::IsWindowFocused();
+		m_ViewportHovered = ImGui::IsWindowHovered();
 
-		const glm::vec2 viewportPanelSize = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
-		if (m_ViewportSize != viewportPanelSize && viewportPanelSize.x > 0 && viewportPanelSize.y > 0)
-		{
-			m_ViewportSize = viewportPanelSize;
-			m_Framebuffer->Resize(static_cast<uint32_t>(viewportPanelSize.x), static_cast<uint32_t>(viewportPanelSize.y));
-			m_CameraController.OnResize(viewportPanelSize.x, viewportPanelSize.y);
+		//Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
-			m_ActiveScene->OnViewportResize(static_cast<uint32_t>(viewportPanelSize.x), static_cast<uint32_t>(viewportPanelSize.y));
-		}
+		m_ViewportSize = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
 
 		const uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		ImGui::Image(textureID, ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });

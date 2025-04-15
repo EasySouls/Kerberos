@@ -28,6 +28,8 @@ namespace Kerberos
 
 		static Application& Get() { return *s_Instance; }
 		Window& GetWindow() const { return *m_Window; }
+		ImGuiLayer* GetImGuiLayer() const { return m_ImGuiLayer; }
+
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& e);
 		bool OnWindowResize(const WindowResizeEvent& e);
