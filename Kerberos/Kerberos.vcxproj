@@ -186,6 +186,7 @@
     <ClInclude Include="src\Kerberos\Scene\Components.h" />
     <ClInclude Include="src\Kerberos\Scene\Entity.h" />
     <ClInclude Include="src\Kerberos\Scene\Scene.h" />
+    <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11Context.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11RendererAPI.h" />

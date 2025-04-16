@@ -1,6 +1,7 @@
 #include "kbrpch.h"
 #include "Scene.h"
-#include "Entity.h"
+#include "Kerberos/Scene/Entity.h"
+#include "Kerberos/Scene/ScriptableEntity.h"
 
 #include "Components.h"
 #include "Kerberos/Renderer/Renderer2D.h"
@@ -14,6 +15,23 @@ namespace Kerberos
 
 	void Scene::OnUpdate(Timestep ts)
 	{
+		/// Update the scripts
+		{
+			m_Registry.view<NativeScriptComponent>().each([this, ts](auto entity, const NativeScriptComponent& script)
+				{
+					if (!script.Instance)
+					{
+						script.Instantiate();
+						script.Instance->m_Entity = Entity{ entity, this };
+						script.OnCreate(script.Instance);
+					}
+
+					script.OnUpdate(script.Instance, ts);
+				});
+		}
+
+		/// Render the scene
+
 		const Camera* mainCamera = nullptr;
 		const glm::mat4* mainCameraTransform = nullptr;
 

@@ -83,6 +83,33 @@ namespace Kerberos
 		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
 		auto& secondCameraComponent = m_SecondCamera.AddComponent<CameraComponent>();
 		secondCameraComponent.IsPrimary = false;
+
+		class CameraController : public ScriptableEntity
+		{
+		public:
+			void OnCreate()
+			{
+			}
+
+			void OnDestroy() {}
+
+			void OnUpdate(const Timestep ts)
+			{
+				auto& transform = GetComponent<TransformComponent>().Transform;
+				constexpr float speed = 2.0f;
+				
+				if (Input::IsKeyPressed(68)) // w
+					transform[3][1] += speed * ts;
+				if (Input::IsKeyPressed(87)) // A
+					transform[3][0] -= speed * ts; 
+				if (Input::IsKeyPressed(65)) // S
+					transform[3][1] -= speed * ts;
+				if (Input::IsKeyPressed(83)) // D
+					transform[3][0] += speed * ts;
+			}
+		};
+
+		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 	}
 
 	void EditorLayer::OnDetach()

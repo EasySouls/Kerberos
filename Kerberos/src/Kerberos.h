@@ -36,6 +36,7 @@
 #include "Kerberos/Scene/Scene.h"
 #include "Kerberos/Scene/Components.h"
 #include "Kerberos/Scene/Entity.h"
+#include "Kerberos/Scene/ScriptableEntity.h"
 #include "Kerberos/Scene/SceneCamera.h"
 /// ---------------------------------
 

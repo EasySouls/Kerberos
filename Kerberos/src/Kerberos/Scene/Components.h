@@ -6,6 +6,8 @@
 
 namespace Kerberos
 {
+	class ScriptableEntity;
+
 	struct TransformComponent
 	{
 		glm::mat4 Transform = glm::mat4(1.0f);
@@ -75,5 +77,34 @@ namespace Kerberos
 		explicit operator SceneCamera& () { return Camera; }
 
 		~CameraComponent() = default;
+	};
+
+	struct NativeScriptComponent
+	{
+		ScriptableEntity* Instance = nullptr;
+
+		std::function<void()> Instantiate;
+		std::function<void()> Destroy;
+
+		std::function<void(ScriptableEntity*)> OnCreate;
+		std::function<void(ScriptableEntity*)> OnDestroy;
+		std::function<void(ScriptableEntity*, Timestep)> OnUpdate;
+
+		template<typename T>
+		void Bind()
+		{
+			Instantiate = [&]() { Instance = new T(); };
+
+			Destroy = [&]() { 
+				delete reinterpret_cast<T*>(Instance); 
+				Instance = nullptr;
+			};
+
+			OnCreate = [](ScriptableEntity* instance) { reinterpret_cast<T*>(instance)->OnCreate(); };
+
+			OnDestroy = [](ScriptableEntity* instance) { reinterpret_cast<T*>(instance)->OnDestroy(); };
+
+			OnUpdate = [](ScriptableEntity* instance, Timestep ts) { reinterpret_cast<T*>(instance)->OnUpdate(ts); };
+		}
 	};
 }

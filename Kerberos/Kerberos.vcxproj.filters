@@ -208,6 +208,7 @@
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Scene\SceneCamera.h" />
+    <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
