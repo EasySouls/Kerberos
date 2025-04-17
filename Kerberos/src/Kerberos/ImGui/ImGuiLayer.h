@@ -12,14 +12,17 @@ namespace Kerberos
 
 		void OnAttach() override;
 		void OnDetach() override;
+		void OnEvent(Event& event) override;
 
 		void OnImGuiRender() override;
+
+		void BlockEvents(const bool block) { m_BlockEvents = block; }
 
 		void Begin();
 		void End();
 
 	private:
-		float m_Time = 0.0f;
+		bool m_BlockEvents = false;
 	};
 
 }

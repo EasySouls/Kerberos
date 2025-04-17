@@ -23,10 +23,10 @@ namespace Kerberos
 					{
 						script.Instantiate();
 						script.Instance->m_Entity = Entity{ entity, this };
-						script.OnCreate(script.Instance);
+						script.Instance->OnCreate();
 					}
 
-					script.OnUpdate(script.Instance, ts);
+					script.Instance->OnUpdate(ts);
 				});
 		}
 

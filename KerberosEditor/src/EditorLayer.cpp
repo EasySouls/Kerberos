@@ -87,25 +87,19 @@ namespace Kerberos
 		class CameraController : public ScriptableEntity
 		{
 		public:
-			void OnCreate()
-			{
-			}
-
-			void OnDestroy() {}
-
-			void OnUpdate(const Timestep ts)
+			void OnUpdate(const Timestep ts) override 
 			{
 				auto& transform = GetComponent<TransformComponent>().Transform;
-				constexpr float speed = 2.0f;
+				constexpr float speed = 5.0f;
 				
 				if (Input::IsKeyPressed(68)) // w
-					transform[3][1] += speed * ts;
+					transform[3].x += speed * ts;
 				if (Input::IsKeyPressed(87)) // A
-					transform[3][0] -= speed * ts; 
+					transform[3].y += speed * ts; 
 				if (Input::IsKeyPressed(65)) // S
-					transform[3][1] -= speed * ts;
+					transform[3].x -= speed * ts;
 				if (Input::IsKeyPressed(83)) // D
-					transform[3][0] += speed * ts;
+					transform[3].y -= speed * ts;
 			}
 		};
 
@@ -344,7 +338,7 @@ namespace Kerberos
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 
-		//Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
 		m_ViewportSize = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
 

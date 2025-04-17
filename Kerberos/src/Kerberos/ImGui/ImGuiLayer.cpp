@@ -59,6 +59,16 @@ namespace Kerberos
 		ImGui::DestroyContext();
 	}
 
+	void ImGuiLayer::OnEvent(Event& event) 
+	{
+		if (m_BlockEvents)
+		{
+			const ImGuiIO& io = ImGui::GetIO();
+			event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+			event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+		}
+	}
+
 	void ImGuiLayer::OnImGuiRender()
 	{
 		//static bool show = false;
@@ -75,7 +85,7 @@ namespace Kerberos
 	void ImGuiLayer::End()
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		Application& application = Application::Get();
+		const Application& application = Application::Get();
 		io.DisplaySize = ImVec2(static_cast<float>(application.GetWindow().GetWidth()), static_cast<float>(application.GetWindow().GetHeight()));
 
 		// Rendering
@@ -85,10 +95,10 @@ namespace Kerberos
 		// Update and Render additional Platform Windows
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
-			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			GLFWwindow* backupCurrentContext = glfwGetCurrentContext();
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-			glfwMakeContextCurrent(backup_current_context);
+			glfwMakeContextCurrent(backupCurrentContext);
 		}
 	}
 }
