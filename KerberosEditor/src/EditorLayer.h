@@ -2,6 +2,7 @@
 #include <Kerberos.h>
 
 #include "ParticleSystem.h"
+#include "Editor/HierarchyPanel.h"
 
 namespace Kerberos
 {
@@ -55,6 +56,9 @@ namespace Kerberos
 		std::unordered_map<char, Ref<SubTexture2D>> m_TileMap;
 		size_t m_MapWidth = 32;
 		size_t m_MapHeight = 16;
+
+		/// Editor Panels
+		HierarchyPanel m_HierarchyPanel;
 	};
 }
 

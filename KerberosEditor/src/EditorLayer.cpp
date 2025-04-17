@@ -104,6 +104,8 @@ namespace Kerberos
 		};
 
 		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+
+		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -287,6 +289,7 @@ namespace Kerberos
 			ImGui::EndMenuBar();
 		}
 
+		m_HierarchyPanel.OnImGuiRender();
 
 		ImGui::Begin("Settings");
 		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));

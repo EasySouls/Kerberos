@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "Scene.h"
+#include "Kerberos/Log.h"
 
 namespace Kerberos
 {
@@ -46,6 +47,20 @@ namespace Kerberos
 		bool HasComponent() const
 		{
 			return m_Scene->m_Registry.any_of<T>(m_EntityHandle);
+		}
+
+		explicit operator bool() const { return m_EntityHandle != entt::null; }
+
+		explicit operator uint32_t () const { return static_cast<uint32_t>(m_EntityHandle); }
+
+		bool operator ==(const Entity& other) const
+		{
+			return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene;
+		}
+
+		bool operator !=(const Entity& other) const
+		{
+			return !(*this == other);
 		}
 
 	private:

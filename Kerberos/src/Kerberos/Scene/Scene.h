@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Kerberos/Core/Timestep.h"
-#include "Components.h"
 
 #include <entt.hpp>
 
@@ -9,6 +8,7 @@
 namespace Kerberos
 {
 	class Entity;
+	class HierarchyPanel;
 
 	class Scene
 	{
@@ -35,5 +35,6 @@ namespace Kerberos
 		uint32_t m_ViewportHeight = 0;
 
 		friend class Entity;
+		friend class HierarchyPanel;
 	};
 }

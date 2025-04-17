@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <glm/glm.hpp>
 
 #include "Kerberos/Scene/SceneCamera.h"
@@ -47,6 +48,7 @@ namespace Kerberos
 
 		explicit operator std::string& () { return Tag; }
 		explicit operator const std::string& () const { return Tag; }
+		explicit operator const char* () const { return Tag.c_str(); }
 	};
 
 	struct CameraComponent
