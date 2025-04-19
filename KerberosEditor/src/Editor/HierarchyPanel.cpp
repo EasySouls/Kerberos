@@ -24,6 +24,18 @@ namespace Kerberos
 			DrawEntityNode(e);
 		}
 		ImGui::End();
+
+		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+		{
+			m_SelectedEntity = {};
+		}
+
+		ImGui::Begin("Properties");
+		if (m_SelectedEntity)
+		{
+			DrawComponents(m_SelectedEntity);
+		}
+		ImGui::End();
 	}
 
 	void HierarchyPanel::DrawEntityNode(const Entity& entity)
@@ -44,6 +56,38 @@ namespace Kerberos
 		if (opened)
 		{
 			ImGui::TreePop();
+		}
+	}
+
+	void HierarchyPanel::DrawComponents(const Entity entity) 
+	{
+		if (entity.HasComponent<TagComponent>())
+		{
+			auto& tag = entity.GetComponent<TagComponent>().Tag;
+
+			char buffer[256];
+			strcpy_s(buffer, sizeof(buffer), tag.c_str());
+			if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
+			{
+				tag = buffer;
+			}
+		}
+		if (entity.HasComponent<TransformComponent>())
+		{
+			auto& transform = entity.GetComponent<TransformComponent>();
+			ImGui::Text("Transform");
+			ImGui::DragFloat3("Position", &transform.Transform[3][0], 0.1f);
+			ImGui::DragFloat3("Rotation", &transform.Transform[2][0], 0.1f);
+			ImGui::DragFloat3("Scale", &transform.Transform[1][0], 0.1f);
+		}
+		if (entity.HasComponent<SpriteRendererComponent>())
+		{
+			auto& spriteRenderer = entity.GetComponent<SpriteRendererComponent>();
+			ImGui::Text("Sprite");
+			ImGui::ColorEdit4("Red", &spriteRenderer.Color.r);
+			ImGui::ColorEdit4("Green", &spriteRenderer.Color.g);
+			ImGui::ColorEdit4("Blue", &spriteRenderer.Color.b);
+			ImGui::ColorEdit4("Alpha", &spriteRenderer.Color.a);
 		}
 	}
 }

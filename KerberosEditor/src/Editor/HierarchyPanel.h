@@ -16,6 +16,7 @@ namespace Kerberos
 		void SetContext(const Ref<Scene>& context);
 
 		void OnImGuiRender();
+		void DrawComponents(Entity entity);
 
 	private:
 		void DrawEntityNode(const Entity& entity);
