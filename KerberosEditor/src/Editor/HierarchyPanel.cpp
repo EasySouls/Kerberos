@@ -1,5 +1,7 @@
 #include "HierarchyPanel.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Kerberos/Scene/Components.h"
 #include <imgui/imgui.h>
 
@@ -84,9 +86,9 @@ namespace Kerberos
 			if (ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
-				ImGui::DragFloat3("Position", &transform.Transform[3][0], 0.1f);
-				ImGui::DragFloat3("Rotation", &transform.Transform[2][0], 0.1f);
-				ImGui::DragFloat3("Scale", &transform.Transform[1][0], 0.1f);
+				ImGui::DragFloat3("Position", glm::value_ptr(transform.Translation), 0.1f);
+				ImGui::DragFloat3("Rotation", glm::value_ptr(transform.Rotation), 0.1f);
+				ImGui::DragFloat3("Scale", glm::value_ptr(transform.Scale), 0.1f);
 
 				ImGui::TreePop();
 			}

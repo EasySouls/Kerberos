@@ -33,7 +33,7 @@ namespace Kerberos
 		/// Render the scene
 
 		const Camera* mainCamera = nullptr;
-		const glm::mat4* mainCameraTransform = nullptr;
+		glm::mat4 mainCameraTransform;
 
 		{
 			const auto group = m_Registry.group<CameraComponent>(entt::get<TransformComponent>);
@@ -43,7 +43,7 @@ namespace Kerberos
 				if (camera.IsPrimary)
 				{
 					mainCamera = &camera.Camera;
-					mainCameraTransform = &transform.Transform;
+					mainCameraTransform = transform.GetTransform();
 					break;
 				}
 			}
@@ -51,14 +51,14 @@ namespace Kerberos
 
 		if (mainCamera)
 		{
-			Renderer2D::BeginScene(*mainCamera, *mainCameraTransform);
+			Renderer2D::BeginScene(*mainCamera, mainCameraTransform);
 
 			const auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (const auto entity : group)
 			{
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
-				Renderer2D::DrawQuad(transform.Transform, sprite.Color);
+				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
 			}
 
 			Renderer2D::EndScene();

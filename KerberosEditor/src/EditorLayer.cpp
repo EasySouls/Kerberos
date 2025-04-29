@@ -89,17 +89,17 @@ namespace Kerberos
 		public:
 			void OnUpdate(const Timestep ts) override 
 			{
-				auto& transform = GetComponent<TransformComponent>().Transform;
+				auto& translation = GetComponent<TransformComponent>().Translation;
 				constexpr float speed = 5.0f;
 				
 				if (Input::IsKeyPressed(68)) // w
-					transform[3].x += speed * ts;
+					translation.x += speed * ts;
 				if (Input::IsKeyPressed(87)) // A
-					transform[3].y += speed * ts; 
+					translation.y += speed * ts;
 				if (Input::IsKeyPressed(65)) // S
-					transform[3].x -= speed * ts;
+					translation.x -= speed * ts;
 				if (Input::IsKeyPressed(83)) // D
-					transform[3].y -= speed * ts;
+					translation.y -= speed * ts;
 			}
 		};
 

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <glm/glm.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 #include "Kerberos/Scene/SceneCamera.h"
 
@@ -11,17 +12,29 @@ namespace Kerberos
 
 	struct TransformComponent
 	{
-		glm::mat4 Transform = glm::mat4(1.0f);
+		glm::vec3 Translation = glm::vec3(0.0f);
+		glm::vec3 Rotation = glm::vec3(0.0f);
+		glm::vec3 Scale = glm::vec3(1.0f);
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
 
-		explicit TransformComponent(const glm::mat4& transform)
-			: Transform(transform)
+		explicit TransformComponent(const glm::vec3& translation)
+			: Translation(translation)
 		{}
 
-		explicit operator glm::mat4& () { return Transform; }
-		explicit operator const glm::mat4& () const { return Transform; }
+		glm::mat4 GetTransform() const
+		{
+			glm::mat4 transform = glm::translate(glm::mat4(1.0f), Translation);
+
+			transform = glm::rotate(transform, glm::radians(Rotation.x), glm::vec3(1, 0, 0));
+			transform = glm::rotate(transform, glm::radians(Rotation.y), glm::vec3(0, 1, 0));
+			transform = glm::rotate(transform, glm::radians(Rotation.z), glm::vec3(0, 0, 1));
+
+			transform = glm::scale(transform, Scale);
+
+			return transform;
+		}
 	};
 
 	struct SpriteRendererComponent
