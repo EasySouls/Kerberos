@@ -5,6 +5,8 @@
 #include "Kerberos/Scene/Components.h"
 #include <imgui/imgui.h>
 
+#include "imgui/imgui_internal.h"
+
 namespace Kerberos
 {
 	HierarchyPanel::HierarchyPanel(const Ref<Scene>& context)
@@ -62,6 +64,79 @@ namespace Kerberos
 		}
 	}
 
+	static void DrawVec3Control(const std::string& label, glm::vec3& values, const float resetValue = 0.0f, const float columnWidth = 80.0f)
+	{
+		ImGui::PushID(label.c_str());
+
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, columnWidth);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
+		const float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
+		const ImVec2 buttonSize = ImVec2(lineHeight + 2.0f, lineHeight);
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.25f, 0.25f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.8f, 0.2f, 0.25f, 1.0f));
+
+		if (ImGui::Button("X", buttonSize))
+		{
+			values.x = resetValue;
+		}
+
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		/// ##X is used to hide the label of the input field
+		ImGui::DragFloat("##X", &values.x, 0.1f);
+		ImGui::PopItemWidth();
+		ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.9f, 0.25f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.8f, 0.2f, 1.0f));
+
+		if (ImGui::Button("Y", buttonSize))
+		{
+			values.y = resetValue;
+		}
+
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		/// ##Y is used to hide the label of the input field
+		ImGui::DragFloat("##Y", &values.y, 0.1f);
+		ImGui::PopItemWidth();
+		ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.2f, 0.8f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.9f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.25f, 0.8f, 1.0f));
+
+		if (ImGui::Button("Z", buttonSize))
+		{
+			values.z = resetValue;
+		}
+
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		/// ##Z is used to hide the label of the input field
+		ImGui::DragFloat("##Z", &values.z, 0.1f);
+		ImGui::PopItemWidth();
+
+		ImGui::PopStyleVar();
+
+		/// Reset the column value to be the default
+		ImGui::Columns(1);
+
+		ImGui::PopID();
+	}
+
 	void HierarchyPanel::DrawComponents(const Entity entity) 
 	{
 		if (entity.HasComponent<TagComponent>())
@@ -86,9 +161,9 @@ namespace Kerberos
 			if (ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
-				ImGui::DragFloat3("Position", glm::value_ptr(transform.Translation), 0.1f);
-				ImGui::DragFloat3("Rotation", glm::value_ptr(transform.Rotation), 0.1f);
-				ImGui::DragFloat3("Scale", glm::value_ptr(transform.Scale), 0.1f);
+				DrawVec3Control("Position", transform.Translation);
+				DrawVec3Control("Rotation", transform.Rotation);
+				DrawVec3Control("Scale", transform.Scale, 1.0f);
 
 				ImGui::TreePop();
 			}
