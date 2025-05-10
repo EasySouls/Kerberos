@@ -150,6 +150,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
     <ClInclude Include="src\Kerberos\Scene\SceneCamera.h" />
     <ClInclude Include="src\Kerberos.h" />
     <ClInclude Include="src\Kerberos\Application.h" />
@@ -163,12 +164,11 @@
     <ClInclude Include="src\Kerberos\Events\KeyEvent.h" />
     <ClInclude Include="src\Kerberos\Events\MouseEvent.h" />
     <ClInclude Include="src\Kerberos\ImGui\ImGuiLayer.h" />
-    <ClInclude Include="src\Kerberos\Input.h" />
-    <ClInclude Include="src\Kerberos\KeyCodes.h" />
+    <ClInclude Include="src\Kerberos\Core\Input.h" />
     <ClInclude Include="src\Kerberos\Layer.h" />
     <ClInclude Include="src\Kerberos\LayerStack.h" />
     <ClInclude Include="src\Kerberos\Log.h" />
-    <ClInclude Include="src\Kerberos\MouseButtonCodes.h" />
+    <ClInclude Include="src\Kerberos\Core\MouseButtonCodes.h" />
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h" />
     <ClInclude Include="src\Kerberos\Renderer\Camera.h" />

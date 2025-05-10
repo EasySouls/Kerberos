@@ -4,6 +4,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.inl>
 #include "imgui/imgui.h"
+#include "Kerberos/Core/Input.h"
 
 #define PROFILE_SCOPE(name) Timer timer##__LINE__(name, 
 
@@ -92,13 +93,13 @@ namespace Kerberos
 				auto& translation = GetComponent<TransformComponent>().Translation;
 				constexpr float speed = 5.0f;
 				
-				if (Input::IsKeyPressed(68)) // w
+				if (Input::IsKeyPressed(Key::W)) // w
 					translation.x += speed * ts;
-				if (Input::IsKeyPressed(87)) // A
+				if (Input::IsKeyPressed(Key::A)) // A
 					translation.y += speed * ts;
-				if (Input::IsKeyPressed(65)) // S
+				if (Input::IsKeyPressed(Key::S)) // S
 					translation.x -= speed * ts;
-				if (Input::IsKeyPressed(83)) // D
+				if (Input::IsKeyPressed(Key::D)) // D
 					translation.y -= speed * ts;
 			}
 		};
@@ -214,9 +215,11 @@ namespace Kerberos
 			m_Framebuffer->Unbind();
 		}
 
-		if (Input::IsMouseButtonPressed(KBR_MOUSE_BUTTON_LEFT))
+		if (Input::IsMouseButtonPressed(Mouse::ButtonLeft))
 		{
-			auto [x, y] = Input::GetMousePosition();
+			const auto mousePos = Input::GetMousePosition();
+			float x = mousePos.x;
+			float y = mousePos.y;
 
 			const auto width = Application::Get().GetWindow().GetWidth();
 			const auto height = Application::Get().GetWindow().GetHeight();

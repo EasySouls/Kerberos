@@ -84,10 +84,7 @@
     <ClInclude Include="src\Kerberos\ImGui\ImGuiLayer.h">
       <Filter>src\Kerberos\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Input.h">
-      <Filter>src\Kerberos</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Kerberos\KeyCodes.h">
+    <ClInclude Include="src\Kerberos\Core\Input.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Layer.h">
@@ -99,7 +96,7 @@
     <ClInclude Include="src\Kerberos\Log.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\MouseButtonCodes.h">
+    <ClInclude Include="src\Kerberos\Core\MouseButtonCodes.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h">
@@ -209,6 +206,7 @@
     </ClInclude>
     <ClInclude Include="src\Kerberos\Scene\SceneCamera.h" />
     <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h" />
+    <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">

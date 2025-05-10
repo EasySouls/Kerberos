@@ -2,8 +2,8 @@
 
 #include "OrthographicCameraController.h"
 
-#include "Kerberos/Input.h"
-#include "Kerberos/KeyCodes.h"
+#include "Kerberos/Core/Input.h"
+#include "Kerberos/Core/KeyCodes.h"
 
 
 namespace Kerberos
@@ -17,15 +17,15 @@ namespace Kerberos
 	void OrthographicCameraController::OnUpdate(const Timestep deltaTime)
 	{
 		/// Move the camera in the x axis
-		if (Input::IsKeyPressed(KBR_KEY_A))
+		if (Input::IsKeyPressed(Key::A))
 			m_CameraPosition.x -= m_CameraMoveSpeed * deltaTime;
-		else if (Input::IsKeyPressed(KBR_KEY_D))
+		else if (Input::IsKeyPressed(Key::D))
 			m_CameraPosition.x += m_CameraMoveSpeed * deltaTime;
 
 		/// Move the camera in the y axis
-		if (Input::IsKeyPressed(KBR_KEY_W))
+		if (Input::IsKeyPressed(Key::W))
 			m_CameraPosition.y += m_CameraMoveSpeed * deltaTime;
-		else if (Input::IsKeyPressed(KBR_KEY_S))
+		else if (Input::IsKeyPressed(Key::S))
 			m_CameraPosition.y -= m_CameraMoveSpeed * deltaTime;
 
 		m_Camera.SetPosition(m_CameraPosition);
@@ -33,9 +33,9 @@ namespace Kerberos
 		/// Rotate the camera if rotation is enabled
 		if (m_RotationEnabled)
 		{
-			if (Input::IsKeyPressed(KBR_KEY_Q))
+			if (Input::IsKeyPressed(Key::Q))
 				m_CameraRotation += m_CameraRotationSpeed * deltaTime;
-			else if (Input::IsKeyPressed(KBR_KEY_E))
+			else if (Input::IsKeyPressed(Key::E))
 				m_CameraRotation -= m_CameraRotationSpeed * deltaTime;
 
 			m_Camera.SetRotation(m_CameraRotation);

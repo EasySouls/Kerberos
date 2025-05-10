@@ -41,8 +41,8 @@
 /// ---------------------------------
 
 /// ---- Input ----------------------
-#include "Kerberos/Input.h"
-#include "Kerberos/KeyCodes.h"
-#include "Kerberos/MouseButtonCodes.h"
+#include "Kerberos/Core/Input.h"
+#include "Kerberos/Core/KeyCodes.h"
+#include "Kerberos/Core/MouseButtonCodes.h"
 #include "Kerberos/OrthographicCameraController.h"
 /// ---------------------------------
