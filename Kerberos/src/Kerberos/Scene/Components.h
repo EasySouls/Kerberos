@@ -17,7 +17,11 @@ namespace Kerberos
 		glm::vec3 Scale = glm::vec3(1.0f);
 
 		TransformComponent() = default;
+		~TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
+		TransformComponent(TransformComponent&&) = default;
+		TransformComponent& operator=(const TransformComponent&) = default;
+		TransformComponent& operator=(TransformComponent&&) = default;
 
 		explicit TransformComponent(const glm::vec3& translation)
 			: Translation(translation)
@@ -42,7 +46,11 @@ namespace Kerberos
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 
 		SpriteRendererComponent() = default;
+		~SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
+		SpriteRendererComponent(SpriteRendererComponent&&) = default;
+		SpriteRendererComponent& operator=(const SpriteRendererComponent&) = default;
+		SpriteRendererComponent& operator=(SpriteRendererComponent&&) = default;
 
 		explicit SpriteRendererComponent(const glm::vec4& color)
 			: Color(color)
@@ -54,7 +62,16 @@ namespace Kerberos
 		std::string Tag;
 
 		TagComponent() = default;
+		~TagComponent() = default;
 		TagComponent(const TagComponent&) = default;
+		TagComponent(TagComponent&&) = default;
+		TagComponent& operator=(const TagComponent&) = default;
+		TagComponent& operator=(TagComponent&&) = default;
+		TagComponent& operator=(const std::string& tag)
+		{
+			Tag = tag;
+			return *this;
+		}
 
 		explicit TagComponent(std::string tag)
 			: Tag(std::move(tag)) {}

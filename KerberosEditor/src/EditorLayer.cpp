@@ -94,13 +94,13 @@ namespace Kerberos
 				constexpr float speed = 5.0f;
 				
 				if (Input::IsKeyPressed(Key::W)) // w
-					translation.x += speed * ts;
-				if (Input::IsKeyPressed(Key::A)) // A
 					translation.y += speed * ts;
-				if (Input::IsKeyPressed(Key::S)) // S
+				if (Input::IsKeyPressed(Key::A)) // A
 					translation.x -= speed * ts;
-				if (Input::IsKeyPressed(Key::D)) // D
+				if (Input::IsKeyPressed(Key::S)) // S
 					translation.y -= speed * ts;
+				if (Input::IsKeyPressed(Key::D)) // D
+					translation.x += speed * ts;
 			}
 		};
 
