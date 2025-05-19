@@ -8,6 +8,7 @@
 #include "Kerberos/Layer.h"
 
 #include "Kerberos/Core/Timestep.h"
+#include "Kerberos/Core/Timer.h"
 
 #include "Kerberos/ImGui/ImGuiLayer.h"
 
@@ -20,20 +21,28 @@
 
 /// ---- Renderer -------------------
 #include "Kerberos/Renderer/Renderer.h"
+#include "Kerberos/Renderer/Renderer2D.h"
 #include "Kerberos/Renderer/RenderCommand.h"
 #include "Kerberos/Renderer/OrthographicCamera.h"
 #include "Kerberos/Renderer/Buffer.h"
 #include "Kerberos/Renderer/Shader.h"
 #include "Kerberos/Renderer/Texture.h"
+#include "Kerberos/Renderer/SubTexture2D.h"
 #include "Kerberos/Renderer/VertexArray.h"
+#include "Kerberos/Renderer/Framebuffer.h"
+/// ---------------------------------
+
+/// ---- Scene ----------------------
+#include "Kerberos/Scene/Scene.h"
+#include "Kerberos/Scene/Components.h"
+#include "Kerberos/Scene/Entity.h"
+#include "Kerberos/Scene/ScriptableEntity.h"
+#include "Kerberos/Scene/SceneCamera.h"
 /// ---------------------------------
 
 /// ---- Input ----------------------
-#include "Kerberos/Input.h"
-#include "Kerberos/KeyCodes.h"
-#include "Kerberos/MouseButtonCodes.h"
+#include "Kerberos/Core/Input.h"
+#include "Kerberos/Core/KeyCodes.h"
+#include "Kerberos/Core/MouseButtonCodes.h"
+#include "Kerberos/OrthographicCameraController.h"
 /// ---------------------------------
-
-/// ---- Entry point ----
-#include "Kerberos/EntryPoint.h"
-/// ---------------------

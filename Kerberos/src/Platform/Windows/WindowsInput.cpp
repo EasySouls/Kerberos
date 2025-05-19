@@ -8,23 +8,23 @@ namespace Kerberos
 {
 	Input* Input::s_Instance = new WindowsInput();
 
-	bool WindowsInput::IsKeyPressedImpl(const int keycode)
+	bool WindowsInput::IsKeyPressedImpl(const KeyCode keycode)
 	{
 		const auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		const auto state = glfwGetKey(window, keycode);
+		const auto state = glfwGetKey(window, static_cast<int32_t>(keycode));
 
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool WindowsInput::IsMouseButtonPressedImpl(const int button) 
+	bool WindowsInput::IsMouseButtonPressedImpl(const MouseButtonCode button) 
 	{
 		const auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		const auto state = glfwGetMouseButton(window, button);
+		const auto state = glfwGetMouseButton(window, static_cast<int8_t>(button));
 
 		return state == GLFW_PRESS;
 	}
 
-	std::pair<float, float> WindowsInput::GetMousePositionImpl() 
+	glm::vec2 WindowsInput::GetMousePositionImpl() 
 	{
 		const auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		double xPos, yPos;
@@ -38,13 +38,13 @@ namespace Kerberos
 
 	float WindowsInput::GetMouseXImpl() 
 	{
-		auto [x, y] = GetMousePositionImpl();
-		return x;
+		const auto pos = GetMousePositionImpl();
+		return pos.x;
 	}
 
 	float WindowsInput::GetMouseYImpl() 
 	{
-		auto [x, y] = GetMousePositionImpl();
-		return y;
+		const auto pos = GetMousePositionImpl();
+		return pos.y;
 	}
 }

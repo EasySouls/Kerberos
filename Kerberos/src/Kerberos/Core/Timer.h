@@ -1,34 +1,43 @@
-#pragma once
-
-#include <chrono>
+#pragma once 
 
 namespace Kerberos
 {
+	template<typename Fn>
 	class Timer
 	{
 	public:
-		Timer()
+		explicit Timer(const char* name, Fn&& callback)
+			: m_Name(name), m_Callback(callback), m_Stopped(false)
 		{
-			Reset();
+			m_StartTimepoint = std::chrono::high_resolution_clock::now();
 		}
 
-		void Reset()
+		~Timer()
 		{
-			m_StartTime = std::chrono::high_resolution_clock::now();
+			if (!m_Stopped)
+				Stop();
 		}
 
-		float Elapsed() const 
+		void Stop()
 		{
-			const long long nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - m_StartTime).count();
-			return static_cast<float>(nanoseconds) * 0.001f * 0.001f * 0.001f;
-		}
+			const auto endTimepoint = std::chrono::high_resolution_clock::now();
 
-		float ElapsedMillis() const
-		{
-			return Elapsed() * 1000.0f;
+			const auto start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
+			const auto end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
+
+			m_Stopped = true;
+
+			auto duration = end - start;
+			auto durationMs = duration * 0.001f;
+
+			m_Callback({ m_Name, durationMs });
 		}
 
 	private:
-		std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTime;
-	};
+		const char* m_Name;
+		Fn m_Callback;
+
+		std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTimepoint;
+		bool m_Stopped;
+  }
 }

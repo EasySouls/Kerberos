@@ -19,23 +19,29 @@ namespace Kerberos
 		KBR_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	Window* Window::Create(const WindowProps& props)
+	Scope<Window> Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return CreateScope<WindowsWindow>(props);
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& props) 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		WindowsWindow::Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow() 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		WindowsWindow::Shutdown();
 	};
 
 	void WindowsWindow::Init(const WindowProps& props) 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
@@ -58,6 +64,8 @@ namespace Kerberos
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		}
 
+		//glfwWindowHint(GLFW_DEPTH_BITS, 32);
+
 		m_Window = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Data.Title.c_str(), nullptr, nullptr);
 
 		switch (context)
@@ -79,6 +87,7 @@ namespace Kerberos
 		SetVSync(true);
 
 		// Set GLFW callbacks
+
 		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, const int width, const int height)
 			{
 				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
@@ -86,6 +95,7 @@ namespace Kerberos
 				data.Height = height;
 
 				WindowResizeEvent event(width, height);
+
 				data.EventCallback(event);
 			});
 
@@ -174,17 +184,23 @@ namespace Kerberos
 
 	void WindowsWindow::Shutdown() 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(m_Window);
 	}
 
 	void WindowsWindow::OnUpdate() 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		glfwPollEvents();
 		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(const bool enabled) 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
 			return;
 

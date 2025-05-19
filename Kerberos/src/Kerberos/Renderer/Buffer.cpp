@@ -6,7 +6,7 @@
 
 namespace Kerberos
 {
-	VertexBuffer* VertexBuffer::Create(const float* vertices, const uint32_t size)
+	Ref<VertexBuffer> VertexBuffer::Create(const float* vertices, const uint32_t size)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -15,7 +15,7 @@ namespace Kerberos
 				return nullptr;
 
 			case RendererAPI::API::OpenGL:
-				return new OpenGLVertexBuffer(vertices, size);
+				return CreateRef<OpenGLVertexBuffer>(vertices, size);
 
 			case RendererAPI::API::Vulkan:
 				KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
@@ -26,7 +26,7 @@ namespace Kerberos
 		return nullptr;
 	}
 
-	IndexBuffer* IndexBuffer::Create(const uint32_t* indices, const uint32_t count)
+	Ref<VertexBuffer> VertexBuffer::Create(uint32_t size) 
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -35,7 +35,27 @@ namespace Kerberos
 				return nullptr;
 
 			case RendererAPI::API::OpenGL:
-				return new OpenGLIndexBuffer(indices, count);
+				return CreateRef<OpenGLVertexBuffer>(size);
+
+			case RendererAPI::API::Vulkan:
+				KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
+				return nullptr;
+		}
+
+		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	Ref<IndexBuffer> IndexBuffer::Create(const uint32_t* indices, const uint32_t count)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+			case RendererAPI::API::None:
+				KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+				return nullptr;
+
+			case RendererAPI::API::OpenGL:
+				return CreateRef<OpenGLIndexBuffer>(indices, count);
 
 			case RendererAPI::API::Vulkan:
 				KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");

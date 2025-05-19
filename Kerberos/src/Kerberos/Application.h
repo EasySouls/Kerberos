@@ -15,24 +15,29 @@ namespace Kerberos
 		/**
 		 * Initializes the window, the renderer, and creates the ImGuiLayer.
 		 */
-		Application();
+		explicit Application(const std::string& name);
 		virtual ~Application();
 
 		void Run();
+		void Close();
 
 		void OnEvent(Event& e);
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
-		inline static Application& Get() { return *s_Instance; }
-		inline Window& GetWindow() const { return *m_Window; }
+		static Application& Get() { return *s_Instance; }
+		Window& GetWindow() const { return *m_Window; }
+		ImGuiLayer* GetImGuiLayer() const { return m_ImGuiLayer; }
+
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& e);
+		bool OnWindowResize(const WindowResizeEvent& e);
 
 	private:
 		bool m_Running = true;
-		float m_LastFrameTime = 0;;
+		bool m_Minimized = false;
+		float m_LastFrameTime = 0;
 
 		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;

@@ -3,28 +3,19 @@
 #define GLFW_INCLUDE_VULKAN
 
 #include "Kerberos/Renderer/GraphicsContext.h"
-
-#include <optional>
+#include "VulkanHelpers.h"
 
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 
+
 namespace Kerberos
 {
+
+
 	class VulkanContext : public GraphicsContext
 	{
 	public:
-		struct QueueFamilyIndices
-		{
-			std::optional<uint32_t> graphicsFamily;
-			std::optional<uint32_t> presentFamily;
-
-			bool IsComplete() const
-			{
-				return graphicsFamily.has_value() && presentFamily.has_value();
-			}
-		};
-
 		struct SwapChainSupportDetails
 		{
 			VkSurfaceCapabilitiesKHR capabilities;
@@ -32,12 +23,13 @@ namespace Kerberos
 			std::vector<VkPresentModeKHR> presentModes;
 		};
 
-		VulkanContext(GLFWwindow* windowHandle);
+		explicit VulkanContext(GLFWwindow* windowHandle);
 		~VulkanContext();
 
 		void Init() override;
 		void SwapBuffers() override;
 
+		QueueFamilyIndices FindQueueFamilies() const;
 	private:
 		void CreateInstance();
 		void SetupDebugMessenger();

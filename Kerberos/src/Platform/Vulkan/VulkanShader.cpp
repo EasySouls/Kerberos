@@ -8,6 +8,8 @@ namespace Kerberos
 {
     std::string VulkanShader::ReadShaderFile(const std::string& filename)
     {
+        KBR_PROFILE_FUNCTION();
+
         const std::ifstream file(filename);
         if (!file.is_open())
         {
@@ -20,6 +22,8 @@ namespace Kerberos
 
     std::pair<std::string, std::string> VulkanShader::SplitShaderSource(const std::string& source)
     {
+        KBR_PROFILE_FUNCTION();
+
 	    const size_t vertexPos = source.find("#type vertex");
         const size_t fragmentPos = source.find("#type fragment");
 
@@ -41,6 +45,8 @@ namespace Kerberos
 
     std::vector<uint32_t> VulkanShader::CompileGLSLToSPIRV(const std::string& glslSource, EShLanguage shaderType)
     {
+        KBR_PROFILE_FUNCTION();
+
         // 1. Create a shader object
         glslang::TShader shader(shaderType);
 
@@ -88,6 +94,8 @@ namespace Kerberos
 
     VkShaderModule VulkanShader::CreateShaderModule(const VkDevice device, const std::vector<uint32_t>& spirvCode)
     {
+        KBR_PROFILE_FUNCTION();
+
         VkShaderModuleCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         createInfo.codeSize = spirvCode.size() * sizeof(uint32_t);

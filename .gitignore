@@ -3,5 +3,10 @@
 bin/
 bin-int/
 
-# Shader cache
+# Cached shaders
 Sandbox/assets/shadercache/
+KerberosEditor/assets/shadercache/
+
+# Profiling stats
+Sandbox/*.json
+KerberosEditor/*.json

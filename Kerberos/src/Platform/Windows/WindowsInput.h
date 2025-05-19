@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Kerberos/Input.h"
+#include "Kerberos/Core/Input.h"
 
 namespace Kerberos
 {
-	class WindowsInput : public Input
+	class WindowsInput final : public Input
 	{
 	protected:
-		bool IsKeyPressedImpl(int keycode) override;
-		bool IsMouseButtonPressedImpl(int button) override;
-		std::pair<float, float> GetMousePositionImpl() override;
+		bool IsKeyPressedImpl(KeyCode keycode) override;
+		bool IsMouseButtonPressedImpl(MouseButtonCode button) override;
+		glm::vec2 GetMousePositionImpl() override;
 		float GetMouseXImpl() override;
 		float GetMouseYImpl() override;
 	};

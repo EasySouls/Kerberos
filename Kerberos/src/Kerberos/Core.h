@@ -9,6 +9,7 @@
 
 #ifdef KBR_DEBUG
 	#define KBR_ENABLE_ASSERTS
+	#define KBR_PROFILE
 #endif
 
 #ifdef KBR_ENABLE_ASSERTS
@@ -19,8 +20,8 @@
 	#define KBR_CORE_ASSERT(x, ...)
 #endif
 
-#define KBR_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
-#define KBR_BIND_FN(fn) [this]<typename T0>(T0&& PH1) { return fn(std::forward<T0>(PH1)); }
+#define KBR_BIND_EVENT_FN(fn) [this](auto&&... args) { return fn(std::forward<decltype(args)>(args)...); }
+#define KBR_BIND_FN(fn) [this]<typename T>(T&& PH1) { return fn(std::forward<T>(PH1)); }
 
 namespace Kerberos
 {

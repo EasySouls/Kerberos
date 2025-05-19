@@ -77,10 +77,12 @@
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;KBR_PLATFORM_WINDOWS;_WINDLL;KBR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.304.1\Include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.309.0\Include;vendor\entt\Include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -89,8 +91,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.304.1\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;C:\VulkanSDK\1.4.304.1\Lib\shaderc_sharedd.lib;C:\VulkanSDK\1.4.304.1\Lib\spirv-cross-cored.lib;C:\VulkanSDK\1.4.304.1\Lib\spirv-cross-glsld.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.304.1\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.309.0\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.309.0\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -99,13 +101,14 @@
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;KBR_PLATFORM_WINDOWS;_WINDLL;KB_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.304.1\Include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.309.0\Include;vendor\entt\Include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -115,8 +118,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.304.1\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;C:\VulkanSDK\1.4.304.1\Lib\shaderc_shared.lib;C:\VulkanSDK\1.4.304.1\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.4.304.1\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.304.1\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.309.0\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.309.0\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
@@ -125,13 +128,14 @@
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;KBR_PLATFORM_WINDOWS;_WINDLL;KB_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.304.1\Include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.309.0\Include;vendor\entt\Include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -141,48 +145,61 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.304.1\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;C:\VulkanSDK\1.4.304.1\Lib\shaderc_shared.lib;C:\VulkanSDK\1.4.304.1\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.4.304.1\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.304.1\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.309.0\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.309.0\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
+    <ClInclude Include="src\Kerberos\Scene\SceneCamera.h" />
     <ClInclude Include="src\Kerberos.h" />
     <ClInclude Include="src\Kerberos\Application.h" />
     <ClInclude Include="src\Kerberos\Core.h" />
     <ClInclude Include="src\Kerberos\Core\Timer.h" />
     <ClInclude Include="src\Kerberos\Core\Timestep.h" />
+    <ClInclude Include="src\Kerberos\Debug\Instrumentor.h" />
     <ClInclude Include="src\Kerberos\EntryPoint.h" />
     <ClInclude Include="src\Kerberos\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Kerberos\Events\Event.h" />
     <ClInclude Include="src\Kerberos\Events\KeyEvent.h" />
     <ClInclude Include="src\Kerberos\Events\MouseEvent.h" />
     <ClInclude Include="src\Kerberos\ImGui\ImGuiLayer.h" />
-    <ClInclude Include="src\Kerberos\Input.h" />
-    <ClInclude Include="src\Kerberos\KeyCodes.h" />
+    <ClInclude Include="src\Kerberos\Core\Input.h" />
     <ClInclude Include="src\Kerberos\Layer.h" />
     <ClInclude Include="src\Kerberos\LayerStack.h" />
     <ClInclude Include="src\Kerberos\Log.h" />
-    <ClInclude Include="src\Kerberos\MouseButtonCodes.h" />
+    <ClInclude Include="src\Kerberos\Core\MouseButtonCodes.h" />
+    <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h" />
+    <ClInclude Include="src\Kerberos\Renderer\Camera.h" />
+    <ClInclude Include="src\Kerberos\Renderer\Framebuffer.h" />
     <ClInclude Include="src\Kerberos\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Kerberos\Renderer\OrthographicCamera.h" />
     <ClInclude Include="src\Kerberos\Renderer\RenderCommand.h" />
     <ClInclude Include="src\Kerberos\Renderer\Renderer.h" />
+    <ClInclude Include="src\Kerberos\Renderer\Renderer2D.h" />
     <ClInclude Include="src\Kerberos\Renderer\RendererAPI.h" />
     <ClInclude Include="src\Kerberos\Renderer\Shader.h" />
+    <ClInclude Include="src\Kerberos\Renderer\SubTexture2D.h" />
     <ClInclude Include="src\Kerberos\Renderer\Texture.h" />
     <ClInclude Include="src\Kerberos\Renderer\VertexArray.h" />
+    <ClInclude Include="src\Kerberos\Scene\Components.h" />
+    <ClInclude Include="src\Kerberos\Scene\Entity.h" />
+    <ClInclude Include="src\Kerberos\Scene\Scene.h" />
+    <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11Context.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11RendererAPI.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanContext.h" />
+    <ClInclude Include="src\Platform\Vulkan\VulkanHelpers.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanRendererAPI.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanShader.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
@@ -192,24 +209,31 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Kerberos\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Kerberos\Application.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Kerberos\Layer.cpp" />
     <ClCompile Include="src\Kerberos\LayerStack.cpp" />
     <ClCompile Include="src\Kerberos\Log.cpp" />
+    <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\Renderer2D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\SubTexture2D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Texture.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp" />
+    <ClCompile Include="src\Kerberos\Scene\Scene.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11RendererAPI.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp" />

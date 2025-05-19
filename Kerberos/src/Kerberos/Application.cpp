@@ -13,12 +13,15 @@ namespace Kerberos
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application()
+	Application::Application(const std::string& name)
 	{
+		KBR_PROFILE_FUNCTION();
+
 		KBR_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		m_Window = std::unique_ptr<Window>(Window::Create());
+		const WindowProps props{ name, 1280, 720 };
+		m_Window = Window::Create(props);
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
@@ -38,10 +41,12 @@ namespace Kerberos
 			const Timestep deltaTime = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
-			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate(deltaTime);
-
 			// TODO: Execute this on the render thread
+			if (!m_Minimized)
+			{
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(deltaTime);
+			}
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
 				layer->OnImGuiRender();
@@ -51,10 +56,16 @@ namespace Kerberos
 		}
 	}
 
+	void Application::Close() 
+	{
+		m_Running = false;
+	}
+
 	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClosed));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResize));
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
 		{
@@ -78,5 +89,19 @@ namespace Kerberos
 	{
 		m_Running = false;
 		return true;
+	}
+
+	bool Application::OnWindowResize(const WindowResizeEvent& e) 
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			m_Minimized = true;
+			return false;
+		}
+
+		m_Minimized = false;
+		Renderer::OnWindowResized(e.GetWidth(), e.GetHeight());
+
+		return false;
 	}
 }

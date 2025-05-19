@@ -10,6 +10,9 @@
     <Filter Include="src\Kerberos\Core">
       <UniqueIdentifier>{11CE04FF-7DE4-0295-C65B-8EB632B1D31C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Kerberos\Debug">
+      <UniqueIdentifier>{4FEBAADF-3BCF-6B35-A42F-6688903256B7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Kerberos\Events">
       <UniqueIdentifier>{DDA792D8-4909-70E6-D276-B6983ED7A6A5}</UniqueIdentifier>
     </Filter>
@@ -18,6 +21,9 @@
     </Filter>
     <Filter Include="src\Kerberos\Renderer">
       <UniqueIdentifier>{DF21D73E-4B8E-9239-1482-2A9780ADB4A1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Kerberos\Scene">
+      <UniqueIdentifier>{F64DB9E0-E231-7A36-4B92-7489379564B8}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Platform">
       <UniqueIdentifier>{21CA02E5-0D2D-9289-B6B2-CA3FA2F45D0C}</UniqueIdentifier>
@@ -57,6 +63,9 @@
     <ClInclude Include="src\Kerberos\Core\Timestep.h">
       <Filter>src\Kerberos\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Debug\Instrumentor.h">
+      <Filter>src\Kerberos\Debug</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\EntryPoint.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
@@ -75,10 +84,7 @@
     <ClInclude Include="src\Kerberos\ImGui\ImGuiLayer.h">
       <Filter>src\Kerberos\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Input.h">
-      <Filter>src\Kerberos</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Kerberos\KeyCodes.h">
+    <ClInclude Include="src\Kerberos\Core\Input.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Layer.h">
@@ -90,10 +96,19 @@
     <ClInclude Include="src\Kerberos\Log.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\MouseButtonCodes.h">
+    <ClInclude Include="src\Kerberos\Core\MouseButtonCodes.h">
+      <Filter>src\Kerberos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\OrthographicCameraController.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Camera.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Framebuffer.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\GraphicsContext.h">
@@ -108,10 +123,16 @@
     <ClInclude Include="src\Kerberos\Renderer\Renderer.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Renderer2D.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\RendererAPI.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Shader.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\SubTexture2D.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Texture.h">
@@ -119,6 +140,15 @@
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\VertexArray.h">
       <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Scene\Components.h">
+      <Filter>src\Kerberos\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Scene\Entity.h">
+      <Filter>src\Kerberos\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Scene\Scene.h">
+      <Filter>src\Kerberos\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Window.h">
       <Filter>src\Kerberos</Filter>
@@ -135,6 +165,9 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
@@ -148,6 +181,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Vulkan\VulkanContext.h">
+      <Filter>src\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\Vulkan\VulkanHelpers.h">
       <Filter>src\Platform\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Vulkan\VulkanRendererAPI.h">
@@ -168,6 +204,9 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Scene\SceneCamera.h" />
+    <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h" />
+    <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
     <ClInclude Include="src\Kerberos\Renderer\UniformBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h" />
   </ItemGroup>
@@ -190,7 +229,13 @@
     <ClCompile Include="src\Kerberos\Log.cpp">
       <Filter>src\Kerberos</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp">
+      <Filter>src\Kerberos</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Buffer.cpp">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Renderer\Framebuffer.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\OrthographicCamera.cpp">
@@ -202,10 +247,16 @@
     <ClCompile Include="src\Kerberos\Renderer\Renderer.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Renderer\Renderer2D.cpp">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\RendererAPI.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Shader.cpp">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Renderer\SubTexture2D.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Texture.cpp">
@@ -213,6 +264,9 @@
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Scene\Scene.cpp">
+      <Filter>src\Kerberos\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp">
       <Filter>src\Platform\D3D11</Filter>
@@ -224,6 +278,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp">
@@ -259,6 +316,7 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\UniformBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLUniformBuffer.cpp" />
   </ItemGroup>

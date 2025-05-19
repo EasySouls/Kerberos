@@ -2,7 +2,12 @@ workspace "Kerberos"
 	architecture "x64"
 	configurations { "Debug", "Release", "Dist" }
 
-	startproject "Sandbox"
+	startproject "KerberosEditor"
+
+	flags
+	{
+		"MultiProcessorCompile"
+	}
 	
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -16,6 +21,7 @@ IncludeDir["ImGui"] = "%{wks.location}/Kerberos/vendor/imgui"
 IncludeDir["glm"] = "%{wks.location}/Kerberos/vendor/glm"
 IncludeDir["stb_image"] = "%{wks.location}/Kerberos/vendor/stb_image"
 IncludeDir["VulkanSDK"] = "%{VULKAN_DIR}/Include"
+IncludeDir["entt"] = "%{wks.location}/Kerberos/vendor/entt/Include"
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
@@ -70,7 +76,8 @@ project "Kerberos"
 		IncludeDir.ImGui,
 		IncludeDir.glm,
 		IncludeDir.stb_image,
-		IncludeDir.VulkanSDK
+		IncludeDir.VulkanSDK,
+		IncludeDir.entt
 	}
 
 	libdirs 
@@ -197,9 +204,61 @@ project "Sandbox"
 	
 	includedirs
 	{
-		"Kerberos/vendor",
 		"Kerberos/src",
-		IncludeDir.glm
+		"Kerberos/vendor",
+		"Kerberos/vendor/spdlog/include",
+		IncludeDir.glm,
+		IncludeDir.entt
+	}
+	
+	links
+	{
+		"Kerberos",
+	}
+	
+	filter "system:windows"
+		systemversion "latest"
+		
+		defines
+		{
+			"KBR_PLATFORM_WINDOWS"
+		}
+		
+	filter "configurations:Debug"
+		defines "KBR_DEBUG"
+		symbols "on"
+		
+	filter "configurations:Release"
+		defines "KBR_RELEASE"
+		optimize "on"
+		
+	filter "configurations:Dist"
+		defines "KBR_DIST"
+		optimize "on"
+
+project "KerberosEditor"
+	location "KerberosEditor"
+	kind "ConsoleApp"
+	staticruntime "on"
+	language "C++"
+	cppdialect "C++20"
+	
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+	
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
+	
+	includedirs
+	{
+		"Kerberos/src",
+		"Kerberos/vendor",
+		"Kerberos/vendor/spdlog/include",
+		IncludeDir.glm,
+		IncludeDir.entt
 	}
 	
 	links

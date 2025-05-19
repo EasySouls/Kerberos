@@ -29,26 +29,36 @@ namespace Kerberos
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
+		KBR_PROFILE_FUNCTION();
+
 		glCreateVertexArrays(1, &m_RendererID);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
+		KBR_PROFILE_FUNCTION();
+
 		glDeleteVertexArrays(1, &m_RendererID);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
+		KBR_PROFILE_FUNCTION();
+
 		glBindVertexArray(m_RendererID);
 	}
 
 	void OpenGLVertexArray::Unbind() const
 	{
+		KBR_PROFILE_FUNCTION();
+
 		glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
 	{
+		KBR_PROFILE_FUNCTION();
+
 		KBR_CORE_ASSERT(!vertexBuffer->GetLayout().GetElements().empty(), "Vertex Buffer has no layout!")
 
 		glBindVertexArray(m_RendererID);
@@ -64,7 +74,7 @@ namespace Kerberos
 				ShaderDataTypeToOpenGLBaseType(element.Type),
 				element.Normalized ? GL_TRUE : GL_FALSE,
 				static_cast<int>(layout.GetStride()),
-				(const void*)element.Offset);
+				reinterpret_cast<const void*>(element.Offset));
 
 			index++;
 		}
@@ -74,6 +84,8 @@ namespace Kerberos
 
 	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
+		KBR_PROFILE_FUNCTION();
+		
 		glBindVertexArray(m_RendererID);
 		indexBuffer->Bind();
 		m_IndexBuffer = indexBuffer;

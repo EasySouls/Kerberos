@@ -18,3 +18,4 @@
 #include <set>
 
 #include "Kerberos/Log.h"
+#include "Kerberos/Debug/Instrumentor.h"

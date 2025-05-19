@@ -6,7 +6,7 @@
 
 namespace Kerberos
 {
-	VertexArray* VertexArray::Create()
+	Ref<VertexArray> VertexArray::Create()
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -15,7 +15,7 @@ namespace Kerberos
 				return nullptr;
 
 			case RendererAPI::API::OpenGL:  
-				return new OpenGLVertexArray();
+				return std::make_shared<OpenGLVertexArray>();
 		
 			case RendererAPI::API::Vulkan:
 				KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");

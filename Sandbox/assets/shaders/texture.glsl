@@ -29,5 +29,7 @@ layout(binding = 0) uniform sampler2D u_Texture;
 
 void main()
 {
+	// If we want to scale the texture, we can multiply the texture coordinates.
+	// We can tint the texture by multiplying the color with a color.
 	color = texture(u_Texture, v_TexCoord);
 }

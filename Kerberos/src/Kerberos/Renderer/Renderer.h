@@ -13,6 +13,8 @@ namespace Kerberos
 	public:
 		static void Init();
 
+		static void OnWindowResized(const uint32_t width, const uint32_t height);
+
 		/**
 		* Transfers all the uniforms to the shaders
 		*/

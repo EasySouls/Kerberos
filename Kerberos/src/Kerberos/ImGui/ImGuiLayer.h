@@ -8,18 +8,21 @@ namespace Kerberos
 	{
 	public:
 		ImGuiLayer();
-		~ImGuiLayer();
+		~ImGuiLayer() override;
 
-		virtual void OnAttach() override;
-		virtual void OnDetach() override;
+		void OnAttach() override;
+		void OnDetach() override;
+		void OnEvent(Event& event) override;
 
-		virtual void OnImGuiRender() override;
+		void OnImGuiRender() override;
+
+		void BlockEvents(const bool block) { m_BlockEvents = block; }
 
 		void Begin();
 		void End();
 
 	private:
-		float m_Time = 0.0f;
+		bool m_BlockEvents = false;
 	};
 
 }

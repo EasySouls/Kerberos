@@ -14,6 +14,8 @@ namespace Kerberos
 
 	void OpenGLContext::Init() 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		glfwMakeContextCurrent(m_WindowHandle);
 
 		const int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
@@ -28,6 +30,8 @@ namespace Kerberos
 
 	void OpenGLContext::SwapBuffers() 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		glfwSwapBuffers(m_WindowHandle);
 	}
 }
