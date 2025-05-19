@@ -1,12 +1,15 @@
 #type vertex
-#version 330 core
+#version 450 core
 
 layout(location = 0) in vec3 a_Position;
 
-uniform mat4 u_ViewProjection;
-uniform mat4 u_Transform;
+layout(binding = 0) uniform CameraBuffer
+{
+	mat4 u_ViewProjection;
+	mat4 u_Transform;
+};
 
-out vec3 v_Position;
+layout(location = 0) out vec3 v_Position;
 
 void main()
 {
@@ -15,13 +18,16 @@ void main()
 }
 
 #type fragment
-#version 330 core
+#version 450 core
+
+layout(location = 0) in vec3 v_Position;
+
+layout(binding = 0) uniform ColorBuffer
+{
+	vec4 u_Color;
+};
 
 layout(location = 0) out vec4 color;
-
-uniform vec4 u_Color;
-
-in vec3 v_Position;
 
 void main()
 {

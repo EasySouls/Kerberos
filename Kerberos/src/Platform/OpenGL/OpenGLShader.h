@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <glm/glm.hpp>
 
+typedef unsigned int GLenum;
 
 namespace Kerberos
 {
@@ -44,5 +45,11 @@ namespace Kerberos
 	private:
 		uint32_t m_RendererID;
 		std::string m_Name;
+		std::string m_FilePath;
+
+
+		std::unordered_map<GLenum, std::vector<uint32_t>> m_VulkanSPIRV;
+		std::unordered_map<GLenum, std::vector<uint32_t>> m_OpenGLSPIRV;
+		std::unordered_map<GLenum, std::string> m_OpenGLSourceCode;
 	};
 }

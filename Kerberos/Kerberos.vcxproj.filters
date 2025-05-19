@@ -207,6 +207,8 @@
     <ClInclude Include="src\Kerberos\Scene\SceneCamera.h" />
     <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
+    <ClInclude Include="src\Kerberos\Renderer\UniformBuffer.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -315,5 +317,7 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Scene\SceneCamera.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\UniformBuffer.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLUniformBuffer.cpp" />
   </ItemGroup>
 </Project>
