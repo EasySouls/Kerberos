@@ -27,7 +27,6 @@ namespace Kerberos
 			Entity e{ entityId, m_Context.get() };
 			DrawEntityNode(e);
 		}
-		ImGui::End();
 
 		/// If an empty space is clicked, deselect the entity
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
@@ -35,32 +34,97 @@ namespace Kerberos
 			m_SelectedEntity = {};
 		}
 
+		/// If the right mouse button is clicked, show the context menu
+		if (ImGui::BeginPopupContextWindow(nullptr, 1 | ImGuiPopupFlags_NoOpenOverItems))
+		{
+			if (ImGui::MenuItem("Create Empty Entity"))
+			{
+				m_Context->CreateEntity("Empty Entity");
+			}
+
+			ImGui::EndPopup();
+		}
+		ImGui::End();
+
 		ImGui::Begin("Properties");
 		if (m_SelectedEntity)
 		{
 			DrawComponents(m_SelectedEntity);
+
+			if (ImGui::Button("Add Component"))
+			{
+				ImGui::OpenPopup("Add Component");
+			}
+
+			if (ImGui::BeginPopup("Add Component"))
+			{
+				if (ImGui::MenuItem("Camera"))
+				{
+					m_SelectedEntity.AddComponent<CameraComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Sprite Renderer"))
+				{
+					m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				/*if (ImGui::MenuItem("Box Collider"))
+				{
+					m_SelectedEntity.AddComponent<BoxCollider2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}*/
+
+				ImGui::EndPopup();
+			}
 		}
 		ImGui::End();
 	}
 
 	void HierarchyPanel::DrawEntityNode(const Entity& entity)
 	{
-		const auto& tag = entity.GetComponent<TagComponent>();
+		const auto& tag = entity.GetComponent<TagComponent>().Tag;
 
 		const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth 
 			| (entity == m_SelectedEntity ? ImGuiTreeNodeFlags_Selected : 0);
 
 		/// The entity's identifier serves as the unique ID for the ImGui tree node
-		const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, "%s", static_cast<const char*>(tag));
+		const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, "%s", tag.c_str());
 
 		if (ImGui::IsItemClicked())
 		{
 			m_SelectedEntity = entity;
 		}
 
+		/// Defer the deletion of the entity until the popup is closed to avoid invalidating the iterator
+		bool entityDeleted = false;
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (ImGui::MenuItem("Delete Entity"))
+			{
+				entityDeleted = true;
+			}
+			ImGui::EndPopup();
+		}
+
 		if (opened)
 		{
+			constexpr ImGuiTreeNodeFlags childFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+			if (bool childOpened = ImGui::TreeNodeEx(reinterpret_cast<void*>(9817239), childFlags, tag.c_str()))
+			{
+				ImGui::TreePop();
+			}
 			ImGui::TreePop();
+		}
+
+		if (entityDeleted)
+		{
+			m_Context->DestroyEntity(entity);
+			if (m_SelectedEntity == entity)
+			{
+				m_SelectedEntity = {};
+			}
 		}
 	}
 

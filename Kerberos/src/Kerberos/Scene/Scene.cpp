@@ -76,6 +76,11 @@ namespace Kerberos
 		return entity;
 	}
 
+	void Scene::DestroyEntity(const Entity entity) 
+	{
+		m_Registry.destroy(static_cast<entt::entity>(entity));
+	}
+
 	void Scene::OnViewportResize(const uint32_t width, const uint32_t height) 
 	{
 		m_ViewportHeight = height;

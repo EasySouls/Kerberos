@@ -53,6 +53,8 @@ namespace Kerberos
 
 		explicit operator uint32_t () const { return static_cast<uint32_t>(m_EntityHandle); }
 
+		explicit operator entt::entity() const { return m_EntityHandle; }
+
 		bool operator ==(const Entity& other) const
 		{
 			return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene;

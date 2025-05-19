@@ -25,6 +25,13 @@ namespace Kerberos
 		 */
 		Entity CreateEntity(const std::string& name = std::string());
 
+		/**
+		 * @brief Destroy an entity in the scene
+		 *
+		 * @param entity The entity to destroy
+		 */
+		void DestroyEntity(Entity entity);
+
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 
