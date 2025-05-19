@@ -347,7 +347,7 @@ namespace Kerberos
 			bool componentDeleted = false;
 			if (ImGui::BeginPopup("ComponentSettings"))
 			{
-				ImGui::Text("Camera Settings");
+				ImGui::Text("Sprite Renderer Settings");
 				ImGui::Separator();
 				if (ImGui::MenuItem("Remove Component"))
 				{

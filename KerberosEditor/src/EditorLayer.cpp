@@ -325,16 +325,6 @@ namespace Kerberos
 			m_SecondCamera.GetComponent<CameraComponent>().IsPrimary = !m_IsPrimaryCamera;
 		}
 
-		{
-			auto& camera = m_SecondCamera.GetComponent<CameraComponent>().Camera;
-			float orthoSize = camera.GetOrthographicSize();
-
-			if (ImGui::DragFloat("Second Camera Size", &orthoSize))
-			{
-				camera.SetOrthographicSize(orthoSize);
-			}
-		}
-
 		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
