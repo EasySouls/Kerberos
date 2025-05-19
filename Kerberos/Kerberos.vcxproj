@@ -81,7 +81,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
@@ -91,7 +91,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.309.0\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.309.0\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;C:\VulkanSDK\1.4.309.0\Lib\shaderc_sharedd.lib;C:\VulkanSDK\1.4.309.0\Lib\spirv-cross-cored.lib;C:\VulkanSDK\1.4.309.0\Lib\spirv-cross-glsld.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.309.0\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -107,7 +107,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
@@ -118,7 +118,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.309.0\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.309.0\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;C:\VulkanSDK\1.4.309.0\Lib\shaderc_shared.lib;C:\VulkanSDK\1.4.309.0\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.4.309.0\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.309.0\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -134,7 +134,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
@@ -145,16 +145,17 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.309.0\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.309.0\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;C:\VulkanSDK\1.4.309.0\Lib\shaderc_shared.lib;C:\VulkanSDK\1.4.309.0\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.4.309.0\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.309.0\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
-    <ClInclude Include="src\Kerberos\Scene\SceneCamera.h" />
     <ClInclude Include="src\Kerberos.h" />
     <ClInclude Include="src\Kerberos\Application.h" />
     <ClInclude Include="src\Kerberos\Core.h" />
+    <ClInclude Include="src\Kerberos\Core\Input.h" />
+    <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
+    <ClInclude Include="src\Kerberos\Core\MouseButtonCodes.h" />
     <ClInclude Include="src\Kerberos\Core\Timer.h" />
     <ClInclude Include="src\Kerberos\Core\Timestep.h" />
     <ClInclude Include="src\Kerberos\Debug\Instrumentor.h" />
@@ -164,11 +165,9 @@
     <ClInclude Include="src\Kerberos\Events\KeyEvent.h" />
     <ClInclude Include="src\Kerberos\Events\MouseEvent.h" />
     <ClInclude Include="src\Kerberos\ImGui\ImGuiLayer.h" />
-    <ClInclude Include="src\Kerberos\Core\Input.h" />
     <ClInclude Include="src\Kerberos\Layer.h" />
     <ClInclude Include="src\Kerberos\LayerStack.h" />
     <ClInclude Include="src\Kerberos\Log.h" />
-    <ClInclude Include="src\Kerberos\Core\MouseButtonCodes.h" />
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h" />
     <ClInclude Include="src\Kerberos\Renderer\Camera.h" />
@@ -182,10 +181,12 @@
     <ClInclude Include="src\Kerberos\Renderer\Shader.h" />
     <ClInclude Include="src\Kerberos\Renderer\SubTexture2D.h" />
     <ClInclude Include="src\Kerberos\Renderer\Texture.h" />
+    <ClInclude Include="src\Kerberos\Renderer\UniformBuffer.h" />
     <ClInclude Include="src\Kerberos\Renderer\VertexArray.h" />
     <ClInclude Include="src\Kerberos\Scene\Components.h" />
     <ClInclude Include="src\Kerberos\Scene\Entity.h" />
     <ClInclude Include="src\Kerberos\Scene\Scene.h" />
+    <ClInclude Include="src\Kerberos\Scene\SceneCamera.h" />
     <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11Context.h" />
@@ -205,11 +206,9 @@
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\kbrpch.h" />
-    <ClInclude Include="src\Kerberos\Renderer\UniformBuffer.h" />
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Kerberos\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Kerberos\Application.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp" />
@@ -227,8 +226,10 @@
     <ClCompile Include="src\Kerberos\Renderer\Shader.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\SubTexture2D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Texture.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\UniformBuffer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Kerberos\Scene\Scene.cpp" />
+    <ClCompile Include="src\Kerberos\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11RendererAPI.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
@@ -247,7 +248,6 @@
     <ClCompile Include="src\kbrpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Renderer\UniformBuffer.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>

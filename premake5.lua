@@ -239,7 +239,7 @@ project "Sandbox"
 project "KerberosEditor"
 	location "KerberosEditor"
 	kind "ConsoleApp"
-	staticruntime "on"
+	staticruntime "off"
 	language "C++"
 	cppdialect "C++20"
 	
