@@ -70,6 +70,18 @@ namespace Kerberos
 					ImGui::CloseCurrentPopup();
 				}
 
+				if (ImGui::MenuItem("Directional Light"))
+				{
+					m_SelectedEntity.AddComponent<DirectionalLightComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Point Light"))
+				{
+					m_SelectedEntity.AddComponent<PointLightComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
 				/*if (ImGui::MenuItem("Box Collider"))
 				{
 					m_SelectedEntity.AddComponent<BoxCollider2DComponent>();
@@ -368,6 +380,88 @@ namespace Kerberos
 			if (componentDeleted)
 			{
 				entity.RemoveComponent<SpriteRendererComponent>();
+			}
+		}
+		if (entity.HasComponent<DirectionalLightComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(DirectionalLightComponent).hash_code()), treeNodeFlags, "Directional Light");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Directional Light Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			if (opened)
+			{
+				auto& directionalLight = entity.GetComponent<DirectionalLightComponent>();
+				ImGui::ColorEdit4("Color", &directionalLight.Light.Color[0]);
+				ImGui::DragFloat("Intensity", &directionalLight.Light.Intensity, 0.01f, 0.0f, 10.0f);
+				ImGui::ColorEdit3("Direction", &directionalLight.Light.Direction[0]);
+
+				ImGui::TreePop();
+			}
+
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<DirectionalLightComponent>();
+			}
+		}
+		if (entity.HasComponent<PointLightComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(PointLightComponent).hash_code()), treeNodeFlags, "Point Light");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Point Light Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			if (opened)
+			{
+				auto& pointLight = entity.GetComponent<PointLightComponent>();
+				ImGui::ColorEdit4("Color", &pointLight.Light.Color[0]);
+				ImGui::ColorEdit3("Position", &pointLight.Light.Position[0]);
+				ImGui::DragFloat("Intensity", &pointLight.Light.Intensity, 0.01f, 0.0f, 10.0f);
+				ImGui::Text("Attenuation factors");
+				ImGui::DragFloat("Constant", &pointLight.Light.Constant, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Linear", &pointLight.Light.Linear, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Quadratic", &pointLight.Light.Quadratic, 0.01f, 0.0f, 1.0f);
+
+				ImGui::TreePop();
+			}
+
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<PointLightComponent>();
 			}
 		}
 	}

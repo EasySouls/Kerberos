@@ -88,11 +88,14 @@ namespace Kerberos
 		sunlightComponent.Light.Color = { 1.0f, 1.0f, 1.0f };
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
-		m_CameraEntity.AddComponent<CameraComponent>();
+		auto& cameraComponent = m_CameraEntity.AddComponent<CameraComponent>();
+		cameraComponent.IsPrimary = false;
 
 		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
 		auto& secondCameraComponent = m_SecondCamera.AddComponent<CameraComponent>();
-		secondCameraComponent.IsPrimary = false;
+		secondCameraComponent.Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
+		auto& cameraTransformComponent = m_SecondCamera.GetComponent<TransformComponent>();
+		cameraTransformComponent.Translation = { 0.0f, 0.0f, -5.0f };
 
 		class CameraController : public ScriptableEntity
 		{
