@@ -52,7 +52,7 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 	}
 
-	void Renderer3D::SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Shader>& shader, const Ref<Texture2D>& texture, const glm::vec4& tintColor)
+	void Renderer3D::SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Shader>& shader, const Ref<Texture2D>& texture, const glm::vec4& tintColor, const float tilingFactor)
 	{
 		if (!mesh || !mesh->GetVertexArray() || mesh->GetIndexCount() == 0)
 		{
@@ -71,6 +71,7 @@ namespace Kerberos
 		textureToUse->Bind(textureSlot);
 		shaderToUse->SetInt("u_Texture", textureSlot);
 		shaderToUse->SetFloat4("u_Color", tintColor);
+		shaderToUse->SetFloat("u_TilingFactor", tilingFactor);
 
 		mesh->GetVertexArray()->Bind();
 		

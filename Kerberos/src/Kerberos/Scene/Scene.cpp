@@ -101,15 +101,12 @@ namespace Kerberos
 		Renderer2D::BeginScene(*mainCamera, mainCameraTransform);
 
 		const auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
-		int count = 0;
 		for (const auto entity : view)
 		{
 			auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
 
 			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
-			count++;
 		}
-		KBR_CORE_INFO("Drawn {0} sprites", count);
 
 		Renderer2D::EndScene();
 	}
@@ -119,15 +116,12 @@ namespace Kerberos
 		Renderer3D::BeginScene(*mainCamera, mainCameraTransform);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
-		int count = 0;
 		for (const auto entity : view)
 		{
 			auto [transform, mesh] = view.get<TransformComponent, StaticMeshComponent>(entity);
 
 			Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), nullptr, mesh.MeshTexture);
-			count++;
 		}
-		KBR_CORE_INFO("Drawn {0} meshes", count);
 
 		Renderer3D::EndScene();
 	}

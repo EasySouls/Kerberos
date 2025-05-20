@@ -80,7 +80,8 @@ namespace Kerberos
 
 		Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
 		Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
-		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh);
+		auto& cubeMeshComponent = cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh);
+		cubeMeshComponent.MeshTexture = m_Texture;
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
 		m_CameraEntity.AddComponent<CameraComponent>();
