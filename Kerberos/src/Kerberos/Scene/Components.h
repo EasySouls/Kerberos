@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+#include "Kerberos/Renderer/Mesh.h"
+#include "Kerberos/Renderer/Texture.h"
 #include "Kerberos/Scene/SceneCamera.h"
 
 namespace Kerberos
@@ -128,5 +130,19 @@ namespace Kerberos
 				Instance = nullptr;
 			};
 		}
+	};
+
+	struct StaticMeshComponent
+	{
+		Ref<Mesh> StaticMesh;
+		Ref<Texture> MeshTexture;
+		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		bool Visible = true;
+
+		StaticMeshComponent() = default;
+		explicit StaticMeshComponent(const Ref<Mesh>& mesh, const Ref<Texture>& texture = nullptr, const glm::vec4& color = glm::vec4(1.0f))
+			: StaticMesh(mesh), MeshTexture(texture), Color(color)
+		{}
+		StaticMeshComponent(const StaticMeshComponent&) = default;
 	};
 }
