@@ -6,6 +6,7 @@
 
 #include "Kerberos/Renderer/Mesh.h"
 #include "Kerberos/Renderer/Texture.h"
+#include "Kerberos/Renderer/Light.h"
 #include "Kerberos/Scene/SceneCamera.h"
 
 namespace Kerberos
@@ -144,5 +145,38 @@ namespace Kerberos
 			: StaticMesh(mesh), MeshTexture(texture), Color(color)
 		{}
 		StaticMeshComponent(const StaticMeshComponent&) = default;
+	};
+
+	struct DirectionalLightComponent
+	{
+		DirectionalLight Light;
+		bool IsEnabled = true;
+
+		DirectionalLightComponent() = default;
+		explicit DirectionalLightComponent(const DirectionalLight& light)
+			: Light(light)
+		{}
+	};
+
+	struct PointLightComponent
+	{
+		PointLight Light;
+		bool IsEnabled = true;
+
+		PointLightComponent() = default;
+		explicit PointLightComponent(const PointLight& light)
+			: Light(light)
+		{}
+	};
+
+	struct SpotLightComponent
+	{
+		SpotLight Light;
+		bool IsEnabled = true;
+
+		SpotLightComponent() = default;
+		explicit SpotLightComponent(const SpotLight& light)
+			: Light(light)
+		{}
 	};
 }

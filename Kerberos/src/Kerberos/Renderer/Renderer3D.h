@@ -7,6 +7,7 @@
 #include "OrthographicCamera.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Light.h"
 
 namespace Kerberos
 {
@@ -17,7 +18,7 @@ namespace Kerberos
 		static void Shutdown();
 
 		static void BeginScene(const OrthographicCamera& camera) = delete;
-        static void BeginScene(const Camera& camera, const glm::mat4& transform);
+        static void BeginScene(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights);
         static void EndScene();
 
 		static void SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform = glm::mat4(1.0f), const Ref<Shader>& shader = nullptr, const Ref<Texture2D>& texture = nullptr, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, float tilingFactor = 1.0f);

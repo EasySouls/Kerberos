@@ -222,6 +222,7 @@
     <ClInclude Include="src\Kerberos\Renderer\Mesh.h" />
     <ClInclude Include="src\Kerberos\Renderer\Vertex.h" />
     <ClInclude Include="src\Kerberos\Renderer\Renderer3D.h" />
+    <ClInclude Include="src\Kerberos\Renderer\Light.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">

@@ -150,6 +150,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Kerberos\Renderer\Light.h" />
     <ClInclude Include="src\Kerberos\Renderer\Renderer3D.h" />
     <ClInclude Include="src\Kerberos\Renderer\Mesh.h" />
     <ClInclude Include="src\Kerberos.h" />

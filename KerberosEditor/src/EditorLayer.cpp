@@ -83,6 +83,10 @@ namespace Kerberos
 		auto& cubeMeshComponent = cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh);
 		cubeMeshComponent.MeshTexture = m_Texture;
 
+		m_SunlightEntity = m_ActiveScene->CreateEntity("Sun");
+		auto& sunlightComponent = m_SunlightEntity.AddComponent<DirectionalLightComponent>();
+		sunlightComponent.Light.Color = { 1.0f, 1.0f, 1.0f };
+
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
 		m_CameraEntity.AddComponent<CameraComponent>();
 

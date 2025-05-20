@@ -113,7 +113,30 @@ namespace Kerberos
 
 	void Scene::Render3D(const Camera* mainCamera, const glm::mat4& mainCameraTransform)
 	{
-		Renderer3D::BeginScene(*mainCamera, mainCameraTransform);
+		const DirectionalLight* sun = nullptr;
+		const auto sunView = m_Registry.view<DirectionalLightComponent, TransformComponent>();
+		for (const auto entity : sunView)
+		{
+			auto [light, transform] = sunView.get<DirectionalLightComponent, TransformComponent>(entity);
+			if (light.IsEnabled)
+			{
+				sun = &light.Light;
+				break;
+			}
+		}
+
+		std::vector<PointLight> pointLights;
+		const auto pointLightView = m_Registry.view<PointLightComponent, TransformComponent>();
+		for (const auto entity : pointLightView)
+		{
+			auto [light, transform] = pointLightView.get<PointLightComponent, TransformComponent>(entity);
+			if (light.IsEnabled)
+			{
+				pointLights.push_back(light.Light);
+			}
+		}
+
+		Renderer3D::BeginScene(*mainCamera, mainCameraTransform, sun, pointLights);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
 		for (const auto entity : view)
@@ -161,4 +184,19 @@ namespace Kerberos
 	template <>
 	void Scene::OnComponentAdded<StaticMeshComponent>(Entity entity, StaticMeshComponent& component)
 	{}
+
+	template <>
+	void Scene::OnComponentAdded<DirectionalLightComponent>(Entity entity, DirectionalLightComponent& component)
+	{
+	}
+
+	template <>
+	void Scene::OnComponentAdded<PointLightComponent>(Entity entity, PointLightComponent& component)
+	{
+	}
+
+	template <>
+	void Scene::OnComponentAdded<SpotLightComponent>(Entity entity, SpotLightComponent& component)
+	{
+	}
 }
