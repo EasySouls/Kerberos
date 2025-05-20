@@ -28,11 +28,8 @@ namespace Kerberos
             uint32_t DrawnMeshes = 0;
         };
 
-		static Statistics GetStatistics() { return s_Stats; }
-		static void ResetStatistics() { s_Stats = Statistics(); }
-    private:
-
-        static Statistics s_Stats;
+		static Statistics GetStatistics();
+		static void ResetStatistics();
 	};
 }
 

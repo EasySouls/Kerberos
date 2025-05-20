@@ -13,7 +13,7 @@ namespace Kerberos
 		~Mesh() = default;
 
 		static Ref<Mesh> CreateCube(float size);
-		Ref<Mesh> CreateSphere(float radius, uint32_t rings, uint32_t sectors);
+		static Ref<Mesh> CreateSphere(float radius, uint32_t rings, uint32_t sectors);
 
 		Ref<VertexArray> GetVertexArray() const { return m_VertexArray; }
 		uint32_t GetIndexCount() const { return m_IndexCount; }

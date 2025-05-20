@@ -78,6 +78,10 @@ namespace Kerberos
 		Entity squareEntity = m_ActiveScene->CreateEntity("Square");
 		squareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
 
+		Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
+		Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
+		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh);
+
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
 		m_CameraEntity.AddComponent<CameraComponent>();
 
@@ -323,6 +327,11 @@ namespace Kerberos
 		{
 			m_CameraEntity.GetComponent<CameraComponent>().IsPrimary = m_IsPrimaryCamera;
 			m_SecondCamera.GetComponent<CameraComponent>().IsPrimary = !m_IsPrimaryCamera;
+		}
+
+		if (ImGui::Checkbox("Toggle 3D", &m_IsScene3D))
+		{
+			m_ActiveScene->Toggle3DMode();
 		}
 
 		ImGui::End();

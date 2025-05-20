@@ -37,10 +37,10 @@ namespace Kerberos
 		glm::mat4 mainCameraTransform;
 
 		{
-			const auto group = m_Registry.group<CameraComponent>(entt::get<TransformComponent>);
-			for (const auto entity : group)
+			const auto view = m_Registry.view<CameraComponent, TransformComponent>();
+			for (const auto entity : view)
 			{
-				auto [camera, transform] = group.get<CameraComponent, TransformComponent>(entity);
+				auto [camera, transform] = view.get<CameraComponent, TransformComponent>(entity);
 				if (camera.IsPrimary)
 				{
 					mainCamera = &camera.Camera;
@@ -100,13 +100,16 @@ namespace Kerberos
 	{
 		Renderer2D::BeginScene(*mainCamera, mainCameraTransform);
 
-		const auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (const auto entity : group)
+		const auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
+		int count = 0;
+		for (const auto entity : view)
 		{
-			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
 
 			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+			count++;
 		}
+		KBR_CORE_INFO("Drawn {0} sprites", count);
 
 		Renderer2D::EndScene();
 	}
@@ -115,13 +118,16 @@ namespace Kerberos
 	{
 		Renderer3D::BeginScene(*mainCamera, mainCameraTransform);
 
-		const auto group = m_Registry.group<TransformComponent>(entt::get<StaticMeshComponent>);
-		for (const auto entity : group)
+		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
+		int count = 0;
+		for (const auto entity : view)
 		{
-			auto [transform, mesh] = group.get<TransformComponent, StaticMeshComponent>(entity);
+			auto [transform, mesh] = view.get<TransformComponent, StaticMeshComponent>(entity);
 
 			Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), nullptr, mesh.MeshTexture);
+			count++;
 		}
+		KBR_CORE_INFO("Drawn {0} meshes", count);
 
 		Renderer3D::EndScene();
 	}
@@ -157,4 +163,8 @@ namespace Kerberos
 	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
 	{
 	}
+
+	template <>
+	void Scene::OnComponentAdded<StaticMeshComponent>(Entity entity, StaticMeshComponent& component)
+	{}
 }
