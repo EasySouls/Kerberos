@@ -150,6 +150,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Kerberos\Renderer\Renderer3D.h" />
     <ClInclude Include="src\Kerberos\Renderer\Mesh.h" />
     <ClInclude Include="src\Kerberos.h" />
     <ClInclude Include="src\Kerberos\Application.h" />
@@ -211,6 +212,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Kerberos\Renderer\Renderer3D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Kerberos\Application.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />

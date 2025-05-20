@@ -81,4 +81,18 @@ namespace Kerberos
 	{
 		throw std::runtime_error("Not implemented yet!");
 	}
+
+	void Mesh::SetupMesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices) 
+	{
+		m_VertexArray = VertexArray::Create();
+
+		auto vertexBuffer = VertexBuffer::Create(vertices.data(), static_cast<uint32_t>(vertices.size() * sizeof(Vertex)));
+		vertexBuffer->SetLayout(Vertex::GetLayout());
+		m_VertexArray->AddVertexBuffer(vertexBuffer);
+
+		const auto indexBuffer = IndexBuffer::Create(indices.data(), static_cast<uint32_t>(indices.size()));
+		m_VertexArray->SetIndexBuffer(indexBuffer);
+
+		m_IndexCount = static_cast<uint32_t>(indices.size());
+	}
 }

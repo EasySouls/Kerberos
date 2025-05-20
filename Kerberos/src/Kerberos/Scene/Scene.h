@@ -4,6 +4,8 @@
 
 #include <entt.hpp>
 
+#include "Kerberos/Renderer/Camera.h"
+
 
 namespace Kerberos
 {
@@ -34,16 +36,24 @@ namespace Kerberos
 
 
 		void OnViewportResize(uint32_t width, uint32_t height);
+
+		void Toggle3DMode() { m_Is3D = !m_Is3D; }
 		
 	private:
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
+
+		void Render2D(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
+
+		void Render3D(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
 
 	private:
 		entt::registry m_Registry;
 
 		uint32_t m_ViewportWidth = 0;
 		uint32_t m_ViewportHeight = 0;
+
+		bool m_Is3D = false;
 
 		friend class Entity;
 		friend class HierarchyPanel;

@@ -135,12 +135,12 @@ namespace Kerberos
 	struct StaticMeshComponent
 	{
 		Ref<Mesh> StaticMesh;
-		Ref<Texture> MeshTexture;
+		Ref<Texture2D> MeshTexture;
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 		bool Visible = true;
 
 		StaticMeshComponent() = default;
-		explicit StaticMeshComponent(const Ref<Mesh>& mesh, const Ref<Texture>& texture = nullptr, const glm::vec4& color = glm::vec4(1.0f))
+		explicit StaticMeshComponent(const Ref<Mesh>& mesh, const Ref<Texture2D>& texture = nullptr, const glm::vec4& color = glm::vec4(1.0f))
 			: StaticMesh(mesh), MeshTexture(texture), Color(color)
 		{}
 		StaticMeshComponent(const StaticMeshComponent&) = default;

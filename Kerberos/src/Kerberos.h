@@ -30,6 +30,9 @@
 #include "Kerberos/Renderer/SubTexture2D.h"
 #include "Kerberos/Renderer/VertexArray.h"
 #include "Kerberos/Renderer/Framebuffer.h"
+//#include "Kerberos/Renderer/Material.h"
+#include "Kerberos/Renderer/Vertex.h"
+#include "Kerberos/Renderer/Renderer3D.h"
 /// ---------------------------------
 
 /// ---- Scene ----------------------

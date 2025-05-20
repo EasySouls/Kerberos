@@ -5,6 +5,7 @@
 
 #include "Components.h"
 #include "Kerberos/Renderer/Renderer2D.h"
+#include "Kerberos/Renderer/Renderer3D.h"
 
 namespace Kerberos
 {
@@ -51,17 +52,14 @@ namespace Kerberos
 
 		if (mainCamera)
 		{
-			Renderer2D::BeginScene(*mainCamera, mainCameraTransform);
-
-			const auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (const auto entity : group)
+			if (m_Is3D)
 			{
-				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-
-				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+				Render3D(mainCamera, mainCameraTransform);
 			}
-
-			Renderer2D::EndScene();
+			else
+			{
+				Render2D(mainCamera, mainCameraTransform);
+			}
 		}
 	}
 
@@ -96,6 +94,36 @@ namespace Kerberos
 				cameraComponent.Camera.SetViewportSize(width, height);
 			}
 		}
+	}
+
+	void Scene::Render2D(const Camera* mainCamera, const glm::mat4& mainCameraTransform) 
+	{
+		Renderer2D::BeginScene(*mainCamera, mainCameraTransform);
+
+		const auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (const auto entity : group)
+		{
+			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+		}
+
+		Renderer2D::EndScene();
+	}
+
+	void Scene::Render3D(const Camera* mainCamera, const glm::mat4& mainCameraTransform)
+	{
+		Renderer3D::BeginScene(*mainCamera, mainCameraTransform);
+
+		const auto group = m_Registry.group<TransformComponent>(entt::get<StaticMeshComponent>);
+		for (const auto entity : group)
+		{
+			auto [transform, mesh] = group.get<TransformComponent, StaticMeshComponent>(entity);
+
+			Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), nullptr, mesh.MeshTexture);
+		}
+
+		Renderer3D::EndScene();
 	}
 
 	template <typename T>
