@@ -23,6 +23,8 @@ namespace Kerberos
 
 		static void SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform = glm::mat4(1.0f), const Ref<Shader>& shader = nullptr, const Ref<Texture2D>& texture = nullptr, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, float tilingFactor = 1.0f);
 
+		static void SetGlobalAmbientLight(const glm::vec3& color, float intensity);
+
         struct Statistics
         {
             uint32_t DrawCalls = 0;

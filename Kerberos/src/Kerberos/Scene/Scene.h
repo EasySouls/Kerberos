@@ -37,7 +37,7 @@ namespace Kerberos
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 
-		void Toggle3DMode() { m_Is3D = !m_Is3D; }
+		void SetIs3D(const bool is3D) { m_Is3D = is3D; }
 		
 	private:
 		template<typename T>
@@ -53,7 +53,7 @@ namespace Kerberos
 		uint32_t m_ViewportWidth = 0;
 		uint32_t m_ViewportHeight = 0;
 
-		bool m_Is3D = false;
+		bool m_Is3D = true;
 
 		friend class Entity;
 		friend class HierarchyPanel;

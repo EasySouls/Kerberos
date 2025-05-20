@@ -37,7 +37,7 @@ namespace Kerberos
 		/// Used when toggling the cameras
 		bool m_IsPrimaryCamera = true;
 
-		bool m_IsScene3D = false;
+		bool m_IsScene3D = true;
 
 		Ref<Texture2D> m_Texture;
 		Ref<Texture2D> m_SpriteSheet;

@@ -41,6 +41,9 @@ uniform sampler2D u_Texture;
 uniform float u_Shininess;
 uniform vec3 u_ViewPos;
 
+uniform vec3 u_GlobalAmbientColor;
+uniform float u_GlobalAmbientIntensity;
+
 struct DirectionalLight
 {
     bool enabled;
@@ -123,7 +126,7 @@ void main()
     vec3 albedo = u_Color.rgb * texSample.rgb;
     float alpha = u_Color.a * texSample.a;
 
-    vec3 totalLighting = vec3(0.0);
+    vec3 totalLighting = u_GlobalAmbientColor * u_GlobalAmbientIntensity * albedo;
 
     // Ambient (hardcoded for now)
     float ambientStrength = 0.1;

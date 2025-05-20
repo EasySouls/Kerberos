@@ -409,9 +409,9 @@ namespace Kerberos
 			if (opened)
 			{
 				auto& directionalLight = entity.GetComponent<DirectionalLightComponent>();
-				ImGui::ColorEdit4("Color", &directionalLight.Light.Color[0]);
+				ImGui::ColorEdit3("Color", &directionalLight.Light.Color[0]);
 				ImGui::DragFloat("Intensity", &directionalLight.Light.Intensity, 0.01f, 0.0f, 10.0f);
-				ImGui::ColorEdit3("Direction", &directionalLight.Light.Direction[0]);
+				DrawVec3Control("Position", directionalLight.Light.Direction);
 
 				ImGui::TreePop();
 			}
@@ -448,8 +448,8 @@ namespace Kerberos
 			if (opened)
 			{
 				auto& pointLight = entity.GetComponent<PointLightComponent>();
-				ImGui::ColorEdit4("Color", &pointLight.Light.Color[0]);
-				ImGui::ColorEdit3("Position", &pointLight.Light.Position[0]);
+				ImGui::ColorEdit3("Color", &pointLight.Light.Color[0]);
+				DrawVec3Control("Position", pointLight.Light.Position);
 				ImGui::DragFloat("Intensity", &pointLight.Light.Intensity, 0.01f, 0.0f, 10.0f);
 				ImGui::Text("Attenuation factors");
 				ImGui::DragFloat("Constant", &pointLight.Light.Constant, 0.01f, 0.0f, 1.0f);

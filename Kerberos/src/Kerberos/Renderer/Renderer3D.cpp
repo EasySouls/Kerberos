@@ -14,6 +14,9 @@ namespace Kerberos
 		const DirectionalLight* SunLight;
 		std::vector<PointLight> PointLights;
 		static constexpr size_t MaxPointLights = 10;
+
+		glm::vec3 GlobalAmbientColor = { 0.5f, 0.5f, 0.5f };
+		float GlobalAmbientIntensity = 1.0f;
 	};
 
 	static Renderer3DData s_RendererData;
@@ -57,8 +60,16 @@ namespace Kerberos
 		s_RendererData.PointLights.reserve(pointLights.size());
 		for (const auto& pointLight : pointLights)
 		{
+			if (s_RendererData.PointLights.size() >= Renderer3DData::MaxPointLights)
+			{
+				KBR_CORE_WARN("Maximum number of point lights exceeded! Only the first {0} will be used.", Renderer3DData::MaxPointLights);
+				break;
+			}
 			s_RendererData.PointLights.push_back(pointLight);
 		}
+
+		s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.GlobalAmbientColor);
+		s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.GlobalAmbientIntensity);
 	}
 
 	void Renderer3D::EndScene() 
@@ -120,6 +131,18 @@ namespace Kerberos
 
 		s_Stats.DrawCalls++;
 		s_Stats.DrawnMeshes++;
+	}
+
+	void Renderer3D::SetGlobalAmbientLight(const glm::vec3& color, const float intensity) 
+	{
+		s_RendererData.GlobalAmbientColor = color;
+		s_RendererData.GlobalAmbientIntensity = intensity;
+		if (s_RendererData.ActiveShader)
+		{
+			s_RendererData.ActiveShader->Bind();
+			s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.GlobalAmbientColor);
+			s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.GlobalAmbientIntensity);
+		}
 	}
 
 	Renderer3D::Statistics Renderer3D::GetStatistics() 

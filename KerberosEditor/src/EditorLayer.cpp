@@ -85,17 +85,23 @@ namespace Kerberos
 
 		m_SunlightEntity = m_ActiveScene->CreateEntity("Sun");
 		auto& sunlightComponent = m_SunlightEntity.AddComponent<DirectionalLightComponent>();
-		sunlightComponent.Light.Color = { 1.0f, 1.0f, 1.0f };
+		sunlightComponent.Light.Color = { 1.0f, 1.0f, 0.8f };
+		sunlightComponent.Light.Direction = { 123, 80, 130 };
+
+		Entity pointLightEntity = m_ActiveScene->CreateEntity("Point Light");
+		auto& pointLightComponent = pointLightEntity.AddComponent<PointLightComponent>();
+		pointLightComponent.Light.Color = { 0.8f, 0.2f, 0.2f };
+		pointLightComponent.Light.Position = { 0.0f, 3.0f, 0.0f };
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
 		auto& cameraComponent = m_CameraEntity.AddComponent<CameraComponent>();
-		cameraComponent.IsPrimary = false;
+		cameraComponent.Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
+		auto& cameraTransformComponent = m_CameraEntity.GetComponent<TransformComponent>();
+		cameraTransformComponent.Translation = { 0.0f, 0.0f, 5.0f };
 
 		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
 		auto& secondCameraComponent = m_SecondCamera.AddComponent<CameraComponent>();
-		secondCameraComponent.Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
-		auto& cameraTransformComponent = m_SecondCamera.GetComponent<TransformComponent>();
-		cameraTransformComponent.Translation = { 0.0f, 0.0f, -5.0f };
+		secondCameraComponent.IsPrimary = false;
 
 		class CameraController : public ScriptableEntity
 		{
@@ -116,7 +122,7 @@ namespace Kerberos
 			}
 		};
 
-		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
@@ -339,7 +345,7 @@ namespace Kerberos
 
 		if (ImGui::Checkbox("Toggle 3D", &m_IsScene3D))
 		{
-			m_ActiveScene->Toggle3DMode();
+			m_ActiveScene->SetIs3D(m_IsScene3D);
 		}
 
 		ImGui::End();
