@@ -8,3 +8,6 @@
 [submodule "Kerberos/vendor/glm"]
 	path = Kerberos/vendor/glm
 	url = https://github.com/g-truc/glm
+[submodule "Kerberos/vendor/yaml-cpp"]
+	path = Kerberos/vendor/yaml-cpp
+	url = https://github.com/EasySouls/yaml-cpp
