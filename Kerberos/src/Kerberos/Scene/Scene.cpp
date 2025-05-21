@@ -145,7 +145,7 @@ namespace Kerberos
 
 			if (mesh.Visible)
 			{
-				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), nullptr, mesh.MeshTexture);
+				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), mesh.MeshMaterial, mesh.MeshTexture);
 			}
 		}
 

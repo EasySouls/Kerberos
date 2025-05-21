@@ -77,7 +77,7 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 	}
 
-	void Renderer3D::SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Shader>& shader, const Ref<Texture2D>& texture, const glm::vec4& tintColor, const float tilingFactor)
+	void Renderer3D::SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture, const float tilingFactor)
 	{
 		if (!mesh || !mesh->GetVertexArray() || mesh->GetIndexCount() == 0)
 		{
@@ -85,11 +85,13 @@ namespace Kerberos
 			return;
 		}
 
-		const Ref<Shader> shaderToUse = shader ? shader : s_RendererData.ActiveShader;
+		const Ref<Shader> shaderToUse = material->Shader ? material->Shader : s_RendererData.ActiveShader;
 		shaderToUse->Bind();
 
 		shaderToUse->SetMat4("u_ViewProjection", s_RendererData.ViewProjectionMatrix);
 		shaderToUse->SetMat4("u_Model", transform);
+
+		shaderToUse->SetMaterial("u_Material", material);
 
 		if (s_RendererData.SunLight)
 		{
@@ -119,11 +121,7 @@ namespace Kerberos
 		constexpr int textureSlot = 0;
 		textureToUse->Bind(textureSlot);
 		shaderToUse->SetInt("u_Texture", textureSlot);
-		shaderToUse->SetFloat4("u_Color", tintColor);
 		shaderToUse->SetFloat("u_TilingFactor", tilingFactor);
-
-		// TODO: Use Materials
-		shaderToUse->SetFloat("u_Shininess", 32.0f);
 
 		mesh->GetVertexArray()->Bind();
 		

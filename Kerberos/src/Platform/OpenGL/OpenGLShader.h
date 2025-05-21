@@ -26,6 +26,8 @@ namespace Kerberos
 		void SetFloat4(const std::string& name, const glm::vec4& value) override;
 		void SetMat4(const std::string& name, const glm::mat4& value) override;
 
+		void SetMaterial(const std::string& name, const Ref<Material>& material) override;
+
 	private:
 		void UploadUniformInt(const std::string& name, int value) const;
 		void UploadUniformIntArray(const std::string& name, const int* values, uint32_t count) const;

@@ -14,6 +14,8 @@ namespace Kerberos
 	{
 		m_IceTexture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
 		m_SpriteSheetTexture = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
+		m_CubeMesh = Mesh::CreateCube(1.0f);
+		m_WhiteMaterial = CreateRef<Material>();
 	}
 
 	void HierarchyPanel::SetContext(const Ref<Scene>& context) 
@@ -86,7 +88,7 @@ namespace Kerberos
 
 				if (ImGui::MenuItem("Static Mesh"))
 				{
-					m_SelectedEntity.AddComponent<StaticMeshComponent>(Mesh::CreateCube(1.0f));
+					m_SelectedEntity.AddComponent<StaticMeshComponent>(m_CubeMesh, m_WhiteMaterial);
 					ImGui::CloseCurrentPopup();
 				}
 

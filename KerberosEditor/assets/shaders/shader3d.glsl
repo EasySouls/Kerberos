@@ -35,7 +35,6 @@ in vec3 v_FragPos_WorldSpace;
 in vec3 v_Normal_WorldSpace;
 in vec2 v_TexCoord;
 
-uniform vec4 u_Color;
 uniform float u_TilingFactor;
 uniform sampler2D u_Texture;
 uniform float u_Shininess;
@@ -43,6 +42,15 @@ uniform vec3 u_ViewPos;
 
 uniform vec3 u_GlobalAmbientColor;
 uniform float u_GlobalAmbientIntensity;
+
+struct Material 
+{
+    vec3 diffuse;
+    vec3 specular;
+    vec3 ambient;
+    float shininess;
+};
+uniform Material u_Material;
 
 struct DirectionalLight
 {
@@ -67,7 +75,7 @@ struct PointLight
 uniform PointLight u_PointLights[MAX_POINT_LIGHTS];
 uniform int u_NumPointLights;
 
-vec3 CalculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 albedo, float specularStrength)
+vec3 CalculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 albedo)
 {
     if (!light.enabled) return vec3(0.0);
 
@@ -79,17 +87,13 @@ vec3 CalculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir
 
     // Specular (Blinn-Phong)
     vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), u_Shininess);
-    vec3 specular = light.color * spec * light.intensity * specularStrength;
-    // Or Phong:
-    // vec3 reflectDir = reflect(-lightDir, normal);
-    // float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material_Shininess);
-    // vec3 specular = light.color * spec * light.intensity * specularStrength;
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), u_Material.shininess);
+    vec3 specular = light.color * spec * light.intensity * u_Material.specular;
 
     return (diffuse * albedo) + specular;
 }
 
-vec3 CalculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo, float specularStrength)
+vec3 CalculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo)
 {
     vec3 lightDir = normalize(light.position - fragPos);
 
@@ -99,12 +103,8 @@ vec3 CalculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewD
 
     // Specular
     vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), u_Shininess);
-    vec3 specular = light.color * spec * light.intensity * specularStrength;
-    // Or Phong:
-    // vec3 reflectDir = reflect(-lightDir, normal);
-    // float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material_Shininess);
-    // vec3 specular = light.color * spec * light.intensity * specularStrength;
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), u_Material.shininess);
+    vec3 specular = light.color * spec * light.intensity * u_Material.specular;
 
     // Attenuation
     float distance = length(light.position - fragPos);
@@ -118,29 +118,29 @@ vec3 CalculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewD
 
 void main()
 {
+    vec4 color = vec4(u_Material.diffuse, 1.0);
+
     vec3 norm = normalize(v_Normal_WorldSpace);
     vec3 viewDir = normalize(u_ViewPos - v_FragPos_WorldSpace);
 
     // Sample material's albedo texture
     vec4 texSample = texture(u_Texture, v_TexCoord * u_TilingFactor);
-    vec3 albedo = u_Color.rgb * texSample.rgb;
-    float alpha = u_Color.a * texSample.a;
+    vec3 albedo = color.rgb * texSample.rgb;
+    float alpha = color.a * texSample.a;
 
-    vec3 totalLighting = u_GlobalAmbientColor * u_GlobalAmbientIntensity * albedo;
+    vec3 totalLighting = vec3(0);
 
-    // Ambient (hardcoded for now)
-    float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * vec3(1.0);
-    totalLighting += ambient * albedo;
+    // Ambient
+    vec3 ambient = u_GlobalAmbientColor * u_GlobalAmbientIntensity * u_Material.ambient * albedo;
+    totalLighting += ambient;
 
     // Directional Light
-    float specularStrength = 0.5;
-    totalLighting += CalculateDirectionalLight(u_DirectionalLight, norm, viewDir, albedo, specularStrength);
+    totalLighting += CalculateDirectionalLight(u_DirectionalLight, norm, viewDir, albedo);
 
     // Point Lights
     for (int i = 0; i < u_NumPointLights; ++i)
     {
-        totalLighting += CalculatePointLight(u_PointLights[i], norm, v_FragPos_WorldSpace, viewDir, albedo, specularStrength);
+        totalLighting += CalculatePointLight(u_PointLights[i], norm, v_FragPos_WorldSpace, viewDir, albedo);
     }
 
     color = vec4(totalLighting, alpha);

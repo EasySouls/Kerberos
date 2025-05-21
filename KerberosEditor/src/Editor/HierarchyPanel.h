@@ -4,6 +4,8 @@
 #include "Kerberos/Scene/Scene.h"
 #include "Kerberos/Scene/Entity.h"
 #include "Kerberos/Renderer/Texture.h"
+#include "Kerberos/Renderer/Material.h"
+#include "Kerberos/Renderer/Mesh.h"
 
 namespace Kerberos
 {
@@ -30,5 +32,7 @@ namespace Kerberos
 		// Examples
 		Ref<Texture2D> m_IceTexture;
 		Ref<Texture2D> m_SpriteSheetTexture;
+		Ref<Mesh> m_CubeMesh;
+		Ref<Material> m_WhiteMaterial;
 	};
 }

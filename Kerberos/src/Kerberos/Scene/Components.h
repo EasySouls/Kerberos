@@ -7,6 +7,7 @@
 #include "Kerberos/Renderer/Mesh.h"
 #include "Kerberos/Renderer/Texture.h"
 #include "Kerberos/Renderer/Light.h"
+#include "Kerberos/Renderer/Material.h"
 #include "Kerberos/Scene/SceneCamera.h"
 
 namespace Kerberos
@@ -135,14 +136,14 @@ namespace Kerberos
 
 	struct StaticMeshComponent
 	{
-		Ref<Mesh> StaticMesh;
-		Ref<Texture2D> MeshTexture;
-		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		Ref<Mesh> StaticMesh = nullptr;
+		Ref<Material> MeshMaterial = nullptr;
+		Ref<Texture2D> MeshTexture = nullptr;
 		bool Visible = true;
 
 		StaticMeshComponent() = default;
-		explicit StaticMeshComponent(const Ref<Mesh>& mesh, const Ref<Texture2D>& texture = nullptr, const glm::vec4& color = glm::vec4(1.0f))
-			: StaticMesh(mesh), MeshTexture(texture), Color(color)
+		StaticMeshComponent(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Texture2D>& texture = nullptr)
+			: StaticMesh(mesh), MeshMaterial(material), MeshTexture(texture)
 		{}
 		StaticMeshComponent(const StaticMeshComponent&) = default;
 	};

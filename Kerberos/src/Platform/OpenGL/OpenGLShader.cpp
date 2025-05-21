@@ -85,6 +85,14 @@ namespace Kerberos
 		UploadUniformMat4(name, value);
 	}
 
+	void OpenGLShader::SetMaterial(const std::string& name, const Ref<Material>& material)
+	{
+		UploadUniformFloat3(name + ".ambient", material->Ambient);
+		UploadUniformFloat3(name + ".diffuse", material->Diffuse);
+		UploadUniformFloat3(name + ".specular", material->Specular);
+		UploadUniformFloat(name + ".shininess", material->Shininess);
+	}
+
 	void OpenGLShader::UploadUniformInt(const std::string& name, const int value) const
 	{
 		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
