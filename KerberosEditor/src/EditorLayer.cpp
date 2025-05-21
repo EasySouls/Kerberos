@@ -176,65 +176,10 @@ namespace Kerberos
 			RenderCommand::Clear();
 		}
 
-#if 0
 		{
-			static float rotation = 0.0f;
-			rotation += deltaTime * 20.0f;
-
-			KBR_PROFILE_SCOPE("Renderer2D Draw");
-			Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-			//Renderer2D::DrawTexturedQuad({ -0.1f, 0.0f, 1.0f }, { 1.0f, 1.0f }, 10.0f, m_SquareColor);
-			Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, -0.9f }, { 5.0f, 5.0f }, rotation, m_Texture, 5);
-			Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, -0.9f }, { 10.0f, 10.0f }, rotation, m_Texture, 1);
-			Renderer2D::DrawTexturedQuad({ 1.0f, 0.0f, 0.0f }, { 1.2f, 1.2f }, 0.0f, { 0.2f, 0.3f, 0.8f, 1.0f });
-
-			for (float y = -5.0f; y < 5.0f; y += 0.5f)
-			{
-				for (float x = -5.0f; x < 5.0f; x += 0.5f)
-				{
-					glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.5f };
-					Renderer2D::DrawTexturedQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, 0.0f, color);
-				}
-			}
-
-			Renderer2D::EndScene();
-		}
-#endif
-
-		{
-			//Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-#if TEXTURE_EXAMPLE
-			Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, 0.4f }, { 1.0f, 1.0f }, 0.0f, m_TextureStairs);
-			Renderer2D::DrawTexturedQuad({ 1.0f, 0.0f, 0.4f }, { 1.0f, 1.0f }, 0.0f, m_TextureBarrel);
-			Renderer2D::DrawTexturedQuad({ -1.0f, 0.0f, 0.4f }, { 1.0f, 2.0f }, 0.0f, m_TextureTree);
-#endif
-
-
-#if MAP_EXAMPLE
-			for (size_t y = 0; y < m_MapHeight; y++)
-			{
-				for (size_t x = 0; x < m_MapWidth; x++)
-				{
-					char tileType = s_Map[x + y * m_MapWidth];
-					Ref<SubTexture2D> texture;
-
-					if (m_TileMap.contains(tileType))
-					{
-						texture = m_TileMap[tileType];
-					}
-
-					else
-						texture = m_TextureGrass;
-					Renderer2D::DrawTexturedQuad({ x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, 0.0f }, { 1.0f, 1.0f }, 0.0f, texture);
-				}
-			}
-#endif
+			KBR_PROFILE_SCOPE("Scene::OnUpdate");
 
 			m_ActiveScene->OnUpdate(deltaTime);
-
-			//Renderer2D::EndScene();
 
 			m_Framebuffer->Unbind();
 		}

@@ -4,6 +4,8 @@
 #include <glm/gtc/type_ptr.inl>
 #include "imgui/imgui.h"
 
+#include "Kerberos/Core/Input.h"
+
 #define PROFILE_SCOPE(name) Kerberos::Timer timer##__LINE__(name, 
 
 static const char* s_Map =
@@ -142,9 +144,11 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 		Kerberos::Renderer2D::EndScene();
 	}
 
-	if (Kerberos::Input::IsMouseButtonPressed(KBR_MOUSE_BUTTON_LEFT))
+	if (Kerberos::Input::IsMouseButtonPressed(Kerberos::Mouse::ButtonLeft))
 	{
-		auto [x, y] = Kerberos::Input::GetMousePosition();
+		const auto mousePos = Kerberos::Input::GetMousePosition();
+		float x = mousePos.x;
+		float y = mousePos.y;
 
 		const auto width = Kerberos::Application::Get().GetWindow().GetWidth();
 		const auto height = Kerberos::Application::Get().GetWindow().GetHeight();
