@@ -120,6 +120,9 @@
     <ClInclude Include="src\Kerberos\Renderer\Light.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Material.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Mesh.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
@@ -231,7 +234,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Renderer\Material.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">

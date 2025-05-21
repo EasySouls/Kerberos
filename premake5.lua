@@ -22,6 +22,7 @@ IncludeDir["glm"] = "%{wks.location}/Kerberos/vendor/glm"
 IncludeDir["stb_image"] = "%{wks.location}/Kerberos/vendor/stb_image"
 IncludeDir["VulkanSDK"] = "%{VULKAN_DIR}/Include"
 IncludeDir["entt"] = "%{wks.location}/Kerberos/vendor/entt/Include"
+IncludeDir["yaml_cpp"] = "%{wks.location}/Kerberos/vendor/yaml-cpp/include"
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
@@ -42,6 +43,7 @@ group "Dependencies"
 	include "Kerberos/vendor/GLFW"
 	include "Kerberos/vendor/glad"
 	include "Kerberos/vendor/imgui"
+	include "Kerberos/vendor/yaml-cpp"
 group ""
 
 project "Kerberos"
@@ -77,7 +79,8 @@ project "Kerberos"
 		IncludeDir.glm,
 		IncludeDir.stb_image,
 		IncludeDir.VulkanSDK,
-		IncludeDir.entt
+		IncludeDir.entt,
+		IncludeDir.yaml_cpp,
 	}
 
 	libdirs 
@@ -90,6 +93,8 @@ project "Kerberos"
 		"GLFW",
 		"Glad",
 		"ImGui",
+		"yaml-cpp",
+
 		"opengl32.lib",
 		Library.Vulkan,
 	}
