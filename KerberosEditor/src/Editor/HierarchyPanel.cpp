@@ -12,6 +12,8 @@ namespace Kerberos
 	HierarchyPanel::HierarchyPanel(const Ref<Scene>& context)
 		: m_Context(context)
 	{
+		m_IceTexture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
+		m_SpriteSheetTexture = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
 	}
 
 	void HierarchyPanel::SetContext(const Ref<Scene>& context) 
@@ -79,6 +81,12 @@ namespace Kerberos
 				if (ImGui::MenuItem("Point Light"))
 				{
 					m_SelectedEntity.AddComponent<PointLightComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Static Mesh"))
+				{
+					m_SelectedEntity.AddComponent<StaticMeshComponent>(Mesh::CreateCube(1.0f));
 					ImGui::CloseCurrentPopup();
 				}
 
@@ -412,6 +420,7 @@ namespace Kerberos
 				ImGui::ColorEdit3("Color", &directionalLight.Light.Color[0]);
 				ImGui::DragFloat("Intensity", &directionalLight.Light.Intensity, 0.01f, 0.0f, 10.0f);
 				DrawVec3Control("Position", directionalLight.Light.Direction);
+				ImGui::Checkbox("Enabled", &directionalLight.IsEnabled);
 
 				ImGui::TreePop();
 			}
@@ -448,6 +457,7 @@ namespace Kerberos
 			if (opened)
 			{
 				auto& pointLight = entity.GetComponent<PointLightComponent>();
+				ImGui::Checkbox("Enabled", &pointLight.IsEnabled);
 				ImGui::ColorEdit3("Color", &pointLight.Light.Color[0]);
 				DrawVec3Control("Position", pointLight.Light.Position);
 				ImGui::DragFloat("Intensity", &pointLight.Light.Intensity, 0.01f, 0.0f, 10.0f);
@@ -462,6 +472,145 @@ namespace Kerberos
 			if (componentDeleted)
 			{
 				entity.RemoveComponent<PointLightComponent>();
+			}
+		}
+		if (entity.HasComponent<DirectionalLightComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(DirectionalLightComponent).hash_code()), treeNodeFlags, "Directional Light");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Directional Light Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			if (opened)
+			{
+				auto& directionalLight = entity.GetComponent<DirectionalLightComponent>();
+				ImGui::ColorEdit3("Color", &directionalLight.Light.Color[0]);
+				ImGui::DragFloat("Intensity", &directionalLight.Light.Intensity, 0.01f, 0.0f, 10.0f);
+				DrawVec3Control("Position", directionalLight.Light.Direction);
+
+				ImGui::TreePop();
+			}
+
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<DirectionalLightComponent>();
+			}
+		}
+		if (entity.HasComponent<StaticMeshComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(StaticMeshComponent).hash_code()), treeNodeFlags, "Static Mesh");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Static Mesh Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			if (opened)
+			{
+				auto& staticMesh = entity.GetComponent<StaticMeshComponent>();
+				ImGui::Checkbox("Visible", &staticMesh.Visible);
+				
+				const char* meshTypes[] = { "Cube", "Sphere" };
+				const char* currentMeshTypeString = meshTypes[0];
+
+				auto basicCube = Mesh::CreateCube(1.0f);
+				auto basicSphere = Mesh::CreateSphere(1.0f, 64, 64);
+
+				if (ImGui::BeginCombo("Mesh Type", currentMeshTypeString))
+				{
+					for (int i = 0; i < 2; i++)
+					{
+						const bool isSelected = (currentMeshTypeString == meshTypes[i]);
+						if (ImGui::Selectable(meshTypes[i], isSelected))
+						{
+							if (meshTypes[i] == "Cube")
+							{
+								staticMesh.StaticMesh = basicCube;
+								currentMeshTypeString = "Cube";
+							}
+							else if (meshTypes[i] == "Sphere")
+							{
+								staticMesh.StaticMesh = basicSphere;
+								currentMeshTypeString = "Sphere";
+							}
+						}
+						if (isSelected)
+						{
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+
+					ImGui::EndCombo();
+				}
+
+				const char* textures[] = { "Ice", "Sprite Sheet" };
+				const char* currentTextureString = textures[0];
+
+				if (ImGui::BeginCombo("Texture", currentTextureString))
+				{
+					for (int i = 0; i < 2; i++)
+					{
+						const bool isSelected = (currentTextureString == textures[i]);
+						if (ImGui::Selectable(textures[i], isSelected))
+						{
+							if (meshTypes[i] == "Cube")
+							{
+								staticMesh.MeshTexture = m_IceTexture;
+								currentTextureString = "Ice";
+							}
+							else if (meshTypes[i] == "Sphere")
+							{
+								staticMesh.MeshTexture = m_SpriteSheetTexture;
+								currentTextureString = "Sprite Sheet";
+							}
+						}
+						if (isSelected)
+						{
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+
+					ImGui::EndCombo();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<StaticMeshComponent>();
 			}
 		}
 	}

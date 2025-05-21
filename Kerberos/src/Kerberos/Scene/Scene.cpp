@@ -143,7 +143,10 @@ namespace Kerberos
 		{
 			auto [transform, mesh] = view.get<TransformComponent, StaticMeshComponent>(entity);
 
-			Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), nullptr, mesh.MeshTexture);
+			if (mesh.Visible)
+			{
+				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), nullptr, mesh.MeshTexture);
+			}
 		}
 
 		Renderer3D::EndScene();

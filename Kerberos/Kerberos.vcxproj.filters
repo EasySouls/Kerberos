@@ -117,6 +117,12 @@
     <ClInclude Include="src\Kerberos\Renderer\GraphicsContext.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Light.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Mesh.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\OrthographicCamera.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
@@ -127,6 +133,9 @@
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Renderer2D.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Renderer3D.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\RendererAPI.h">
@@ -142,6 +151,9 @@
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\UniformBuffer.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Vertex.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\VertexArray.h">
@@ -219,10 +231,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Renderer\Mesh.h" />
-    <ClInclude Include="src\Kerberos\Renderer\Vertex.h" />
-    <ClInclude Include="src\Kerberos\Renderer\Renderer3D.h" />
-    <ClInclude Include="src\Kerberos\Renderer\Light.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -252,6 +260,9 @@
     <ClCompile Include="src\Kerberos\Renderer\Framebuffer.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Renderer\Mesh.cpp">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\OrthographicCamera.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
@@ -262,6 +273,9 @@
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Renderer2D.cpp">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Renderer\Renderer3D.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\RendererAPI.cpp">
@@ -339,7 +353,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Renderer\Mesh.cpp" />
-    <ClCompile Include="src\Kerberos\Renderer\Renderer3D.cpp" />
   </ItemGroup>
 </Project>
