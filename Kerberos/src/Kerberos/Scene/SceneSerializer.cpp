@@ -5,7 +5,9 @@
 #include "Kerberos/Scene/Components.h"
 
 #include <yaml-cpp/yaml.h>
+
 #include <fstream>
+#include <filesystem>
 
 namespace Kerberos
 {
@@ -54,6 +56,17 @@ namespace Kerberos
 		}
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
+
+		const std::filesystem::path filePathObj(filepath);
+
+		/// Check if there's a parent directory
+		if (const std::filesystem::path parentDir = filePathObj.parent_path(); !parentDir.empty()) {
+			std::error_code ec;
+			std::filesystem::create_directories(parentDir, ec);
+			if (ec) {
+				KBR_CORE_ERROR("Could not create directory {0}: {1}", parentDir.string(), ec.message());
+			}
+		}
 
 		if (std::ofstream fileOut(filepath); fileOut)
 		{
