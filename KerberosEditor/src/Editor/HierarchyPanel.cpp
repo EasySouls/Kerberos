@@ -22,6 +22,10 @@ namespace Kerberos
 	void HierarchyPanel::SetContext(const Ref<Scene>& context)
 	{
 		m_Context = context;
+
+		/// This is neccessary to avoid having a dangling pointer to the previous context
+		/// when loading a new scene
+		m_SelectedEntity = {};
 	}
 
 	void HierarchyPanel::OnImGuiRender()

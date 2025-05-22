@@ -194,6 +194,7 @@
     <ClInclude Include="src\Kerberos\Scene\SceneCamera.h" />
     <ClInclude Include="src\Kerberos\Scene\SceneSerializer.h" />
     <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h" />
+    <ClInclude Include="src\Kerberos\Utils\PlatformUtils.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11Context.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11RendererAPI.h" />
@@ -253,6 +254,7 @@
     <ClCompile Include="src\Platform\Vulkan\VulkanRendererAPI.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanShader.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsPlatformUtils.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\kbrpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>

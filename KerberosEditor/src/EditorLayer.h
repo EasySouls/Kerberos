@@ -20,6 +20,14 @@ namespace Kerberos
 		void OnEvent(Event& event) override;
 
 	private:
+		bool OnKeyPressed(const KeyPressedEvent& event);
+
+		void SaveScene() const;
+		void SaveSceneAs() const;
+		void LoadScene();
+		void NewScene();
+
+	private:
 		OrthographicCameraController m_CameraController;
 		Ref<Framebuffer> m_Framebuffer;
 

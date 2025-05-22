@@ -65,7 +65,9 @@ namespace Kerberos
 
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, const uint32_t indexCount)
 	{
-		const uint32_t count = indexCount ? vertexArray->GetIndexBuffer()->GetCount() : indexCount;
+		vertexArray->Bind();
+
+		const uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, static_cast<int>(count), GL_UNSIGNED_INT, nullptr);
 	}
 }

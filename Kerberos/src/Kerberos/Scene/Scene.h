@@ -16,7 +16,7 @@ namespace Kerberos
 	{
 	public:
 		Scene();
-		~Scene() = default;
+		virtual ~Scene();
 
 		void OnUpdate(Timestep ts);
 

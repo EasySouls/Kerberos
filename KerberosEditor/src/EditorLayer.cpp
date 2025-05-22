@@ -1,5 +1,7 @@
 #include "EditorLayer.h"
 
+#include "Kerberos/Utils/PlatformUtils.h"
+
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.inl>
@@ -117,11 +119,11 @@ namespace Kerberos
 		class CameraController : public ScriptableEntity
 		{
 		public:
-			void OnUpdate(const Timestep ts) override 
+			void OnUpdate(const Timestep ts) override
 			{
 				auto& translation = GetComponent<TransformComponent>().Translation;
 				constexpr float speed = 5.0f;
-				
+
 				if (Input::IsKeyPressed(Key::W)) // w
 					translation.y += speed * ts;
 				if (Input::IsKeyPressed(Key::A)) // A
@@ -263,31 +265,29 @@ namespace Kerberos
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Exit")) 
+				if (ImGui::MenuItem("Exit"))
 					Application::Get().Close();
 
 				ImGui::MenuItem("Fullscreen", nullptr, &optFullscreenPersistent);
 
-				if (ImGui::MenuItem("New Scene"))
+				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
 				{
-					m_ActiveScene = CreateRef<Scene>();
-					m_HierarchyPanel.SetContext(m_ActiveScene);
+					NewScene();
 				}
 
-				if (ImGui::MenuItem("Save Scene"))
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
 				{
-					SceneSerializer serializer(m_ActiveScene);
-					serializer.Serialize("assets/scenes/Example.kerberos");
+					SaveScene();
 				}
 
-				if (ImGui::MenuItem("Load Scene"))
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
 				{
-					/// Create a new scene, since otherwise the deserialized entities would be added to the current scene
-					m_ActiveScene = CreateRef<Scene>();
-					m_HierarchyPanel.SetContext(m_ActiveScene);
+					SaveSceneAs();
+				}
 
-					SceneSerializer serializer(m_ActiveScene);
-					serializer.Deserialize("assets/scenes/Example.kerberos");
+				if (ImGui::MenuItem("Load...", "Ctrl+O"))
+				{
+					LoadScene();
 				}
 
 				ImGui::EndMenu();
@@ -356,5 +356,84 @@ namespace Kerberos
 	void EditorLayer::OnEvent(Event& event)
 	{
 		m_CameraController.OnEvent(event);
+
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<KeyPressedEvent>(KBR_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 	}
+
+	bool EditorLayer::OnKeyPressed(const KeyPressedEvent& event)
+	{
+		/// Shortcuts
+		if (event.GetRepeatCount() > 0)
+			return false;
+
+		const bool ctrl = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+		const bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+
+		switch (event.GetKeyCode())
+		{
+		case Key::S:
+			if (ctrl && shift)
+			{
+				SaveSceneAs();
+			}
+			else if (ctrl)
+			{
+				SaveScene();
+			}
+			break;
+		case Key::N:
+			if (ctrl)
+			{
+				NewScene();
+			}
+			break;
+		case Key::O:
+			if (ctrl)
+			{
+				LoadScene();
+			}
+			break;
+		}
+	}
+
+	void EditorLayer::NewScene()
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+		m_HierarchyPanel.SetContext(m_ActiveScene);
+	}
+
+	void EditorLayer::SaveScene() const
+	{
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize("assets/scenes/Example.kerberos");
+	}
+
+	void EditorLayer::SaveSceneAs() const 
+	{
+		const std::string filepath = FileDialog::SaveFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
+		if (filepath.empty())
+			return;
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize(filepath);
+	}
+
+	void EditorLayer::LoadScene() 
+	{
+		const std::string filepath = FileDialog::OpenFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
+
+		if (filepath.empty())
+			return;
+
+		/// Create a new scene, since otherwise the deserialized entities would be added to the current scene
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+		m_HierarchyPanel.SetContext(m_ActiveScene);
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Deserialize("assets/scenes/Example.kerberos");
+	}
+
 }

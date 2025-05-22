@@ -14,6 +14,12 @@ namespace Kerberos
 		m_Registry = entt::basic_registry();
 	}
 
+	Scene::~Scene() 
+	{
+		/// Destroy all entities in the scene
+		m_Registry.clear<entt::entity>();
+	}
+
 	void Scene::OnUpdate(Timestep ts)
 	{
 		/// Update the scripts
