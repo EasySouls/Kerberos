@@ -164,7 +164,52 @@ namespace Kerberos
 			return CreateRef<Mesh>(vertices, indices);
 		}
 
-	void Mesh::SetupMesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices) 
+		Ref<Mesh> Mesh::CreatePlane(const float size) 
+		{
+			return CreatePlane(size, size);
+		}
+
+		Ref<Mesh> Mesh::CreatePlane(const float width, const float height)
+		{
+			std::vector<Vertex> vertices;
+			std::vector<uint32_t> indices;
+
+			const float halfWidth = width * 0.5f;
+			const float halfHeight = height * 0.5f;
+
+			const glm::vec3 positions[4] = {
+				{-halfWidth, 0.0f, -halfHeight},
+				{ halfWidth, 0.0f, -halfHeight},
+				{ halfWidth,  0.0f, halfHeight},
+				{-halfWidth, 0.0f, halfHeight}
+			};
+
+			constexpr glm::vec3 normal = { 0.0f, 1.0f, 0.0f };
+
+			constexpr glm::vec2 texCoords[4] = {
+				{0.0f, 0.0f},
+				{1.0f, 0.0f},
+				{1.0f, 1.0f},
+				{0.0f, 1.0f}
+			};
+
+			vertices.push_back({ .Position = positions[0], .Normal = normal, .TexCoord = texCoords[0] });
+			vertices.push_back({ .Position = positions[1], .Normal = normal, .TexCoord = texCoords[1] });
+			vertices.push_back({ .Position = positions[2], .Normal = normal, .TexCoord = texCoords[2] });
+			vertices.push_back({ .Position = positions[3], .Normal = normal, .TexCoord = texCoords[3] });
+
+			indices.push_back(0);
+			indices.push_back(1);
+			indices.push_back(2);
+
+			indices.push_back(2);
+			indices.push_back(3);
+			indices.push_back(0);
+
+			return CreateRef<Mesh>(vertices, indices);
+		}
+
+		void Mesh::SetupMesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices) 
 	{
 		m_VertexArray = VertexArray::Create();
 
