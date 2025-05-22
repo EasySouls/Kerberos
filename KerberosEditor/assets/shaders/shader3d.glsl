@@ -71,6 +71,7 @@ struct PointLight
     float linear;
     float quadratic;
 };
+
 #define MAX_POINT_LIGHTS 10
 uniform PointLight u_PointLights[MAX_POINT_LIGHTS];
 uniform int u_NumPointLights;
@@ -118,15 +119,16 @@ vec3 CalculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewD
 
 void main()
 {
-    vec4 color = vec4(u_Material.diffuse, 1.0);
+    vec4 baseColor = vec4(u_Material.diffuse, 1.0);
 
     vec3 norm = normalize(v_Normal_WorldSpace);
     vec3 viewDir = normalize(u_ViewPos - v_FragPos_WorldSpace);
 
     // Sample material's albedo texture
     vec4 texSample = texture(u_Texture, v_TexCoord * u_TilingFactor);
-    vec3 albedo = color.rgb * texSample.rgb;
-    float alpha = color.a * texSample.a;
+
+    vec3 albedo = baseColor.rgb * texSample.rgb;
+    float alpha = baseColor.a * texSample.a;
 
     vec3 totalLighting = vec3(0);
 

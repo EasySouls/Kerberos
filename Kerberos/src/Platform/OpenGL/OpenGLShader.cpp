@@ -60,7 +60,7 @@ namespace Kerberos
 		UploadUniformInt(name, value);
 	}
 
-	void OpenGLShader::SetIntArray(const std::string& name, int* values, uint32_t count)
+	void OpenGLShader::SetIntArray(const std::string& name, int* values, const uint32_t count)
 	{
 		UploadUniformIntArray(name, values, count);
 	}
@@ -262,7 +262,7 @@ namespace Kerberos
 			glDetachShader(program, id);
 		}
 
-		// Assign the programId to the class member only when compilation succeded
+		// Assign the programId to the class member only when compilation succeeded
 		m_RendererID = program;
 	}
 }

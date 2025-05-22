@@ -85,7 +85,7 @@ namespace Kerberos
 			return;
 		}
 
-		const Ref<Shader> shaderToUse = material->Shader ? material->Shader : s_RendererData.ActiveShader;
+		const Ref<Shader> shaderToUse = material->MaterialShader ? material->MaterialShader : s_RendererData.ActiveShader;
 		shaderToUse->Bind();
 
 		shaderToUse->SetMat4("u_ViewProjection", s_RendererData.ViewProjectionMatrix);

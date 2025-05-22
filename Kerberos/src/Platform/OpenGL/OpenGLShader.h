@@ -39,8 +39,9 @@ namespace Kerberos
 
 		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const;
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const;
-		std::string ReadFile(const std::string& filepath);
-		std::unordered_map<unsigned int, std::string> Preprocess(const std::string& shaderSource);
+
+		static std::string ReadFile(const std::string& filepath);
+		static std::unordered_map<unsigned int, std::string> Preprocess(const std::string& shaderSource);
 		void Compile(const std::unordered_map<unsigned int, std::string>& shaderSources);
 
 	private:
