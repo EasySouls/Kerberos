@@ -81,18 +81,12 @@ namespace Kerberos
 		const Ref<Material> whiteMaterial = CreateRef<Material>();
 
 		Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
-		Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
-		auto& cubeMeshComponent = cubeEntity.AddComponent<StaticMeshComponent>();
-		cubeMeshComponent.StaticMesh = cubeMesh;
-		cubeMeshComponent.MeshMaterial = whiteMaterial;
-		cubeMeshComponent.MeshTexture = m_Texture;
+		const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
+		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
 
 		Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
 		const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
-		auto& sphereMeshComponent = sphereEntity.AddComponent<StaticMeshComponent>();
-		sphereMeshComponent.StaticMesh = sphereMesh;
-		sphereMeshComponent.MeshTexture = m_Texture;
-		sphereMeshComponent.MeshMaterial = whiteMaterial;
+		sphereEntity.AddComponent<StaticMeshComponent>(sphereMesh, whiteMaterial, m_Texture);
 		sphereEntity.GetComponent<TransformComponent>().Translation = { 2.0f, -1.2f, -2.0f };
 
 		m_SunlightEntity = m_ActiveScene->CreateEntity("Sun");

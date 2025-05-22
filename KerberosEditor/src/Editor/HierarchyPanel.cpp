@@ -223,7 +223,7 @@ namespace Kerberos
 		ImGui::PopID();
 	}
 
-	void HierarchyPanel::DrawComponents(const Entity entity) 
+	void HierarchyPanel::DrawComponents(const Entity entity) const
 	{
 		if (entity.HasComponent<TagComponent>())
 		{
@@ -606,6 +606,13 @@ namespace Kerberos
 
 					ImGui::EndCombo();
 				}
+
+				ImGui::Separator();
+				ImGui::Text("Material");
+				ImGui::ColorEdit3("Diffuse", &staticMesh.MeshMaterial->Diffuse[0]);
+				ImGui::ColorEdit3("Ambient", &staticMesh.MeshMaterial->Ambient[0]);
+				ImGui::ColorEdit3("Specular", &staticMesh.MeshMaterial->Specular[0]);
+				ImGui::DragFloat("Shininess", &staticMesh.MeshMaterial->Shininess, 0.1f, 0.0f, 10.0f);
 
 				ImGui::TreePop();
 			}
