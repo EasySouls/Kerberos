@@ -49,10 +49,9 @@ group ""
 project "Kerberos"
 	location "Kerberos"
 	kind "StaticLib"
-	staticruntime "off"
+	staticruntime "on"
 	language "C++"
 	cppdialect "C++20"
-
 	
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -99,10 +98,12 @@ project "Kerberos"
 		Library.Vulkan,
 	}
 
-	defines {
+	defines 
+	{
 		"_CRT_SECURE_NO_WARNINGS",
 		"GLFW_INCLUDE_NONE",
-		"IMGUI_DOCKING_BRANCH"
+		"IMGUI_DOCKING_BRANCH",
+		"YAML_CPP_STATIC_DEFINE"
 	}
 	
 	filter "system:windows"
@@ -244,7 +245,7 @@ project "Sandbox"
 project "KerberosEditor"
 	location "KerberosEditor"
 	kind "ConsoleApp"
-	staticruntime "off"
+	staticruntime "on"
 	language "C++"
 	cppdialect "C++20"
 	

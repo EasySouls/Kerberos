@@ -76,12 +76,12 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;KBR_PLATFORM_WINDOWS;_WINDLL;KBR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;YAML_CPP_STATIC_DEFINE;KBR_PLATFORM_WINDOWS;_WINDLL;KBR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;E:\VulkanSDK\1.4.309.0\Include;vendor\entt\Include;vendor\yaml-cpp\include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
@@ -100,14 +100,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;KBR_PLATFORM_WINDOWS;_WINDLL;KB_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;YAML_CPP_STATIC_DEFINE;KBR_PLATFORM_WINDOWS;_WINDLL;KB_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;E:\VulkanSDK\1.4.309.0\Include;vendor\entt\Include;vendor\yaml-cpp\include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
@@ -127,14 +127,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;KBR_PLATFORM_WINDOWS;_WINDLL;KB_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;YAML_CPP_STATIC_DEFINE;KBR_PLATFORM_WINDOWS;_WINDLL;KB_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;E:\VulkanSDK\1.4.309.0\Include;vendor\entt\Include;vendor\yaml-cpp\include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
@@ -192,6 +192,7 @@
     <ClInclude Include="src\Kerberos\Scene\Entity.h" />
     <ClInclude Include="src\Kerberos\Scene\Scene.h" />
     <ClInclude Include="src\Kerberos\Scene\SceneCamera.h" />
+    <ClInclude Include="src\Kerberos\Scene\SceneSerializer.h" />
     <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11Context.h" />
@@ -237,6 +238,7 @@
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Kerberos\Scene\Scene.cpp" />
     <ClCompile Include="src\Kerberos\Scene\SceneCamera.cpp" />
+    <ClCompile Include="src\Kerberos\Scene\SceneSerializer.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11RendererAPI.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />

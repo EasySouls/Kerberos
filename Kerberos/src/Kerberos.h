@@ -42,6 +42,7 @@
 #include "Kerberos/Scene/Entity.h"
 #include "Kerberos/Scene/ScriptableEntity.h"
 #include "Kerberos/Scene/SceneCamera.h"
+#include "Kerberos/Scene/SceneSerializer.h"
 /// ---------------------------------
 
 /// ---- Input ----------------------

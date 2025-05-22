@@ -3,8 +3,8 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.inl>
+
 #include "imgui/imgui.h"
-#include "Kerberos/Core/Input.h"
 
 #define PROFILE_SCOPE(name) Timer timer##__LINE__(name, 
 
@@ -36,10 +36,10 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		FramebufferSpecification frameBuferSpec;
-		frameBuferSpec.Width = 1280;
-		frameBuferSpec.Height = 720;
-		m_Framebuffer = Framebuffer::Create(frameBuferSpec);
+		FramebufferSpecification frameBufferSpec;
+		frameBufferSpec.Width = 1280;
+		frameBufferSpec.Height = 720;
+		m_Framebuffer = Framebuffer::Create(frameBufferSpec);
 
 		m_ActiveScene = CreateRef<Scene>();
 
@@ -137,6 +137,9 @@ namespace Kerberos
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize("/assets/scenes/Example.kerberos");
 	}
 
 	void EditorLayer::OnDetach()

@@ -57,5 +57,6 @@ namespace Kerberos
 
 		friend class Entity;
 		friend class HierarchyPanel;
+		friend class SceneSerializer;
 	};
 }
