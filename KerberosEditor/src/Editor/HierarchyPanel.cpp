@@ -15,15 +15,16 @@ namespace Kerberos
 		m_IceTexture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
 		m_SpriteSheetTexture = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
 		m_CubeMesh = Mesh::CreateCube(1.0f);
+		m_SphereMesh = Mesh::CreateSphere(1.0f, 16, 16);
 		m_WhiteMaterial = CreateRef<Material>();
 	}
 
-	void HierarchyPanel::SetContext(const Ref<Scene>& context) 
+	void HierarchyPanel::SetContext(const Ref<Scene>& context)
 	{
 		m_Context = context;
 	}
 
-	void HierarchyPanel::OnImGuiRender() 
+	void HierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Hierarchy");
 		for (const auto entityId : m_Context->m_Registry.view<entt::entity>())
@@ -108,7 +109,7 @@ namespace Kerberos
 	{
 		const auto& tag = entity.GetComponent<TagComponent>().Tag;
 
-		const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth 
+		const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth
 			| (entity == m_SelectedEntity ? ImGuiTreeNodeFlags_Selected : 0);
 
 		/// The entity's identifier serves as the unique ID for the ImGui tree node
@@ -240,7 +241,7 @@ namespace Kerberos
 
 				ImGui::TreePop();
 			}
-			
+
 		}
 		if (entity.HasComponent<TransformComponent>())
 		{
@@ -262,7 +263,7 @@ namespace Kerberos
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
 			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(CameraComponent).hash_code()), treeNodeFlags, "Camera");
 			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.0f);
-			if (ImGui::Button("+", ImVec2{20, 20}))
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
 			{
 				ImGui::OpenPopup("ComponentSettings");
 			}
@@ -354,7 +355,7 @@ namespace Kerberos
 			{
 				entity.RemoveComponent<CameraComponent>();
 			}
-		}	
+		}
 		if (entity.HasComponent<SpriteRendererComponent>())
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
@@ -543,12 +544,9 @@ namespace Kerberos
 			{
 				auto& staticMesh = entity.GetComponent<StaticMeshComponent>();
 				ImGui::Checkbox("Visible", &staticMesh.Visible);
-				
+
 				const char* meshTypes[] = { "Cube", "Sphere" };
 				const char* currentMeshTypeString = meshTypes[0];
-
-				auto basicCube = Mesh::CreateCube(1.0f);
-				auto basicSphere = Mesh::CreateSphere(1.0f, 64, 64);
 
 				if (ImGui::BeginCombo("Mesh Type", currentMeshTypeString))
 				{
@@ -559,12 +557,12 @@ namespace Kerberos
 						{
 							if (meshTypes[i] == "Cube")
 							{
-								staticMesh.StaticMesh = basicCube;
+								staticMesh.StaticMesh = m_CubeMesh;
 								currentMeshTypeString = "Cube";
 							}
 							else if (meshTypes[i] == "Sphere")
 							{
-								staticMesh.StaticMesh = basicSphere;
+								staticMesh.StaticMesh = m_CubeMesh;
 								currentMeshTypeString = "Sphere";
 							}
 						}
@@ -607,12 +605,23 @@ namespace Kerberos
 					ImGui::EndCombo();
 				}
 
-				ImGui::Separator();
-				ImGui::Text("Material");
-				ImGui::ColorEdit3("Diffuse", &staticMesh.MeshMaterial->Diffuse[0]);
-				ImGui::ColorEdit3("Ambient", &staticMesh.MeshMaterial->Ambient[0]);
-				ImGui::ColorEdit3("Specular", &staticMesh.MeshMaterial->Specular[0]);
-				ImGui::DragFloat("Shininess", &staticMesh.MeshMaterial->Shininess, 0.1f, 0.0f, 10.0f);
+				if (staticMesh.MeshMaterial)
+				{
+					ImGui::Separator();
+					ImGui::Text("Material");
+					ImGui::ColorEdit3("Diffuse", &staticMesh.MeshMaterial->Diffuse[0]);
+					ImGui::ColorEdit3("Ambient", &staticMesh.MeshMaterial->Ambient[0]);
+					ImGui::ColorEdit3("Specular", &staticMesh.MeshMaterial->Specular[0]);
+					ImGui::DragFloat("Shininess", &staticMesh.MeshMaterial->Shininess, 0.1f, 0.0f, 10.0f);
+				}
+
+				if (staticMesh.MeshTexture)
+				{
+					ImGui::Separator();
+					ImGui::Text("Texture");
+					const uint32_t textureID = staticMesh.MeshTexture->GetRendererID();
+					ImGui::Image(textureID, ImVec2{ 64, 64 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+				}
 
 				ImGui::TreePop();
 			}

@@ -33,6 +33,7 @@ namespace Kerberos
 		Ref<Texture2D> m_IceTexture;
 		Ref<Texture2D> m_SpriteSheetTexture;
 		Ref<Mesh> m_CubeMesh;
+		Ref<Mesh> m_SphereMesh;
 		Ref<Material> m_WhiteMaterial;
 	};
 }

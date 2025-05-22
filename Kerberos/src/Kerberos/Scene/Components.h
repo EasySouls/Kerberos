@@ -141,7 +141,13 @@ namespace Kerberos
 		Ref<Texture2D> MeshTexture = nullptr;
 		bool Visible = true;
 
-		StaticMeshComponent() = default;
+		StaticMeshComponent()
+		{
+			// TODO: This creates a brand-new material and mesh every time. We should probably have a default material and mesh in the renderer and use that instead.
+			MeshMaterial = CreateRef<Material>();
+			StaticMesh = Mesh::CreateCube(1.0f);
+		}
+
 		StaticMeshComponent(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Texture2D>& texture = nullptr)
 			: StaticMesh(mesh), MeshMaterial(material), MeshTexture(texture)
 		{}
