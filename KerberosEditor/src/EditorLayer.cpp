@@ -139,7 +139,7 @@ namespace Kerberos
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
 		SceneSerializer serializer(m_ActiveScene);
-		serializer.Serialize("/assets/scenes/Example.kerberos");
+		serializer.Serialize("assets/scenes/Example.kerberos");
 	}
 
 	void EditorLayer::OnDetach()
@@ -264,7 +264,33 @@ namespace Kerberos
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Exit")) Application::Get().Close();
+				if (ImGui::MenuItem("Exit")) 
+					Application::Get().Close();
+
+				ImGui::MenuItem("Fullscreen", nullptr, &optFullscreenPersistent);
+
+				if (ImGui::MenuItem("New Scene"))
+				{
+					m_ActiveScene = CreateRef<Scene>();
+					m_HierarchyPanel.SetContext(m_ActiveScene);
+				}
+
+				if (ImGui::MenuItem("Save Scene"))
+				{
+					SceneSerializer serializer(m_ActiveScene);
+					serializer.Serialize("assets/scenes/Example.kerberos");
+				}
+
+				if (ImGui::MenuItem("Load Scene"))
+				{
+					/// Create a new scene, since otherwise the deserialized entities would be added to the current scene
+					m_ActiveScene = CreateRef<Scene>();
+					m_HierarchyPanel.SetContext(m_ActiveScene);
+
+					SceneSerializer serializer(m_ActiveScene);
+					serializer.Deserialize("assets/scenes/Example.kerberos");
+				}
+
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
