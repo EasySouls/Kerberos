@@ -38,7 +38,9 @@ namespace Kerberos
 		void OnViewportResize(uint32_t width, uint32_t height);
 
 		void SetIs3D(const bool is3D) { m_Is3D = is3D; }
-		
+
+		Entity GetPrimaryCameraEntity();
+
 	private:
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);

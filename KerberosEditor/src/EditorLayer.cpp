@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.inl>
 
 #include "imgui/imgui.h"
+#include <ImGuizmo/ImGuizmo.h>
 
 #define PROFILE_SCOPE(name) Timer timer##__LINE__(name, 
 
@@ -348,6 +349,44 @@ namespace Kerberos
 
 		const uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		ImGui::Image(textureID, ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		/// Gizmos
+		if (const Entity selectedEntity = m_HierarchyPanel.GetSelectedEntity(); selectedEntity && m_GizmoType != -1)
+		{
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
+
+			const float windowWidth = ImGui::GetWindowWidth();
+			const float windowHeight = ImGui::GetWindowHeight();
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+			const Entity cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+			const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+
+			const glm::mat4 cameraProjection = camera.GetProjection();
+			const glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+			/// Entity transform
+			auto& tc = selectedEntity.GetComponent<TransformComponent>();
+			auto transform = tc.GetTransform();
+			glm::vec3 originalRotation = tc.Rotation;
+
+			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+				static_cast<ImGuizmo::OPERATION>(m_GizmoType), ImGuizmo::MODE::LOCAL, glm::value_ptr(transform));
+
+			if (ImGuizmo::IsUsing())
+			{
+				glm::vec3 translation, rotation, scale;
+				ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
+
+				glm::vec3 deltaRotation = rotation - originalRotation;
+
+				tc.Translation = translation;
+				tc.Rotation += deltaRotation;
+				tc.Scale = scale;
+			}
+		}
+
 		ImGui::End();
 
 		ImGui::End();
@@ -393,6 +432,20 @@ namespace Kerberos
 			{
 				LoadScene();
 			}
+			break;
+
+		/// Gizmos
+		case Key::Q:
+			m_GizmoType = -1;
+			break;
+		case Key::W:
+			m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+			break;
+		case Key::E:
+			m_GizmoType = ImGuizmo::OPERATION::SCALE;
+			break;
+		case Key::R:
+			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
 			break;
 		}
 	}

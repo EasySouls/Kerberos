@@ -158,6 +158,21 @@ namespace Kerberos
 		Renderer3D::EndScene();
 	}
 
+	Entity Scene::GetPrimaryCameraEntity() 
+	{
+		const auto view = m_Registry.view<CameraComponent>();
+		for (const auto entity : view)
+		{
+			const auto& camera = view.get<CameraComponent>(entity);
+			if (camera.IsPrimary)
+			{
+				return Entity{ entity, this };
+			}
+		}
+
+		return {};
+	}
+
 	template <typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{

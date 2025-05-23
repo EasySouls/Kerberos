@@ -4,6 +4,9 @@
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 #include "Kerberos/Renderer/Mesh.h"
 #include "Kerberos/Renderer/Texture.h"
 #include "Kerberos/Renderer/Light.h"
@@ -33,13 +36,11 @@ namespace Kerberos
 
 		glm::mat4 GetTransform() const
 		{
-			glm::mat4 transform = glm::translate(glm::mat4(1.0f), Translation);
+			const glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
 
-			transform = glm::rotate(transform, glm::radians(Rotation.x), glm::vec3(1, 0, 0));
-			transform = glm::rotate(transform, glm::radians(Rotation.y), glm::vec3(0, 1, 0));
-			transform = glm::rotate(transform, glm::radians(Rotation.z), glm::vec3(0, 0, 1));
-
-			transform = glm::scale(transform, Scale);
+			const glm::mat4 transform = glm::translate(glm::mat4(1.0f), Translation) 
+				* rotation 
+				* glm::scale(glm::mat4(1.0f), Scale);
 
 			return transform;
 		}

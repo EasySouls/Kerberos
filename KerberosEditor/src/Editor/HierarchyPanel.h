@@ -21,6 +21,8 @@ namespace Kerberos
 		void OnImGuiRender();
 		void DrawComponents(Entity entity) const;
 
+		Entity GetSelectedEntity() const { return m_SelectedEntity; }
+
 	private:
 		void DrawEntityNode(const Entity& entity);
 
