@@ -2,49 +2,23 @@ Scene: Unnamed Scene
 Entities:
   - Entity: 7
     TagComponent:
-      Tag: Square
+      Tag: Second Camera
     TransformComponent:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.2, 0.3, 0.8, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.7853982
+        PerspectiveNear: 0.01
+        PerspectiveFar: 100
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      IsPrimary: false
+      FixedAspectRatio: false
   - Entity: 6
-    TagComponent:
-      Tag: Cube
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-  - Entity: 5
-    TagComponent:
-      Tag: Sphere
-    TransformComponent:
-      Translation: [2, -1.2, -2]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-  - Entity: 4
-    TagComponent:
-      Tag: Plane
-    TransformComponent:
-      Translation: [0, 1.3, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-  - Entity: 3
-    TagComponent:
-      Tag: Sun
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-  - Entity: 2
-    TagComponent:
-      Tag: Point Light
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-  - Entity: 1
     TagComponent:
       Tag: Camera
     TransformComponent:
@@ -62,21 +36,47 @@ Entities:
         OrthographicFar: 1
       IsPrimary: true
       FixedAspectRatio: false
-  - Entity: 0
+  - Entity: 5
     TagComponent:
-      Tag: Second Camera
+      Tag: Point Light
     TransformComponent:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    CameraComponent:
-      Camera:
-        ProjectionType: 1
-        PerspectiveFOV: 0.7853982
-        PerspectiveNear: 0.01
-        PerspectiveFar: 100
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
-      IsPrimary: false
-      FixedAspectRatio: false
+  - Entity: 4
+    TagComponent:
+      Tag: Sun
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 3
+    TagComponent:
+      Tag: Plane
+    TransformComponent:
+      Translation: [0, 1.3, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 2
+    TagComponent:
+      Tag: Sphere
+    TransformComponent:
+      Translation: [2, -1.2, -2]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 0
+    TagComponent:
+      Tag: Square
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.2, 0.3, 0.8, 1]

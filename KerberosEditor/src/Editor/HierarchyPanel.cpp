@@ -157,11 +157,14 @@ namespace Kerberos
 
 	static void DrawVec3Control(const std::string& label, glm::vec3& values, const float resetValue = 0.0f, const float columnWidth = 80.0f)
 	{
+		const ImGuiIO& io = ImGui::GetIO();
+		auto boldFont = io.Fonts->Fonts[1];
+
 		ImGui::PushID(label.c_str());
 
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, columnWidth);
-		ImGui::Text(label.c_str());
+		ImGui::Text("%s", label.c_str());
 		ImGui::NextColumn();
 
 		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
@@ -174,10 +177,12 @@ namespace Kerberos
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.25f, 0.25f, 1.0f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.8f, 0.2f, 0.25f, 1.0f));
 
+		ImGui::PushFont(boldFont);
 		if (ImGui::Button("X", buttonSize))
 		{
 			values.x = resetValue;
 		}
+		ImGui::PopFont();
 
 		ImGui::PopStyleColor(3);
 
@@ -191,10 +196,12 @@ namespace Kerberos
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.9f, 0.25f, 1.0f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.8f, 0.2f, 1.0f));
 
+		ImGui::PushFont(boldFont);
 		if (ImGui::Button("Y", buttonSize))
 		{
 			values.y = resetValue;
 		}
+		ImGui::PopFont();
 
 		ImGui::PopStyleColor(3);
 
@@ -208,10 +215,12 @@ namespace Kerberos
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.9f, 1.0f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.25f, 0.8f, 1.0f));
 
+		ImGui::PushFont(boldFont);
 		if (ImGui::Button("Z", buttonSize))
 		{
 			values.z = resetValue;
 		}
+		ImGui::PopFont();
 
 		ImGui::PopStyleColor(3);
 
@@ -426,7 +435,7 @@ namespace Kerberos
 				auto& directionalLight = entity.GetComponent<DirectionalLightComponent>();
 				ImGui::ColorEdit3("Color", &directionalLight.Light.Color[0]);
 				ImGui::DragFloat("Intensity", &directionalLight.Light.Intensity, 0.01f, 0.0f, 10.0f);
-				DrawVec3Control("Position", directionalLight.Light.Direction);
+				DrawVec3Control("Direction", directionalLight.Light.Direction);
 				ImGui::Checkbox("Enabled", &directionalLight.IsEnabled);
 
 				ImGui::TreePop();
@@ -481,10 +490,10 @@ namespace Kerberos
 				entity.RemoveComponent<PointLightComponent>();
 			}
 		}
-		if (entity.HasComponent<DirectionalLightComponent>())
+		if (entity.HasComponent<SpotLightComponent>())
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
-			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(DirectionalLightComponent).hash_code()), treeNodeFlags, "Directional Light");
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(SpotLightComponent).hash_code()), treeNodeFlags, "Spotlight");
 			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
 			if (ImGui::Button("+", ImVec2{ 20, 20 }))
 			{
@@ -507,17 +516,18 @@ namespace Kerberos
 
 			if (opened)
 			{
-				auto& directionalLight = entity.GetComponent<DirectionalLightComponent>();
-				ImGui::ColorEdit3("Color", &directionalLight.Light.Color[0]);
-				ImGui::DragFloat("Intensity", &directionalLight.Light.Intensity, 0.01f, 0.0f, 10.0f);
-				DrawVec3Control("Position", directionalLight.Light.Direction);
+				auto& spotlight = entity.GetComponent<SpotLightComponent>();
+				ImGui::ColorEdit3("Color", &spotlight.Light.Color[0]);
+				ImGui::DragFloat("Intensity", &spotlight.Light.Intensity, 0.01f, 0.0f, 10.0f);
+				DrawVec3Control("Position", spotlight.Light.Position);
+				ImGui::Checkbox("Enabled", &spotlight.IsEnabled);
 
 				ImGui::TreePop();
 			}
 
 			if (componentDeleted)
 			{
-				entity.RemoveComponent<DirectionalLightComponent>();
+				entity.RemoveComponent<SpotLightComponent>();
 			}
 		}
 		if (entity.HasComponent<StaticMeshComponent>())
@@ -554,17 +564,19 @@ namespace Kerberos
 
 				if (ImGui::BeginCombo("Mesh Type", currentMeshTypeString))
 				{
-					for (int i = 0; i < 2; i++)
+					for (auto& meshType : meshTypes) 
 					{
-						const bool isSelected = (currentMeshTypeString == meshTypes[i]);
-						if (ImGui::Selectable(meshTypes[i], isSelected))
+						const std::string meshTypeString = currentMeshTypeString;
+
+						const bool isSelected = (currentMeshTypeString == meshType);
+						if (ImGui::Selectable(meshType, isSelected))
 						{
-							if (meshTypes[i] == "Cube")
+							if (meshTypeString == "Cube")
 							{
 								staticMesh.StaticMesh = m_CubeMesh;
 								currentMeshTypeString = "Cube";
 							}
-							else if (meshTypes[i] == "Sphere")
+							else if (meshTypeString == "Sphere")
 							{
 								staticMesh.StaticMesh = m_CubeMesh;
 								currentMeshTypeString = "Sphere";

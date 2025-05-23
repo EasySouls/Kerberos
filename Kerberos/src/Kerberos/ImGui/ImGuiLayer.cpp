@@ -32,6 +32,12 @@ namespace Kerberos
 		/*io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos; */
 
+		io.Fonts->AddFontFromFileTTF("assets/fonts/Inter/Inter_18pt-Italic.ttf", 18.0f);
+		io.Fonts->AddFontFromFileTTF("assets/fonts/Inter/Inter_18pt-Bold.ttf", 18.0f);
+		io.Fonts->AddFontFromFileTTF("assets/fonts/Inter/Inter_18pt-SemiBold.ttf", 18.0f);
+		ImFont* interRegular = io.Fonts->AddFontFromFileTTF("assets/fonts/Inter/Inter_18pt-Regular.ttf", 18.0f);
+		io.FontDefault = interRegular;
+
 		// Setup color style
 		ImGui::StyleColorsDark();
 
