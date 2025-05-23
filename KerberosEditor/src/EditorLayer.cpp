@@ -371,18 +371,27 @@ namespace Kerberos
 			auto transform = tc.GetTransform();
 			glm::vec3 originalRotation = tc.Rotation;
 
+			/// Snapping 
+			const bool snap = Input::IsKeyPressed(Key::LeftControl);
+			float snapValue = 0.5f;
+			if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+				snapValue = 45.0f;
+
+			const float snapValues[3] = { snap ? snapValue : 0.0f, snap ? snapValue : 0.0f, snap ? snapValue : 0.0f };
+
 			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-				static_cast<ImGuizmo::OPERATION>(m_GizmoType), ImGuizmo::MODE::LOCAL, glm::value_ptr(transform));
+				static_cast<ImGuizmo::OPERATION>(m_GizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform), nullptr, snapValues);
 
 			if (ImGuizmo::IsUsing())
 			{
 				glm::vec3 translation, rotation, scale;
 				ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
 
-				glm::vec3 deltaRotation = rotation - originalRotation;
+				//glm::vec3 deltaRotation = rotation - originalRotation;
 
 				tc.Translation = translation;
-				tc.Rotation += deltaRotation;
+				//tc.Rotation += deltaRotation;
+				tc.Rotation = rotation;
 				tc.Scale = scale;
 			}
 		}
