@@ -23,6 +23,7 @@ IncludeDir["stb_image"] = "%{wks.location}/Kerberos/vendor/stb_image"
 IncludeDir["VulkanSDK"] = "%{VULKAN_DIR}/Include"
 IncludeDir["entt"] = "%{wks.location}/Kerberos/vendor/entt/Include"
 IncludeDir["yaml_cpp"] = "%{wks.location}/Kerberos/vendor/yaml-cpp/include"
+IncludeDir["ImGuizmo"] = "%{wks.location}/Kerberos/vendor/ImGuizmo"
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
@@ -44,6 +45,7 @@ group "Dependencies"
 	include "Kerberos/vendor/glad"
 	include "Kerberos/vendor/imgui"
 	include "Kerberos/vendor/yaml-cpp"
+	include "Kerberos/vendor/ImGuizmo"
 group ""
 
 project "Kerberos"
@@ -65,7 +67,7 @@ project "Kerberos"
 		"%{prj.name}/src/**.cpp",
 
 		"%{prj.name}/vendor/stb_image/**.h",
-		"%{prj.name}/vendor/stb_image/**.cpp"
+		"%{prj.name}/vendor/stb_image/**.cpp",
 	}
 	
 	includedirs
@@ -80,6 +82,7 @@ project "Kerberos"
 		IncludeDir.VulkanSDK,
 		IncludeDir.entt,
 		IncludeDir.yaml_cpp,
+		IncludeDir.ImGuizmo,
 	}
 
 	libdirs 
@@ -93,6 +96,7 @@ project "Kerberos"
 		"Glad",
 		"ImGui",
 		"yaml-cpp",
+		"ImGuizmo",
 
 		"opengl32.lib",
 		Library.Vulkan,
@@ -105,6 +109,9 @@ project "Kerberos"
 		"IMGUI_DOCKING_BRANCH",
 		"YAML_CPP_STATIC_DEFINE"
 	}
+
+	filter "files:vendor/ImGuizmo/ImGuizmo.cpp"
+		flags { "NoPCH" }
 	
 	filter "system:windows"
 		systemversion "latest"

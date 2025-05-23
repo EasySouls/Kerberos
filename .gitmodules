@@ -11,3 +11,6 @@
 [submodule "Kerberos/vendor/yaml-cpp"]
 	path = Kerberos/vendor/yaml-cpp
 	url = https://github.com/EasySouls/yaml-cpp
+[submodule "Kerberos/vendor/ImGuizmo"]
+	path = Kerberos/vendor/ImGuizmo
+	url = https://github.com/EasySouls/ImGuizmo
