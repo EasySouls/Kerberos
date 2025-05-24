@@ -5,6 +5,7 @@
 #include "Kerberos/Renderer/Camera.h"
 #include "Kerberos/Events/MouseEvent.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
 namespace Kerberos
@@ -30,7 +31,7 @@ namespace Kerberos
 		glm::vec3 GetRight() const;
 		glm::vec3 GetForward() const;
 		const glm::vec3& GetPosition() const { return m_Position; }
-		glm::quat GetOrientation() const { return m_Orientation; }
+		glm::quat GetOrientation() const;
 
 		float GetPitch() const { return m_Pitch; }
 		float GetYaw() const { return m_Yaw; }
@@ -48,7 +49,7 @@ namespace Kerberos
 		glm::vec3 CalculatePosition() const;
 
 		std::pair<float, float> GetPanSpeed() const;
-		float GetRotateSpeed() const;
+		float GetRotationSpeed() const;
 		float GetZoomSpeed() const;
 
 	private:
@@ -58,18 +59,17 @@ namespace Kerberos
 		float m_FarClip = 1000.0f;
 
 		glm::mat4 m_View;
-		glm::vec3 m_Position = { 0.0f, 0.0f, -5.0f };
+		glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_FocalPoint = { 0.0f, 0.0f, 0.0f };
 
 		glm::vec2 m_InitialMousePosition = { 0.0f, 0.0f };
 
-		float m_Distance = 0.0f;
+		float m_Distance = 10.0f;
 		float m_Pitch = 0.0f;
 		float m_Yaw = 0.0f;
-		glm::quat m_Orientation = glm::angleAxis(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 
-		float m_ViewportWidth = 0.0f;
-		float m_ViewportHeight = 0.0f;
+		float m_ViewportWidth = 1280.0f;
+		float m_ViewportHeight = 720.0f;
 	};
 }
 

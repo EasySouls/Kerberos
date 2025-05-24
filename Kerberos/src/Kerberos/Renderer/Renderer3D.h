@@ -9,6 +9,7 @@
 #include "Texture.h"
 #include "Light.h"
 #include "Material.h"
+#include "Kerberos/Scene/EditorCamera.h"
 
 namespace Kerberos
 {
@@ -19,6 +20,7 @@ namespace Kerberos
 		static void Shutdown();
 
 		static void BeginScene(const OrthographicCamera& camera) = delete;
+		static void BeginScene(const EditorCamera& camera, const DirectionalLight* sun, const std::vector<PointLight>& pointLights);
         static void BeginScene(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights);
         static void EndScene();
 

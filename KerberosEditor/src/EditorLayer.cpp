@@ -11,24 +11,6 @@
 
 #define PROFILE_SCOPE(name) Timer timer##__LINE__(name, 
 
-static const char* s_Map =
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWDDDDDDDDDDDDDWWWWWWWWW"
-"WWWWWWWWDGGGGGGGGGGGGGGDWWWWWWWW"
-"WWWWWWWDGGGGGGGGGGGGGGGGDWWWWWWW"
-"WWWWWWWDGGGGGGGGGGGGGGGGDWWWWWWW"
-"WWWWWWWDGGGGGGGGGGGGGGGGDWWWWWWW"
-"WWWWWWWDGGGGGGGGGGGGGGGGDWWWWWWW"
-"WWWWWWWWDGGGGGGGGGGGGGGDWWWWWWWW"
-"WWWWWWWWWDDDDDDDDDDDDDDWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW";
-
 namespace Kerberos
 {
 	EditorLayer::EditorLayer()
@@ -46,6 +28,8 @@ namespace Kerberos
 
 		m_ActiveScene = CreateRef<Scene>();
 
+		m_EditorCamera = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
+
 		m_ViewportSize = { 1280.0f, 720.0f };
 
 		m_Texture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
@@ -59,24 +43,6 @@ namespace Kerberos
 		m_TextureGrass = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 1, 11 }, { 128, 128 }, { 1, 1 });
 		m_TextureDirt = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 6, 11 }, { 128, 128 }, { 1, 1 });
 		m_TextureWater = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128, 128 }, { 1, 1 });
-
-		m_TileMap['G'] = m_TextureGrass;
-		m_TileMap['D'] = m_TextureDirt;
-		m_TileMap['W'] = m_TextureWater;
-
-		m_Particle = ParticleProps{
-			.Position = { 0.0f, 0.0f },
-			.Velocity = { 0.0f, 0.0f },
-			.VelocityVariation = { 3.0f, 1.0f },
-			.ColorBegin = { 0.8f, 0.3f, 0.2f, 1.0f },
-			.ColorEnd = { 0.2f, 0.3f, 0.8f, 1.0f },
-			.SizeBegin = 0.2f,
-			.SizeEnd = 0.0f,
-			.SizeVariation = 0.3f,
-			.LifeTime = 1.0f
-		};
-
-		m_CameraController.SetZoomLevel(5.0f);
 
 		Entity squareEntity = m_ActiveScene->CreateEntity("Square");
 		squareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
@@ -139,9 +105,6 @@ namespace Kerberos
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
-
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Serialize("assets/scenes/Example.kerberos");
 	}
 
 	void EditorLayer::OnDetach()
@@ -164,16 +127,17 @@ namespace Kerberos
 		{
 			m_Framebuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
 			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 
 			m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
 		}
 
 		{
-			KBR_PROFILE_SCOPE("CameraController::OnUpdate");
+			KBR_PROFILE_SCOPE("EditorCamera::OnUpdate");
 
 			/// Only update the camera when the viewport is focused
 			if (m_ViewportFocused)
-				m_CameraController.OnUpdate(deltaTime);
+				m_EditorCamera.OnUpdate(deltaTime);
 		}
 
 		Renderer2D::ResetStatistics();
@@ -190,37 +154,11 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("Scene::OnUpdate");
 
-			m_ActiveScene->OnUpdate(deltaTime);
+			m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera);
+			m_ActiveScene->OnUpdateRuntime(deltaTime);
 
 			m_Framebuffer->Unbind();
 		}
-
-		if (Input::IsMouseButtonPressed(Mouse::ButtonLeft))
-		{
-			const auto mousePos = Input::GetMousePosition();
-			float x = mousePos.x;
-			float y = mousePos.y;
-
-			const auto width = Application::Get().GetWindow().GetWidth();
-			const auto height = Application::Get().GetWindow().GetHeight();
-			const auto& bounds = m_CameraController.GetBounds();
-
-			const auto& pos = m_CameraController.GetCamera().GetPosition();
-
-			const float halfWidth = static_cast<float>(width) * 0.5f;
-			const float halfHeight = static_cast<float>(height) * 0.5f;
-
-			x = ((x - halfWidth) / static_cast<float>(width)) * bounds.GetWidth();
-			y = ((halfHeight - y) / static_cast<float>(height)) * bounds.GetHeight();
-
-			m_Particle.Position = { x + pos.x, y + pos.y };
-
-			for (int i = 0; i < 10; i++)
-				m_ParticleSystem.Emit(m_Particle);
-		}
-
-		m_ParticleSystem.OnUpdate(deltaTime);
-		m_ParticleSystem.OnRender(m_CameraController.GetCamera());
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -301,12 +239,10 @@ namespace Kerberos
 		ImGui::Begin("Settings");
 		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
 
-		const auto stats = Renderer2D::GetStatistics();
-		ImGui::Text("Renderer2D Stats");
-		ImGui::Text("Draw Calls: %u", stats.DrawCalls);
-		ImGui::Text("Quads: %u", stats.QuadCount);
-		ImGui::Text("Vertices: %u", stats.GetTotalVertexCount());
-		ImGui::Text("Indices: %u", stats.GetTotalIndexCount());
+		const auto [DrawCalls, DrawnMeshes] = Renderer3D::GetStatistics();
+		ImGui::Text("Renderer3D Stats");
+		ImGui::Text("Draw Calls: %u", DrawCalls);
+		ImGui::Text("Meshes: %u", DrawnMeshes);
 
 		for (const auto& [Name, Time] : m_ProfileResults)
 		{
@@ -316,12 +252,6 @@ namespace Kerberos
 		m_ProfileResults.clear();
 
 		ImGui::Text("FPS: %.2f", m_Fps);
-
-		/*ImGui::Text("Camera Stats");
-		const auto& camera = m_CameraController.GetCamera();
-		ImGui::Text("Position: %.1f, %.1f, %.1f", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-		ImGui::Text("Rotation: %.1f", camera.GetRotation());
-		ImGui::Text("Zoom Level: %.1f", m_CameraController.GetZoomLevel());*/
 
 		if (ImGui::Checkbox("Toggle Primary Camera", &m_IsPrimaryCamera))
 		{
@@ -333,6 +263,21 @@ namespace Kerberos
 		{
 			m_ActiveScene->SetIs3D(m_IsScene3D);
 		}
+
+		ImGui::Separator();
+
+		ImGui::Text("Gizmo Type: %s", m_GizmoType == -1 ? "None" : (m_GizmoType == ImGuizmo::OPERATION::TRANSLATE ? "Translate" : (m_GizmoType == ImGuizmo::OPERATION::SCALE ? "Scale" : "Rotate")));
+		ImGui::Text("Viewport Size: %.0f x %.0f", m_ViewportSize.x, m_ViewportSize.y);
+		ImGui::Text("Viewport Focused: %s", m_ViewportFocused ? "Yes" : "No");
+		ImGui::Text("Viewport Hovered: %s", m_ViewportHovered ? "Yes" : "No");
+
+		ImGui::Separator();
+
+		ImGui::Text("Editor Camera");
+		const glm::vec3& cameraPosition = m_EditorCamera.GetPosition();
+		ImGui::Text("Position: (%.2f, %.2f, %.2f)", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+		ImGui::Text("Rotation: (Pitch: %.2f, Yaw: %.2f)", m_EditorCamera.GetPitch(), m_EditorCamera.GetYaw());
+		ImGui::Text("Distance: %.2f", m_EditorCamera.GetDistance());
 
 		ImGui::End();
 
@@ -404,6 +349,7 @@ namespace Kerberos
 	void EditorLayer::OnEvent(Event& event)
 	{
 		m_CameraController.OnEvent(event);
+		m_EditorCamera.OnEvent(event);
 
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(KBR_BIND_EVENT_FN(EditorLayer::OnKeyPressed));

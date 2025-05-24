@@ -20,7 +20,12 @@ namespace Kerberos
 		m_Registry.clear<entt::entity>();
 	}
 
-	void Scene::OnUpdate(Timestep ts)
+	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera)
+	{
+		Render3DEditor(camera);
+	}
+
+	void Scene::OnUpdateRuntime(Timestep ts)
 	{
 		/// Update the scripts
 		{
@@ -60,11 +65,11 @@ namespace Kerberos
 		{
 			if (m_Is3D)
 			{
-				Render3D(mainCamera, mainCameraTransform);
+				Render3DRuntime(mainCamera, mainCameraTransform);
 			}
 			else
 			{
-				Render2D(mainCamera, mainCameraTransform);
+				Render2DRuntime(mainCamera, mainCameraTransform);
 			}
 		}
 	}
@@ -102,7 +107,7 @@ namespace Kerberos
 		}
 	}
 
-	void Scene::Render2D(const Camera* mainCamera, const glm::mat4& mainCameraTransform) 
+	void Scene::Render2DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform) 
 	{
 		Renderer2D::BeginScene(*mainCamera, mainCameraTransform);
 
@@ -117,7 +122,7 @@ namespace Kerberos
 		Renderer2D::EndScene();
 	}
 
-	void Scene::Render3D(const Camera* mainCamera, const glm::mat4& mainCameraTransform)
+	void Scene::Render3DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform)
 	{
 		const DirectionalLight* sun = nullptr;
 		const auto sunView = m_Registry.view<DirectionalLightComponent, TransformComponent>();
@@ -143,6 +148,47 @@ namespace Kerberos
 		}
 
 		Renderer3D::BeginScene(*mainCamera, mainCameraTransform, sun, pointLights);
+
+		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
+		for (const auto entity : view)
+		{
+			auto [transform, mesh] = view.get<TransformComponent, StaticMeshComponent>(entity);
+
+			if (mesh.Visible)
+			{
+				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), mesh.MeshMaterial, mesh.MeshTexture);
+			}
+		}
+
+		Renderer3D::EndScene();
+	}
+
+	void Scene::Render3DEditor(const EditorCamera& camera) 
+	{
+		const DirectionalLight* sun = nullptr;
+		const auto sunView = m_Registry.view<DirectionalLightComponent, TransformComponent>();
+		for (const auto entity : sunView)
+		{
+			auto [light, transform] = sunView.get<DirectionalLightComponent, TransformComponent>(entity);
+			if (light.IsEnabled)
+			{
+				sun = &light.Light;
+				break;
+			}
+		}
+
+		std::vector<PointLight> pointLights;
+		const auto pointLightView = m_Registry.view<PointLightComponent, TransformComponent>();
+		for (const auto entity : pointLightView)
+		{
+			auto [light, transform] = pointLightView.get<PointLightComponent, TransformComponent>(entity);
+			if (light.IsEnabled)
+			{
+				pointLights.push_back(light.Light);
+			}
+		}
+
+		Renderer3D::BeginScene(camera, sun, pointLights);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
 		for (const auto entity : view)

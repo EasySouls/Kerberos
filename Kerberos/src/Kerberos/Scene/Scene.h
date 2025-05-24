@@ -4,6 +4,7 @@
 
 #include <entt.hpp>
 
+#include "EditorCamera.h"
 #include "Kerberos/Renderer/Camera.h"
 
 
@@ -18,7 +19,8 @@ namespace Kerberos
 		Scene();
 		virtual ~Scene();
 
-		void OnUpdate(Timestep ts);
+		void OnUpdateEditor(Timestep ts, const EditorCamera& camera);
+		void OnUpdateRuntime(Timestep ts);
 
 		/**
 		 * @brief Create an entity in the scene and assigns it a transform component
@@ -45,9 +47,11 @@ namespace Kerberos
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
 
-		void Render2D(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
+		void Render2DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
 
-		void Render3D(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
+		void Render3DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
+
+		void Render3DEditor(const EditorCamera& camera);
 
 	private:
 		entt::registry m_Registry;

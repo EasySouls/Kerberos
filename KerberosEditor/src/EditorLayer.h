@@ -31,6 +31,8 @@ namespace Kerberos
 		OrthographicCameraController m_CameraController;
 		Ref<Framebuffer> m_Framebuffer;
 
+		EditorCamera m_EditorCamera;
+
 		Ref<Scene> m_ActiveScene;
 		Entity m_CameraEntity;
 		Entity m_SecondCamera;
@@ -63,13 +65,6 @@ namespace Kerberos
 		float m_Fps = 0;
 
 		std::vector<ProfileResult> m_ProfileResults;
-
-		ParticleSystem m_ParticleSystem;
-		ParticleProps m_Particle;
-
-		std::unordered_map<char, Ref<SubTexture2D>> m_TileMap;
-		size_t m_MapWidth = 32;
-		size_t m_MapHeight = 16;
 
 		/// Editor Panels
 		HierarchyPanel m_HierarchyPanel;

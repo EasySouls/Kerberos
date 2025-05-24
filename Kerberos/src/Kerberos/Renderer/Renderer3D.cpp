@@ -43,6 +43,36 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 	}
 
+	void Renderer3D::BeginScene(const EditorCamera& camera, const DirectionalLight* sun,
+		const std::vector<PointLight>& pointLights) 
+	{
+		KBR_PROFILE_FUNCTION();
+
+		const auto& viewProjection = camera.GetViewMatrix();
+		s_RendererData.ViewProjectionMatrix = viewProjection;
+		s_RendererData.CameraPosition = camera.GetPosition();
+
+		s_RendererData.ActiveShader->Bind();
+		s_RendererData.ActiveShader->SetMat4("u_ViewProjection", viewProjection);
+		s_RendererData.ActiveShader->SetFloat3("u_ViewPos", s_RendererData.CameraPosition);
+
+		s_RendererData.SunLight = sun;
+		s_RendererData.PointLights.clear();
+		s_RendererData.PointLights.reserve(pointLights.size());
+		for (const auto& pointLight : pointLights)
+		{
+			if (s_RendererData.PointLights.size() >= Renderer3DData::MaxPointLights)
+			{
+				KBR_CORE_WARN("Maximum number of point lights exceeded! Only the first {0} will be used.", Renderer3DData::MaxPointLights);
+				break;
+			}
+			s_RendererData.PointLights.push_back(pointLight);
+		}
+
+		s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.GlobalAmbientColor);
+		s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.GlobalAmbientIntensity);
+	}
+
 	void Renderer3D::BeginScene(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights)
 	{
 		KBR_PROFILE_FUNCTION();
