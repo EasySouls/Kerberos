@@ -89,7 +89,7 @@ namespace Kerberos
 		m_View = glm::inverse(m_View);
 	}
 
-	bool EditorCamera::OnMouseScroll(MouseScrolledEvent& e) 
+	bool EditorCamera::OnMouseScroll(const MouseScrolledEvent& e) 
 	{
 		const float delta = e.GetYOffset() * 0.1f;
 		MouseZoom(delta);

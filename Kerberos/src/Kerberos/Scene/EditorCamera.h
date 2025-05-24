@@ -40,7 +40,7 @@ namespace Kerberos
 		void UpdateProjection();
 		void UpdateView();
 
-		bool OnMouseScroll(MouseScrolledEvent& e);
+		bool OnMouseScroll(const MouseScrolledEvent& e);
 
 		void MousePan(const glm::vec2& delta);
 		void MouseRotate(const glm::vec2& delta);
@@ -64,7 +64,7 @@ namespace Kerberos
 
 		glm::vec2 m_InitialMousePosition = { 0.0f, 0.0f };
 
-		float m_Distance = 10.0f;
+		float m_Distance = 5.0f;
 		float m_Pitch = 0.0f;
 		float m_Yaw = 0.0f;
 

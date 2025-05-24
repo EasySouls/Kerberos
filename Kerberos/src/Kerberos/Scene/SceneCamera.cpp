@@ -54,7 +54,6 @@ namespace Kerberos
 		else
 		{
 			m_Projection = glm::perspective(m_PerspectiveFov, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
-			m_Projection[1][1] *= -1; // Invert Y axis
 		}
 	}
 }

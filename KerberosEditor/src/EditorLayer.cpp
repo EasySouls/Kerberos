@@ -56,12 +56,12 @@ namespace Kerberos
 		Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
 		const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
 		sphereEntity.AddComponent<StaticMeshComponent>(sphereMesh, whiteMaterial, m_Texture);
-		sphereEntity.GetComponent<TransformComponent>().Translation = { 2.0f, -1.2f, -2.0f };
+		sphereEntity.GetComponent<TransformComponent>().Translation = { 2.0f, 1.2f, -2.0f };
 
 		Entity planeEntity = m_ActiveScene->CreateEntity("Plane");
 		const Ref<Mesh> planeMesh = Mesh::CreatePlane(10.0f, 10.0f);
 		planeEntity.AddComponent<StaticMeshComponent>(planeMesh, whiteMaterial, nullptr);
-		planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, 1.3f, 0.0f };
+		planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, -1.0f, 0.0f };
 
 		m_SunlightEntity = m_ActiveScene->CreateEntity("Sun");
 		auto& sunlightComponent = m_SunlightEntity.AddComponent<DirectionalLightComponent>();
@@ -126,7 +126,7 @@ namespace Kerberos
 			(spec.Width != static_cast<uint32_t>(m_ViewportSize.x) || spec.Height != static_cast<uint32_t>(m_ViewportSize.y)))
 		{
 			m_Framebuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
-			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+			//m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 
 			m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
@@ -155,7 +155,7 @@ namespace Kerberos
 			KBR_PROFILE_SCOPE("Scene::OnUpdate");
 
 			m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera);
-			m_ActiveScene->OnUpdateRuntime(deltaTime);
+			//m_ActiveScene->OnUpdateRuntime(deltaTime);
 
 			m_Framebuffer->Unbind();
 		}

@@ -48,7 +48,7 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		const auto& viewProjection = camera.GetViewMatrix();
+		const auto& viewProjection = camera.GetViewProjectionMatrix();
 		s_RendererData.ViewProjectionMatrix = viewProjection;
 		s_RendererData.CameraPosition = camera.GetPosition();
 
