@@ -24,6 +24,7 @@ namespace Kerberos
 		FramebufferSpecification frameBufferSpec;
 		frameBufferSpec.Width = 1280;
 		frameBufferSpec.Height = 720;
+		frameBufferSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
 		m_Framebuffer = Framebuffer::Create(frameBufferSpec);
 
 		m_ActiveScene = CreateRef<Scene>();
@@ -140,7 +141,7 @@ namespace Kerberos
 				m_EditorCamera.OnUpdate(deltaTime);
 		}
 
-		Renderer2D::ResetStatistics();
+		Renderer3D::ResetStatistics();
 
 		{
 			KBR_PROFILE_SCOPE("Renderer Prep");
@@ -305,11 +306,15 @@ namespace Kerberos
 			const float windowHeight = ImGui::GetWindowHeight();
 			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
-			const Entity cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+			/// Will be used for the Runtime camera
+			/*const Entity cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
 			const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
 
 			const glm::mat4 cameraProjection = camera.GetProjection();
-			const glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+			const glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());*/
+
+			const glm::mat4 cameraProjection = m_EditorCamera.GetProjection();
+			const glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
 
 			/// Entity transform
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
