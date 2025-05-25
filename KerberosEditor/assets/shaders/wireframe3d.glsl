@@ -30,7 +30,7 @@ void main()
 #version 460 core
 
 layout(triangles) in;
-layout(line_strip, max_vertices = 9) out;
+layout(line_strip, max_vertices = 3) out;
 
 in vec3 v_FragPos_WorldSpace[];
 in vec3 v_Normal_WorldSpace[];
@@ -39,40 +39,55 @@ in vec2 v_TexCoord[];
 out vec3 g_FragPos_WorldSpace;
 out vec3 g_Normal_WorldSpace;
 out vec2 g_TexCoord;
-flat out int g_PrimitiveType; // 0 for triangle, 1 for line
+noperspective out vec3 g_EdgeDistance;
 
 uniform mat4 u_ViewProjection;
 
-// Helper function to generate a vertex for the line strip
-void EmitVertexWithPrimitiveType(int index, int primitiveType)
-{
-    g_FragPos_WorldSpace = v_FragPos_WorldSpace[index];
-    g_Normal_WorldSpace = v_Normal_WorldSpace[index];
-    g_TexCoord = v_TexCoord[index];
-	g_PrimitiveType = primitiveType; // Set the primitive type (0 for triangle, 1 for line)
-    gl_Position = gl_in[index].gl_Position; // Use the projected position from the vertex shader
-    EmitVertex();
-}
-
 void main()
 {
-    // Emit the original triangle(Primitive Type 0)
-    EmitVertexWithPrimitiveType(0, 0);
-    EmitVertexWithPrimitiveType(1, 0);
-    EmitVertexWithPrimitiveType(2, 0);
-    EndPrimitive();
+    vec4 p;
 
-    // Emit lines for the edges (Primitive Type 1)
-    EmitVertexWithPrimitiveType(0, 1);
-    EmitVertexWithPrimitiveType(1, 1);
-    EndPrimitive();
+	p = gl_in[0].gl_Position;
+    vec2 p0 = vec2(u_ViewProjection * (p / p.w));
 
-    EmitVertexWithPrimitiveType(1, 1);
-    EmitVertexWithPrimitiveType(2, 1);
-    EndPrimitive();
+	p = gl_in[1].gl_Position;
+	vec2 p1 = vec2(u_ViewProjection * (p / p.w));
 
-    EmitVertexWithPrimitiveType(2, 1);
-    EmitVertexWithPrimitiveType(0, 1);
+	p = gl_in[2].gl_Position;
+	vec2 p2 = vec2(u_ViewProjection * (p / p.w));
+
+	float a = length(p1 - p2);
+	float b = length(p2 - p0);
+	float c = length(p1 - p0);
+
+	float alpha = acos((b * b + c * c - a * a) / (2.0 * b * c));
+	float beta = acos((a * a + c * c - b * b) / (2.0 * a * c));
+
+    float ha = abs(c * sin(beta));
+	float hb = abs(c * sin(alpha));
+	float hc = abs(b * sin(alpha));
+
+    g_FragPos_WorldSpace = v_FragPos_WorldSpace[0];
+    g_Normal_WorldSpace = v_Normal_WorldSpace[0];
+    g_TexCoord = v_TexCoord[0];
+    gl_Position = gl_in[0].gl_Position;
+	g_EdgeDistance = vec3(ha, 0.0, 0.0);
+    EmitVertex();
+
+    g_FragPos_WorldSpace = v_FragPos_WorldSpace[1];
+    g_Normal_WorldSpace = v_Normal_WorldSpace[1];
+    g_TexCoord = v_TexCoord[1];
+    gl_Position = gl_in[1].gl_Position;
+    g_EdgeDistance = vec3(0.0, hb, 0.0);
+    EmitVertex();
+
+    g_FragPos_WorldSpace = v_FragPos_WorldSpace[2];
+    g_Normal_WorldSpace = v_Normal_WorldSpace[2];
+    g_TexCoord = v_TexCoord[2];
+    gl_Position = gl_in[2].gl_Position;
+    g_EdgeDistance = vec3(0.0, 0.0, hc);
+    EmitVertex();
+
     EndPrimitive();
 }
 
@@ -84,7 +99,7 @@ layout(location = 0) out vec4 color;
 in vec3 g_FragPos_WorldSpace;
 in vec3 g_Normal_WorldSpace;
 in vec2 g_TexCoord;
-flat in int g_PrimitiveType; // 0 for triangle, 1 for line
+noperspective in vec3 g_EdgeDistance;
 
 uniform float u_TilingFactor;
 uniform sampler2D u_Texture;
@@ -170,13 +185,6 @@ vec3 CalculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewD
 
 void main()
 {
-	// If it's a wireframe primitive, set color to green 
-    if (g_PrimitiveType == 1) 
-    {
-        color = vec4(0.1, 1.0, 0.2, 1.0);
-        return;
-	}
-
     vec4 baseColor = vec4(u_Material.diffuse, 1.0);
 
     vec3 norm = normalize(g_Normal_WorldSpace);
@@ -203,5 +211,28 @@ void main()
         totalLighting += CalculatePointLight(u_PointLights[i], norm, g_FragPos_WorldSpace, viewDir, albedo);
     }
 
+    // Calculating whether to show the wireframe
+	float d = min(g_EdgeDistance.x, min(g_EdgeDistance.y, g_EdgeDistance.z));
+
+    float mixVal = 0.0;
+    float wireframeWidth = 0.5;
+    if (d < wireframeWidth - 1)
+    {
+        mixVal = 1.0;
+    }
+    else if (d > wireframeWidth + 1)
+    {
+        mixVal = 0.0;
+    }
+    else
+    {
+		float x = d - (wireframeWidth - 1.0);
+		mixVal = exp2(-2.0 * x * x);
+    }
+
+	vec4 wireframeColor = vec4(0.1, 1.0, 0.2, 1.0);
+
     color = vec4(totalLighting, alpha);
+
+	color = mix(color, wireframeColor, mixVal);
 }
