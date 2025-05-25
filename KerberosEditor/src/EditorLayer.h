@@ -56,6 +56,8 @@ namespace Kerberos
 		bool m_RenderSkybox = false;
 		bool m_RenderOceanSkybox = true;
 
+		bool m_ShowWireframe = false;
+
 		Ref<Texture2D> m_Texture;
 		Ref<Texture2D> m_SpriteSheet;
 		Ref<SubTexture2D> m_TextureStairs, m_TextureBarrel, m_TextureTree, m_TextureGrass, m_TextureDirt, m_TextureWater;

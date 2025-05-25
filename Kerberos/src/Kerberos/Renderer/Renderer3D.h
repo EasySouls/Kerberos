@@ -28,6 +28,7 @@ namespace Kerberos
 
 		static void SetGlobalAmbientLight(const glm::vec3& color, float intensity);
 		static void ToggleSkyboxTexture();
+		static void SetShowWireframe(bool showWireframe);
 
         struct Statistics
         {

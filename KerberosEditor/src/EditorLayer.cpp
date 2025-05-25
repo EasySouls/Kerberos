@@ -274,6 +274,11 @@ namespace Kerberos
 			Renderer3D::ToggleSkyboxTexture();
 		}
 
+		if (ImGui::Checkbox("Show Wireframe", &m_ShowWireframe))
+		{
+			Renderer3D::SetShowWireframe(m_ShowWireframe);
+		}
+
 		ImGui::Separator();
 
 		ImGui::Text("Gizmo Type: %s", m_GizmoType == -1 ? "None" : (m_GizmoType == ImGuizmo::OPERATION::TRANSLATE ? "Translate" : (m_GizmoType == ImGuizmo::OPERATION::SCALE ? "Scale" : "Rotate")));

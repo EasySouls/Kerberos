@@ -14,6 +14,9 @@ namespace Kerberos
 		Ref<Texture2D> WhiteTexture;
 		glm::vec3 CameraPosition;
 
+		Ref<Shader> BaseShader = nullptr;
+		Ref<Shader> WireframeShader = nullptr;
+
 		const DirectionalLight* SunLight;
 		std::vector<PointLight> PointLights;
 		static constexpr size_t MaxPointLights = 10;
@@ -39,7 +42,10 @@ namespace Kerberos
 
 		s_RendererData = Renderer3DData();
 
-		s_RendererData.ActiveShader = Shader::Create("assets/shaders/shader3d.glsl");
+		s_RendererData.BaseShader = Shader::Create("assets/shaders/shader3d.glsl");
+		s_RendererData.WireframeShader = Shader::Create("assets/shaders/wireframe3d.glsl");
+		/// Set the default shader to the base shader
+		s_RendererData.ActiveShader = s_RendererData.BaseShader;
 
 		s_RendererData.WhiteTexture = Texture2D::Create(1, 1);
 		uint32_t whiteTextureData = 0xffffffff;
@@ -287,6 +293,11 @@ namespace Kerberos
 	void Renderer3D::ToggleSkyboxTexture() 
 	{
 		s_RendererData.RenderOceanSkybox = !s_RendererData.RenderOceanSkybox;
+	}
+
+	void Renderer3D::SetShowWireframe(const bool showWireframe) 
+	{
+		s_RendererData.ActiveShader = showWireframe ? s_RendererData.WireframeShader : s_RendererData.BaseShader;
 	}
 
 	Renderer3D::Statistics Renderer3D::GetStatistics() 
