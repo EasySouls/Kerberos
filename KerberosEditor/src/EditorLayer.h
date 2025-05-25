@@ -54,6 +54,7 @@ namespace Kerberos
 
 		/// Later this should be handled by the ECS system
 		bool m_RenderSkybox = false;
+		bool m_RenderOceanSkybox = true;
 
 		Ref<Texture2D> m_Texture;
 		Ref<Texture2D> m_SpriteSheet;

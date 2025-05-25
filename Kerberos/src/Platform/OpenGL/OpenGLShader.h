@@ -11,7 +11,7 @@ namespace Kerberos
 	{
 	public:
 		explicit OpenGLShader(const std::string& filepath);
-		OpenGLShader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		OpenGLShader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc, const std::string& geometrySrc = "");
 		~OpenGLShader() override;
 
 		void Bind() const override;

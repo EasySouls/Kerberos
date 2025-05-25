@@ -22,8 +22,10 @@ namespace Kerberos
 		float GlobalAmbientIntensity = 1.0f;
 
 		bool RenderSkybox = false;
+		bool RenderOceanSkybox = false;
 		Ref<Shader> SkyboxShader = nullptr;
-		Ref<TextureCube> SkyboxTexture = nullptr;
+		Ref<TextureCube> StarmapSkyboxTexture = nullptr;
+		Ref<TextureCube> OceanSkyboxTexture = nullptr;
 		Ref<VertexArray> SkyboxVertexArray = nullptr;
 	};
 
@@ -44,7 +46,7 @@ namespace Kerberos
 		s_RendererData.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
 		s_RendererData.SkyboxShader = Shader::Create("assets/shaders/skybox.glsl");
-		const std::vector<std::string> skyboxTextures = {
+		const std::vector<std::string> skymapTextures = {
 			"assets/textures/starmap_cubemap_0.png",
 			"assets/textures/starmap_cubemap_1.png",
 			"assets/textures/starmap_cubemap_2.png",
@@ -53,7 +55,16 @@ namespace Kerberos
 			"assets/textures/starmap_cubemap_5.png",
 
 		};
-		s_RendererData.SkyboxTexture = TextureCube::Create("Starmap Skybox", skyboxTextures, false);
+		s_RendererData.StarmapSkyboxTexture = TextureCube::Create("Starmap Skybox", skymapTextures, false);
+		const std::vector<std::string> oceanCubeTextures = {
+			"assets/textures/skybox/right.jpg",
+			"assets/textures/skybox/left.jpg",
+			"assets/textures/skybox/top.jpg",
+			"assets/textures/skybox/bottom.jpg",
+			"assets/textures/skybox/front.jpg",
+			"assets/textures/skybox/back.jpg"
+		};
+		s_RendererData.OceanSkyboxTexture = TextureCube::Create("Ocean Skybox", oceanCubeTextures, false);
 		const std::vector<float> skyboxVertices = {
 			-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
@@ -192,7 +203,10 @@ namespace Kerberos
 		s_RendererData.SkyboxShader->SetMat4("u_View", skyboxView);
 		s_RendererData.SkyboxShader->SetMat4("u_Projection", s_RendererData.ProjectionMatrix);
 		s_RendererData.SkyboxVertexArray->Bind();
-		s_RendererData.SkyboxTexture->Bind(0);
+		if (s_RendererData.RenderOceanSkybox)
+			s_RendererData.OceanSkyboxTexture->Bind(0);
+		else
+			s_RendererData.StarmapSkyboxTexture->Bind(0);
 
 		/// Always 36 indices for the skybox
 		RenderCommand::DrawArray(s_RendererData.SkyboxVertexArray, 36);
@@ -268,6 +282,11 @@ namespace Kerberos
 			s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.GlobalAmbientColor);
 			s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.GlobalAmbientIntensity);
 		}
+	}
+
+	void Renderer3D::ToggleSkyboxTexture() 
+	{
+		s_RendererData.RenderOceanSkybox = !s_RendererData.RenderOceanSkybox;
 	}
 
 	Renderer3D::Statistics Renderer3D::GetStatistics() 

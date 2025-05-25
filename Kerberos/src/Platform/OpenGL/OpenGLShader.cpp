@@ -17,6 +17,8 @@ namespace Kerberos
 			return GL_VERTEX_SHADER;
 		if (type == "fragment" || type == "pixel")
 			return GL_FRAGMENT_SHADER;
+		if (type == "geometry")
+			return GL_GEOMETRY_SHADER;
 		KBR_CORE_ASSERT(false, "Unknown shader type!")
 			return 0;
 	}
@@ -31,12 +33,14 @@ namespace Kerberos
 		m_Name = path.stem().string();
 	}
 
-	OpenGLShader::OpenGLShader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	OpenGLShader::OpenGLShader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc, const std::string& geometrySrc)
 		: m_Name(std::move(name))
 	{
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
+		if (!geometrySrc.empty())
+			sources[GL_GEOMETRY_SHADER] = geometrySrc;
 		Compile(sources);
 	}
 
@@ -176,13 +180,13 @@ namespace Kerberos
 
 		while (pos != std::string::npos)
 		{
-			size_t eol = shaderSource.find_first_of("\r\n", pos);
+			const size_t eol = shaderSource.find_first_of("\r\n", pos);
 			KBR_CORE_ASSERT(eol != std::string::npos, "Syntax error!");
-			size_t begin = pos + typeTokenLength + 1;
+			const size_t begin = pos + typeTokenLength + 1;
 			std::string type = shaderSource.substr(begin, eol - begin);
-			KBR_CORE_ASSERT(type == "vertex" || type == "fragment" || type == "pixel", "Invalid shader type specified!");
+			KBR_CORE_ASSERT(type == "vertex" || type == "fragment" || type == "pixel" || type == "geometry", "Invalid shader type specified!");
 
-			size_t nextLinePos = shaderSource.find_first_not_of("\r\n", eol);
+			const size_t nextLinePos = shaderSource.find_first_not_of("\r\n", eol);
 			pos = shaderSource.find(typeToken, nextLinePos);
 
 			shaderSources[ShaderTypeFromString(type)]
@@ -196,9 +200,10 @@ namespace Kerberos
 	{
 		// Create a shader program
 		const GLuint program = glCreateProgram();
-		KBR_CORE_ASSERT(shaderSources.size() <= 2, "Only 2 shaders in a file is supported for now!");
+		KBR_CORE_ASSERT(shaderSources.size() <= 3, "Only 3 shaders in a file is supported!");
 
-		std::array<GLenum, 2> glShaderIDs;
+		std::vector<GLenum> glShaderIDs;
+		glShaderIDs.resize(shaderSources.size());
 
 		int glShaderIDIndex = 0;
 		for (const auto& [shaderType, source] : shaderSources)

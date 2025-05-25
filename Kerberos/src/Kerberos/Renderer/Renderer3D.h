@@ -27,6 +27,7 @@ namespace Kerberos
 		static void SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture = nullptr, float tilingFactor = 1.0f);
 
 		static void SetGlobalAmbientLight(const glm::vec3& color, float intensity);
+		static void ToggleSkyboxTexture();
 
         struct Statistics
         {

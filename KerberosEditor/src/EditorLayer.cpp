@@ -269,6 +269,10 @@ namespace Kerberos
 
 		ImGui::Checkbox("Render Skybox", &m_RenderSkybox);
 
+		if (ImGui::Checkbox("Toggle Skybox Texture", &m_RenderOceanSkybox))
+		{
+			Renderer3D::ToggleSkyboxTexture();
+		}
 
 		ImGui::Separator();
 
