@@ -52,6 +52,9 @@ namespace Kerberos
 
 		int m_GizmoType = -1;
 
+		/// Later this should be handled by the ECS system
+		bool m_RenderSkybox = false;
+
 		Ref<Texture2D> m_Texture;
 		Ref<Texture2D> m_SpriteSheet;
 		Ref<SubTexture2D> m_TextureStairs, m_TextureBarrel, m_TextureTree, m_TextureGrass, m_TextureDirt, m_TextureWater;

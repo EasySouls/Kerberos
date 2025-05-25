@@ -19,7 +19,11 @@ namespace Kerberos
 		void SetClearColor(const glm::vec4& color) override;
 		void Clear() override;
 
+		void SetDepthTest(bool enabled) override;
+		void SetDepthFunc(DepthFunc func) override;
+
 		void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) override;
+		void DrawArray(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) override;
 
 	private:
 		void CreateRenderPass();

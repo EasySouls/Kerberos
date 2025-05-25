@@ -17,7 +17,18 @@ namespace Kerberos
 		static void SetClearColor(const glm::vec4& color) { s_RendererAPI->SetClearColor(color); }
 		static void Clear() { s_RendererAPI->Clear(); }
 
-		static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, const uint32_t indexCount = 0) { s_RendererAPI->DrawIndexed(vertexArray, indexCount); }
+		static void SetDepthTest(const bool enabled) { s_RendererAPI->SetDepthTest(enabled); }
+		static void SetDepthFunc(const DepthFunc func) { s_RendererAPI->SetDepthFunc(func); }
+
+		static void DrawIndexed(const Ref<VertexArray>& vertexArray, const uint32_t indexCount = 0) 
+		{
+			s_RendererAPI->DrawIndexed(vertexArray, indexCount); 
+		}
+
+		static void DrawArray(const Ref<VertexArray>& vertexArray, const uint32_t vertexCount)
+		{
+			s_RendererAPI->DrawArray(vertexArray, vertexCount);
+		}
 
 		// void SetupRendererAPI() { s_RendererAPI = RendererAPI::Create(); }
 		static void SetupRendererAPI();

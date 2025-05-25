@@ -28,6 +28,7 @@
 #include "Kerberos/Renderer/Shader.h"
 #include "Kerberos/Renderer/Texture.h"
 #include "Kerberos/Renderer/SubTexture2D.h"
+#include "Kerberos/Renderer/TextureCube.h"
 #include "Kerberos/Renderer/VertexArray.h"
 #include "Kerberos/Renderer/Framebuffer.h"
 #include "Kerberos/Renderer/Light.h"

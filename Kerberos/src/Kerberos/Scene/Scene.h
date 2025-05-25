@@ -19,7 +19,7 @@ namespace Kerberos
 		Scene();
 		virtual ~Scene();
 
-		void OnUpdateEditor(Timestep ts, const EditorCamera& camera);
+		void OnUpdateEditor(Timestep ts, const EditorCamera& camera, bool renderSkybox);
 		void OnUpdateRuntime(Timestep ts);
 
 		/**
@@ -51,7 +51,7 @@ namespace Kerberos
 
 		void Render3DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
 
-		void Render3DEditor(const EditorCamera& camera);
+		void Render3DEditor(const EditorCamera& camera, bool renderSkybox);
 
 	private:
 		entt::registry m_Registry;

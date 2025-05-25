@@ -63,11 +63,45 @@ namespace Kerberos
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
+	void OpenGLRendererAPI::SetDepthTest(const bool enabled) 
+	{
+		if (enabled)
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+	}
+
+	void OpenGLRendererAPI::SetDepthFunc(const DepthFunc func)
+	{
+		GLenum glFunc = GL_LESS;
+		switch (func)
+		{
+		case DepthFunc::Never:         glFunc = GL_NEVER; break;
+		case DepthFunc::Always:        glFunc = GL_ALWAYS; break;
+		case DepthFunc::Equal:         glFunc = GL_EQUAL; break;
+		case DepthFunc::NotEqual:      glFunc = GL_NOTEQUAL; break;
+		case DepthFunc::Less:          glFunc = GL_LESS; break;
+		case DepthFunc::LessEqual:     glFunc = GL_LEQUAL; break;
+		case DepthFunc::Greater:       glFunc = GL_GREATER; break;
+		case DepthFunc::GreaterEqual:  glFunc = GL_GEQUAL; break;
+		default:                       KBR_CORE_ASSERT(false, "Unknown depth function!"); break;
+		}
+
+		glDepthFunc(glFunc);
+	}
+
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, const uint32_t indexCount)
 	{
 		vertexArray->Bind();
 
 		const uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, static_cast<int>(count), GL_UNSIGNED_INT, nullptr);
+	}
+
+	void OpenGLRendererAPI::DrawArray(const Ref<VertexArray>& vertexArray, const uint32_t vertexCount)
+	{
+		vertexArray->Bind();
+
+		glDrawArrays(GL_TRIANGLES, 0, static_cast<int>(vertexCount));
 	}
 }

@@ -7,6 +7,18 @@
 
 namespace Kerberos
 {
+	enum class DepthFunc : uint8_t
+	{
+		Always = 0,
+		Never = 1,
+		Less = 2,
+		LessEqual = 3,
+		Greater = 4,
+		GreaterEqual = 5,
+		Equal = 6,
+		NotEqual = 7
+	};
+
 	class RendererAPI
 	{
 	public:
@@ -26,7 +38,11 @@ namespace Kerberos
 		virtual void SetClearColor(const glm::vec4& color) = 0;
 		virtual void Clear() = 0;
 
+		virtual void SetDepthTest(bool enabled) = 0;
+		virtual void SetDepthFunc(DepthFunc func) = 0;
+
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
+		virtual void DrawArray(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
 
 		static API GetAPI() { return s_API; }
 	private:

@@ -50,9 +50,11 @@ namespace Kerberos
 
 		const Ref<Material> whiteMaterial = CreateRef<Material>();
 
+		const auto skymapTexture = Texture2D::Create("assets/textures/starmap_cubemap_1.png");
+
 		Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
 		const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
-		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
+		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, skymapTexture);
 
 		Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
 		const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
@@ -155,7 +157,7 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("Scene::OnUpdate");
 
-			m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera);
+			m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera, m_RenderSkybox);
 			//m_ActiveScene->OnUpdateRuntime(deltaTime);
 
 			m_Framebuffer->Unbind();
@@ -264,6 +266,9 @@ namespace Kerberos
 		{
 			m_ActiveScene->SetIs3D(m_IsScene3D);
 		}
+
+		ImGui::Checkbox("Render Skybox", &m_RenderSkybox);
+
 
 		ImGui::Separator();
 

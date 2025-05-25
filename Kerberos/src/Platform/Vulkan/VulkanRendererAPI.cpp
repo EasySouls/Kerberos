@@ -108,9 +108,21 @@ namespace Kerberos
 		);
 	}
 
+	void VulkanRendererAPI::SetDepthTest(bool enabled) 
+	{
+		throw std::runtime_error("Depth test not implemented in VulkanRendererAPI yet!");
+	}
+
+	void VulkanRendererAPI::SetDepthFunc(DepthFunc func) 
+	{
+		throw std::runtime_error("Depth function not implemented in VulkanRendererAPI yet!");
+	}
+
 	void VulkanRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
 	}
+
+	void VulkanRendererAPI::DrawArray(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) {}
 
 	void VulkanRendererAPI::RecordCommandBuffer(const VkCommandBuffer commandBuffer, const uint32_t imageIndex) 
 	{

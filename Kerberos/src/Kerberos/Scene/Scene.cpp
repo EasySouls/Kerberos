@@ -20,9 +20,9 @@ namespace Kerberos
 		m_Registry.clear<entt::entity>();
 	}
 
-	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera)
+	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera, const bool renderSkybox)
 	{
-		Render3DEditor(camera);
+		Render3DEditor(camera, renderSkybox);
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts)
@@ -163,7 +163,7 @@ namespace Kerberos
 		Renderer3D::EndScene();
 	}
 
-	void Scene::Render3DEditor(const EditorCamera& camera) 
+	void Scene::Render3DEditor(const EditorCamera& camera, const bool renderSkybox) 
 	{
 		const DirectionalLight* sun = nullptr;
 		const auto sunView = m_Registry.view<DirectionalLightComponent, TransformComponent>();
@@ -188,7 +188,7 @@ namespace Kerberos
 			}
 		}
 
-		Renderer3D::BeginScene(camera, sun, pointLights);
+		Renderer3D::BeginScene(camera, sun, pointLights, renderSkybox);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
 		for (const auto entity : view)
@@ -269,4 +269,8 @@ namespace Kerberos
 	void Scene::OnComponentAdded<SpotLightComponent>(Entity entity, SpotLightComponent& component)
 	{
 	}
+
+	template <>
+	void Scene::OnComponentAdded<SkyboxComponent>(Entity entity, SkyboxComponent& component)
+	{}
 }

@@ -11,6 +11,7 @@
 #include "Kerberos/Renderer/Texture.h"
 #include "Kerberos/Renderer/Light.h"
 #include "Kerberos/Renderer/Material.h"
+#include "Kerberos/Renderer/TextureCube.h"
 #include "Kerberos/Scene/SceneCamera.h"
 
 namespace Kerberos
@@ -186,5 +187,20 @@ namespace Kerberos
 		explicit SpotLightComponent(const SpotLight& light)
 			: Light(light)
 		{}
+	};
+
+	struct SkyboxComponent
+	{
+		Ref<TextureCube> SkyboxTexture = nullptr;
+		Ref<Shader> SkyboxShader = nullptr;
+
+		SkyboxComponent() = default;
+		explicit SkyboxComponent(const Ref<TextureCube>& texture)
+			: SkyboxTexture(texture)
+		{}
+		SkyboxComponent(const SkyboxComponent&) = default;
+		SkyboxComponent(SkyboxComponent&&) = default;
+		SkyboxComponent& operator=(const SkyboxComponent&) = default;
+		SkyboxComponent& operator=(SkyboxComponent&&) = default;
 	};
 }

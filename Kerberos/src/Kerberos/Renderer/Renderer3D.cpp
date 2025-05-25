@@ -1,11 +1,14 @@
 #include "kbrpch.h"
 #include "Renderer3D.h"
 #include "RenderCommand.h"
+#include "TextureCube.h"
 
 namespace Kerberos
 {
 	struct Renderer3DData
 	{
+		glm::mat4 ViewMatrix;
+		glm::mat4 ProjectionMatrix;
 		glm::mat4 ViewProjectionMatrix;
 		Ref<Shader> ActiveShader;
 		Ref<Texture2D> WhiteTexture;
@@ -17,6 +20,11 @@ namespace Kerberos
 
 		glm::vec3 GlobalAmbientColor = { 0.5f, 0.5f, 0.5f };
 		float GlobalAmbientIntensity = 1.0f;
+
+		bool RenderSkybox = false;
+		Ref<Shader> SkyboxShader = nullptr;
+		Ref<TextureCube> SkyboxTexture = nullptr;
+		Ref<VertexArray> SkyboxVertexArray = nullptr;
 	};
 
 	static Renderer3DData s_RendererData;
@@ -35,6 +43,67 @@ namespace Kerberos
 		uint32_t whiteTextureData = 0xffffffff;
 		s_RendererData.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
+		s_RendererData.SkyboxShader = Shader::Create("assets/shaders/skybox.glsl");
+		const std::vector<std::string> skyboxTextures = {
+			"assets/textures/starmap_cubemap_0.png",
+			"assets/textures/starmap_cubemap_1.png",
+			"assets/textures/starmap_cubemap_2.png",
+			"assets/textures/starmap_cubemap_3.png",
+			"assets/textures/starmap_cubemap_4.png",
+			"assets/textures/starmap_cubemap_5.png",
+
+		};
+		s_RendererData.SkyboxTexture = TextureCube::Create("Starmap Skybox", skyboxTextures, false);
+		const std::vector<float> skyboxVertices = {
+			-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+		};
+		s_RendererData.SkyboxVertexArray = VertexArray::Create();
+		const Ref<VertexBuffer> skyboxVertexBuffer = VertexBuffer::Create(skyboxVertices.data(), skyboxVertices.size() * sizeof(float));
+		skyboxVertexBuffer->SetLayout({
+			{ ShaderDataType::Float3, "a_Position" }
+			});
+		s_RendererData.SkyboxVertexArray->AddVertexBuffer(skyboxVertexBuffer);
+
 		ResetStatistics();
 	}
 
@@ -44,11 +113,13 @@ namespace Kerberos
 	}
 
 	void Renderer3D::BeginScene(const EditorCamera& camera, const DirectionalLight* sun,
-		const std::vector<PointLight>& pointLights) 
+		const std::vector<PointLight>& pointLights, const bool renderSkybox) 
 	{
 		KBR_PROFILE_FUNCTION();
 
 		const auto& viewProjection = camera.GetViewProjectionMatrix();
+		s_RendererData.ViewMatrix = camera.GetViewMatrix();
+		s_RendererData.ProjectionMatrix = camera.GetProjection();
 		s_RendererData.ViewProjectionMatrix = viewProjection;
 		s_RendererData.CameraPosition = camera.GetPosition();
 
@@ -71,6 +142,8 @@ namespace Kerberos
 
 		s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.GlobalAmbientColor);
 		s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.GlobalAmbientIntensity);
+
+		s_RendererData.RenderSkybox = renderSkybox;
 	}
 
 	void Renderer3D::BeginScene(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights)
@@ -78,7 +151,8 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		const auto& viewProjection = camera.GetProjection() * glm::inverse(transform);
-		s_RendererData.ViewProjectionMatrix = viewProjection;
+		s_RendererData.ViewMatrix = glm::inverse(transform);
+		s_RendererData.ProjectionMatrix = camera.GetProjection();
 		s_RendererData.CameraPosition = transform[3];
 
 		s_RendererData.ActiveShader->Bind();
@@ -105,6 +179,29 @@ namespace Kerberos
 	void Renderer3D::EndScene() 
 	{
 		KBR_PROFILE_FUNCTION();
+
+		/// Render the skybox last if enabled
+		if (!s_RendererData.RenderSkybox)
+			return;
+
+		RenderCommand::SetDepthFunc(DepthFunc::LessEqual);
+		s_RendererData.SkyboxShader->Bind();
+
+		/// Remove translation from view matrix
+		const glm::mat4 skyboxView = glm::mat4(glm::mat3(s_RendererData.ViewMatrix)); 
+		s_RendererData.SkyboxShader->SetMat4("u_View", skyboxView);
+		s_RendererData.SkyboxShader->SetMat4("u_Projection", s_RendererData.ProjectionMatrix);
+		s_RendererData.SkyboxVertexArray->Bind();
+		s_RendererData.SkyboxTexture->Bind(0);
+
+		/// Always 36 indices for the skybox
+		RenderCommand::DrawArray(s_RendererData.SkyboxVertexArray, 36);
+
+		/// Reset depth function to default
+		RenderCommand::SetDepthFunc(DepthFunc::Less); 
+
+		s_Stats.DrawCalls++;
+		s_Stats.DrawnMeshes++;
 	}
 
 	void Renderer3D::SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture, const float tilingFactor)
