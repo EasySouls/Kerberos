@@ -8,6 +8,7 @@
 #include "Kerberos/Renderer/RendererAPI.h"
 #include "Platform/OpenGL/OpenGLContext.h"
 #include "Platform/Vulkan/VulkanContext.h"
+#include "Platform/D3D11/D3D11Context.h"
 
 
 namespace Kerberos
@@ -59,7 +60,9 @@ namespace Kerberos
 		}
 
 		const auto context = RendererAPI::GetAPI();
-		if (context == RendererAPI::API::Vulkan)
+
+		/// Every other renderer API except OpenGL requires GLFW_NO_API to be set
+		if (context != RendererAPI::API::OpenGL)
 		{
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		}
@@ -78,6 +81,12 @@ namespace Kerberos
 			break;
 		case RendererAPI::API::Vulkan:
 			m_Context = new VulkanContext(m_Window);
+			break;
+		case RendererAPI::API::DirectX11:
+			m_Context = new D3D11Context(m_Window);
+			break;
+		case RendererAPI::API::DirectX12:
+			KBR_CORE_ASSERT(false, "DirectX12 is currently not supported!");
 			break;
 		}
 		m_Context->Init();

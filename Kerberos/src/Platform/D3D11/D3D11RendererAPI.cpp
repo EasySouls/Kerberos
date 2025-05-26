@@ -1,5 +1,6 @@
 #include "kbrpch.h"
 #include "D3D11RendererAPI.h"
+#include "D3D11Context.h"
 
 #include <glm/gtc/type_ptr.inl>
 
@@ -9,6 +10,11 @@ namespace Kerberos
 	void D3D11RendererAPI::Init()
 	{
 	
+	}
+
+	void D3D11RendererAPI::SetViewport(const uint32_t x, const uint32_t y, const uint32_t width, const uint32_t height)
+	{
+		D3D11Context::Get().OnWindowResize(width, height);
 	}
 
 	void D3D11RendererAPI::SetClearColor(const glm::vec4& color)

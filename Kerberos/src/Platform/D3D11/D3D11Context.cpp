@@ -2,12 +2,26 @@
 
 #include "D3D11Context.h"
 
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+
 namespace Kerberos
 {
-	D3D11Context::D3D11Context(const HWND windowHandle)
-		: m_WindowHandle(windowHandle)
+	D3D11Context* D3D11Context::s_Instance = nullptr;
+
+	D3D11Context::D3D11Context(GLFWwindow* windowHandle)
+		: m_GlfwWindowHandle(windowHandle)
 	{
-		KBR_CORE_ASSERT(windowHandle, "Window handle is null!");
+		KBR_PROFILE_FUNCTION();
+
+		KBR_CORE_ASSERT(!s_Instance, "D3D11Context already exists!");
+		s_Instance = this;
+
+		KBR_CORE_ASSERT(windowHandle, "GLFW window handle is null!");
+
+		m_WindowHandle = glfwGetWin32Window(m_GlfwWindowHandle);
+
+		KBR_CORE_ASSERT(m_WindowHandle, "Win32 window handle is null!");
 	}
 
 	D3D11Context::~D3D11Context()
@@ -32,6 +46,11 @@ namespace Kerberos
 
 	void D3D11Context::Init()
 	{
+		if (FAILED(CreateDXGIFactory1(IID_PPV_ARGS(&m_DxgiFactory))))
+		{
+			KBR_CORE_ASSERT(false, "Could not create DXGIFactory");
+		}
+
 		constexpr int width = 1280;
 		constexpr int height = 720;
 
@@ -75,14 +94,67 @@ namespace Kerberos
 			return;
 		}
 
-		ID3D11Resource* backBuffer = nullptr;
-		m_SwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&backBuffer));
-		m_Device->CreateRenderTargetView(backBuffer, nullptr, &m_RenderTargetView);
-		backBuffer->Release();
+		//backBuffer->Release();
 	}
 
 	void D3D11Context::SwapBuffers()
 	{
+		D3D11_VIEWPORT viewport = {};
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = static_cast<float>(m_WindowWidth);
+		viewport.Height = static_cast<float>(m_WindowHeight);
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+
+		constexpr float clearColor[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+
+		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), clearColor);
+		m_DeviceContext->RSSetViewports(1, &viewport);
+		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
+
 		m_SwapChain->Present(1, 0);
+	}
+
+	void D3D11Context::OnWindowResize(uint32_t width, uint32_t height)
+	{
+		m_DeviceContext->Flush();
+
+		DestroySwapChainResources();
+
+		HRESULT hr = m_SwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+
+		if (FAILED(hr))
+		{
+			KBR_CORE_ERROR("Failed to resize swapchain buffers!");
+		}
+
+		m_WindowWidth = width;
+		m_WindowHeight = height;
+
+		CreateSwapChainResources();
+	}
+
+	bool D3D11Context::CreateSwapChainResources()
+	{
+		ComPtr<ID3D11Texture2D> backBuffer = nullptr;
+		if (FAILED(m_SwapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))))
+		{
+			KBR_CORE_ERROR("Failed to get back buffer from swap chain!");
+			return false;
+		}
+
+		if (FAILED(m_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, &m_RenderTargetView)))
+		{
+			KBR_CORE_ERROR("Failed to create render target view!");
+			return false;
+		}
+
+		return true;
+	}
+
+	void D3D11Context::DestroySwapChainResources()
+	{
+		m_RenderTargetView.Reset();
 	}
 }

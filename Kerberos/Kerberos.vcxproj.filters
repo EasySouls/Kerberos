@@ -156,6 +156,9 @@
     <ClInclude Include="src\Kerberos\Renderer\Texture.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\TextureCube.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\UniformBuffer.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
@@ -166,6 +169,9 @@
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Scene\Components.h">
+      <Filter>src\Kerberos\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Scene\EditorCamera.h">
       <Filter>src\Kerberos\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Scene\Entity.h">
@@ -213,6 +219,9 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLTextureCube.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
@@ -243,9 +252,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Scene\EditorCamera.h" />
-    <ClInclude Include="src\Kerberos\Renderer\TextureCube.h" />
-    <ClInclude Include="src\Platform\OpenGL\OpenGLTextureCube.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -305,11 +311,17 @@
     <ClCompile Include="src\Kerberos\Renderer\Texture.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Renderer\TextureCube.cpp">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\UniformBuffer.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Scene\EditorCamera.cpp">
+      <Filter>src\Kerberos\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Scene\Scene.cpp">
       <Filter>src\Kerberos\Scene</Filter>
@@ -344,6 +356,9 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLTextureCube.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLUniformBuffer.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
@@ -374,8 +389,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Scene\EditorCamera.cpp" />
-    <ClCompile Include="src\Kerberos\Renderer\TextureCube.cpp" />
-    <ClCompile Include="src\Platform\OpenGL\OpenGLTextureCube.cpp" />
   </ItemGroup>
 </Project>

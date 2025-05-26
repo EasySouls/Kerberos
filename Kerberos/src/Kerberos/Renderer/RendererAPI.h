@@ -26,7 +26,9 @@ namespace Kerberos
 		{
 			None = 0, 
 			OpenGL = 1, 
-			Vulkan = 2,
+			DirectX11 = 2,
+			DirectX12 = 3,
+			Vulkan = 4,
 		};
 
 		virtual ~RendererAPI() = default;
