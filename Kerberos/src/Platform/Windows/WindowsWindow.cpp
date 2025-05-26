@@ -9,6 +9,11 @@
 #include "Platform/OpenGL/OpenGLContext.h"
 #include "Platform/Vulkan/VulkanContext.h"
 
+extern "C"
+{
+	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+	//​__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
 
 namespace Kerberos
 {
