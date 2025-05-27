@@ -3,40 +3,45 @@
 #include "Kerberos/Core.h"
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
+#include "Platform/D3D11/D3D11Shader.h"
 
 
 namespace Kerberos
 {
-	Ref<Shader> Shader::Create(const std::string& filepath) 
+	Ref<Shader> Shader::Create(const std::string& filepath)
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::API::None:
-				KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!")
-					return nullptr;
+		case RendererAPI::API::None:
+			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!")
+				return nullptr;
 		case RendererAPI::API::OpenGL:
-				return std::make_shared<OpenGLShader>(filepath);
-			case RendererAPI::API::Vulkan:
-				KBR_CORE_ASSERT(false, "Vulkan is currently not supported!")
-					return nullptr;
+			return CreateRef<OpenGLShader>(filepath);
+		case RendererAPI::API::DirectX11:
+			return CreateRef<D3D11Shader>(filepath);
+		case RendererAPI::API::Vulkan:
+			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!")
+				return nullptr;
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
 
-	Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) 
+	Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::API::None:    
-				KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!")
+		case RendererAPI::API::None:
+			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!")
 				return nullptr;
-			case RendererAPI::API::OpenGL:  
-				return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc);
-			case RendererAPI::API::Vulkan:
-				KBR_CORE_ASSERT(false, "Vulkan is currently not supported!")
-					return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
+		case RendererAPI::API::DirectX11:
+			return CreateRef<D3D11Shader>(name, vertexSrc, fragmentSrc);
+		case RendererAPI::API::Vulkan:
+			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!")
+				return nullptr;
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -47,13 +52,13 @@ namespace Kerberos
 	{
 		auto& name = shader->GetName();
 		KBR_CORE_ASSERT(!Exists(name), "Shader already exists!")
-		m_Shaders[name] = shader;
+			m_Shaders[name] = shader;
 	}
 
 	void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
 	{
 		KBR_CORE_ASSERT(!Exists(name), "Shader already exists!")
-		m_Shaders[name] = shader;
+			m_Shaders[name] = shader;
 	}
 
 	Ref<Shader> ShaderLibrary::Load(const std::string& filepath)
@@ -73,7 +78,7 @@ namespace Kerberos
 	Ref<Shader> ShaderLibrary::Get(const std::string& name)
 	{
 		KBR_CORE_ASSERT(Exists(name), "Shader not found!")
-		return m_Shaders[name];
+			return m_Shaders[name];
 	}
 
 	bool ShaderLibrary::Exists(const std::string& name) const

@@ -1,9 +1,11 @@
 #include "kbrpch.h"
 
 #include "D3D11Context.h"
+#include "Kerberos/Renderer/Vertex.h"
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
+#include <Platform/D3D11/D3D11Shader.h>
 
 namespace Kerberos
 {
@@ -73,7 +75,7 @@ namespace Kerberos
 		D3D_FEATURE_LEVEL featureLevel;
 		constexpr D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
 
-		const HRESULT hr = D3D11CreateDeviceAndSwapChain(
+		HRESULT hr = D3D11CreateDeviceAndSwapChain(
 			nullptr,
 			D3D_DRIVER_TYPE_HARDWARE,
 			nullptr,
@@ -94,7 +96,66 @@ namespace Kerberos
 			return;
 		}
 
-		//backBuffer->Release();
+		CreateSwapChainResources();
+
+		ComPtr<ID3DBlob> vertexShaderBlob = nullptr;
+		m_VertexShader = D3D11Shader::CreateVertexShader(L"assets/shaders/Main.vs.hlsl", vertexShaderBlob);
+		if (m_VertexShader == nullptr)
+		{
+			KBR_CORE_ERROR("Failed to create vertex shader!");
+			return;
+		}
+
+		m_PixelShader = D3D11Shader::CreatePixelShader(L"assets/shaders/Main.ps.hlsl");
+		if (m_PixelShader == nullptr)
+		{
+			KBR_CORE_ERROR("Failed to create pixel shader!");
+			return;
+		}
+		
+		// Create the Input Layout Descriptor
+		// TODO: Use ShaderDataType to create the input layout dynamically
+		constexpr D3D11_INPUT_ELEMENT_DESC vertexInputLayoutInfo[] =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(Vertex, Position), D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, offsetof(Vertex, Normal), D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, offsetof(Vertex, TexCoord), D3D11_INPUT_PER_VERTEX_DATA, 0}
+		};
+
+		hr = m_Device->CreateInputLayout(
+			vertexInputLayoutInfo,
+			_countof(vertexInputLayoutInfo),
+			vertexShaderBlob->GetBufferPointer(),
+			vertexShaderBlob->GetBufferSize(),
+			&m_VertexLayout);
+
+		if (FAILED(hr))
+		{
+			KBR_CORE_ERROR("Failed to create vertex input layout!");
+			return;
+		}
+
+		constexpr Vertex vertices[] =
+		{
+			{ { 0.0f, 0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.5f, 1.0f } },
+			{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
+			{ { 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } }
+		};
+
+		D3D11_BUFFER_DESC bufferDesc = {};
+		bufferDesc.ByteWidth = sizeof(vertices);
+		bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+		D3D11_SUBRESOURCE_DATA initData = {};
+		initData.pSysMem = vertices;
+
+		if (FAILED(m_Device->CreateBuffer(&bufferDesc, &initData, &m_VertexBuffer)))
+		{
+			KBR_CORE_ERROR("Failed to create vertex buffer!");
+			return;
+		}
+
 	}
 
 	void D3D11Context::SwapBuffers()
@@ -108,10 +169,22 @@ namespace Kerberos
 		viewport.MaxDepth = 1.0f;
 
 		constexpr float clearColor[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+		constexpr UINT vertexStride = sizeof(Vertex);
+		constexpr UINT vertexOffset = 0;
 
 		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), clearColor);
+
+		m_DeviceContext->IASetInputLayout(m_VertexLayout.Get());
+		m_DeviceContext->IASetVertexBuffers(0, 1, m_VertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
+		m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		m_DeviceContext->VSSetShader(m_VertexShader.Get(), nullptr, 0);
 		m_DeviceContext->RSSetViewports(1, &viewport);
+		m_DeviceContext->PSSetShader(m_PixelShader.Get(), nullptr, 0);
+
 		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
+
+		m_DeviceContext->Draw(3, 0); // Draw 3 vertices
 
 		if (FAILED(m_SwapChain->Present(1, 0)))
 		{

@@ -21,6 +21,15 @@ namespace Kerberos
 
 		void OnWindowResize(uint32_t width, uint32_t height);
 
+		[[nodiscard]] 
+		ComPtr<ID3D11Device> GetDevice() const { return m_Device; }
+		[[nodiscard]] 
+		ComPtr<ID3D11DeviceContext> GetDeviceContext() const { return m_DeviceContext; }
+		[[nodiscard]] 
+		ComPtr<IDXGISwapChain> GetSwapChain() const { return m_SwapChain; }
+		[[nodiscard]] 
+		ComPtr<ID3D11RenderTargetView> GetRenderTargetView() const { return m_RenderTargetView; }
+
 		static D3D11Context& Get() { return *s_Instance; }
 
 	private:
@@ -36,6 +45,11 @@ namespace Kerberos
 		ComPtr<ID3D11DeviceContext> m_DeviceContext = nullptr;
 		ComPtr<IDXGISwapChain> m_SwapChain = nullptr;
 		ComPtr<ID3D11RenderTargetView> m_RenderTargetView = nullptr;
+
+		ComPtr<ID3D11VertexShader> m_VertexShader = nullptr;
+		ComPtr<ID3D11PixelShader> m_PixelShader = nullptr;
+		ComPtr<ID3D11InputLayout> m_VertexLayout = nullptr;
+		ComPtr<ID3D11Buffer> m_VertexBuffer = nullptr;
 
 		uint32_t m_WindowWidth = 0;
 		uint32_t m_WindowHeight = 0;

@@ -201,6 +201,9 @@
     <ClInclude Include="src\Platform\D3D11\D3D11RendererAPI.h">
       <Filter>src\Platform\D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\D3D11\D3D11Shader.h">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
@@ -336,6 +339,9 @@
       <Filter>src\Platform\D3D11</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\D3D11\D3D11RendererAPI.cpp">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\D3D11\D3D11Shader.cpp">
       <Filter>src\Platform\D3D11</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp">
