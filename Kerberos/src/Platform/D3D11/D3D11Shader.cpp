@@ -24,7 +24,7 @@ namespace Kerberos
 		ComPtr<ID3DBlob> tempShaderBlob = nullptr;
 		ComPtr<ID3DBlob> errorBlob = nullptr;
 
-		HRESULT hr = D3DCompileFromFile(
+		const HRESULT hr = D3DCompileFromFile(
 			fileName.data(),
 			nullptr,
 			D3D_COMPILE_STANDARD_FILE_INCLUDE,
@@ -56,7 +56,7 @@ namespace Kerberos
 		ComPtr<ID3DBlob> tempShaderBlob = nullptr;
 		ComPtr<ID3DBlob> errorBlob = nullptr;
 
-		HRESULT hr = D3DCompile(
+		const HRESULT hr = D3DCompile(
 			source.data(),
 			source.size(),
 			nullptr,
@@ -94,7 +94,7 @@ namespace Kerberos
 		}
 
 		ComPtr<ID3D11VertexShader> vertexShader;
-		HRESULT hr = D3D11Context::Get().GetDevice()->CreateVertexShader(
+		const HRESULT hr = D3D11Context::Get().GetDevice()->CreateVertexShader(
 			vertexShaderBlob->GetBufferPointer(),
 			vertexShaderBlob->GetBufferSize(),
 			nullptr,
@@ -119,7 +119,7 @@ namespace Kerberos
 		}
 
 		ComPtr<ID3D11PixelShader> pixelShader;
-		HRESULT hr = D3D11Context::Get().GetDevice()->CreatePixelShader(
+		const HRESULT hr = D3D11Context::Get().GetDevice()->CreatePixelShader(
 			pixelShaderBlob->GetBufferPointer(),
 			pixelShaderBlob->GetBufferSize(),
 			nullptr,

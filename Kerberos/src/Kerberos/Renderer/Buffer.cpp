@@ -2,6 +2,7 @@
 #include "Buffer.h"
 #include "RendererAPI.h"
 #include "Kerberos/Core.h"
+#include "Platform/D3D11/D3D11Buffer.h"
 #include "Platform/OpenGL/OpenGLBuffer.h"
 
 namespace Kerberos
@@ -10,36 +11,50 @@ namespace Kerberos
 	{
 		switch (RendererAPI::GetAPI())
 		{
-			case RendererAPI::API::None:
-				KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); 
-				return nullptr;
+		case RendererAPI::API::None:
+			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
 
-			case RendererAPI::API::OpenGL:
-				return CreateRef<OpenGLVertexBuffer>(vertices, size);
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLVertexBuffer>(vertices, size);
 
-			case RendererAPI::API::Vulkan:
-				KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
-				return nullptr;
+		case RendererAPI::API::D3D11:
+			return CreateRef<D3D11VertexBuffer>(vertices, size);
+
+		case RendererAPI::API::D3D12:
+			KBR_CORE_ASSERT(false, "D3D12 is currently not supported!");
+			return nullptr;
+
+		case RendererAPI::API::Vulkan:
+			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
+			return nullptr;
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
 
-	Ref<VertexBuffer> VertexBuffer::Create(uint32_t size) 
+	Ref<VertexBuffer> VertexBuffer::Create(uint32_t size)
 	{
 		switch (RendererAPI::GetAPI())
 		{
-			case RendererAPI::API::None:
-				KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-				return nullptr;
+		case RendererAPI::API::None:
+			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
 
-			case RendererAPI::API::OpenGL:
-				return CreateRef<OpenGLVertexBuffer>(size);
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLVertexBuffer>(size);
 
-			case RendererAPI::API::Vulkan:
-				KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
-				return nullptr;
+		case RendererAPI::API::D3D11:
+			return CreateRef<D3D11VertexBuffer>(size);
+
+		case RendererAPI::API::D3D12:
+			KBR_CORE_ASSERT(false, "D3D12 is currently not supported!");
+			return nullptr;
+
+		case RendererAPI::API::Vulkan:
+			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
+			return nullptr;
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -50,16 +65,23 @@ namespace Kerberos
 	{
 		switch (RendererAPI::GetAPI())
 		{
-			case RendererAPI::API::None:
-				KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-				return nullptr;
+		case RendererAPI::API::None:
+			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
 
-			case RendererAPI::API::OpenGL:
-				return CreateRef<OpenGLIndexBuffer>(indices, count);
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLIndexBuffer>(indices, count);
 
-			case RendererAPI::API::Vulkan:
-				KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
-				return nullptr;
+		case RendererAPI::API::D3D11:
+			return CreateRef<D3D11IndexBuffer>(indices, count);
+
+		case RendererAPI::API::D3D12:
+			KBR_CORE_ASSERT(false, "D3D12 is currently not supported!");
+			return nullptr;
+
+		case RendererAPI::API::Vulkan:
+			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
+			return nullptr;
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");

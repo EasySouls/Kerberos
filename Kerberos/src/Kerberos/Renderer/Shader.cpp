@@ -17,7 +17,7 @@ namespace Kerberos
 				return nullptr;
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLShader>(filepath);
-		case RendererAPI::API::DirectX11:
+		case RendererAPI::API::D3D11:
 			return CreateRef<D3D11Shader>(filepath);
 		case RendererAPI::API::Vulkan:
 			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!")
@@ -37,7 +37,7 @@ namespace Kerberos
 				return nullptr;
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
-		case RendererAPI::API::DirectX11:
+		case RendererAPI::API::D3D11:
 			return CreateRef<D3D11Shader>(name, vertexSrc, fragmentSrc);
 		case RendererAPI::API::Vulkan:
 			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!")

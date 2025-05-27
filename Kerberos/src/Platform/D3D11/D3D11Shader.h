@@ -11,7 +11,7 @@ namespace Kerberos
 
 	using Microsoft::WRL::ComPtr;
 
-	class D3D11Shader : public Shader
+	class D3D11Shader final : public Shader
 	{
 	public:
 		explicit D3D11Shader(const std::string& filepath);
@@ -21,16 +21,16 @@ namespace Kerberos
 		void Bind() const override;
 		void Unbind() const override;
 
-		virtual void SetInt(const std::string& name, int value) {}
-		virtual void SetIntArray(const std::string& name, int* values, uint32_t count) {}
-		virtual void SetFloat(const std::string& name, float value) {}
-		virtual void SetFloat3(const std::string& name, const glm::vec3& value) {}
-		virtual void SetFloat4(const std::string& name, const glm::vec4& value) {}
-		virtual void SetMat4(const std::string& name, const glm::mat4& value) {}
+		void SetInt(const std::string& name, int value) override {}
+		void SetIntArray(const std::string& name, int* values, uint32_t count) override {}
+		void SetFloat(const std::string& name, float value) override {}
+		void SetFloat3(const std::string& name, const glm::vec3& value) override {}
+		void SetFloat4(const std::string& name, const glm::vec4& value) override {}
+		void SetMat4(const std::string& name, const glm::mat4& value) override {}
 
-		virtual void SetMaterial(const std::string& name, const Ref<Material>& material) {}
+		void SetMaterial(const std::string& name, const Ref<Material>& material) override {}
 
-		virtual const std::string& GetName() const { return "D3D11 Shader"; }
+		const std::string& GetName() const override { return "D3D11 Shader"; }
 
 	private:
 		/*

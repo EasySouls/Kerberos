@@ -4,12 +4,12 @@
 
 namespace Kerberos
 {
-	class OpenGLVertexBuffer final : public VertexBuffer
+	class D3D11VertexBuffer final : public VertexBuffer
 	{
 	public:
-		OpenGLVertexBuffer(const float* vertices, uint32_t size);
-		explicit OpenGLVertexBuffer(uint32_t size);
-		~OpenGLVertexBuffer() override;
+		D3D11VertexBuffer(const float* vertices, uint32_t size);
+		explicit D3D11VertexBuffer(uint32_t size);
+		~D3D11VertexBuffer() override;
 
 		void SetData(const void* data, uint32_t size) override;
 
@@ -24,11 +24,11 @@ namespace Kerberos
 		BufferLayout m_Layout;
 	};
 
-	class OpenGLIndexBuffer final : public IndexBuffer
+	class D3D11IndexBuffer final : public IndexBuffer
 	{
 	public:
-		OpenGLIndexBuffer(const uint32_t* indices, uint32_t count);
-		~OpenGLIndexBuffer() override;
+		D3D11IndexBuffer(const uint32_t* indices, uint32_t count);
+		~D3D11IndexBuffer() override;
 
 		void Bind() const override;
 		void Unbind() const override;
@@ -39,5 +39,6 @@ namespace Kerberos
 		uint32_t m_RendererID;
 		uint32_t m_Count;
 	};
+	
 }
 

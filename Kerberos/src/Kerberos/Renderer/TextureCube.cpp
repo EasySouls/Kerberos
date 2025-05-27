@@ -3,6 +3,7 @@
 
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLTextureCube.h"
+#include "Platform/D3D11/D3D11TextureCube.h"
 
 namespace Kerberos
 {
@@ -17,6 +18,13 @@ namespace Kerberos
 
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLTextureCube>(name, faces, generateMipmaps, srgb);
+
+		case RendererAPI::API::D3D11:
+			return CreateRef<D3D11TextureCube>(name, faces, generateMipmaps, srgb);
+
+		case RendererAPI::API::D3D12:
+			KBR_CORE_ASSERT(false, "D3D12 is currently not supported!");
+			return nullptr;	
 
 		case RendererAPI::API::Vulkan:
 			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");

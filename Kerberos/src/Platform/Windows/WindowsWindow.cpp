@@ -87,11 +87,11 @@ namespace Kerberos
 		case RendererAPI::API::Vulkan:
 			m_Context = new VulkanContext(m_Window);
 			break;
-		case RendererAPI::API::DirectX11:
+		case RendererAPI::API::D3D11:
 			m_Context = new D3D11Context(m_Window);
 			break;
-		case RendererAPI::API::DirectX12:
-			KBR_CORE_ASSERT(false, "DirectX12 is currently not supported!");
+		case RendererAPI::API::D3D12:
+			KBR_CORE_ASSERT(false, "D3D12 is currently not supported!");
 			break;
 		}
 		m_Context->Init();
