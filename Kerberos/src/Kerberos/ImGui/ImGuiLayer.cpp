@@ -6,9 +6,15 @@
 #define IMGUI_IMPL_API
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
-
+#ifdef KBR_PLATFORM_WINDOWS
+#include <imgui/backends/imgui_impl_dx11.h>
+#include "Platform/D3D11/D3D11Context.h"
+#endif
 #include <GLFW/glfw3.h>
 #include <ImGuizmo.h>
+
+#include "Kerberos/Renderer/Renderer.h"
+#include "Kerberos/Renderer/RendererAPI.h"
 
 namespace Kerberos
 {
@@ -53,13 +59,33 @@ namespace Kerberos
 
 
 		// Setup Platform/Renderer bindings
-		ImGui_ImplGlfw_InitForOpenGL(window, true);
-		ImGui_ImplOpenGL3_Init("#version 410");
+		if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
+		{
+			ImGui_ImplGlfw_InitForOpenGL(window, true);
+			ImGui_ImplOpenGL3_Init("#version 410");
+		}
+		else if (Renderer::GetAPI() == RendererAPI::API::D3D11)
+		{
+			ImGui_ImplGlfw_InitForOther(window, true);
+#ifdef KBR_PLATFORM_WINDOWS
+			ImGui_ImplDX11_Init(D3D11Context::Get().GetDevice().Get(), D3D11Context::Get().GetDeviceContext().Get());
+#endif
+		}
 	}
 
 	void ImGuiLayer::OnDetach()
 	{
-		ImGui_ImplOpenGL3_Shutdown();
+		if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
+		{
+			ImGui_ImplOpenGL3_Shutdown();
+		}
+		else if (Renderer::GetAPI() == RendererAPI::API::D3D11)
+		{
+#ifdef KBR_PLATFORM_WINDOWS
+			ImGui_ImplDX11_Shutdown();
+#endif
+		}
+
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
@@ -82,6 +108,16 @@ namespace Kerberos
 
 	void ImGuiLayer::Begin()
 	{
+		if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
+		{
+			ImGui_ImplOpenGL3_NewFrame();
+		}
+		else if (Renderer::GetAPI() == RendererAPI::API::D3D11)
+		{
+#ifdef KBR_PLATFORM_WINDOWS
+			ImGui_ImplDX11_NewFrame();
+#endif
+		}
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -97,7 +133,17 @@ namespace Kerberos
 
 		// Rendering
 		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
+		{
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		}
+		else if (Renderer::GetAPI() == RendererAPI::API::D3D11)
+		{
+#ifdef KBR_PLATFORM_WINDOWS
+			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+#endif
+		}
 
 		// Update and Render additional Platform Windows
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

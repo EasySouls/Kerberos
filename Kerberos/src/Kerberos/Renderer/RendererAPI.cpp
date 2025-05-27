@@ -3,5 +3,5 @@
 
 namespace Kerberos
 {
-	RendererAPI::API RendererAPI::s_API = API::D3D11;
+	RendererAPI::API RendererAPI::s_API = API::OpenGL;
 }
