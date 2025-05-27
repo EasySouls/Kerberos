@@ -9,6 +9,24 @@
 
 namespace Kerberos
 {
+	namespace Utils
+	{
+		static std::string GetFeatureLevelName(D3D_FEATURE_LEVEL featureLevel)
+		{
+			switch (featureLevel)
+			{
+			case D3D_FEATURE_LEVEL_10_0: return "10.0";
+			case D3D_FEATURE_LEVEL_10_1: return "10.1";
+			case D3D_FEATURE_LEVEL_11_0: return "11.0";
+			case D3D_FEATURE_LEVEL_11_1: return "11.1";
+			case D3D_FEATURE_LEVEL_12_0: return "12.0";
+			case D3D_FEATURE_LEVEL_12_1: return "12.1";
+			case D3D_FEATURE_LEVEL_12_2: return "12.2";
+			default: return "Unknown";
+			}
+		}
+	}
+
 	D3D11Context* D3D11Context::s_Instance = nullptr;
 
 	D3D11Context::D3D11Context(GLFWwindow* windowHandle)
@@ -57,6 +75,7 @@ namespace Kerberos
 		constexpr int height = 720;
 
 		DXGI_SWAP_CHAIN_DESC sd = {};
+		ZeroMemory(&sd, sizeof(sd));
 		sd.BufferCount = 1;									// One back buffer
 		sd.BufferDesc.Width = width;
 		sd.BufferDesc.Height = height;
@@ -73,26 +92,53 @@ namespace Kerberos
 		constexpr UINT createDeviceFlags = 0;
 
 		D3D_FEATURE_LEVEL featureLevel;
-		constexpr D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
+		constexpr D3D_FEATURE_LEVEL featureLevels[] = {
+			D3D_FEATURE_LEVEL_12_2,
+			D3D_FEATURE_LEVEL_12_1,
+			D3D_FEATURE_LEVEL_12_0,
+			D3D_FEATURE_LEVEL_11_1,
+			D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_10_1,
+			D3D_FEATURE_LEVEL_10_0,
+		};
+		constexpr UINT numFeatureLevels = _countof(featureLevels);
 
-		HRESULT hr = D3D11CreateDeviceAndSwapChain(
-			nullptr,
-			D3D_DRIVER_TYPE_HARDWARE,
-			nullptr,
-			createDeviceFlags,
-			featureLevels,
-			0,
-			D3D11_SDK_VERSION,
-			&sd,
-			&m_SwapChain,
-			&m_Device,
-			&featureLevel,
-			&m_DeviceContext
-		);
+		constexpr D3D_DRIVER_TYPE driverTypes[] = {
+			D3D_DRIVER_TYPE_HARDWARE,						// Hardware acceleration
+			D3D_DRIVER_TYPE_WARP,							// Software fallback
+			D3D_DRIVER_TYPE_REFERENCE						// Debugging purposes
+		};
+		constexpr UINT numDriverTypes = _countof(driverTypes);
 
-		if (FAILED(hr))
+		for (const auto driverType : driverTypes)
 		{
-			KBR_CORE_ERROR("Failed to create device and swap chain!");
+			const HRESULT hr = D3D11CreateDeviceAndSwapChain(
+				nullptr,
+				driverType,
+				nullptr,
+				createDeviceFlags,
+				featureLevels,
+				numFeatureLevels,
+				D3D11_SDK_VERSION,
+				&sd,
+				&m_SwapChain,
+				&m_Device,
+				&featureLevel,
+				&m_DeviceContext
+			);
+			if (SUCCEEDED(hr))
+			{
+				std::string featureLevelName = Utils::GetFeatureLevelName(featureLevel);
+
+				KBR_CORE_INFO("D3D11 device created successfully with feature level: {0}", featureLevelName);
+				break;
+			}
+		}
+
+		if (m_Device == nullptr || m_SwapChain == nullptr || m_DeviceContext == nullptr)
+		{
+			KBR_CORE_ERROR("Failed to create D3D11 device, swap chain, or device context!");
+			KBR_CORE_ASSERT(false, "Failed to create D3D11 device, swap chain, or device context!");
 			return;
 		}
 
@@ -122,7 +168,7 @@ namespace Kerberos
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, offsetof(Vertex, TexCoord), D3D11_INPUT_PER_VERTEX_DATA, 0}
 		};
 
-		hr = m_Device->CreateInputLayout(
+		const HRESULT hr = m_Device->CreateInputLayout(
 			vertexInputLayoutInfo,
 			_countof(vertexInputLayoutInfo),
 			vertexShaderBlob->GetBufferPointer(),

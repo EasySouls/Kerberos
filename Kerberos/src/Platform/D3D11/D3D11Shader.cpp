@@ -3,6 +3,8 @@
 #include "D3D11Context.h"
 
 #include <d3dcompiler.h>
+#include <fstream>
+#include <filesystem>
 
 namespace Kerberos
 {
@@ -39,7 +41,7 @@ namespace Kerberos
 		{
 			if (errorBlob != nullptr)
 			{
-				KBR_CORE_ERROR("{0}", static_cast<const char*>(errorBlob->GetBufferPointer()));
+				KBR_CORE_ERROR("Shader error log: {0}", static_cast<const char*>(errorBlob->GetBufferPointer()));
 			}
 			KBR_ASSERT(false, "Failed to compile shader from file");
 			return false;
@@ -87,9 +89,11 @@ namespace Kerberos
 	ComPtr<ID3D11VertexShader> D3D11Shader::CreateVertexShader(const std::wstring& fileName,
 		ComPtr<ID3DBlob>& vertexShaderBlob)
 	{
-		if (!CompileShaderFromFile(fileName, "Main", "vs_5_0", vertexShaderBlob))
+		const std::string vertexShaderSource = ReadFile(std::string(fileName.begin(), fileName.end()));
+
+		if (!CompileShaderFromSource(vertexShaderSource, "Main", "vs_5_0", vertexShaderBlob))
 		{
-			KBR_CORE_ERROR("Failed to compile vertex shader from file");
+			KBR_CORE_ERROR("Failed to compile vertex shader");
 			return nullptr;
 		}
 
@@ -102,7 +106,7 @@ namespace Kerberos
 
 		if (FAILED(hr))
 		{
-			KBR_CORE_ERROR("Failed to create vertex shader from file");
+			KBR_CORE_ERROR("Failed to create vertex shader");
 			return nullptr;
 		}
 
@@ -112,9 +116,11 @@ namespace Kerberos
 	ComPtr<ID3D11PixelShader> D3D11Shader::CreatePixelShader(const std::wstring& fileName) 
 	{
 		ComPtr<ID3DBlob> pixelShaderBlob = nullptr;
-		if (!CompileShaderFromFile(fileName, "Main", "ps_5_0", pixelShaderBlob))
+		const std::string pixelShaderSource = ReadFile(std::string(fileName.begin(), fileName.end()));
+
+		if (!CompileShaderFromSource(pixelShaderSource, "Main", "ps_5_0", pixelShaderBlob))
 		{
-			KBR_CORE_ERROR("Failed to compile pixel shader from file");
+			KBR_CORE_ERROR("Failed to compile pixel shader");
 			return nullptr;
 		}
 
@@ -127,10 +133,35 @@ namespace Kerberos
 
 		if (FAILED(hr))
 		{
-			KBR_CORE_ERROR("Failed to create pixel shader from file");
+			KBR_CORE_ERROR("Failed to create pixel shader");
 			return nullptr;
 		}
 
 		return pixelShader;
+	}
+
+	std::string D3D11Shader::ReadFile(const std::string& filepath)
+	{
+		std::ifstream in(filepath, std::ios::in | std::ios::binary);
+
+		if (!in)
+		{
+			KBR_CORE_ERROR("Could not open file '{0}'", filepath);
+			KBR_CORE_ASSERT(false, "File not found!")
+				return "";
+		}
+
+		/// Check the size of the file and resize the string
+		std::string result;
+		in.seekg(0, std::ios::end);
+		result.resize(in.tellg());
+
+		/// Read the shaders into the string
+		in.seekg(0, std::ios::beg);
+		in.read(result.data(), static_cast<std::streamsize>(result.size()));
+
+		in.close();
+
+		return result;
 	}
 }

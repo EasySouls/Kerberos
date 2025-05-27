@@ -10,11 +10,11 @@ namespace Kerberos
 {
 	using Microsoft::WRL::ComPtr;
 
-	class D3D11Context : public GraphicsContext
+	class D3D11Context final : public GraphicsContext
 	{
 	public:
 		D3D11Context(GLFWwindow* windowHandle);
-		~D3D11Context();
+		virtual ~D3D11Context();
 
 		void Init() override;
 		void SwapBuffers() override;

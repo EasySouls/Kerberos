@@ -59,6 +59,8 @@ namespace Kerberos
 		[[nodiscard]] 
 		static ComPtr<ID3D11PixelShader> CreatePixelShader(const std::wstring& fileName);
 
+		static std::string ReadFile(const std::string& filepath);
+
 	private:
 		friend class D3D11Context;
 	};
