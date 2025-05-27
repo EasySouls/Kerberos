@@ -40,6 +40,56 @@ Library["ShaderC_Release"] = "%{LibraryDir.VulkanSDK}/shaderc_shared.lib"
 Library["SPIRV_Cross_Release"] = "%{LibraryDir.VulkanSDK}/spirv-cross-core.lib"
 Library["SPIRV_Cross_GLSL_Release"] = "%{LibraryDir.VulkanSDK}/spirv-cross-glsl.lib"
 
+-- Function to find the latest Windows SDK
+function getLatestWindowsSDK()
+	local windowsSdkDir = os.getenv("WindowsSdkDir")
+	if windowsSdkDir == nil then
+		windowsSdkDir = os.getenv("ProgramFiles(x86)") .. "/Windows Kits/10"
+	end
+
+	local includeBaseDir = windowsSdkDir .. "/Include/"
+	local latestVersion = ""
+	local latestVersionNum = 0
+
+	-- Premake doesn't have os.walk(), so we'll rely on checking common SDK locations
+	-- This is less robust than walking directories but more likely to work with Premake
+	local commonSdkVersions =
+	{
+		"10.0.26100.0",
+		"10.0.22621.0", -- Windows 11 22H2/23H2
+		"10.0.22000.0",
+		"10.0.19041.0", -- Windows 10 2004/20H2/21H1/21H2
+		"10.0.18362.0", -- Windows 10 1903/1909
+		-- Add other recent versions if needed
+	}
+
+	-- Check for the existence of common SDK versions in descending order
+	for _, version in ipairs(commonSdkVersions) do
+		local potentialIncludeDir = includeBaseDir .. version .. "/um"
+		local potentialLibDir = windowsSdkDir .. "/Lib/" .. version .. "/um/x64" -- Assuming x64
+
+		if os.isdir(potentialIncludeDir) and os.isdir(potentialLibDir) then
+			local buildNumStr = version:match("10%.0%.(%d+)%.0")
+			local buildNum = tonumber(buildNumStr)
+			if buildNum and buildNum > latestVersionNum then
+				latestVersionNum = buildNum
+				latestVersion = version
+			end
+		end
+	end
+
+	if latestVersion == "" then
+		print("Warning: Could not find a suitable Windows SDK version among common versions.")
+		print("Please ensure a supported Windows 10/11 SDK is installed.")
+		return nil, nil
+	end
+
+	local includeDir = includeBaseDir .. latestVersion .. "/um"
+	local libDir = windowsSdkDir .. "/Lib/" .. latestVersion .. "/um/x64"
+
+	return includeDir, libDir
+end
+
 group "Dependencies"
 	include "Kerberos/vendor/GLFW"
 	include "Kerberos/vendor/glad"
@@ -122,14 +172,9 @@ project "Kerberos"
 			"_WINDLL",
 		}
 
-		local windowsSdkDir = os.getenv("WindowsSdkDir")
-		print(windowsSdkDir)
-		if windowsSdkDir == nil then
-			windowsSdkDir = os.getenv("ProgramFiles(x86)") .. "/Windows Kits/10"
-		end
-
-		local windowsSdkIncludeDir = windowsSdkDir .. "/Include/10.0.22621.0/um"
-		local windowsSdkLibDir = windowsSdkDir .. "/Lib/10.0.22621.0/um/x64"
+		local windowsSdkIncludeDir, windowsSdkLibDir = getLatestWindowsSDK()
+		print("Windows SDK Include dir: " .. windowsSdkIncludeDir)
+		print("Windows SDK Lib dir: " .. windowsSdkLibDir)
 
 		includedirs
 		{
@@ -157,7 +202,9 @@ project "Kerberos"
 			"odbccp32.lib"]]--
 			"d3d11.lib",
 			"dxgi.lib",
-			"d3dcompiler.lib"
+			"d3dcompiler.lib",
+			"winmm.lib",
+			"dxguid.lib"
 		}
 
 	filter "system:linux"

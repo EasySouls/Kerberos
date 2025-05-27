@@ -99,7 +99,7 @@ namespace Kerberos
 
 	void D3D11Context::SwapBuffers()
 	{
-		D3D11_VIEWPORT viewport = {};
+		D3D11_VIEWPORT viewport;
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
 		viewport.Width = static_cast<float>(m_WindowWidth);
@@ -113,16 +113,19 @@ namespace Kerberos
 		m_DeviceContext->RSSetViewports(1, &viewport);
 		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
 
-		m_SwapChain->Present(1, 0);
+		if (FAILED(m_SwapChain->Present(1, 0)))
+		{
+			KBR_CORE_ERROR("Failed to present swap chain!");
+		}
 	}
 
-	void D3D11Context::OnWindowResize(uint32_t width, uint32_t height)
+	void D3D11Context::OnWindowResize(const uint32_t width, const uint32_t height)
 	{
 		m_DeviceContext->Flush();
 
 		DestroySwapChainResources();
 
-		HRESULT hr = m_SwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+		const HRESULT hr = m_SwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 
 		if (FAILED(hr))
 		{
