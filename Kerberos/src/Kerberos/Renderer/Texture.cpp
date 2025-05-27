@@ -2,6 +2,7 @@
 #include "Texture.h"
 #include "Renderer.h"
 #include "Kerberos/Core.h"
+#include "Platform/D3D11/D3D11Texture.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
 
 namespace Kerberos
@@ -16,6 +17,13 @@ namespace Kerberos
 
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLTexture2D>(path);
+
+		case RendererAPI::API::D3D11:
+			return CreateRef<D3D11Texture2D>(path);
+
+		case RendererAPI::API::D3D12:
+			KBR_CORE_ASSERT(false, "D3D12 is not implemented yet!");
+			return nullptr;
 
 		case RendererAPI::API::Vulkan:
 			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
@@ -36,6 +44,13 @@ namespace Kerberos
 
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLTexture2D>(width, height);
+
+		case RendererAPI::API::D3D11:
+			return CreateRef<D3D11Texture2D>(width, height);
+
+		case RendererAPI::API::D3D12:
+			KBR_CORE_ASSERT(false, "D3D12 is not implemented yet!");
+			return nullptr;
 
 		case RendererAPI::API::Vulkan:
 			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");

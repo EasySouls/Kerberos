@@ -2,6 +2,7 @@
 #include "RenderCommand.h"
 
 #include "RendererAPI.h"
+#include "Platform/D3D11/D3D11RendererAPI.h"
 #include "Platform/OpenGL/OpenGLRendererAPI.h"
 #include "Platform/Vulkan/VulkanRendererAPI.h"
 
@@ -19,11 +20,18 @@ namespace Kerberos
 		case RendererAPI::API::OpenGL:
 			s_RendererAPI = new OpenGLRendererAPI();
 			return;
+
+		case RendererAPI::API::D3D11:
+			s_RendererAPI = new D3D11RendererAPI();
+			return;
+
+		case RendererAPI::API::D3D12:
+			KBR_CORE_ASSERT(false, "D3D12 is not implemented yet!");
+			return;
+
 		case RendererAPI::API::Vulkan:
 			{
-			const auto rendererApi = new VulkanRendererAPI();
-			rendererApi->Init();
-			s_RendererAPI = rendererApi;
+			s_RendererAPI = new VulkanRendererAPI();
 			return;
 			}
 		}
