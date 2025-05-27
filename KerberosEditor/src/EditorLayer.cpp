@@ -54,7 +54,7 @@ namespace Kerberos
 
 		Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
 		const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
-		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, skymapTexture);
+		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
 
 		Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
 		const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);

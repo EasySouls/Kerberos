@@ -164,6 +164,55 @@ namespace Kerberos
 			return CreateRef<Mesh>(vertices, indices);
 		}
 
+		Ref<Mesh> Mesh::CreateTetrahedron(const float size) 
+		{
+			std::vector<Vertex> vertices;
+			std::vector<uint32_t> indices;
+
+			// Define the 4 vertices of a tetrahedron
+			// These coordinates represent an equilateral tetrahedron centered around the origin.
+			// You can adjust the size by multiplying these coordinates by 'size'.
+			const float h = size * std::sqrt(2.0f / 3.0f); // Height from centroid to a vertex
+			const float r = size * std::sqrt(1.0f / 6.0f); // Radius from centroid to a face center
+
+			vertices.push_back({ .Position = {0.0f, 0.0f, h}, .Normal = {0.0f, 0.0f, 1.0f}, .TexCoord = {0.5f, 1.0f} });
+			vertices.push_back({ .Position = {size * 0.5f, size * -std::sqrt(3.0f) / 6.0f, -r}, .Normal = {0.0f, 0.0f, 1.0f}, .TexCoord = {1.0f, 0.0f} });
+			vertices.push_back({ .Position = {size * -0.5f, size * -std::sqrt(3.0f) / 6.0f, -r}, .Normal = {0.0f, 0.0f, 1.0f}, .TexCoord = {0.0f, 0.0f} });
+			vertices.push_back({ .Position = {0.0f, size * std::sqrt(3.0f) / 3.0f, -r}, .Normal = {0.0f, 0.0f, 1.0f}, .TexCoord = {0.5f, 0.5f} });
+
+			// Define the indices for the 4 triangular faces
+			// Each set of 3 indices defines a triangle.
+			// We use the vertex indices from the 'vertices' vector.
+
+			// Face 1 (bottom triangle)
+			indices.push_back(0); // Index of first vertex
+			indices.push_back(1); // Index of second vertex
+			indices.push_back(2); // Index of third vertex
+
+			// Face 2
+			indices.push_back(0);
+			indices.push_back(2);
+			indices.push_back(3);
+
+			// Face 3
+			indices.push_back(0);
+			indices.push_back(3);
+			indices.push_back(1);
+
+			// Face 4 (back triangle)
+			indices.push_back(1);
+			indices.push_back(3);
+			indices.push_back(2);
+
+			// Note: Normals and TexCoords for a simple tetrahedron are often less critical
+			// than for complex objects like spheres. The normals here are just placeholders
+			// and would ideally be calculated based on the face they belong to if per-face
+			// normals are needed. TexCoords are also illustrative; their values depend
+			// on how you want to map textures onto the faces.
+
+			return CreateRef<Mesh>(vertices, indices);
+		}
+
 		Ref<Mesh> Mesh::CreatePlane(const float size) 
 		{
 			return CreatePlane(size, size);

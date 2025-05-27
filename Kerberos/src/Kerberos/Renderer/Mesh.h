@@ -14,6 +14,7 @@ namespace Kerberos
 
 		static Ref<Mesh> CreateCube(float size);
 		static Ref<Mesh> CreateSphere(float radius, uint32_t sectorCount, uint32_t stackCount);
+		static Ref<Mesh> CreateTetrahedron(float size);
 		static Ref<Mesh> CreatePlane(float size);
 		static Ref<Mesh> CreatePlane(float width, float height);
 
