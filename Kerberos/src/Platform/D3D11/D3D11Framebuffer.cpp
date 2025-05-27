@@ -171,7 +171,7 @@ namespace Kerberos
             depthStencilDesc.CPUAccessFlags = 0;
             depthStencilDesc.MiscFlags = 0;
 
-            hr = m_Device->CreateTexture2D(&depthStencilDesc, nullptr, &m_DepthTexture);
+            hr = m_Device->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthTexture.GetAddressOf());
             KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create depth texture!");
 
             D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
@@ -194,7 +194,7 @@ namespace Kerberos
         m_OriginalRTV = nullptr;
         m_OriginalDSV = nullptr;
         m_OriginalNumViewports = 1; // Always query for at least one viewport
-        m_Context->OMGetRenderTargets(1, &m_OriginalRTV, &m_OriginalDSV);
+        m_Context->OMGetRenderTargets(1, m_OriginalRTV.GetAddressOf(), m_OriginalDSV.GetAddressOf());
         m_Context->RSGetViewports(&m_OriginalNumViewports, &m_OriginalViewport);
 
         // --- Create a temporary vector of raw pointers to pass to OMSetRenderTargets ---
