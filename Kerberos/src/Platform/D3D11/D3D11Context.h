@@ -4,6 +4,9 @@
 #include <d3d11.h>
 #include <dxgi1_3.h>
 #include <wrl.h>
+#ifdef KBR_DEBUG
+#include <d3d11sdklayers.h>
+#endif
 #include <GLFW/glfw3.h>
 
 namespace Kerberos
@@ -35,6 +38,7 @@ namespace Kerberos
 	private:
 		bool CreateSwapChainResources();
 		void DestroySwapChainResources();
+		void ProcessInfoQueueMessages() const;
 
 	private:
 		GLFWwindow* m_GlfwWindowHandle = nullptr;
@@ -45,7 +49,10 @@ namespace Kerberos
 		ComPtr<ID3D11DeviceContext> m_DeviceContext = nullptr;
 		ComPtr<IDXGISwapChain> m_SwapChain = nullptr;
 		ComPtr<ID3D11RenderTargetView> m_RenderTargetView = nullptr;
+#ifdef KBR_DEBUG
 		ComPtr<ID3D11Debug> m_DebugDevice = nullptr;
+		ComPtr<ID3D11InfoQueue> m_InfoQueue = nullptr;
+#endif
 
 		ComPtr<ID3D11VertexShader> m_VertexShader = nullptr;
 		ComPtr<ID3D11PixelShader> m_PixelShader = nullptr;

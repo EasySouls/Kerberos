@@ -2,6 +2,8 @@ struct PSInput
 {
     float4 position : SV_Position;
     float3 color : COLOR0;
+    float3 normal : NORMAL0;
+    float2 texcoord : TEXCOORD0;
 };
 
 struct PSOutput

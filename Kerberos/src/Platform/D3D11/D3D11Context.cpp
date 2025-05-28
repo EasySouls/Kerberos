@@ -2,6 +2,7 @@
 
 #include "D3D11Context.h"
 #include "Kerberos/Renderer/Vertex.h"
+#include "D3D11Utils.h"
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
@@ -77,7 +78,7 @@ namespace Kerberos
 
 		DXGI_SWAP_CHAIN_DESC sd = {};
 		ZeroMemory(&sd, sizeof(sd));
-		sd.BufferCount = 1;									// One back buffer
+		sd.BufferCount = 2;									// One back buffer
 		sd.BufferDesc.Width = width;
 		sd.BufferDesc.Height = height;
 		sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;  // Use 32-bit color
@@ -89,8 +90,9 @@ namespace Kerberos
 		sd.SampleDesc.Quality = 0;
 		sd.Windowed = TRUE;
 		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;			// Discard old frames
+		//sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;		// Flip model doesn't support multisampling
 
-		UINT createDeviceFlags = D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+		UINT createDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 
 #ifdef KBR_DEBUG
 		createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG; // Enable debug layer in debug builds
@@ -98,7 +100,6 @@ namespace Kerberos
 
 		D3D_FEATURE_LEVEL featureLevel;
 		constexpr D3D_FEATURE_LEVEL featureLevels[] = {
-			D3D_FEATURE_LEVEL_12_2,
 			D3D_FEATURE_LEVEL_12_1,
 			D3D_FEATURE_LEVEL_12_0,
 			D3D_FEATURE_LEVEL_11_1,
@@ -113,7 +114,6 @@ namespace Kerberos
 			D3D_DRIVER_TYPE_WARP,							// Software fallback
 			D3D_DRIVER_TYPE_REFERENCE						// Debugging purposes
 		};
-		constexpr UINT numDriverTypes = _countof(driverTypes);
 
 		ComPtr<ID3D11DeviceContext> deviceContext;
 
@@ -153,7 +153,18 @@ namespace Kerberos
 		if (FAILED(m_Device.As(&m_DebugDevice)))
 		{
 			KBR_CORE_ERROR("Failed to create debug device!");
-			return;
+		}
+
+		if (SUCCEEDED(m_Device.As(&m_InfoQueue)))
+		{
+			m_InfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, TRUE);
+			m_InfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, TRUE);
+
+			ProcessInfoQueueMessages();
+		}
+		else
+		{
+			KBR_CORE_WARN("Failed to query ID3D11InfoQueue interface. Advanced D3D11 debug messages may not be available.");
 		}
 #endif
 
@@ -200,9 +211,9 @@ namespace Kerberos
 
 		constexpr Vertex vertices[] =
 		{
-			{ { 0.0f, 0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.5f, 1.0f } },
-			{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f } },
-			{ { 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f } }
+			{.Position = { 0.0f, 0.5f, 0.0f }, .Normal = { 0.0f, 1.0f, 0.0f }, .TexCoord = { 0.5f, 1.0f } },
+			{.Position = { -0.5f, -0.5f, 0.0f }, .Normal = { 0.0f, 1.0f, 0.0f }, .TexCoord = { 0.0f, 0.0f } },
+			{.Position = { 0.5f, -0.5f, 0.0f }, .Normal = { 0.0f, 1.0f, 0.0f }, .TexCoord = { 1.0f, 0.0f } }
 		};
 
 		D3D11_BUFFER_DESC bufferDesc = {};
@@ -249,10 +260,14 @@ namespace Kerberos
 
 		m_DeviceContext->Draw(3, 0); // Draw 3 vertices
 
+		ProcessInfoQueueMessages();
+
 		if (FAILED(m_SwapChain->Present(1, 0)))
 		{
 			KBR_CORE_ERROR("Failed to present swap chain!");
 		}
+
+		ProcessInfoQueueMessages();
 	}
 
 	void D3D11Context::OnWindowResize(const uint32_t width, const uint32_t height)
@@ -272,6 +287,8 @@ namespace Kerberos
 		m_WindowHeight = height;
 
 		CreateSwapChainResources();
+
+		ProcessInfoQueueMessages();
 	}
 
 	bool D3D11Context::CreateSwapChainResources()
@@ -289,11 +306,73 @@ namespace Kerberos
 			return false;
 		}
 
+		ProcessInfoQueueMessages();
+
 		return true;
 	}
 
 	void D3D11Context::DestroySwapChainResources()
 	{
 		m_RenderTargetView.Reset();
+	}
+
+	void D3D11Context::ProcessInfoQueueMessages() const 
+	{
+#ifdef KBR_DEBUG
+		const uint64_t messageCount = m_InfoQueue->GetNumStoredMessages();
+
+		for (uint64_t i = 0; i < messageCount; ++i)
+		{
+			size_t messageLength = 0;
+			if (FAILED(m_InfoQueue->GetMessage(i, nullptr, &messageLength)))
+			{
+				KBR_CORE_WARN("Failed to get message length from InfoQueue!");
+				continue;
+			}
+
+			D3D11_MESSAGE* message = static_cast<D3D11_MESSAGE*>(malloc(messageLength));
+			if (message == nullptr)
+			{
+				KBR_CORE_ERROR("Failed to allocate memory for D3D11_MESSAGE!");
+				continue;
+			}
+
+			if (FAILED(m_InfoQueue->GetMessage(i, message, &messageLength)))
+			{
+				KBR_CORE_ERROR("Failed to get message from InfoQueue!");
+				free(message);
+				continue;
+			}
+
+			const std::string_view messageCategory = D3D11Utils::GetMessageCategoryName(message->Category);
+			const std::string_view messageSeverity = D3D11Utils::GetMessageSeverityName(message->Severity);
+
+			//KBR_CORE_CRITICAL("[D3D11 {0}, ID {1}] {2}", messageCategory, message->ID, message->pDescription);
+
+			switch (message->Severity)
+			{
+			case D3D11_MESSAGE_SEVERITY_CORRUPTION:
+				KBR_CORE_CRITICAL("[D3D11 {0}, {1}] {2}", messageSeverity, messageCategory, message->pDescription);
+				break;
+			case D3D11_MESSAGE_SEVERITY_ERROR:
+				KBR_CORE_ERROR("[D3D11 {0}, {1}] {2}", messageSeverity, messageCategory, message->pDescription);
+				break;
+			case D3D11_MESSAGE_SEVERITY_WARNING:
+				KBR_CORE_WARN("[D3D11 {0}, {1}] {2}", messageSeverity, messageCategory, message->pDescription);
+				break;
+			case D3D11_MESSAGE_SEVERITY_INFO:
+				KBR_CORE_INFO("[D3D11 {0}, {1}] {2}", messageSeverity, messageCategory, message->pDescription);
+				break;
+			case D3D11_MESSAGE_SEVERITY_MESSAGE:
+				KBR_CORE_TRACE("[D3D11 {0}, {1}] {2}", messageSeverity, messageCategory, message->pDescription);
+				break;
+			}
+
+			free(message);
+		}
+
+		m_InfoQueue->ClearStoredMessages();
+#endif
+
 	}
 }

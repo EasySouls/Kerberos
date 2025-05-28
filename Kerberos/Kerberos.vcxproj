@@ -205,6 +205,7 @@
     <ClInclude Include="src\Platform\D3D11\D3D11Shader.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11Texture.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11TextureCube.h" />
+    <ClInclude Include="src\Platform\D3D11\D3D11Utils.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11VertexArray.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
