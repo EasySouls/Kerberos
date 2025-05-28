@@ -195,13 +195,28 @@
     <ClInclude Include="src\Kerberos\Window.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\D3D11\D3D11Buffer.h">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\D3D11\D3D11Context.h">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\D3D11\D3D11Framebuffer.h">
       <Filter>src\Platform\D3D11</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\D3D11\D3D11RendererAPI.h">
       <Filter>src\Platform\D3D11</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\D3D11\D3D11Shader.h">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\D3D11\D3D11Texture.h">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\D3D11\D3D11TextureCube.h">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\D3D11\D3D11VertexArray.h">
       <Filter>src\Platform\D3D11</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h">
@@ -255,11 +270,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Platform\D3D11\D3D11Framebuffer.h" />
-    <ClInclude Include="src\Platform\D3D11\D3D11Texture.h" />
-    <ClInclude Include="src\Platform\D3D11\D3D11Buffer.h" />
-    <ClInclude Include="src\Platform\D3D11\D3D11TextureCube.h" />
-    <ClInclude Include="src\Platform\D3D11\D3D11VertexArray.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -340,13 +350,28 @@
     <ClCompile Include="src\Kerberos\Scene\SceneSerializer.cpp">
       <Filter>src\Kerberos\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\D3D11\D3D11Buffer.cpp">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\D3D11\D3D11Framebuffer.cpp">
       <Filter>src\Platform\D3D11</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\D3D11\D3D11RendererAPI.cpp">
       <Filter>src\Platform\D3D11</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\D3D11\D3D11Shader.cpp">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\D3D11\D3D11Texture.cpp">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\D3D11\D3D11TextureCube.cpp">
+      <Filter>src\Platform\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\D3D11\D3D11VertexArray.cpp">
       <Filter>src\Platform\D3D11</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp">
@@ -400,10 +425,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Platform\D3D11\D3D11Framebuffer.cpp" />
-    <ClCompile Include="src\Platform\D3D11\D3D11Texture.cpp" />
-    <ClCompile Include="src\Platform\D3D11\D3D11Buffer.cpp" />
-    <ClCompile Include="src\Platform\D3D11\D3D11TextureCube.cpp" />
-    <ClCompile Include="src\Platform\D3D11\D3D11VertexArray.cpp" />
   </ItemGroup>
 </Project>

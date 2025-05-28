@@ -215,7 +215,8 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+		/// Ensure that VSync is only set for OpenGL, as other APIs have a different way of handling it
+		if (RendererAPI::GetAPI() != RendererAPI::API::OpenGL)
 			return;
 
 		if (enabled)
