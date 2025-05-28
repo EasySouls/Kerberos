@@ -13,7 +13,8 @@ namespace Kerberos
             {
             case FramebufferTextureFormat::RGBA8:           return DXGI_FORMAT_R8G8B8A8_UNORM;
             case FramebufferTextureFormat::DEPTH24STENCIL8: return DXGI_FORMAT_D24_UNORM_S8_UINT;
-                // Add more mappings as needed
+            case FramebufferTextureFormat::None:
+	            break;
             }
             KBR_CORE_ASSERT(false, "Unknown Framebuffer Texture Format!");
             return DXGI_FORMAT_UNKNOWN;
@@ -65,11 +66,11 @@ namespace Kerberos
 
 	void D3D11Framebuffer::Invalidate()
 	{
-        ReleaseResources(); // Release existing resources before recreating
+        ReleaseResources();
 
         HRESULT hr;
 
-        // --- Create Color Attachments ---
+        /// Create Color Attachments
         if (!m_ColorAttachmentSpecs.empty())
         {
             m_ColorTextures.resize(m_ColorAttachmentSpecs.size(), nullptr);
@@ -238,7 +239,7 @@ namespace Kerberos
         {
             for (size_t i = 0; i < m_ColorTextures.size(); ++i)
             {
-                DXGI_FORMAT format = Utils::FramebufferTextureFormatToDXGIFormat(m_ColorAttachmentSpecs[i].TextureFormat);
+                const DXGI_FORMAT format = Utils::FramebufferTextureFormatToDXGIFormat(m_ColorAttachmentSpecs[i].TextureFormat);
                 m_Context->ResolveSubresource(m_ResolvedColorTextures[i].Get(), 0, m_ColorTextures[i].Get(), 0, format);
             }
         }
@@ -276,20 +277,18 @@ namespace Kerberos
         KBR_CORE_ASSERT(index < m_ColorAttachmentSpecs.size(), "Index out of bounds for color attachment!");
         if (m_Specification.Samples > 1)
         {
-            // For multisampled, return the SRV of the resolved texture
+            /// For multisampled, return the SRV of the resolved texture
             KBR_CORE_ASSERT(index < m_ResolvedColorSRVs.size(), "Resolved SRV index out of bounds!");
             return reinterpret_cast<intptr_t>(m_ResolvedColorSRVs[index].Get());
         }
-        else
-        {
-            // For non-multisampled, return the SRV of the main texture
-            KBR_CORE_ASSERT(index < m_ColorSRVs.size(), "SRV index out of bounds!");
-            return reinterpret_cast<intptr_t>(m_ColorSRVs[index].Get());
-        }
+
+        /// For non-multisampled, return the SRV of the main texture
+        KBR_CORE_ASSERT(index < m_ColorSRVs.size(), "SRV index out of bounds!");
+        return reinterpret_cast<intptr_t>(m_ColorSRVs[index].Get());
 	}
 
-	void D3D11Framebuffer::ReleaseResources()
-	{
+	void D3D11Framebuffer::ReleaseResources() const 
+    {
         for (auto & rtv : m_ColorRTVs) if (rtv) rtv->Release();
         for (auto& srv : m_ColorSRVs) if (srv) srv->Release(); // This would be for non-multisampled textures directly
         for (auto& tex : m_ColorTextures) if (tex) tex->Release();
@@ -299,13 +298,5 @@ namespace Kerberos
 
         if (m_DepthStencilView) m_DepthStencilView->Release();
         if (m_DepthTexture) m_DepthTexture->Release();
-
-        //m_ColorRTVs.clear();
-        //m_ColorSRVs.clear();
-        //m_ColorTextures.clear();
-        //m_ResolvedColorSRVs.clear();
-        //m_ResolvedColorTextures.clear();
-        //m_DepthStencilView = nullptr;
-        //m_DepthTexture = nullptr;
 	}
 }

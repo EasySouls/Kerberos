@@ -24,8 +24,6 @@ namespace Kerberos
 		void DrawArray(const Ref<VertexArray>& vertexArray, const uint32_t vertexCount) override {}
 
 	private:
-		Ref<ID3D11DeviceContext> m_Context;
-		Ref<ID3D11RenderTargetView> m_Target;
-		Ref<ID3D11DepthStencilView> m_DepthStencilView;
+		glm::vec4 m_ClearColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 	};
 }

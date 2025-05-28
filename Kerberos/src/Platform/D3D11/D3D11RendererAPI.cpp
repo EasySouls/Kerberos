@@ -19,19 +19,34 @@ namespace Kerberos
 
 	void D3D11RendererAPI::SetClearColor(const glm::vec4& color)
 	{
-		// TODO: Set the clear color for the render target view
+		m_ClearColor = color;
 	}
 
 	void D3D11RendererAPI::Clear()
 	{
-		//constexpr float clearDepth = 1.0f; // The value to clear the depth buffer to
-		//constexpr UINT8 clearStencil = 0; // The value to clear the stencil buffer to
+		const auto rtv = D3D11Context::Get().GetRenderTargetView();
+		const auto context = D3D11Context::Get().GetDeviceContext();
 
-		//m_Context->ClearDepthStencilView(m_DepthStencilView.get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, clearDepth, clearStencil);
+		if (!rtv || !context)
+		{
+			KBR_CORE_ASSERT(false, "Render target view or device context is null!");
+			return;
+		}
+
+		context->ClearRenderTargetView(rtv.Get(), glm::value_ptr(m_ClearColor));
 	}
 
 	void D3D11RendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
-		
+		const auto context = D3D11Context::Get().GetDeviceContext();
+		if (!context)
+		{
+			KBR_CORE_ASSERT(false, "Device context is null!");
+			return;
+		}
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		/*context->IASetVertexBuffers(0, 1, vertexArray->GetVertexBuffer().GetAddressOf(), vertexArray->GetVertexBuffer()->GetStridePtr(), vertexArray->GetVertexBuffer()->GetOffsetPtr());
+		context->IASetIndexBuffer(vertexArray->GetIndexBuffer()->GetBuffer().Get(), vertexArray->GetIndexBuffer()->GetFormat(), 0);
+		context->DrawIndexed(indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount(), 0, 0);*/
 	}
 }

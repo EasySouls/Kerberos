@@ -39,12 +39,11 @@ namespace Kerberos
 		uint32_t m_Height;
 		RendererID m_RendererID;
 
-		// D3D11 specific members
+		//! D3D11 specific members
 		ComPtr<ID3D11Texture2D> m_Texture;
 		ComPtr<ID3D11ShaderResourceView> m_ShaderResourceView;
 		ComPtr<ID3D11SamplerState> m_SamplerState;
-		DXGI_FORMAT m_InternalFormat;
-		DXGI_FORMAT m_DataFormat;
+		DXGI_FORMAT m_Format;
 	};
 }
 

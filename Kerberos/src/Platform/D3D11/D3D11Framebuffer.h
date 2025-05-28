@@ -28,7 +28,7 @@ namespace Kerberos
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 
 	private:
-		void ReleaseResources();
+		void ReleaseResources() const;
 
 	private:
 		FramebufferSpecification m_Specification;
