@@ -13,7 +13,7 @@ namespace Kerberos
 	class D3D11Context final : public GraphicsContext
 	{
 	public:
-		D3D11Context(GLFWwindow* windowHandle);
+		explicit D3D11Context(GLFWwindow* windowHandle);
 		virtual ~D3D11Context();
 
 		void Init() override;
@@ -45,6 +45,7 @@ namespace Kerberos
 		ComPtr<ID3D11DeviceContext> m_DeviceContext = nullptr;
 		ComPtr<IDXGISwapChain> m_SwapChain = nullptr;
 		ComPtr<ID3D11RenderTargetView> m_RenderTargetView = nullptr;
+		ComPtr<ID3D11Debug> m_DebugDevice = nullptr;
 
 		ComPtr<ID3D11VertexShader> m_VertexShader = nullptr;
 		ComPtr<ID3D11PixelShader> m_PixelShader = nullptr;

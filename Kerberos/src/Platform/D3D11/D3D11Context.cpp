@@ -11,7 +11,7 @@ namespace Kerberos
 {
 	namespace Utils
 	{
-		static std::string GetFeatureLevelName(D3D_FEATURE_LEVEL featureLevel)
+		static std::string GetFeatureLevelName(const D3D_FEATURE_LEVEL featureLevel)
 		{
 			switch (featureLevel)
 			{
@@ -46,22 +46,23 @@ namespace Kerberos
 
 	D3D11Context::~D3D11Context()
 	{
-		if (m_SwapChain)
-		{
-			m_SwapChain->Release();
-		}
-		if (m_Device)
-		{
-			m_Device->Release();
-		}
-		if (m_DeviceContext)
-		{
-			m_DeviceContext->Release();
-		}
-		if (m_RenderTargetView)
-		{
-			m_RenderTargetView->Release();
-		}
+		m_DeviceContext->Flush();
+		m_VertexBuffer.Reset();
+
+		DestroySwapChainResources();
+		m_SwapChain.Reset();
+		m_DxgiFactory.Reset();
+		m_PixelShader.Reset();
+		m_VertexShader.Reset();
+		
+		m_DeviceContext.Reset();
+#ifdef KBR_DEBUG
+		m_DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+		m_DebugDevice.Reset();
+#endif
+		m_Device.Reset();
+		s_Instance = nullptr;
+		KBR_CORE_INFO("D3D11Context destroyed successfully!");
 	}
 
 	void D3D11Context::Init()
@@ -89,7 +90,11 @@ namespace Kerberos
 		sd.Windowed = TRUE;
 		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;			// Discard old frames
 
-		constexpr UINT createDeviceFlags = 0;
+		UINT createDeviceFlags = D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+
+#ifdef KBR_DEBUG
+		createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG; // Enable debug layer in debug builds
+#endif
 
 		D3D_FEATURE_LEVEL featureLevel;
 		constexpr D3D_FEATURE_LEVEL featureLevels[] = {
@@ -110,6 +115,8 @@ namespace Kerberos
 		};
 		constexpr UINT numDriverTypes = _countof(driverTypes);
 
+		ComPtr<ID3D11DeviceContext> deviceContext;
+
 		for (const auto driverType : driverTypes)
 		{
 			const HRESULT hr = D3D11CreateDeviceAndSwapChain(
@@ -124,7 +131,7 @@ namespace Kerberos
 				&m_SwapChain,
 				&m_Device,
 				&featureLevel,
-				&m_DeviceContext
+				&deviceContext
 			);
 			if (SUCCEEDED(hr))
 			{
@@ -135,12 +142,22 @@ namespace Kerberos
 			}
 		}
 
-		if (m_Device == nullptr || m_SwapChain == nullptr || m_DeviceContext == nullptr)
+		if (m_Device == nullptr || m_SwapChain == nullptr || deviceContext == nullptr)
 		{
 			KBR_CORE_ERROR("Failed to create D3D11 device, swap chain, or device context!");
 			KBR_CORE_ASSERT(false, "Failed to create D3D11 device, swap chain, or device context!");
 			return;
 		}
+
+#ifdef KBR_DEBUG
+		if (FAILED(m_Device.As(&m_DebugDevice)))
+		{
+			KBR_CORE_ERROR("Failed to create debug device!");
+			return;
+		}
+#endif
+
+		m_DeviceContext = deviceContext;
 
 		CreateSwapChainResources();
 
