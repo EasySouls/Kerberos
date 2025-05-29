@@ -12,7 +12,7 @@ namespace Kerberos
 
 	class D3D11Texture2D final : public Texture2D
 	{
-	using RendererID = uint32_t;
+	using RendererID = uint64_t;
 
 	public:
 		explicit D3D11Texture2D(const std::string& path);
@@ -22,7 +22,7 @@ namespace Kerberos
 		uint32_t GetWidth() const override { return m_Width; }
 		uint32_t GetHeight() const override { return m_Height; }
 
-		uint32_t GetRendererID() const override { return m_RendererID; }
+		RendererID GetRendererID() const override { return m_RendererID; }
 
 		void Bind(uint32_t slot = 0) const override;
 

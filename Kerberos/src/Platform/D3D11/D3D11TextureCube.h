@@ -9,7 +9,7 @@ namespace Kerberos
 	class D3D11TextureCube final : public TextureCube
 	{
 	public:
-		using RendererID = uint32_t;
+		using RendererID = uint64_t;
 
 		D3D11TextureCube(std::string name, const std::vector<std::string>& faces,
 			bool generateMipmaps, bool srgb);
@@ -17,7 +17,7 @@ namespace Kerberos
 
 		void Bind(uint32_t slot = 0) const override;
 
-		uint32_t GetRendererID() const override { return m_RendererID; }
+		uint64_t GetRendererID() const override { return m_RendererID; }
 		const std::string& GetName() const override { return m_Name; }
 		uint32_t GetWidth() const override;
 		uint32_t GetHeight() const override;

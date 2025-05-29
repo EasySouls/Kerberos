@@ -22,7 +22,7 @@ namespace Kerberos
 
 		void Resize(uint32_t width, uint32_t height) override;
 
-		uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const override;
+		uint64_t GetColorAttachmentRendererID(uint32_t index = 0) const override;
 
 		FramebufferSpecification& GetSpecification() override { return m_Specification; }
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
@@ -53,8 +53,5 @@ namespace Kerberos
 		ComPtr<ID3D11DepthStencilView> m_OriginalDSV = nullptr;
 		D3D11_VIEWPORT m_OriginalViewport = {};
 		UINT m_OriginalNumViewports = 1;
-
-		ComPtr<ID3D11Device> m_Device = nullptr;
-		ComPtr<ID3D11DeviceContext> m_Context = nullptr;
 	};
 }

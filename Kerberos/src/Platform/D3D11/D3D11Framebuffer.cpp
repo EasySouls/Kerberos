@@ -40,9 +40,6 @@ namespace Kerberos
 	D3D11Framebuffer::D3D11Framebuffer(const FramebufferSpecification& spec)
 		: m_Specification(spec)
 	{
-        m_Device = D3D11Context::Get().GetDevice();
-        m_Context = D3D11Context::Get().GetDeviceContext();
-
         // Populate color and depth attachment specs
         for (auto format : spec.Attachments.Attachments)
         {
@@ -69,6 +66,8 @@ namespace Kerberos
         ReleaseResources();
 
         HRESULT hr;
+
+        auto device = D3D11Context::Get().GetDevice();
 
         /// Create Color Attachments
         if (!m_ColorAttachmentSpecs.empty())
@@ -110,7 +109,7 @@ namespace Kerberos
                 textureDesc.CPUAccessFlags = 0;
                 textureDesc.MiscFlags = 0;
 
-                hr = m_Device->CreateTexture2D(&textureDesc, nullptr, m_ColorTextures[i].GetAddressOf());
+                hr = device->CreateTexture2D(&textureDesc, nullptr, m_ColorTextures[i].GetAddressOf());
                 KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create color texture!");
 
                 D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
@@ -118,7 +117,7 @@ namespace Kerberos
                 rtvDesc.ViewDimension = (m_Specification.Samples > 1) ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
                 rtvDesc.Texture2D.MipSlice = 0;
 
-                hr = m_Device->CreateRenderTargetView(m_ColorTextures[i].Get(), &rtvDesc, m_ColorRTVs[i].GetAddressOf());
+                hr = device->CreateRenderTargetView(m_ColorTextures[i].Get(), &rtvDesc, m_ColorRTVs[i].GetAddressOf());
                 KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create RTV!");
 
                 if (m_Specification.Samples == 1)
@@ -129,7 +128,7 @@ namespace Kerberos
                     srvDesc.Texture2D.MipLevels = 1;
                     srvDesc.Texture2D.MostDetailedMip = 0;
 
-                    hr = m_Device->CreateShaderResourceView(m_ColorTextures[i].Get(), &srvDesc, m_ColorSRVs[i].GetAddressOf());
+                    hr = device->CreateShaderResourceView(m_ColorTextures[i].Get(), &srvDesc, m_ColorSRVs[i].GetAddressOf());
                     KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create SRV!");
                 }
                 else // Create resolved texture for multisampling
@@ -139,7 +138,7 @@ namespace Kerberos
                     resolvedTextureDesc.SampleDesc.Quality = 0;
                     resolvedTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE; // Only SRV for resolved texture
 
-                    hr = m_Device->CreateTexture2D(&resolvedTextureDesc, nullptr, m_ResolvedColorTextures[i].GetAddressOf());
+                    hr = device->CreateTexture2D(&resolvedTextureDesc, nullptr, m_ResolvedColorTextures[i].GetAddressOf());
                     KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create resolved color texture!");
 
                     D3D11_SHADER_RESOURCE_VIEW_DESC resolvedSrvDesc = {};
@@ -148,7 +147,7 @@ namespace Kerberos
                     resolvedSrvDesc.Texture2D.MipLevels = 1;
                     resolvedSrvDesc.Texture2D.MostDetailedMip = 0;
 
-                    hr = m_Device->CreateShaderResourceView(m_ResolvedColorTextures[i].Get(), &resolvedSrvDesc, m_ResolvedColorSRVs[i].GetAddressOf());
+                    hr = device->CreateShaderResourceView(m_ResolvedColorTextures[i].Get(), &resolvedSrvDesc, m_ResolvedColorSRVs[i].GetAddressOf());
                     KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create resolved SRV!");
                 }
             }
@@ -172,7 +171,7 @@ namespace Kerberos
             depthStencilDesc.CPUAccessFlags = 0;
             depthStencilDesc.MiscFlags = 0;
 
-            hr = m_Device->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthTexture.GetAddressOf());
+            hr = device->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthTexture.GetAddressOf());
             KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create depth texture!");
 
             D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
@@ -180,7 +179,7 @@ namespace Kerberos
             dsvDesc.ViewDimension = (m_Specification.Samples > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
             dsvDesc.Texture2D.MipSlice = 0;
 
-            hr = m_Device->CreateDepthStencilView(m_DepthTexture.Get(), &dsvDesc, m_DepthStencilView.GetAddressOf());
+            hr = device->CreateDepthStencilView(m_DepthTexture.Get(), &dsvDesc, m_DepthStencilView.GetAddressOf());
             KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create DSV!");
         }
 
@@ -189,14 +188,16 @@ namespace Kerberos
 
 	void D3D11Framebuffer::Bind()
 	{
-        KBR_CORE_ASSERT(m_Context, "D3DContext not initialized!");
+		const auto deviceContext = D3D11Context::Get().GetDeviceContext();
+
+        KBR_CORE_ASSERT(deviceContext, "D3DContext not initialized!");
 
         // Save original RTV/DSV and viewport
         m_OriginalRTV = nullptr;
         m_OriginalDSV = nullptr;
         m_OriginalNumViewports = 1; // Always query for at least one viewport
-        m_Context->OMGetRenderTargets(1, m_OriginalRTV.GetAddressOf(), m_OriginalDSV.GetAddressOf());
-        m_Context->RSGetViewports(&m_OriginalNumViewports, &m_OriginalViewport);
+        deviceContext->OMGetRenderTargets(1, m_OriginalRTV.GetAddressOf(), m_OriginalDSV.GetAddressOf());
+        deviceContext->RSGetViewports(&m_OriginalNumViewports, &m_OriginalViewport);
 
         std::vector<ID3D11RenderTargetView*> rtvPointers;
         rtvPointers.reserve(m_ColorRTVs.size());
@@ -206,7 +207,7 @@ namespace Kerberos
         }
 
         /// Bind our RTVs and DSV
-        m_Context->OMSetRenderTargets(
+        deviceContext->OMSetRenderTargets(
             static_cast<UINT>(
                 rtvPointers.size()),
             rtvPointers.data(), 
@@ -220,23 +221,25 @@ namespace Kerberos
         viewport.MaxDepth = 1.0f;
         viewport.TopLeftX = 0;
         viewport.TopLeftY = 0;
-        m_Context->RSSetViewports(1, &viewport);
+        deviceContext->RSSetViewports(1, &viewport);
 
         /// Clear the render target(s) and depth/stencil
         for (auto& rtv : m_ColorRTVs)
         {
 	        constexpr float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; // Default clear to black
-            m_Context->ClearRenderTargetView(rtv.Get(), clearColor);
+            deviceContext->ClearRenderTargetView(rtv.Get(), clearColor);
         }
         if (m_DepthStencilView)
         {
-            m_Context->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+            deviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
         }
 	}
 
 	void D3D11Framebuffer::Unbind()
 	{
-        KBR_CORE_ASSERT(m_Context, "D3DContext not initialized!");
+		const auto deviceContext = D3D11Context::Get().GetDeviceContext();
+
+        KBR_CORE_ASSERT(deviceContext, "D3DContext not initialized!");
 
         // If multisampled, resolve the textures before they are potentially read by ImGui
         if (m_Specification.Samples > 1)
@@ -244,17 +247,20 @@ namespace Kerberos
             for (size_t i = 0; i < m_ColorTextures.size(); ++i)
             {
                 const DXGI_FORMAT format = Utils::FramebufferTextureFormatToDXGIFormat(m_ColorAttachmentSpecs[i].TextureFormat);
-                m_Context->ResolveSubresource(m_ResolvedColorTextures[i].Get(), 0, m_ColorTextures[i].Get(), 0, format);
+                deviceContext->ResolveSubresource(m_ResolvedColorTextures[i].Get(), 0, m_ColorTextures[i].Get(), 0, format);
             }
         }
 
-        // Restore original render targets and viewport
-        m_Context->OMSetRenderTargets(1, &m_OriginalRTV, m_OriginalDSV.Get());
-        m_Context->RSSetViewports(m_OriginalNumViewports, &m_OriginalViewport);
+        /// Since in the current setup Unbind is called before GraphicsContext::SwapBuffers,
+		/// we do not restore the original RTV/DSV here.
 
-        // Release the temporary references to the original RTV/DSV
-        if (m_OriginalRTV) m_OriginalRTV->Release();
-        if (m_OriginalDSV) m_OriginalDSV->Release();
+        //// Restore original render targets and viewport
+        //deviceContext->OMSetRenderTargets(1, &m_OriginalRTV, m_OriginalDSV.Get());
+        //deviceContext->RSSetViewports(m_OriginalNumViewports, &m_OriginalViewport);
+
+        //// Release the temporary references to the original RTV/DSV
+        //if (m_OriginalRTV) m_OriginalRTV->Release();
+        //if (m_OriginalDSV) m_OriginalDSV->Release();
 	}
 
 	void D3D11Framebuffer::Resize(uint32_t width, uint32_t height)
@@ -266,29 +272,30 @@ namespace Kerberos
         }
         if (width == m_Specification.Width && height == m_Specification.Height)
         {
-            // No actual resize needed
+            /// No actual resize needed
             return;
         }
 
         m_Specification.Width = width;
         m_Specification.Height = height;
 
-        Invalidate(); // Recreate all resources with new dimensions
+        /// Recreate all resources with new dimensions
+        Invalidate(); 
 	}
 
-	uint32_t D3D11Framebuffer::GetColorAttachmentRendererID(const uint32_t index) const
+	uint64_t D3D11Framebuffer::GetColorAttachmentRendererID(const uint32_t index) const
 	{
         KBR_CORE_ASSERT(index < m_ColorAttachmentSpecs.size(), "Index out of bounds for color attachment!");
         if (m_Specification.Samples > 1)
         {
             /// For multisampled, return the SRV of the resolved texture
             KBR_CORE_ASSERT(index < m_ResolvedColorSRVs.size(), "Resolved SRV index out of bounds!");
-            return reinterpret_cast<intptr_t>(m_ResolvedColorSRVs[index].Get());
+            return reinterpret_cast<uint64_t>(m_ResolvedColorSRVs[index].Get());
         }
 
         /// For non-multisampled, return the SRV of the main texture
         KBR_CORE_ASSERT(index < m_ColorSRVs.size(), "SRV index out of bounds!");
-        return reinterpret_cast<intptr_t>(m_ColorSRVs[index].Get());
+        return reinterpret_cast<uint64_t>(m_ColorSRVs[index].Get());
 	}
 
 	void D3D11Framebuffer::ReleaseResources() const 

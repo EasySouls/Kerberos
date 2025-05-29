@@ -117,7 +117,7 @@ namespace Kerberos
 			return;
 		}
 
-		m_RendererID = reinterpret_cast<intptr_t>(m_ShaderResourceView.Get());
+		m_RendererID = reinterpret_cast<RendererID>(m_ShaderResourceView.Get());
 
 		stbi_image_free(imageData);
 	}
@@ -169,7 +169,7 @@ namespace Kerberos
 			return;
 		}
 
-		m_RendererID = reinterpret_cast<intptr_t>(m_ShaderResourceView.Get());
+		m_RendererID = reinterpret_cast<RendererID>(m_ShaderResourceView.Get());
 
 	}
 

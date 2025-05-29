@@ -257,17 +257,28 @@ namespace Kerberos
 		constexpr UINT vertexStride = sizeof(Vertex);
 		constexpr UINT vertexOffset = 0;
 
-		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), clearColor);
+		//m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), clearColor);
 
 		m_DeviceContext->IASetInputLayout(m_VertexLayout.Get());
 		m_DeviceContext->IASetVertexBuffers(0, 1, m_VertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
 		m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		m_DeviceContext->VSSetShader(m_VertexShader.Get(), nullptr, 0);
-		m_DeviceContext->RSSetViewports(1, &viewport);
+		//m_DeviceContext->RSSetViewports(1, &viewport);
 		m_DeviceContext->PSSetShader(m_PixelShader.Get(), nullptr, 0);
 
-		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
+		//m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
+
+		/// This is only for debugging purposes, we should set the render target view before drawing
+
+		ID3D11RenderTargetView* currentRenderTargetView = nullptr;
+		m_DeviceContext->OMGetRenderTargets(1, &currentRenderTargetView, nullptr);
+		if (currentRenderTargetView == nullptr)
+		{
+			KBR_CORE_ERROR("The Render Target View was not set before presenting!");
+		}
+
+		/// End of debugging code
 
 		m_DeviceContext->Draw(3, 0); // Draw 3 vertices
 

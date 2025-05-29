@@ -43,13 +43,13 @@ namespace Kerberos
 
 	void D3D11RendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
-		const auto context = D3D11Context::Get().GetDeviceContext();
-		if (!context)
-		{
-			KBR_CORE_ASSERT(false, "Device context is null!");
-			return;
-		}
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		//const auto context = D3D11Context::Get().GetDeviceContext();
+		//if (!context)
+		//{
+		//	KBR_CORE_ASSERT(false, "Device context is null!");
+		//	return;
+		//}
+		//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		/*context->IASetVertexBuffers(0, 1, vertexArray->GetVertexBuffer().GetAddressOf(), vertexArray->GetVertexBuffer()->GetStridePtr(), vertexArray->GetVertexBuffer()->GetOffsetPtr());
 		context->IASetIndexBuffer(vertexArray->GetIndexBuffer()->GetBuffer().Get(), vertexArray->GetIndexBuffer()->GetFormat(), 0);
 		context->DrawIndexed(indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount(), 0, 0);*/

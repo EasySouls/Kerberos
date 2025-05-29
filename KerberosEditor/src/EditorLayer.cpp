@@ -307,7 +307,7 @@ namespace Kerberos
 
 		m_ViewportSize = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
 
-		const uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+		const uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		ImGui::Image(textureID, ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 		/// Gizmos
