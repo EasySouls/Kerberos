@@ -73,6 +73,9 @@ namespace Kerberos
 			KBR_CORE_ASSERT(false, "Could not create DXGIFactory");
 		}
 
+		constexpr char factoryName[] = "DXGI Factory";
+		m_DxgiFactory->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(factoryName), factoryName);
+
 		constexpr int width = 1280;
 		constexpr int height = 720;
 
@@ -149,6 +152,9 @@ namespace Kerberos
 			return;
 		}
 
+		constexpr char deviceName[] = "DEV_Main";
+		m_Device->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(deviceName), deviceName);
+
 #ifdef KBR_DEBUG
 		if (FAILED(m_Device.As(&m_DebugDevice)))
 		{
@@ -159,6 +165,7 @@ namespace Kerberos
 		{
 			m_InfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, TRUE);
 			m_InfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, TRUE);
+			//m_InfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_WARNING, TRUE);
 
 			ProcessInfoQueueMessages();
 		}
@@ -169,6 +176,10 @@ namespace Kerberos
 #endif
 
 		m_DeviceContext = deviceContext;
+
+		D3D11Utils::SetDebugName(m_DeviceContext.Get(), "Device Context");
+		constexpr char swapChainName[] = "Swap Chain";
+		m_SwapChain->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(swapChainName), swapChainName);
 
 		CreateSwapChainResources();
 

@@ -198,17 +198,21 @@ namespace Kerberos
         m_Context->OMGetRenderTargets(1, m_OriginalRTV.GetAddressOf(), m_OriginalDSV.GetAddressOf());
         m_Context->RSGetViewports(&m_OriginalNumViewports, &m_OriginalViewport);
 
-        // --- Create a temporary vector of raw pointers to pass to OMSetRenderTargets ---
-        std::vector<ID3D11RenderTargetView*> rawRTVs(m_ColorRTVs.size());
-        for (size_t i = 0; i < m_ColorRTVs.size(); ++i)
+        std::vector<ID3D11RenderTargetView*> rtvPointers;
+        rtvPointers.reserve(m_ColorRTVs.size());
+        for (const auto& comPtrRtv : m_ColorRTVs)
         {
-            rawRTVs[i] = m_ColorRTVs[i].Get(); // Get the raw pointer from the ComPtr
+            rtvPointers.push_back(comPtrRtv.Get());
         }
 
-        // Bind our RTVs and DSV
-        m_Context->OMSetRenderTargets(static_cast<UINT>(m_ColorRTVs.size()), rawRTVs.data(), m_DepthStencilView.Get());
+        /// Bind our RTVs and DSV
+        m_Context->OMSetRenderTargets(
+            static_cast<UINT>(
+                rtvPointers.size()),
+            rtvPointers.data(), 
+            m_DepthStencilView.Get());
 
-        // Set the viewport
+        /// Set the viewport
         D3D11_VIEWPORT viewport = {};
         viewport.Width = static_cast<float>(m_Specification.Width);
         viewport.Height = static_cast<float>(m_Specification.Height);
@@ -218,7 +222,7 @@ namespace Kerberos
         viewport.TopLeftY = 0;
         m_Context->RSSetViewports(1, &viewport);
 
-        // Clear the render target(s) and depth/stencil
+        /// Clear the render target(s) and depth/stencil
         for (auto& rtv : m_ColorRTVs)
         {
 	        constexpr float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; // Default clear to black

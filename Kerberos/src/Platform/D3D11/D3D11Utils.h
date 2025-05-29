@@ -5,6 +5,14 @@
 
 namespace Kerberos::D3D11Utils
 {
+    template<UINT TDebugNameLength>
+    inline void SetDebugName(
+        _In_ ID3D11DeviceChild* deviceResource,
+        _In_z_ const char(&debugName)[TDebugNameLength])
+    {
+        deviceResource->SetPrivateData(WKPDID_D3DDebugObjectName, TDebugNameLength - 1, debugName);
+    }
+
 	inline const std::map<D3D11_MESSAGE_SEVERITY, std::string_view>& GetD3D11SeverityMap()
     {
         static const std::map<D3D11_MESSAGE_SEVERITY, std::string_view> severityMap = {

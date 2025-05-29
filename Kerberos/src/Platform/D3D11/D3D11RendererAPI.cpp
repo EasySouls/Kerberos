@@ -22,10 +22,15 @@ namespace Kerberos
 		m_ClearColor = color;
 	}
 
+	/**
+	* Gets the Device Context from the D3D11Context and the currently bound Render Target View,
+	* then clears the render target view with the currently set clear color.
+	*/
 	void D3D11RendererAPI::Clear()
 	{
-		const auto rtv = D3D11Context::Get().GetRenderTargetView();
 		const auto context = D3D11Context::Get().GetDeviceContext();
+		ID3D11RenderTargetView* rtv = nullptr;
+		context->OMGetRenderTargets(1, &rtv, nullptr);
 
 		if (!rtv || !context)
 		{
@@ -33,7 +38,7 @@ namespace Kerberos
 			return;
 		}
 
-		context->ClearRenderTargetView(rtv.Get(), glm::value_ptr(m_ClearColor));
+		context->ClearRenderTargetView(rtv, glm::value_ptr(m_ClearColor));
 	}
 
 	void D3D11RendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
