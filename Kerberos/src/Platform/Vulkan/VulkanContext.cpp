@@ -14,10 +14,10 @@ const std::vector<const char*> deviceExtensions = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-#ifdef NDEBUG
-constexpr bool enableValidationLayers = false;
-#else
+#ifdef KBR_DEBUG
 constexpr bool enableValidationLayers = true;
+#else
+constexpr bool enableValidationLayers = false;
 #endif
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
@@ -26,8 +26,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 	void* pUserData)
 {
-
-	std::cerr << "validation layer: " << pCallbackData->pMessage << '\n';
+	KBR_CORE_ERROR("Validation layer: {0}", pCallbackData->pMessage);
 
 	return VK_FALSE;
 }
@@ -88,8 +87,8 @@ namespace Kerberos
 		appInfo.pApplicationName = "Kerberos";
 		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.pEngineName = "Kerberos Engine";
-		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-		appInfo.apiVersion = VK_API_VERSION_1_3;
+		appInfo.engineVersion = VK_MAKE_API_VERSION(1, 0, 0, 0);
+		appInfo.apiVersion = VK_API_VERSION_1_4;
 
 		VkInstanceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -204,10 +203,15 @@ namespace Kerberos
 
 	void VulkanContext::CreateLogicalDevice()
 	{
-		QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice);
+		auto [graphicsFamily, presentFamily] = FindQueueFamilies(m_PhysicalDevice);
+
+		if (!graphicsFamily.has_value() || !presentFamily.has_value())
+		{
+			throw std::runtime_error("Queue family indices are not complete!");
+		}
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-		std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+		std::set<uint32_t> uniqueQueueFamilies = { graphicsFamily.value(), presentFamily.value() };
 
 		float queuePriority = 1.0f;
 		for (uint32_t queueFamily : uniqueQueueFamilies)
@@ -248,8 +252,8 @@ namespace Kerberos
 			throw std::runtime_error("failed to create logical device!");
 		}
 
-		vkGetDeviceQueue(m_Device, indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
-		vkGetDeviceQueue(m_Device, indices.presentFamily.value(), 0, &m_PresentQueue);
+		vkGetDeviceQueue(m_Device, graphicsFamily.value(), 0, &m_GraphicsQueue);
+		vkGetDeviceQueue(m_Device, presentFamily.value(), 0, &m_PresentQueue);
 	}
 
 	void VulkanContext::CreateSwapChain()
@@ -276,10 +280,14 @@ namespace Kerberos
 		createInfo.imageArrayLayers = 1;
 		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-		const QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice);
-		const uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+		const auto [graphicsFamily, presentFamily] = FindQueueFamilies(m_PhysicalDevice);
+		if (!graphicsFamily.has_value() || !presentFamily.has_value())
+		{
+			throw std::runtime_error("Queue family indices are not complete!");
+		}
+		const uint32_t queueFamilyIndices[] = { graphicsFamily.value(), presentFamily.value() };
 
-		if (indices.graphicsFamily != indices.presentFamily)
+		if (graphicsFamily != presentFamily)
 		{
 			createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 			createInfo.queueFamilyIndexCount = 2;
@@ -531,20 +539,20 @@ namespace Kerberos
 		{
 			return capabilities.currentExtent;
 		}
-		else
-		{
-			int width, height;
-			glfwGetFramebufferSize(m_WindowHandle, &width, &height);
 
-			VkExtent2D actualExtent = {
-				static_cast<uint32_t>(width),
-				static_cast<uint32_t>(height)
-			};
+		/// If the current extent is not defined, we need to query the window size
 
-			actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
-			actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+		int width, height;
+		glfwGetFramebufferSize(m_WindowHandle, &width, &height);
 
-			return actualExtent;
-		}
+		VkExtent2D actualExtent = {
+			static_cast<uint32_t>(width),
+			static_cast<uint32_t>(height)
+		};
+
+		actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+		actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+
+		return actualExtent;
 	}
 }

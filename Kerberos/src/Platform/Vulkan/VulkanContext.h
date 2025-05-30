@@ -11,8 +11,6 @@
 
 namespace Kerberos
 {
-
-
 	class VulkanContext : public GraphicsContext
 	{
 	public:
@@ -39,6 +37,10 @@ namespace Kerberos
 		void CreateSwapChain();
 		void CreateImageViews();
 
+		/////////////////////////////////////////////////////////
+		//////////////////// Helper methods  ////////////////////
+		/////////////////////////////////////////////////////////
+		
 		static std::vector<const char*> GetRequiredExtensions();
 		static bool CheckValidationLayerSupport();
 		static void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
