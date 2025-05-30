@@ -33,10 +33,15 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 
 namespace Kerberos
 {
+	VulkanContext* VulkanContext::s_Instance = nullptr;
+
 	VulkanContext::VulkanContext(GLFWwindow* windowHandle)
 		: m_WindowHandle(windowHandle)
 	{
 		KBR_CORE_ASSERT(m_WindowHandle, "Window handle is null!")
+
+		KBR_CORE_ASSERT(!s_Instance, "VulkanContext already exists!");
+		s_Instance = this;
 	}
 
 	VulkanContext::~VulkanContext()

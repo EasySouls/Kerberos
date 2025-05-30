@@ -296,7 +296,9 @@ namespace Kerberos
 
 		m_ImmediateContext->Flush();
 
+#ifdef KBR_DEBUG
 		m_DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+#endif
 
 		ProcessInfoQueueMessages();
 

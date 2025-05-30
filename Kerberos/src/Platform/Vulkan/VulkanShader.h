@@ -30,11 +30,14 @@ namespace Kerberos
 
 	private:
 		static std::string ReadShaderFile(const std::string& filename);
-		static std::pair<std::string, std::string> SplitShaderSource(const std::string& source);
+		static std::unordered_map<GLenum, std::string> SplitShaderSource(const std::string& source);
 
 		void CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
 
-		static VkShaderModule CreateShaderModule(VkDevice device, const std::vector<uint32_t>& spirvCode);
+		void CreateShaderModules();
+
+		static void Reflect(VkShaderStageFlagBits stage, const std::vector<uint32_t>& spirvCode);
+		void ReflectAllStages();
 
 	private:
 		std::string m_Name;

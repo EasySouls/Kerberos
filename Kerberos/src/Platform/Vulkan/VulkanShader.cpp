@@ -74,12 +74,12 @@ namespace Kerberos
 		Utils::CreateCacheDirectoryIfNeeded();
 
 		const std::string source = ReadShaderFile(filepath);
-		auto shaderSources = SplitShaderSource(source);
+		const auto shaderSources = SplitShaderSource(source);
 
 		{
 			// TODO: Time shader compilation and caching
 			CompileOrGetVulkanBinaries(shaderSources);
-			CreateShaderModule();
+			CreateShaderModules();
 			ReflectAllStages();
 		}
 
@@ -101,7 +101,7 @@ namespace Kerberos
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
 
 		CompileOrGetVulkanBinaries(sources);
-		CreateShaderModule();
+		CreateShaderModules();
 		ReflectAllStages();
 	}
 
@@ -186,12 +186,15 @@ namespace Kerberos
 		return buffer.str();
 	}
 
-	std::pair<std::string, std::string> VulkanShader::SplitShaderSource(const std::string& source)
+	std::unordered_map<GLenum, std::string> VulkanShader::SplitShaderSource(const std::string& source)
 	{
 		KBR_PROFILE_FUNCTION();
 
+		/// TODO: This should look for #type directive to determine the shader stages
+
 		const size_t vertexPos = source.find("#type vertex");
 		const size_t fragmentPos = source.find("#type fragment");
+		const size_t geometryPos = source.find("#type geometry");
 
 		if (vertexPos == std::string::npos || fragmentPos == std::string::npos)
 		{
@@ -200,13 +203,17 @@ namespace Kerberos
 				"directives.");
 		}
 
-		std::string vertexSource = source.substr(vertexPos + std::string("#type vertex").length(),
+		const std::string vertexSource = source.substr(vertexPos + std::string("#type vertex").length(),
 			fragmentPos - vertexPos -
 			std::string("#type vertex").length());
-		std::string fragmentSource = source.substr(fragmentPos +
+		const std::string fragmentSource = source.substr(fragmentPos +
 			std::string("#type fragment").length());
 
-		return { vertexSource, fragmentSource };
+		std::unordered_map<GLenum, std::string> shaderSources;
+		shaderSources[GL_VERTEX_SHADER] = vertexSource;
+		shaderSources[GL_FRAGMENT_SHADER] = fragmentSource;
+
+		return shaderSources;
 	}
 
 	void VulkanShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources)
@@ -225,31 +232,34 @@ namespace Kerberos
 		m_VulkanSPIRV.clear();
 
 		for (auto&& [stage, source] : shaderSources) {
-			std::filesystem::path shaderFilePath = m_Filepath; // Used for unique cache naming
-			// Ensure filename is valid for filesystem operations
+			std::filesystem::path shaderFilePath = m_Filepath;
+
 			std::string baseFilename = shaderFilePath.empty() ? m_Name : shaderFilePath.filename().string();
-			if (baseFilename.empty()) baseFilename = "unnamed_shader"; // Fallback
+			if (baseFilename.empty()) baseFilename = "unnamed_shader";
 
 			std::filesystem::path cachedPath = cacheDirectory / (baseFilename + Utils::ShaderStageCachedFileExtension(stage));
 
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
 			if (in.is_open()) {
+				/// The file exists, read the SPIR-V binary from cache
+				
 				in.seekg(0, std::ios::end);
 				auto size = in.tellg();
 				in.seekg(0, std::ios::beg);
 
 				auto& data = m_VulkanSPIRV[stage];
 				data.resize(size / sizeof(uint32_t));
-				in.read((char*)data.data(), size);
+				in.read(reinterpret_cast<char*>(data.data()), size);
 				in.close();
 				KBR_CORE_TRACE("Vulkan Shader: Loaded SPIR-V from cache: {0}", cachedPath.string());
 			}
 			else {
+				/// The file does not exist, compile the GLSL source to SPIR-V
+
 				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_Filepath.c_str(), options);
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
-					KBR_CORE_ERROR("Vulkan Shader: GLSL to SPIR-V compilation failed for {0} ({1}):\n{2}",
-						m_Filepath, Utils::GLShaderStageToString(stage), module.GetErrorMessage());
-					KBR_CORE_ASSERT(false);
+					KBR_CORE_ERROR("Vulkan Shader: GLSL to SPIR-V compilation failed for {0} ({1}):\n{2}", m_Filepath, Utils::GLShaderStageToString(stage), module.GetErrorMessage());
+					KBR_CORE_ASSERT(false, "Vulkan Shader: GLSL to SPIR-V compilation failed");
 				}
 
 				m_VulkanSPIRV[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
@@ -257,7 +267,7 @@ namespace Kerberos
 				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
 				if (out.is_open()) {
 					auto& data = m_VulkanSPIRV[stage];
-					out.write((char*)data.data(), data.size() * sizeof(uint32_t));
+					out.write(reinterpret_cast<char*>(data.data()), data.size() * sizeof(uint32_t));
 					out.flush();
 					out.close();
 					KBR_CORE_TRACE("Vulkan Shader: Compiled SPIR-V and cached to: {0}", cachedPath.string());
@@ -269,132 +279,128 @@ namespace Kerberos
 		}
 	}
 
-	VkShaderModule VulkanShader::CreateShaderModule(const VkDevice device, const std::vector<uint32_t>& spirvCode)
+	void VulkanShader::CreateShaderModules()
 	{
 		KBR_PROFILE_FUNCTION();
 
-		VkShaderModuleCreateInfo createInfo = {};
-		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		createInfo.codeSize = spirvCode.size() * sizeof(uint32_t);
-		createInfo.pCode = spirvCode.data();
+		const auto device = VulkanContext::Get().GetDevice();
 
-		VkShaderModule shaderModule;
-		if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) !=
-			VK_SUCCESS)
+		KBR_CORE_ASSERT(device, "VkDevice is null");
+
+		m_ShaderModules.clear();
+		m_PipelineShaderStageCreateInfos.clear();
+
+		for (auto const& [glStage, spirvCode] : m_VulkanSPIRV)
 		{
-			throw std::runtime_error("Failed to create shader module!");
-		}
+			if (spirvCode.empty())
+			{
+				KBR_CORE_ERROR("Vulkan Shader: No SPIR-V code found for stage {0} in shader {1}", Utils::GLShaderStageToString(glStage), m_Filepath);
+				continue;
+			}
 
-		return shaderModule;
+			VkShaderModuleCreateInfo createInfo{};
+			createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+			createInfo.codeSize = spirvCode.size() * sizeof(uint32_t);
+			createInfo.pCode = spirvCode.data();
+
+			VkShaderModule shaderModule;
+			if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
+			{
+				KBR_CORE_ERROR("Vulkan Shader: Failed to create shader module for stage {0} in shader {1}", Utils::GLShaderStageToString(glStage), m_Filepath);
+				continue;
+			}
+
+			VkShaderStageFlagBits vkStage = Utils::GLShaderStageToVulkanStage(glStage);
+			m_ShaderModules[vkStage] = shaderModule;
+
+			VkPipelineShaderStageCreateInfo shaderStageInfo{};
+			shaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			shaderStageInfo.stage = vkStage;
+			shaderStageInfo.module = shaderModule;
+			shaderStageInfo.pName = "main";
+
+			m_PipelineShaderStageCreateInfos.push_back(shaderStageInfo);
+			KBR_CORE_TRACE("Vulkan Shader: Created VkShaderModule for stage {0} ({1})", m_Name, Utils::GLShaderStageToString(glStage));
+		}
 	}
 
-	//TBuiltInResource VulkanShader::InitResources()
- //   {
- //       TBuiltInResource resources;
+	void VulkanShader::ReflectAllStages()
+	{
+		KBR_PROFILE_FUNCTION();
 
- //       resources.maxLights = 32;
- //       resources.maxClipPlanes = 6;
- //       resources.maxTextureUnits = 32;
- //       resources.maxTextureCoords = 32;
- //       resources.maxVertexAttribs = 64;
- //       resources.maxVertexUniformComponents = 4096;
- //       resources.maxVaryingFloats = 64;
- //       resources.maxVertexTextureImageUnits = 32;
- //       resources.maxCombinedTextureImageUnits = 80;
- //       resources.maxTextureImageUnits = 32;
- //       resources.maxFragmentUniformComponents = 4096;
- //       resources.maxDrawBuffers = 32;
- //       resources.maxVertexUniformVectors = 128;
- //       resources.maxVaryingVectors = 8;
- //       resources.maxFragmentUniformVectors = 16;
- //       resources.maxVertexOutputVectors = 16;
- //       resources.maxFragmentInputVectors = 15;
- //       resources.minProgramTexelOffset = -8;
- //       resources.maxProgramTexelOffset = 7;
- //       resources.maxClipDistances = 8;
- //       resources.maxComputeWorkGroupCountX = 65535;
- //       resources.maxComputeWorkGroupCountY = 65535;
- //       resources.maxComputeWorkGroupCountZ = 65535;
- //       resources.maxComputeWorkGroupSizeX = 1024;
- //       resources.maxComputeWorkGroupSizeY = 1024;
- //       resources.maxComputeWorkGroupSizeZ = 64;
- //       resources.maxComputeUniformComponents = 1024;
- //       resources.maxComputeTextureImageUnits = 16;
- //       resources.maxComputeImageUniforms = 8;
- //       resources.maxComputeAtomicCounters = 8;
- //       resources.maxComputeAtomicCounterBuffers = 1;
- //       resources.maxVaryingComponents = 60;
- //       resources.maxVertexOutputComponents = 64;
- //       resources.maxGeometryInputComponents = 64;
- //       resources.maxGeometryOutputComponents = 128;
- //       resources.maxFragmentInputComponents = 128;
- //       resources.maxImageUnits = 8;
- //       resources.maxCombinedImageUnitsAndFragmentOutputs = 8;
- //       resources.maxCombinedShaderOutputResources = 8;
- //       resources.maxImageSamples = 0;
- //       resources.maxVertexImageUniforms = 0;
- //       resources.maxTessControlImageUniforms = 0;
- //       resources.maxTessEvaluationImageUniforms = 0;
- //       resources.maxGeometryImageUniforms = 0;
- //       resources.maxFragmentImageUniforms = 8;
- //       resources.maxCombinedImageUniforms = 8;
- //       resources.maxGeometryTextureImageUnits = 16;
- //       resources.maxGeometryOutputVertices = 256;
- //       resources.maxGeometryTotalOutputComponents = 1024;
- //       resources.maxGeometryUniformComponents = 1024;
- //       resources.maxGeometryVaryingComponents = 64;
- //       resources.maxTessControlInputComponents = 128;
- //       resources.maxTessControlOutputComponents = 128;
- //       resources.maxTessControlTextureImageUnits = 16;
- //       resources.maxTessControlUniformComponents = 1024;
- //       resources.maxTessControlTotalOutputComponents = 4096;
- //       resources.maxTessEvaluationInputComponents = 128;
- //       resources.maxTessEvaluationOutputComponents = 128;
- //       resources.maxTessEvaluationTextureImageUnits = 16;
- //       resources.maxTessEvaluationUniformComponents = 1024;
- //       resources.maxTessPatchComponents = 120;
- //       resources.maxPatchVertices = 32;
- //       resources.maxTessGenLevel = 64;
- //       resources.maxViewports = 16;
- //       resources.maxVertexAtomicCounters = 0;
- //       resources.maxTessControlAtomicCounters = 0;
- //       resources.maxTessEvaluationAtomicCounters = 0;
- //       resources.maxGeometryAtomicCounters = 0;
- //       resources.maxFragmentAtomicCounters = 8;
- //       resources.maxCombinedAtomicCounters = 8;
- //       resources.maxAtomicCounterBindings = 1;
- //       resources.maxVertexAtomicCounterBuffers = 0;
- //       resources.maxTessControlAtomicCounterBuffers = 0;
- //       resources.maxTessEvaluationAtomicCounterBuffers = 0;
- //       resources.maxGeometryAtomicCounterBuffers = 0;
- //       resources.maxFragmentAtomicCounterBuffers = 1;
- //       resources.maxCombinedAtomicCounterBuffers = 1;
- //       resources.maxAtomicCounterBufferSize = 16384;
- //       resources.maxTransformFeedbackBuffers = 4;
- //       resources.maxTransformFeedbackInterleavedComponents = 64;
- //       resources.maxCullDistances = 8;
- //       resources.maxCombinedClipAndCullDistances = 8;
- //       resources.maxSamples = 4;
- //       resources.maxMeshOutputVerticesNV = 256;
- //       resources.maxMeshOutputPrimitivesNV = 512;
- //       resources.maxMeshWorkGroupSizeX_NV = 32;
- //       resources.maxMeshWorkGroupSizeY_NV = 1;
- //       resources.maxMeshWorkGroupSizeZ_NV = 1;
- //       resources.maxTaskWorkGroupSizeX_NV = 32;
- //       resources.maxTaskWorkGroupSizeY_NV = 1;
- //       resources.maxTaskWorkGroupSizeZ_NV = 1;
- //       resources.maxMeshViewCountNV = 4;
+		KBR_CORE_TRACE("Shader reflection for {0}", m_Filepath.empty() ? m_Name : m_Filepath);
 
- //       resources.limits.nonInductiveForLoops = 1;
- //       resources.limits.whileLoops = 1;
- //       resources.limits.doWhileLoops = 1;
- //       resources.limits.generalUniformIndexing = 1;
- //       resources.limits.generalAttributeMatrixVectorIndexing = 1;
- //       resources.limits.generalVaryingIndexing = 1;
- //       resources.limits.generalSamplerIndexing = 1;
- //       resources.limits.generalVariableIndexing = 1;
- //       resources.limits.generalConstantMatrixVectorIndexing = 1;
+		for (auto const & [stage, spirvCode] : m_VulkanSPIRV)
+		{
+			if (!spirvCode.empty())
+			{
+				Reflect(Utils::GLShaderStageToVulkanStage(stage), spirvCode);
+			}
+		}
+	}
 
- //       return resources;
- //   }
+	void VulkanShader::Reflect(const VkShaderStageFlagBits stage, const std::vector<uint32_t>& spirvCode)
+	{
+		const spirv_cross::Compiler compiler(spirvCode);
+		spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+
+		const char* stageName = nullptr;
+		switch (stage)
+		{
+		case VK_SHADER_STAGE_VERTEX_BIT:   stageName = "Vertex"; break;
+		case VK_SHADER_STAGE_FRAGMENT_BIT: stageName = "Fragment"; break;
+		case VK_SHADER_STAGE_GEOMETRY_BIT: stageName = "Geometry"; break;
+		}
+
+		KBR_CORE_TRACE("  Stage: {0}", stageName);
+		KBR_CORE_TRACE("    Uniform Buffers: {0}", resources.uniform_buffers.size());
+		for (const auto& resource : resources.uniform_buffers) {
+			const auto& bufferType = compiler.get_type(resource.base_type_id);
+			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+			uint32_t bufferSize = compiler.get_declared_struct_size(bufferType);
+			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}, Size: {3}", resource.name, set, binding, bufferSize);
+			// Store this info (set, binding, type, stageFlags) for VkDescriptorSetLayout creation
+		}
+
+		KBR_CORE_TRACE("    Sampled Images (Textures/Samplers): {0}", resources.sampled_images.size());
+		for (const auto& resource : resources.sampled_images) {
+			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}", resource.name, set, binding);
+			// Store this info for VkDescriptorSetLayout creation
+		}
+
+		KBR_CORE_TRACE("    Storage Buffers: {0}", resources.storage_buffers.size());
+		for (const auto& resource : resources.storage_buffers) {
+			const auto& bufferType = compiler.get_type(resource.base_type_id);
+			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+			uint32_t bufferSize = compiler.get_declared_struct_size(bufferType); // May not be accurate if runtime-sized array
+			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}, Approx Size: {3}", resource.name, set, binding, bufferSize);
+		}
+
+		KBR_CORE_TRACE("    Storage Images: {0}", resources.storage_images.size());
+		for (const auto& resource : resources.storage_images) {
+			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}", resource.name, set, binding);
+		}
+
+		KBR_CORE_TRACE("    Push Constant Buffers: {0}", resources.push_constant_buffers.size());
+		for (const auto& resource : resources.push_constant_buffers) {
+			const auto& bufferType = compiler.get_type(resource.base_type_id);
+			uint32_t offset = 0; // Typically
+			// SPIRV-Cross might need a bit more work to get exact offset for members if it's a struct.
+		   // For a single push constant block, its range covers the whole block.
+			size_t size = compiler.get_declared_struct_size(bufferType);
+
+			// Get shader stage for this push constant more accurately
+			// auto ranges = compiler.get_active_buffer_ranges(resource.id);
+			// For now, we assume the 'stage' passed to Reflect applies.
+
+			KBR_CORE_TRACE("      Name: {0}, Offset: {1}, Size: {2}", resource.name, offset, size);
+			// Store this info (stageFlags, offset, size) for VkPushConstantRange creation
+		}
+	}
 }

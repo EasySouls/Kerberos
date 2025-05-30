@@ -28,6 +28,12 @@ namespace Kerberos
 		void SwapBuffers() override;
 
 		QueueFamilyIndices FindQueueFamilies() const;
+
+		VkSurfaceKHR GetSurface() const { return m_Surface; }
+		VkDevice GetDevice() const { return m_Device; }
+
+		static VulkanContext& Get() { return *s_Instance; }
+
 	private:
 		void CreateInstance();
 		void SetupDebugMessenger();
@@ -70,5 +76,7 @@ namespace Kerberos
 		VkFormat m_SwapChainImageFormat;
 		VkExtent2D m_SwapChainExtent;
 		std::vector<VkImageView> m_SwapChainImageViews;
+
+		static VulkanContext* s_Instance;
 	};
 }
