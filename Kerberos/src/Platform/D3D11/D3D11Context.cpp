@@ -251,26 +251,15 @@ namespace Kerberos
 
 	void D3D11Context::SwapBuffers()
 	{
-		D3D11_VIEWPORT viewport;
-		viewport.TopLeftX = 0;
-		viewport.TopLeftY = 0;
-		viewport.Width = static_cast<float>(m_WindowWidth);
-		viewport.Height = static_cast<float>(m_WindowHeight);
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
-
-		constexpr float clearColor[] = { 0.9f, 0.1f, 0.1f, 1.0f };
 		constexpr UINT vertexStride = sizeof(Vertex);
 		constexpr UINT vertexOffset = 0;
-
-		m_ImmediateContext->ClearRenderTargetView(m_BackBufferRTV.Get(), clearColor);
 
 		m_ImmediateContext->IASetInputLayout(m_VertexLayout.Get());
 		m_ImmediateContext->IASetVertexBuffers(0, 1, &m_VertexBuffer, &vertexStride, &vertexOffset);
 		m_ImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		m_ImmediateContext->VSSetShader(m_VertexShader.Get(), nullptr, 0);
-		m_ImmediateContext->RSSetViewports(1, &viewport);
+		m_ImmediateContext->RSSetViewports(1, &m_Viewport);
 		m_ImmediateContext->PSSetShader(m_PixelShader.Get(), nullptr, 0);
 
 		m_ImmediateContext->OMSetRenderTargets(1, m_BackBufferRTV.GetAddressOf(), nullptr);
@@ -335,6 +324,14 @@ namespace Kerberos
 		}
 
 		ProcessInfoQueueMessages();
+
+		/// Set the viewport to match the window size
+		m_Viewport.TopLeftX = 0;
+		m_Viewport.TopLeftY = 0;
+		m_Viewport.Width = static_cast<float>(m_WindowWidth);
+		m_Viewport.Height = static_cast<float>(m_WindowHeight);
+		m_Viewport.MinDepth = 0.0f;
+		m_Viewport.MaxDepth = 1.0f;
 
 		return true;
 	}

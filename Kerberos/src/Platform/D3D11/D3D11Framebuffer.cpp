@@ -187,11 +187,9 @@ namespace Kerberos
 
         KBR_CORE_ASSERT(deviceContext, "D3DContext not initialized!");
 
-        // Save original RTV/DSV and viewport
-        m_OriginalRTV = nullptr;
-        m_OriginalDSV = nullptr;
+        /// Save original RTV/DSV and viewport
         m_OriginalNumViewports = 1; // Always query for at least one viewport
-        deviceContext->OMGetRenderTargets(1, m_OriginalRTV.GetAddressOf(), m_OriginalDSV.GetAddressOf());
+        deviceContext->OMGetRenderTargets(1, m_OriginalRTV.ReleaseAndGetAddressOf(), m_OriginalDSV.ReleaseAndGetAddressOf());
         deviceContext->RSGetViewports(&m_OriginalNumViewports, &m_OriginalViewport);
 
         std::vector<ID3D11RenderTargetView*> rtvPointers;
@@ -218,16 +216,17 @@ namespace Kerberos
         viewport.TopLeftY = 0;
         deviceContext->RSSetViewports(1, &viewport);
 
-        /// Clear the render target(s) and depth/stencil
-        for (auto& rtv : m_ColorRTVs)
-        {
-	        constexpr float clearColor[4] = { 0.0f, 1.0f, 0.0f, 1.0f }; // Default clear to green
-            deviceContext->ClearRenderTargetView(rtv.Get(), clearColor);
-        }
-        if (m_DepthStencilView)
-        {
-            deviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-        }
+		/// Clear is handled by D3D11RendererApi (although for now it clears only the first color attachment)
+        ///// Clear the render target(s) and depth/stencil
+        //for (auto& rtv : m_ColorRTVs)
+        //{
+	       // constexpr float clearColor[4] = { 0.0f, 1.0f, 0.0f, 1.0f }; // Default clear to green
+        //    deviceContext->ClearRenderTargetView(rtv.Get(), clearColor);
+        //}
+        //if (m_DepthStencilView)
+        //{
+        //    deviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        //}
 	}
 
 	void D3D11Framebuffer::Unbind()
@@ -252,6 +251,10 @@ namespace Kerberos
         // Restore original render targets and viewport
         deviceContext->OMSetRenderTargets(1, m_OriginalRTV.GetAddressOf(), m_OriginalDSV.Get());
         deviceContext->RSSetViewports(m_OriginalNumViewports, &m_OriginalViewport);
+
+		/// Release the original RTV/DSV to avoid memory leaks
+        m_OriginalRTV.Reset();
+        m_OriginalDSV.Reset();
 	}
 
 	void D3D11Framebuffer::Resize(uint32_t width, uint32_t height)

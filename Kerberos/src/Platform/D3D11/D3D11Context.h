@@ -49,6 +49,7 @@ namespace Kerberos
 		ComPtr<ID3D11DeviceContext> m_ImmediateContext = nullptr;
 		ComPtr<IDXGISwapChain> m_SwapChain = nullptr;
 		ComPtr<ID3D11RenderTargetView> m_BackBufferRTV = nullptr;
+		D3D11_VIEWPORT m_Viewport = {};
 #ifdef KBR_DEBUG
 		ComPtr<ID3D11Debug> m_DebugDevice = nullptr;
 		ComPtr<ID3D11InfoQueue> m_InfoQueue = nullptr;
