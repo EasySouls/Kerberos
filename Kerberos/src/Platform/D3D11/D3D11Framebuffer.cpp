@@ -41,7 +41,7 @@ namespace Kerberos
 		: m_Specification(spec)
 	{
         // Populate color and depth attachment specs
-        for (auto format : spec.Attachments.Attachments)
+        for (auto& format : spec.Attachments.Attachments)
         {
             if (Utils::IsDepthFormat(format.TextureFormat))
             {
@@ -54,11 +54,6 @@ namespace Kerberos
         }
 
         Invalidate();
-	}
-
-	D3D11Framebuffer::~D3D11Framebuffer()
-	{
-        //ReleaseResources();
 	}
 
 	void D3D11Framebuffer::Invalidate()
@@ -226,7 +221,7 @@ namespace Kerberos
         /// Clear the render target(s) and depth/stencil
         for (auto& rtv : m_ColorRTVs)
         {
-	        constexpr float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; // Default clear to black
+	        constexpr float clearColor[4] = { 0.0f, 1.0f, 0.0f, 1.0f }; // Default clear to green
             deviceContext->ClearRenderTargetView(rtv.Get(), clearColor);
         }
         if (m_DepthStencilView)

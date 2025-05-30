@@ -13,7 +13,7 @@ namespace Kerberos
 	{
 	public:
 		explicit D3D11Framebuffer(const FramebufferSpecification& spec);
-		~D3D11Framebuffer() override;
+		~D3D11Framebuffer() override = default;
 
 		void Invalidate();
 
