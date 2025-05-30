@@ -14,7 +14,7 @@ namespace Kerberos
 		void Init() override;
 		void Cleanup() const;
 
-		void SetViewport(const uint32_t x, const uint32_t y, const uint32_t width, const uint32_t height) override;
+		auto SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) -> void override;
 
 		void SetClearColor(const glm::vec4& color) override;
 		void Clear() override;
@@ -35,9 +35,6 @@ namespace Kerberos
 		void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
 	private:
-		Scope<VulkanContext> m_Context;
-
-		VkDevice m_Device = VK_NULL_HANDLE;
 		VkImage m_Image = VK_NULL_HANDLE;
 		VkExtent2D m_SwapChainExtent = {};
 		VkFormat m_SwapChainImageFormat = {};

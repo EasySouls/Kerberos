@@ -17,16 +17,18 @@ namespace Kerberos
 
 	void VulkanRendererAPI::Cleanup() const
 	{
-		vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+		const auto device = VulkanContext::Get().GetDevice();
+
+		vkDestroyCommandPool(device, m_CommandPool, nullptr);
 
 		for (const auto framebuffer : m_SwapChainFramebuffers)
 		{
-			vkDestroyFramebuffer(m_Device, framebuffer, nullptr);
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
 		}
 
-		vkDestroyPipeline(m_Device, m_GraphicsPipeline, nullptr);
-		vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
-		vkDestroyRenderPass(m_Device, m_RenderPass, nullptr);
+		vkDestroyPipeline(device, m_GraphicsPipeline, nullptr);
+		vkDestroyPipelineLayout(device, m_PipelineLayout, nullptr);
+		vkDestroyRenderPass(device, m_RenderPass, nullptr);
 	}
 
 	void VulkanRendererAPI::SetViewport(const uint32_t x, const uint32_t y, const uint32_t width,
@@ -210,7 +212,9 @@ namespace Kerberos
 		renderPassInfo.subpassCount = 1;
 		renderPassInfo.pSubpasses = &subpass;
 
-		if (vkCreateRenderPass(m_Device, &renderPassInfo, nullptr, &m_RenderPass) != VK_SUCCESS)
+		const auto device = VulkanContext::Get().GetDevice();
+
+		if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &m_RenderPass) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create render pass!");
 		}
@@ -316,7 +320,9 @@ namespace Kerberos
 		pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 		pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
-		if (vkCreatePipelineLayout(m_Device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
+		const auto device = VulkanContext::Get().GetDevice();
+
+		if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create pipeline layout!");
 		}
@@ -342,7 +348,7 @@ namespace Kerberos
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
 		pipelineInfo.basePipelineIndex = -1; // Optional
 
-		if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
+		if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create graphics pipeline!");
 		}
@@ -368,7 +374,9 @@ namespace Kerberos
 				.layers = 1
 			};
 
-			if (vkCreateFramebuffer(m_Device, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]) != VK_SUCCESS)
+			const auto device = VulkanContext::Get().GetDevice();
+
+			if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("failed to create framebuffer!");
 			}
@@ -377,20 +385,24 @@ namespace Kerberos
 
 	void VulkanRendererAPI::CreateCommandPool() 
 	{
-		const auto [graphicsFamily, presentFamily] = m_Context->FindQueueFamilies();
+		const auto& context = VulkanContext::Get();
+		const auto [graphicsFamily, presentFamily] = context.FindQueueFamilies();
 
 		if (!graphicsFamily.has_value())
 		{
 			throw std::runtime_error("failed to find graphics queue family!");
 		}
 
-		VkCommandPoolCreateInfo poolInfo {
+		const VkCommandPoolCreateInfo poolInfo {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+			.pNext = nullptr,
 			.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, // Optional
 			.queueFamilyIndex = graphicsFamily.value(),
 		};
 
-		if (vkCreateCommandPool(m_Device, &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS)
+		const auto device = VulkanContext::Get().GetDevice();
+
+		if (vkCreateCommandPool(device, &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create command pool!");
 		}
@@ -406,7 +418,9 @@ namespace Kerberos
 			.commandBufferCount = 1,
 		};
 
-		if (const VkResult result = vkAllocateCommandBuffers(m_Device, &allocInfo, &m_CommandBuffer); result != VK_SUCCESS)
+		const auto device = VulkanContext::Get().GetDevice();
+
+		if (const VkResult result = vkAllocateCommandBuffers(device, &allocInfo, &m_CommandBuffer); result != VK_SUCCESS)
 		{
 			KBR_ASSERT(false, "Failed to allocate command buffers! Result: {0}", VulkanHelpers::VkResultToString(result))
 		}

@@ -358,7 +358,7 @@ namespace Kerberos
 			const auto& bufferType = compiler.get_type(resource.base_type_id);
 			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-			uint32_t bufferSize = compiler.get_declared_struct_size(bufferType);
+			size_t bufferSize = compiler.get_declared_struct_size(bufferType);
 			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}, Size: {3}", resource.name, set, binding, bufferSize);
 			// Store this info (set, binding, type, stageFlags) for VkDescriptorSetLayout creation
 		}
@@ -376,7 +376,7 @@ namespace Kerberos
 			const auto& bufferType = compiler.get_type(resource.base_type_id);
 			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-			uint32_t bufferSize = compiler.get_declared_struct_size(bufferType); // May not be accurate if runtime-sized array
+			size_t bufferSize = compiler.get_declared_struct_size(bufferType);
 			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}, Approx Size: {3}", resource.name, set, binding, bufferSize);
 		}
 
