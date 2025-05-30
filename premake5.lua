@@ -103,7 +103,7 @@ group ""
 project "Kerberos"
 	location "Kerberos"
 	kind "StaticLib"
-	staticruntime "on"
+	staticruntime "off"
 	language "C++"
 	cppdialect "C++20"
 	
@@ -171,7 +171,6 @@ project "Kerberos"
 		defines
 		{
 			"KBR_PLATFORM_WINDOWS",
-			"_WINDLL",
 		}
 
 		local windowsSdkIncludeDir, windowsSdkLibDir = getLatestWindowsSDK()
@@ -302,7 +301,7 @@ project "Sandbox"
 project "KerberosEditor"
 	location "KerberosEditor"
 	kind "ConsoleApp"
-	staticruntime "on"
+	staticruntime "off"
 	language "C++"
 	cppdialect "C++20"
 	
