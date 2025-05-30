@@ -4,7 +4,7 @@
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Platform/D3D11/D3D11Shader.h"
-
+#include "Platform/Vulkan/VulkanShader.h"
 
 namespace Kerberos
 {
@@ -15,13 +15,19 @@ namespace Kerberos
 		case RendererAPI::API::None:
 			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!")
 				return nullptr;
+
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLShader>(filepath);
+
 		case RendererAPI::API::D3D11:
 			return CreateRef<D3D11Shader>(filepath);
+
+		case RendererAPI::API::D3D12:
+			KBR_CORE_ASSERT(false, "RendererAPI::D3D12 is currently not supported!");
+			return nullptr;
+
 		case RendererAPI::API::Vulkan:
-			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!")
-				return nullptr;
+			return CreateRef<VulkanShader>(filepath);
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -33,15 +39,21 @@ namespace Kerberos
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
-			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!")
-				return nullptr;
+			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
+
 		case RendererAPI::API::D3D11:
 			return CreateRef<D3D11Shader>(name, vertexSrc, fragmentSrc);
+
+		case RendererAPI::API::D3D12:
+			KBR_CORE_ASSERT(false, "RendererAPI::D3D12 is currently not supported!");
+			return nullptr;
+
 		case RendererAPI::API::Vulkan:
-			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!")
-				return nullptr;
+			return CreateRef<VulkanShader>(name, vertexSrc, fragmentSrc);
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");

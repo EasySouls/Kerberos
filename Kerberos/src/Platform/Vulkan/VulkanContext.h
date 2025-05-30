@@ -22,7 +22,7 @@ namespace Kerberos
 		};
 
 		explicit VulkanContext(GLFWwindow* windowHandle);
-		~VulkanContext();
+		~VulkanContext() override;
 
 		void Init() override;
 		void SwapBuffers() override;

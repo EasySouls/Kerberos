@@ -4,6 +4,7 @@
 #include "Kerberos/Core.h"
 #include "Platform/D3D11/D3D11Texture.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
+#include "Platform/Vulkan/VulkanTexture.h"
 
 namespace Kerberos
 {
@@ -26,8 +27,7 @@ namespace Kerberos
 			return nullptr;
 
 		case RendererAPI::API::Vulkan:
-			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
-			return nullptr;
+			return CreateRef<VulkanTexture2D>(path);
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -53,8 +53,7 @@ namespace Kerberos
 			return nullptr;
 
 		case RendererAPI::API::Vulkan:
-			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
-			return nullptr;
+			return CreateRef<VulkanTexture2D>(width, height);
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");

@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLTextureCube.h"
 #include "Platform/D3D11/D3D11TextureCube.h"
+#include "Platform/Vulkan/VulkanTextureCube.h"
 
 namespace Kerberos
 {
@@ -27,8 +28,7 @@ namespace Kerberos
 			return nullptr;	
 
 		case RendererAPI::API::Vulkan:
-			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
-			return nullptr;
+			return CreateRef<VulkanTextureCube>(name, faces, generateMipmaps, srgb);
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");

@@ -4,6 +4,7 @@
 #include "Kerberos/Core.h"
 #include "Platform/D3D11/D3D11Buffer.h"
 #include "Platform/OpenGL/OpenGLBuffer.h"
+#include "Platform/Vulkan/VulkanBuffer.h"
 
 namespace Kerberos
 {
@@ -26,8 +27,7 @@ namespace Kerberos
 			return nullptr;
 
 		case RendererAPI::API::Vulkan:
-			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
-			return nullptr;
+			return CreateRef<VulkanVertexBuffer>(vertices, size);
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -53,8 +53,7 @@ namespace Kerberos
 			return nullptr;
 
 		case RendererAPI::API::Vulkan:
-			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
-			return nullptr;
+			return CreateRef<VulkanVertexBuffer>(size);
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -80,8 +79,7 @@ namespace Kerberos
 			return nullptr;
 
 		case RendererAPI::API::Vulkan:
-			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
-			return nullptr;
+			return CreateRef<VulkanIndexBuffer>(indices, count);
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");

@@ -17,7 +17,7 @@ namespace Kerberos
 	{
 	public:
 		explicit D3D11Context(GLFWwindow* windowHandle);
-		virtual ~D3D11Context();
+		~D3D11Context() override;
 
 		void Init() override;
 		void SwapBuffers() override;

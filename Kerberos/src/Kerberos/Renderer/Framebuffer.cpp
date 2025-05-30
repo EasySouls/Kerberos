@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "Platform/D3D11/D3D11Framebuffer.h"
 #include "Platform/OpenGL/OpenGLFramebuffer.h"
+#include "Platform/Vulkan/VulkanFramebuffer.h"
 
 namespace Kerberos
 {
@@ -26,8 +27,7 @@ namespace Kerberos
 			return nullptr;
 
 		case RendererAPI::API::Vulkan:
-			KBR_CORE_ASSERT(false, "Vulkan is currently not supported!");
-			return nullptr;
+			return CreateRef<VulkanFramebuffer>(spec);
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");

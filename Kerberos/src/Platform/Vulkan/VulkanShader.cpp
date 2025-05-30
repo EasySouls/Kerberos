@@ -6,7 +6,74 @@
 
 namespace Kerberos
 {
-    std::string VulkanShader::ReadShaderFile(const std::string& filename)
+	VulkanShader::VulkanShader(const std::string& filepath)
+	{
+		
+	}
+
+	VulkanShader::VulkanShader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc,
+		const std::string& geometrySrc)
+			: m_Name(std::move(name))
+	{
+		
+	}
+
+	VulkanShader::~VulkanShader()
+	{
+		
+	}
+
+	void VulkanShader::Bind() const
+	{
+		
+	}
+
+	void VulkanShader::Unbind() const
+	{
+		
+	}
+
+	const std::string& VulkanShader::GetName() const
+	{
+		return m_Name;
+	}
+
+	void VulkanShader::SetInt(const std::string& name, int value)
+	{
+
+	}
+
+	void VulkanShader::SetIntArray(const std::string& name, int* values, uint32_t count)
+	{
+
+	}
+
+	void VulkanShader::SetFloat(const std::string& name, float value)
+	{
+
+	}
+
+	void VulkanShader::SetFloat3(const std::string& name, const glm::vec3& value)
+	{
+
+	}
+
+	void VulkanShader::SetFloat4(const std::string& name, const glm::vec4& value)
+	{
+
+	}
+
+	void VulkanShader::SetMat4(const std::string& name, const glm::mat4& value)
+	{
+
+	}
+
+	void VulkanShader::SetMaterial(const std::string& name, const Ref<Material>& material)
+	{
+
+	}
+
+	std::string VulkanShader::ReadShaderFile(const std::string& filename)
     {
         KBR_PROFILE_FUNCTION();
 
