@@ -247,6 +247,7 @@ namespace Kerberos
 			return;
 		}
 
+		m_ImmediateContext->OMSetRenderTargets(1, m_BackBufferRTV.GetAddressOf(), nullptr);
 	}
 
 	void D3D11Context::SwapBuffers()
@@ -289,9 +290,15 @@ namespace Kerberos
 
 	void D3D11Context::OnWindowResize(const uint32_t width, const uint32_t height)
 	{
+		/// Unbind the current render target and destroy swap chain resources before resizing
+		m_ImmediateContext->OMSetRenderTargets(0, nullptr, nullptr); 
+		DestroySwapChainResources();
+
 		m_ImmediateContext->Flush();
 
-		DestroySwapChainResources();
+		m_DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+
+		ProcessInfoQueueMessages();
 
 		const HRESULT hr = m_SwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 
