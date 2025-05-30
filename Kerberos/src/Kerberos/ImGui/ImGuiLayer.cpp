@@ -68,7 +68,7 @@ namespace Kerberos
 		{
 			ImGui_ImplGlfw_InitForOther(window, true);
 #ifdef KBR_PLATFORM_WINDOWS
-			ImGui_ImplDX11_Init(D3D11Context::Get().GetDevice().Get(), D3D11Context::Get().GetDeviceContext().Get());
+			ImGui_ImplDX11_Init(D3D11Context::Get().GetDevice().Get(), D3D11Context::Get().GetImmediateContext().Get());
 #endif
 		}
 	}

@@ -47,7 +47,7 @@ namespace Kerberos
 
 	D3D11Context::~D3D11Context()
 	{
-		m_DeviceContext->Flush();
+		m_ImmediateContext->Flush();
 		m_VertexBuffer.Reset();
 
 		DestroySwapChainResources();
@@ -56,14 +56,20 @@ namespace Kerberos
 		m_PixelShader.Reset();
 		m_VertexShader.Reset();
 		
-		m_DeviceContext.Reset();
 #ifdef KBR_DEBUG
-		m_DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+		if (FAILED(m_DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL)))
+		{
+			KBR_CORE_ERROR("Failed to report live device objects!");
+		}
 		m_DebugDevice.Reset();
 #endif
+
+		m_ImmediateContext.Reset();
 		m_Device.Reset();
 		s_Instance = nullptr;
 		KBR_CORE_INFO("D3D11Context destroyed successfully!");
+
+		ProcessInfoQueueMessages();
 	}
 
 	void D3D11Context::Init()
@@ -175,9 +181,9 @@ namespace Kerberos
 		}
 #endif
 
-		m_DeviceContext = deviceContext;
+		m_ImmediateContext = deviceContext;
 
-		D3D11Utils::SetDebugName(m_DeviceContext.Get(), "Device Context");
+		D3D11Utils::SetDebugName(m_ImmediateContext.Get(), "Device Context");
 		constexpr char swapChainName[] = "Swap Chain";
 		m_SwapChain->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(swapChainName), swapChainName);
 
@@ -253,26 +259,26 @@ namespace Kerberos
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 
-		constexpr float clearColor[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+		constexpr float clearColor[] = { 0.9f, 0.1f, 0.1f, 1.0f };
 		constexpr UINT vertexStride = sizeof(Vertex);
 		constexpr UINT vertexOffset = 0;
 
-		//m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), clearColor);
+		m_ImmediateContext->ClearRenderTargetView(m_BackBufferRTV.Get(), clearColor);
 
-		m_DeviceContext->IASetInputLayout(m_VertexLayout.Get());
-		m_DeviceContext->IASetVertexBuffers(0, 1, m_VertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
-		m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_ImmediateContext->IASetInputLayout(m_VertexLayout.Get());
+		m_ImmediateContext->IASetVertexBuffers(0, 1, &m_VertexBuffer, &vertexStride, &vertexOffset);
+		m_ImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		m_DeviceContext->VSSetShader(m_VertexShader.Get(), nullptr, 0);
-		//m_DeviceContext->RSSetViewports(1, &viewport);
-		m_DeviceContext->PSSetShader(m_PixelShader.Get(), nullptr, 0);
+		m_ImmediateContext->VSSetShader(m_VertexShader.Get(), nullptr, 0);
+		m_ImmediateContext->RSSetViewports(1, &viewport);
+		m_ImmediateContext->PSSetShader(m_PixelShader.Get(), nullptr, 0);
 
-		//m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
+		m_ImmediateContext->OMSetRenderTargets(1, m_BackBufferRTV.GetAddressOf(), nullptr);
 
 		/// This is only for debugging purposes, we should set the render target view before drawing
 
 		ID3D11RenderTargetView* currentRenderTargetView = nullptr;
-		m_DeviceContext->OMGetRenderTargets(1, &currentRenderTargetView, nullptr);
+		m_ImmediateContext->OMGetRenderTargets(1, &currentRenderTargetView, nullptr);
 		if (currentRenderTargetView == nullptr)
 		{
 			KBR_CORE_ERROR("The Render Target View was not set before presenting!");
@@ -280,7 +286,7 @@ namespace Kerberos
 
 		/// End of debugging code
 
-		m_DeviceContext->Draw(3, 0); // Draw 3 vertices
+		m_ImmediateContext->Draw(3, 0); // Draw 3 vertices
 
 		ProcessInfoQueueMessages();
 
@@ -294,7 +300,7 @@ namespace Kerberos
 
 	void D3D11Context::OnWindowResize(const uint32_t width, const uint32_t height)
 	{
-		m_DeviceContext->Flush();
+		m_ImmediateContext->Flush();
 
 		DestroySwapChainResources();
 
@@ -305,12 +311,12 @@ namespace Kerberos
 			KBR_CORE_ERROR("Failed to resize swapchain buffers!");
 		}
 
+		ProcessInfoQueueMessages();
+
 		m_WindowWidth = width;
 		m_WindowHeight = height;
 
 		CreateSwapChainResources();
-
-		ProcessInfoQueueMessages();
 	}
 
 	bool D3D11Context::CreateSwapChainResources()
@@ -322,7 +328,7 @@ namespace Kerberos
 			return false;
 		}
 
-		if (FAILED(m_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, &m_RenderTargetView)))
+		if (FAILED(m_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, &m_BackBufferRTV)))
 		{
 			KBR_CORE_ERROR("Failed to create render target view!");
 			return false;
@@ -335,7 +341,7 @@ namespace Kerberos
 
 	void D3D11Context::DestroySwapChainResources()
 	{
-		m_RenderTargetView.Reset();
+		m_BackBufferRTV.Reset();
 	}
 
 	void D3D11Context::ProcessInfoQueueMessages() const 

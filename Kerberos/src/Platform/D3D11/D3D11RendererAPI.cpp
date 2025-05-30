@@ -28,7 +28,7 @@ namespace Kerberos
 	*/
 	void D3D11RendererAPI::Clear()
 	{
-		const auto context = D3D11Context::Get().GetDeviceContext();
+		const auto context = D3D11Context::Get().GetImmediateContext();
 		ID3D11RenderTargetView* rtv = nullptr;
 		context->OMGetRenderTargets(1, &rtv, nullptr);
 
@@ -43,7 +43,7 @@ namespace Kerberos
 
 	void D3D11RendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
-		//const auto context = D3D11Context::Get().GetDeviceContext();
+		//const auto context = D3D11Context::Get().GetImmediateContext();
 		//if (!context)
 		//{
 		//	KBR_CORE_ASSERT(false, "Device context is null!");

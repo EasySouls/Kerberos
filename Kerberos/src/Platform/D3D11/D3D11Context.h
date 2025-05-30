@@ -27,11 +27,11 @@ namespace Kerberos
 		[[nodiscard]] 
 		ComPtr<ID3D11Device> GetDevice() const { return m_Device; }
 		[[nodiscard]] 
-		ComPtr<ID3D11DeviceContext> GetDeviceContext() const { return m_DeviceContext; }
+		ComPtr<ID3D11DeviceContext> GetImmediateContext() const { return m_ImmediateContext; }
 		[[nodiscard]] 
 		ComPtr<IDXGISwapChain> GetSwapChain() const { return m_SwapChain; }
 		[[nodiscard]] 
-		ComPtr<ID3D11RenderTargetView> GetRenderTargetView() const { return m_RenderTargetView; }
+		ComPtr<ID3D11RenderTargetView> GetRenderTargetView() const { return m_BackBufferRTV; }
 
 		static D3D11Context& Get() { return *s_Instance; }
 
@@ -46,9 +46,9 @@ namespace Kerberos
 
 		ComPtr<ID3D11Device> m_Device = nullptr;
 		ComPtr<IDXGIFactory2> m_DxgiFactory = nullptr;
-		ComPtr<ID3D11DeviceContext> m_DeviceContext = nullptr;
+		ComPtr<ID3D11DeviceContext> m_ImmediateContext = nullptr;
 		ComPtr<IDXGISwapChain> m_SwapChain = nullptr;
-		ComPtr<ID3D11RenderTargetView> m_RenderTargetView = nullptr;
+		ComPtr<ID3D11RenderTargetView> m_BackBufferRTV = nullptr;
 #ifdef KBR_DEBUG
 		ComPtr<ID3D11Debug> m_DebugDevice = nullptr;
 		ComPtr<ID3D11InfoQueue> m_InfoQueue = nullptr;

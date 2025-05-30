@@ -202,7 +202,7 @@ namespace Kerberos
 		KBR_CORE_ASSERT(m_ShaderResourceView, "Shader Resource View is not initialized!");
 		KBR_CORE_ASSERT(slot < D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, "Invalid shader resource slot!");
 
-		const auto context = D3D11Context::Get().GetDeviceContext();
+		const auto context = D3D11Context::Get().GetImmediateContext();
 		context->PSSetShaderResources(slot, 1, m_ShaderResourceView.GetAddressOf());
 		//context->PSSetSamplers(slot, 1, m_SamplerState.GetAddressOf());
 	}
@@ -224,7 +224,7 @@ namespace Kerberos
 
 		KBR_CORE_ASSERT(size == m_Width * m_Height * bytesPerPixel, "Data size does not match texture size.");
 
-		const auto context = D3D11Context::Get().GetDeviceContext();
+		const auto context = D3D11Context::Get().GetImmediateContext();
 		const uint32_t rowPitch = m_Width * bytesPerPixel;
 		context->UpdateSubresource(m_Texture.Get(), 0, nullptr, data, rowPitch, 0);
 	}

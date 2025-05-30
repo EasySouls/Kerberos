@@ -58,7 +58,7 @@ namespace Kerberos
 
 	D3D11Framebuffer::~D3D11Framebuffer()
 	{
-        ReleaseResources();
+        //ReleaseResources();
 	}
 
 	void D3D11Framebuffer::Invalidate()
@@ -188,7 +188,7 @@ namespace Kerberos
 
 	void D3D11Framebuffer::Bind()
 	{
-		const auto deviceContext = D3D11Context::Get().GetDeviceContext();
+		const auto deviceContext = D3D11Context::Get().GetImmediateContext();
 
         KBR_CORE_ASSERT(deviceContext, "D3DContext not initialized!");
 
@@ -237,7 +237,7 @@ namespace Kerberos
 
 	void D3D11Framebuffer::Unbind()
 	{
-		const auto deviceContext = D3D11Context::Get().GetDeviceContext();
+		const auto deviceContext = D3D11Context::Get().GetImmediateContext();
 
         KBR_CORE_ASSERT(deviceContext, "D3DContext not initialized!");
 
@@ -254,13 +254,9 @@ namespace Kerberos
         /// Since in the current setup Unbind is called before GraphicsContext::SwapBuffers,
 		/// we do not restore the original RTV/DSV here.
 
-        //// Restore original render targets and viewport
-        //deviceContext->OMSetRenderTargets(1, &m_OriginalRTV, m_OriginalDSV.Get());
-        //deviceContext->RSSetViewports(m_OriginalNumViewports, &m_OriginalViewport);
-
-        //// Release the temporary references to the original RTV/DSV
-        //if (m_OriginalRTV) m_OriginalRTV->Release();
-        //if (m_OriginalDSV) m_OriginalDSV->Release();
+        // Restore original render targets and viewport
+        deviceContext->OMSetRenderTargets(1, m_OriginalRTV.GetAddressOf(), m_OriginalDSV.Get());
+        deviceContext->RSSetViewports(m_OriginalNumViewports, &m_OriginalViewport);
 	}
 
 	void D3D11Framebuffer::Resize(uint32_t width, uint32_t height)
