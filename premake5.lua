@@ -37,13 +37,10 @@ Library["ShaderC_Debug"] = "%{LibraryDir.VulkanSDK}/shaderc_sharedd.lib"
 Library["SPIRV_Cross_Debug"] = "%{LibraryDir.VulkanSDK}/spirv-cross-cored.lib"
 Library["SPIRV_Cross_GLSL_Debug"] = "%{LibraryDir.VulkanSDK}/spirv-cross-glsld.lib"
 Library["SPIRV_Tools_Debug"] = "%{LibraryDir.VulkanSDK}/SPIRV-Toolsd.lib"
--- Library["Glslang_Debug"] = "%{LibraryDir.VulkanSDK}/glslangd.lib"
 
 Library["ShaderC_Release"] = "%{LibraryDir.VulkanSDK}/shaderc_shared.lib"
 Library["SPIRV_Cross_Release"] = "%{LibraryDir.VulkanSDK}/spirv-cross-core.lib"
 Library["SPIRV_Cross_GLSL_Release"] = "%{LibraryDir.VulkanSDK}/spirv-cross-glsl.lib"
--- Library["SPIRV_Tools_Release"] = "%{LibraryDir.VulkanSDK}/SPIRV-Tools.lib"
--- Library["Glslang_Release"] = "%{LibraryDir.VulkanSDK}/glslang.lib"
 
 -- Function to find the latest Windows SDK
 function getLatestWindowsSDK()
@@ -226,7 +223,6 @@ project "Kerberos"
 			Library.SPIRV_Cross_Debug,
 			Library.SPIRV_Cross_GLSL_Debug,
 	--		Library.SPIRV_Tools_Debug,
-	--		Library.Glslang_Debug,
 		}
 		
 	filter "configurations:Release"
@@ -239,8 +235,6 @@ project "Kerberos"
 			Library.ShaderC_Release,
 			Library.SPIRV_Cross_Release,
 			Library.SPIRV_Cross_GLSL_Release,
-	--		Library.SPIRV_Tools_Release,
-	--		Library.Glslang_Release,
 		}
 		
 	filter "configurations:Dist"
@@ -253,8 +247,6 @@ project "Kerberos"
 			Library.ShaderC_Release,
 			Library.SPIRV_Cross_Release,
 			Library.SPIRV_Cross_GLSL_Release,
-	--		Library.SPIRV_Tools_Release,
-	--		Library.Glslang_Release,
 		}
 
 project "Sandbox"

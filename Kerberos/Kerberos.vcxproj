@@ -91,7 +91,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;E:\VulkanSDK\1.4.313.1\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;E:\VulkanSDK\1.4.313.1\Lib\shaderc_sharedd.lib;E:\VulkanSDK\1.4.313.1\Lib\spirv-cross-cored.lib;E:\VulkanSDK\1.4.313.1\Lib\spirv-cross-glsld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;E:\VulkanSDK\1.4.313.1\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;E:\VulkanSDK\1.4.313.1\Lib\shaderc_sharedd.lib;E:\VulkanSDK\1.4.313.1\Lib\spirv-cross-cored.lib;E:\VulkanSDK\1.4.313.1\Lib\spirv-cross-glsld.lib;E:\VulkanSDK\1.4.313.1\Lib\glslangd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>E:\VulkanSDK\1.4.313.1\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>

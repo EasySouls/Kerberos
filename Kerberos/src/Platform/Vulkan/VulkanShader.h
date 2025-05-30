@@ -4,7 +4,8 @@
 #include "Kerberos/Renderer/Shader.h"
 
 #include <vulkan/vulkan.h>
-#include <glslang/Public/ShaderLang.h>
+
+#include "glad/glad.h"
 
 namespace Kerberos
 {
@@ -30,12 +31,18 @@ namespace Kerberos
 	private:
 		static std::string ReadShaderFile(const std::string& filename);
 		static std::pair<std::string, std::string> SplitShaderSource(const std::string& source);
-		static std::vector<uint32_t> CompileGLSLToSPIRV(const std::string& glslSource, EShLanguage shaderType);
-		static VkShaderModule CreateShaderModule(VkDevice device, const std::vector<uint32_t>& spirvCode);
 
-		static TBuiltInResource InitResources();
+		void CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
+
+		static VkShaderModule CreateShaderModule(VkDevice device, const std::vector<uint32_t>& spirvCode);
 
 	private:
 		std::string m_Name;
+		std::string m_Filepath;
+
+		std::unordered_map<GLenum, std::vector<uint32_t>> m_VulkanSPIRV;
+
+		std::unordered_map<VkShaderStageFlagBits, VkShaderModule> m_ShaderModules;
+		std::vector<VkPipelineShaderStageCreateInfo> m_PipelineShaderStageCreateInfos;
 	};
 }
