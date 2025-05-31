@@ -28,6 +28,9 @@ namespace Kerberos
 		void SetMat4(const std::string& name, const glm::mat4& value) override;
 		void SetMaterial(const std::string& name, const Ref<Material>& material) override;
 
+		std::unordered_map<VkShaderStageFlagBits, VkShaderModule>& GetShaderModules() { return m_ShaderModules; }
+		std::unordered_map<VkShaderStageFlagBits, VkPipelineShaderStageCreateInfo>& GetPipelineShaderStageCreateInfos() { return m_PipelineShaderStageCreateInfos; }
+
 	private:
 		static std::string ReadShaderFile(const std::string& filename);
 		static std::unordered_map<GLenum, std::string> SplitShaderSource(const std::string& source);
@@ -46,6 +49,6 @@ namespace Kerberos
 		std::unordered_map<GLenum, std::vector<uint32_t>> m_VulkanSPIRV;
 
 		std::unordered_map<VkShaderStageFlagBits, VkShaderModule> m_ShaderModules;
-		std::vector<VkPipelineShaderStageCreateInfo> m_PipelineShaderStageCreateInfos;
+		std::unordered_map<VkShaderStageFlagBits, VkPipelineShaderStageCreateInfo> m_PipelineShaderStageCreateInfos;
 	};
 }

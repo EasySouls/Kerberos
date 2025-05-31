@@ -319,7 +319,7 @@ namespace Kerberos
 			shaderStageInfo.module = shaderModule;
 			shaderStageInfo.pName = "main";
 
-			m_PipelineShaderStageCreateInfos.push_back(shaderStageInfo);
+			m_PipelineShaderStageCreateInfos[vkStage] = shaderStageInfo;
 			KBR_CORE_TRACE("Vulkan Shader: Created VkShaderModule for stage {0} ({1})", m_Name, Utils::GLShaderStageToString(glStage));
 		}
 	}

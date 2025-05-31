@@ -4,8 +4,6 @@
 
 #include <vulkan/vulkan.h>
 
-#include "VulkanContext.h"
-
 namespace Kerberos
 {
 	class VulkanRendererAPI : public RendererAPI

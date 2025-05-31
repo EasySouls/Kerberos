@@ -2,7 +2,9 @@
 
 #include "VulkanRendererAPI.h"
 
+#include "VulkanContext.h"
 #include "VulkanHelpers.h"
+#include "VulkanShader.h"
 
 namespace Kerberos
 {
@@ -226,8 +228,13 @@ namespace Kerberos
 
 	void VulkanRendererAPI::CreateGraphicsPipeline()
 	{
+		VulkanShader basic3DShader("assets/shaders/shader3d.glsl");
+		const auto createShaderStages = basic3DShader.GetPipelineShaderStageCreateInfos();
+
 		// TODO: Load shaders before creating the pipeline
 		VkPipelineShaderStageCreateInfo shaderStages[2] = {};
+		shaderStages[0] = createShaderStages.at(VK_SHADER_STAGE_VERTEX_BIT);
+		shaderStages[1] = createShaderStages.at(VK_SHADER_STAGE_FRAGMENT_BIT);
 
 		std::vector<VkDynamicState> dynamicStateEnables = {
 			VK_DYNAMIC_STATE_VIEWPORT,
