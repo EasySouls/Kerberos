@@ -229,7 +229,7 @@ namespace Kerberos
 	void VulkanRendererAPI::CreateGraphicsPipeline()
 	{
 		VulkanShader basic3DShader("assets/shaders/shader3d-vulkan.glsl");
-		const auto createShaderStages = basic3DShader.GetPipelineShaderStageCreateInfos();
+		const auto& createShaderStages = basic3DShader.GetPipelineShaderStageCreateInfos();
 
 		// TODO: Load shaders before creating the pipeline
 		VkPipelineShaderStageCreateInfo shaderStages[2] = {};
@@ -271,7 +271,7 @@ namespace Kerberos
 		viewport.maxDepth = 1.0f;
 
 		VkRect2D scissor{};
-		scissor.offset = { 0, 0 };
+		scissor.offset = {.x = 0, .y = 0 };
 		scissor.extent = swapChainExtent;
 
 		VkPipelineViewportStateCreateInfo viewportState{};
@@ -326,12 +326,15 @@ namespace Kerberos
 		colorBlending.blendConstants[2] = 0.0f; // Optional
 		colorBlending.blendConstants[3] = 0.0f; // Optional
 
+		const auto& descriptorSetLayouts = basic3DShader.GetDescriptorSetLayouts();
+		const auto& pushConstantRanges = basic3DShader.GetPushConstantRanges();
+
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = 0; // Optional
-		pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
-		pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
-		pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+		pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+		pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
+		pipelineLayoutInfo.pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size());
+		pipelineLayoutInfo.pPushConstantRanges = pushConstantRanges.data();
 
 		const auto device = VulkanContext::Get().GetDevice();
 

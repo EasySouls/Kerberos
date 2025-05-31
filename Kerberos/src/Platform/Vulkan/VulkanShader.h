@@ -30,6 +30,8 @@ namespace Kerberos
 
 		std::unordered_map<VkShaderStageFlagBits, VkShaderModule>& GetShaderModules() { return m_ShaderModules; }
 		std::unordered_map<VkShaderStageFlagBits, VkPipelineShaderStageCreateInfo>& GetPipelineShaderStageCreateInfos() { return m_PipelineShaderStageCreateInfos; }
+		const std::vector<VkDescriptorSetLayout>& GetDescriptorSetLayouts() const { return m_DescriptorSetLayouts; }
+		const std::vector<VkPushConstantRange>& GetPushConstantRanges() const { return m_PushConstantRanges; }
 
 	private:
 		static std::string ReadShaderFile(const std::string& filename);
@@ -39,8 +41,10 @@ namespace Kerberos
 
 		void CreateShaderModules();
 
-		static void Reflect(VkShaderStageFlagBits stage, const std::vector<uint32_t>& spirvCode);
+		void Reflect(VkShaderStageFlagBits stage, const std::vector<uint32_t>& spirvCode);
 		void ReflectAllStages();
+
+		void CreateDescriptorSetLayouts();
 
 	private:
 		std::string m_Name;
@@ -50,5 +54,9 @@ namespace Kerberos
 
 		std::unordered_map<VkShaderStageFlagBits, VkShaderModule> m_ShaderModules;
 		std::unordered_map<VkShaderStageFlagBits, VkPipelineShaderStageCreateInfo> m_PipelineShaderStageCreateInfos;
+
+		std::map<uint32_t, std::map<uint32_t, VkDescriptorSetLayoutBinding>> m_DescriptorSetLayoutsInfo;
+		std::vector<VkDescriptorSetLayout> m_DescriptorSetLayouts;
+		std::vector<VkPushConstantRange> m_PushConstantRanges;
 	};
 }

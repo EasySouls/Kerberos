@@ -2,6 +2,7 @@
 #include "VulkanShader.h"
 
 #include <filesystem>
+#include <ranges>
 
 #include <shaderc/shaderc.hpp>
 #include <spirv_cross/spirv_cross.hpp>
@@ -81,6 +82,7 @@ namespace Kerberos
 			CompileOrGetVulkanBinaries(shaderSources);
 			CreateShaderModules();
 			ReflectAllStages();
+			CreateDescriptorSetLayouts();
 		}
 
 		auto lastSlash = filepath.find_last_of("/\\");
@@ -103,6 +105,7 @@ namespace Kerberos
 		CompileOrGetVulkanBinaries(sources);
 		CreateShaderModules();
 		ReflectAllStages();
+		CreateDescriptorSetLayouts();
 	}
 
 	VulkanShader::~VulkanShader()
@@ -110,16 +113,22 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		const VkDevice device = VulkanContext::Get().GetDevice();
-
 		KBR_CORE_ASSERT(device, "Vulkan logical device is null in destructor!");
 
-		for (auto& kv : m_ShaderModules) {
-			if (kv.second != VK_NULL_HANDLE) {
-				vkDestroyShaderModule(device, kv.second, nullptr);
+		for (const auto& shaderModule : m_ShaderModules | std::views::values) {
+			if (shaderModule != VK_NULL_HANDLE) {
+				vkDestroyShaderModule(device, shaderModule, nullptr);
 			}
 		}
 		m_ShaderModules.clear();
 		m_PipelineShaderStageCreateInfos.clear();
+
+		for (const VkDescriptorSetLayout layout : m_DescriptorSetLayouts) {
+			if (layout != VK_NULL_HANDLE) {
+				vkDestroyDescriptorSetLayout(device, layout, nullptr);
+			}
+		}
+		m_DescriptorSetLayouts.clear();
 	}
 
 	void VulkanShader::Bind() const
@@ -339,6 +348,59 @@ namespace Kerberos
 		}
 	}
 
+	void VulkanShader::CreateDescriptorSetLayouts()
+	{
+		KBR_PROFILE_FUNCTION();
+
+		const VkDevice device = VulkanContext::Get().GetDevice();
+		KBR_CORE_ASSERT(device, "Vulkan logical device is null in CreateDescriptorSetLayouts!");
+
+		/// Clear existing descriptor set layouts
+		for (const VkDescriptorSetLayout layout : m_DescriptorSetLayouts)
+		{
+			if (layout != VK_NULL_HANDLE)
+			{
+				vkDestroyDescriptorSetLayout(device, layout, nullptr);
+			}
+		}
+		m_DescriptorSetLayouts.clear();
+
+		if (!m_DescriptorSetLayoutsInfo.empty())
+		{
+			const uint32_t maxSet = m_DescriptorSetLayoutsInfo.rbegin()->first;
+			m_DescriptorSetLayouts.resize(maxSet + 1, VK_NULL_HANDLE);
+		}
+
+		for (auto const& [setIndex, bindingsMap] : m_DescriptorSetLayoutsInfo)
+		{
+			std::vector<VkDescriptorSetLayoutBinding> bindings;
+			for (const auto& bindingInfo : bindingsMap | std::views::values)
+			{
+				bindings.push_back(bindingInfo);
+			}
+
+			if (bindings.empty())
+			{
+				KBR_CORE_WARN("Vulkan Shader: No bindings found for descriptor set {0} in shader {1}", setIndex, m_Filepath);
+				continue;
+			}
+
+			VkDescriptorSetLayoutCreateInfo layoutCreateInfo{};
+			layoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+			layoutCreateInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+			layoutCreateInfo.pBindings = bindings.data();
+
+			VkDescriptorSetLayout descriptorSetLayout;
+			if (vkCreateDescriptorSetLayout(device, &layoutCreateInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
+			{
+				KBR_CORE_ERROR("Vulkan Shader: Failed to create descriptor set layout for set {0} in shader {1}", setIndex, m_Filepath);
+				continue;
+			}
+			KBR_CORE_TRACE("Vulkan Shader: Created descriptor set layout for set {0} in shader {1}", setIndex, m_Filepath);
+			m_DescriptorSetLayouts[setIndex] = descriptorSetLayout;
+		}
+	}
+
 	void VulkanShader::Reflect(const VkShaderStageFlagBits stage, const std::vector<uint32_t>& spirvCode)
 	{
 		const spirv_cross::Compiler compiler(spirvCode);
@@ -359,16 +421,67 @@ namespace Kerberos
 			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 			size_t bufferSize = compiler.get_declared_struct_size(bufferType);
+
 			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}, Size: {3}", resource.name, set, binding, bufferSize);
-			// Store this info (set, binding, type, stageFlags) for VkDescriptorSetLayout creation
+
+			auto& bindingsForSet = m_DescriptorSetLayoutsInfo[set];
+			if (!bindingsForSet.contains(binding))
+			{
+				constexpr uint32_t descriptorCount = 1;
+				/// Create a new binding for this set
+				VkDescriptorSetLayoutBinding newBinding{};
+				newBinding.binding = binding;
+				newBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				newBinding.descriptorCount = descriptorCount;
+				newBinding.stageFlags = stage; // Initial stage
+				newBinding.pImmutableSamplers = nullptr;
+
+				bindingsForSet[binding] = newBinding;
+			}
+			else
+			{
+				/// Binding already exists, merge stage flags
+				bindingsForSet[binding].stageFlags |= stage;
+			}
 		}
 
 		KBR_CORE_TRACE("    Sampled Images (Textures/Samplers): {0}", resources.sampled_images.size());
 		for (const auto& resource : resources.sampled_images) {
 			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+			uint32_t descriptorCount = 1;
+
 			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}", resource.name, set, binding);
-			// Store this info for VkDescriptorSetLayout creation
+			
+			// Check if it's an array of textures (e.g., `sampler2D textures[4]`)
+			const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+			if (!type.array.empty()) {
+				descriptorCount = type.array[0]; // Assuming 1D array for simplicity
+				if (descriptorCount == 0) // Unsized array (e.g., `sampler2D textures[]`)
+					//descriptorCount = VulkanContext::Get().GetCapabilities().maxSamplerAllocationCount; // Or some max you define
+					descriptorCount = 1; // Default to 1 if unsized
+			}
+
+			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}, Count: {3}", resource.name, set, binding, descriptorCount);
+
+			auto& bindingsForSet = m_DescriptorSetLayoutsInfo[set];
+			if (!bindingsForSet.contains(binding))
+			{
+				VkDescriptorSetLayoutBinding newBinding{};
+				newBinding.binding = binding;
+				newBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				newBinding.descriptorCount = descriptorCount;
+				newBinding.stageFlags = stage;
+				newBinding.pImmutableSamplers = nullptr;
+
+				bindingsForSet[binding] = newBinding;
+			}
+			else
+			{
+				bindingsForSet[binding].stageFlags |= stage;
+				// KBR_CORE_ASSERT(bindingsForSet[binding].descriptorCount == descriptorCount, "Descriptor count mismatch for binding!");
+				// You might want to handle this warning/error if a binding count differs between stages.
+			}
 		}
 
 		KBR_CORE_TRACE("    Storage Buffers: {0}", resources.storage_buffers.size());
@@ -377,14 +490,59 @@ namespace Kerberos
 			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 			size_t bufferSize = compiler.get_declared_struct_size(bufferType);
+
 			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}, Approx Size: {3}", resource.name, set, binding, bufferSize);
+
+			auto& bindingsForSet = m_DescriptorSetLayoutsInfo[set];
+			if (!bindingsForSet.contains(binding))
+			{
+				constexpr uint32_t descriptorCount = 1;
+				VkDescriptorSetLayoutBinding newBinding{};
+				newBinding.binding = binding;
+				newBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+				newBinding.descriptorCount = descriptorCount;
+				newBinding.stageFlags = stage;
+				newBinding.pImmutableSamplers = nullptr;
+
+				bindingsForSet[binding] = newBinding;
+			}
+			else
+			{
+				bindingsForSet[binding].stageFlags |= stage;
+			}
 		}
 
 		KBR_CORE_TRACE("    Storage Images: {0}", resources.storage_images.size());
 		for (const auto& resource : resources.storage_images) {
 			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+			uint32_t descriptorCount = 1;
+			const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+			if (!type.array.empty()) {
+				descriptorCount = type.array[0];
+				if (descriptorCount == 0)
+					//descriptorCount = VulkanContext::Get().GetCapabilities().maxStorageImageAllocationCount; // Or some max
+					descriptorCount = 1; // Default to 1 if unsized
+			}
+
 			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}", resource.name, set, binding);
+
+			auto& bindingsForSet = m_DescriptorSetLayoutsInfo[set];
+			if (!bindingsForSet.contains(binding))
+			{
+				VkDescriptorSetLayoutBinding newBinding{};
+				newBinding.binding = binding;
+				newBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+				newBinding.descriptorCount = descriptorCount;
+				newBinding.stageFlags = stage;
+				newBinding.pImmutableSamplers = nullptr;
+
+				bindingsForSet[binding] = newBinding;
+			}
+			else
+			{
+				bindingsForSet[binding].stageFlags |= stage;
+			}
 		}
 
 		KBR_CORE_TRACE("    Push Constant Buffers: {0}", resources.push_constant_buffers.size());
@@ -401,6 +559,29 @@ namespace Kerberos
 
 			KBR_CORE_TRACE("      Name: {0}, Offset: {1}, Size: {2}", resource.name, offset, size);
 			// Store this info (stageFlags, offset, size) for VkPushConstantRange creation
+
+			const auto ranges = compiler.get_active_buffer_ranges(resource.id);
+			bool found = false;
+			for (auto& existingRange : m_PushConstantRanges) {
+				// Assuming a single push constant block starts at offset 0.
+				// If you have multiple distinct push constant blocks with different offsets,
+				// this comparison needs to be more robust (e.g., comparing resource name or actual offset from SPIR-V).
+				// For a typical use case with one push constant block, offset will be 0.
+				if (existingRange.offset == 0 && existingRange.size == size) {
+					existingRange.stageFlags |= stage; // Merge stage flags
+					found = true;
+					KBR_CORE_TRACE("      Merged Push Constant Range: Name: {0}}", resource.name);
+					break;
+				}
+			}
+
+			if (!found) {
+				VkPushConstantRange pushConstantRange{};
+				pushConstantRange.stageFlags = stage;
+				pushConstantRange.offset = offset;
+				pushConstantRange.size = static_cast<uint32_t>(size);
+				m_PushConstantRanges.push_back(pushConstantRange);
+			}
 		}
 	}
 }
