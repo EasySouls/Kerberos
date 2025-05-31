@@ -228,7 +228,7 @@ namespace Kerberos
 
 	void VulkanRendererAPI::CreateGraphicsPipeline()
 	{
-		VulkanShader basic3DShader("assets/shaders/shader3d.glsl");
+		VulkanShader basic3DShader("assets/shaders/shader3d-vulkan.glsl");
 		const auto createShaderStages = basic3DShader.GetPipelineShaderStageCreateInfos();
 
 		// TODO: Load shaders before creating the pipeline
