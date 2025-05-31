@@ -32,14 +32,11 @@ namespace Kerberos
 		void CreateCommandPool();
 		void CreateCommandBuffer();
 
-		void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+		void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) const;
 
 	private:
 		VkImage m_Image = VK_NULL_HANDLE;
-		VkExtent2D m_SwapChainExtent = {};
-		VkFormat m_SwapChainImageFormat = {};
 		VkRenderPass m_RenderPass = VK_NULL_HANDLE;
-		std::vector<VkImageView> m_SwapChainImageViews;
 
 		VkPipelineLayout m_PipelineLayout = VK_NULL_HANDLE;
 		VkPipeline m_GraphicsPipeline = VK_NULL_HANDLE;

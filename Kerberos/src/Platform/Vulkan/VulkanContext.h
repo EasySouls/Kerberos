@@ -31,6 +31,11 @@ namespace Kerberos
 
 		VkSurfaceKHR GetSurface() const { return m_Surface; }
 		VkDevice GetDevice() const { return m_Device; }
+		VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
+		VkFormat GetSwapChainImageFormat() const { return m_SwapChainImageFormat; }
+		VkExtent2D GetSwapChainExtent() const { return m_SwapChainExtent; }
+		const std::vector<VkImage>& GetSwapChainImages() const { return m_SwapChainImages; }
+		const std::vector<VkImageView>& GetSwapChainImageViews() const { return m_SwapChainImageViews; }
 
 		static VulkanContext& Get() { return *s_Instance; }
 

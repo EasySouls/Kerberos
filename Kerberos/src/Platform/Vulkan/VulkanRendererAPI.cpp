@@ -126,7 +126,7 @@ namespace Kerberos
 
 	void VulkanRendererAPI::DrawArray(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) {}
 
-	void VulkanRendererAPI::RecordCommandBuffer(const VkCommandBuffer commandBuffer, const uint32_t imageIndex) 
+	void VulkanRendererAPI::RecordCommandBuffer(const VkCommandBuffer commandBuffer, const uint32_t imageIndex) const
 	{
 		constexpr VkCommandBufferBeginInfo beginInfo {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -139,13 +139,15 @@ namespace Kerberos
 
 		VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
 
+		const VkExtent2D swapChainExtent = VulkanContext::Get().GetSwapChainExtent();
+
 		const VkRenderPassBeginInfo renderPassInfo{
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.renderPass = m_RenderPass,
 			.framebuffer = m_SwapChainFramebuffers[imageIndex],
 			.renderArea = {
 				.offset = { 0, 0 },
-				.extent = m_SwapChainExtent
+				.extent = swapChainExtent
 			},
 			.clearValueCount = 1,
 			.pClearValues = &clearColor
@@ -158,15 +160,15 @@ namespace Kerberos
 		VkViewport viewport;
 		viewport.x = 0.0f;
 		viewport.y = 0.0f;
-		viewport.width = static_cast<float>(m_SwapChainExtent.width);
-		viewport.height = static_cast<float>(m_SwapChainExtent.height);
+		viewport.width = static_cast<float>(swapChainExtent.width);
+		viewport.height = static_cast<float>(swapChainExtent.height);
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 
 		VkRect2D scissor;
 		scissor.offset = { 0, 0 };
-		scissor.extent = m_SwapChainExtent;
+		scissor.extent = swapChainExtent;
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
 		vkCmdDraw(commandBuffer, 3, 1, 0, 0);
@@ -186,8 +188,10 @@ namespace Kerberos
 
 	void VulkanRendererAPI::CreateRenderPass() 
 	{
+		const auto swapChainImageFormat = VulkanContext::Get().GetSwapChainImageFormat();
+
 		VkAttachmentDescription colorAttachment{};
-		colorAttachment.format = m_SwapChainImageFormat;
+		colorAttachment.format = swapChainImageFormat;
 		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -248,18 +252,20 @@ namespace Kerberos
 		inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		inputAssembly.primitiveRestartEnable = VK_FALSE;
 
+		const VkExtent2D swapChainExtent = VulkanContext::Get().GetSwapChainExtent();
+
 		// The viewport and scissor can be dynamically set in the command buffer
 		VkViewport viewport{};
 		viewport.x = 0.0f;
 		viewport.y = 0.0f;
-		viewport.width = static_cast<float>(m_SwapChainExtent.width);
-		viewport.height = static_cast<float>(m_SwapChainExtent.height);
+		viewport.width = static_cast<float>(swapChainExtent.width);
+		viewport.height = static_cast<float>(swapChainExtent.height);
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 
 		VkRect2D scissor{};
 		scissor.offset = { 0, 0 };
-		scissor.extent = m_SwapChainExtent;
+		scissor.extent = swapChainExtent;
 
 		VkPipelineViewportStateCreateInfo viewportState{};
 		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -356,12 +362,16 @@ namespace Kerberos
 
 	void VulkanRendererAPI::CreateFramebuffers() 
 	{
-		m_SwapChainFramebuffers.resize(m_SwapChainImageViews.size());
+		const auto& context = VulkanContext::Get();
+		const auto swapChainImageViews = context.GetSwapChainImageViews();
+		const VkExtent2D swapChainExtent = context.GetSwapChainExtent();
 
-		for (size_t i = 0; i < m_SwapChainImageViews.size(); ++i)
+		m_SwapChainFramebuffers.resize(swapChainImageViews.size());
+
+		for (size_t i = 0; i < swapChainImageViews.size(); ++i)
 		{
 			VkImageView attachments[] = {
-				m_SwapChainImageViews[i]
+				swapChainImageViews[i]
 			};
 
 			VkFramebufferCreateInfo framebufferInfo {
@@ -369,8 +379,8 @@ namespace Kerberos
 				.renderPass = m_RenderPass,
 				.attachmentCount = 1,
 				.pAttachments = attachments,
-				.width = m_SwapChainExtent.width,
-				.height = m_SwapChainExtent.height,
+				.width = swapChainExtent.width,
+				.height = swapChainExtent.height,
 				.layers = 1
 			};
 
