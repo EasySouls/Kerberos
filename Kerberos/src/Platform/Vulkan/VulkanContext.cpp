@@ -135,8 +135,9 @@ namespace Kerberos
 			createInfo.pNext = nullptr;
 		}
 
-		if (vkCreateInstance(&createInfo, nullptr, &m_Instance) != VK_SUCCESS)
+		if (const VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance); result != VK_SUCCESS)
 		{
+			KBR_CORE_ASSERT(false, "Failed to create instance! Result: {0}", VulkanHelpers::VkResultToString(result))
 			throw std::runtime_error("failed to create instance!");
 		}
 	}
@@ -156,8 +157,9 @@ namespace Kerberos
 
 	void VulkanContext::CreateSurface()
 	{
-		if (glfwCreateWindowSurface(m_Instance, m_WindowHandle, nullptr, &m_Surface) != VK_SUCCESS)
+		if (const VkResult result = glfwCreateWindowSurface(m_Instance, m_WindowHandle, nullptr, &m_Surface); result != VK_SUCCESS)
 		{
+			KBR_CORE_ASSERT(false, "Failed to create window surface! Result: {0}", VulkanHelpers::VkResultToString(result))
 			throw std::runtime_error("failed to create window surface!");
 		}
 	}
@@ -271,8 +273,9 @@ namespace Kerberos
 			createInfo.enabledLayerCount = 0;
 		}
 
-		if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device) != VK_SUCCESS)
+		if (const VkResult result = vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device); result != VK_SUCCESS)
 		{
+			KBR_CORE_ASSERT(false, "Failed to create logical device! Result: {0}", VulkanHelpers::VkResultToString(result))
 			throw std::runtime_error("failed to create logical device!");
 		}
 
@@ -330,9 +333,9 @@ namespace Kerberos
 		createInfo.clipped = VK_TRUE;
 		createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-		if (vkCreateSwapchainKHR(m_Device, &createInfo, nullptr, &m_SwapChain) != VK_SUCCESS)
+		if (const VkResult result = vkCreateSwapchainKHR(m_Device, &createInfo, nullptr, &m_SwapChain); result != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create swap chain!");
+			KBR_CORE_ASSERT(false, "Failed to create swapchain! Result: {0}", VulkanHelpers::VkResultToString(result))
 		}
 
 		vkGetSwapchainImagesKHR(m_Device, m_SwapChain, &imageCount, nullptr);
@@ -366,9 +369,9 @@ namespace Kerberos
 			createInfo.subresourceRange.baseArrayLayer = 0;
 			createInfo.subresourceRange.layerCount = 1;
 
-			if (vkCreateImageView(m_Device, &createInfo, nullptr, &m_SwapChainImageViews[i]) != VK_SUCCESS)
+			if (const VkResult result = vkCreateImageView(m_Device, &createInfo, nullptr, &m_SwapChainImageViews[i]); result != VK_SUCCESS)
 			{
-				throw std::runtime_error("failed to create image views!");
+				KBR_CORE_ASSERT(false, "Failed to create image views! Result: {0}", VulkanHelpers::VkResultToString(result))
 			}
 		}
 	}
@@ -401,9 +404,9 @@ namespace Kerberos
 		renderPassInfo.subpassCount = 1;
 		renderPassInfo.pSubpasses = &subpass;
 
-		if (vkCreateRenderPass(m_Device, &renderPassInfo, nullptr, &m_RenderPass) != VK_SUCCESS)
+		if (const VkResult result = vkCreateRenderPass(m_Device, &renderPassInfo, nullptr, &m_RenderPass); result != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create render pass!");
+			KBR_CORE_ASSERT(false, "Failed to create render pass! Result: {0}", VulkanHelpers::VkResultToString(result))
 		}
 	}
 
@@ -518,9 +521,9 @@ namespace Kerberos
 		pipelineLayoutInfo.pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size());
 		pipelineLayoutInfo.pPushConstantRanges = pushConstantRanges.data();
 
-		if (vkCreatePipelineLayout(m_Device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
+		if (const VkResult result = vkCreatePipelineLayout(m_Device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout); result != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create pipeline layout!");
+			KBR_CORE_ASSERT(false, "Failed to create pipeline layout! Result: {0}", VulkanHelpers::VkResultToString(result))
 		}
 
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -544,9 +547,9 @@ namespace Kerberos
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
 		pipelineInfo.basePipelineIndex = -1; // Optional
 
-		if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
+		if (const VkResult result = vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline); result != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create graphics pipeline!");
+			KBR_CORE_ASSERT(false, "Failed to create graphics pipeline! Result: {0}", VulkanHelpers::VkResultToString(result))
 		}
 	}
 
@@ -572,9 +575,9 @@ namespace Kerberos
 				.layers = 1,
 			};
 
-			if (vkCreateFramebuffer(m_Device, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]) != VK_SUCCESS)
+			if (const VkResult result = vkCreateFramebuffer(m_Device, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]); result  != VK_SUCCESS)
 			{
-				throw std::runtime_error("failed to create framebuffer!");
+				KBR_CORE_ASSERT(false, "Failed to create framebuffer! Result: {0}", VulkanHelpers::VkResultToString(result))
 			}
 		}
 	}
@@ -595,9 +598,9 @@ namespace Kerberos
 			.queueFamilyIndex = graphicsFamily.value(),
 		};
 
-		if (vkCreateCommandPool(m_Device, &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS)
+		if (const VkResult result = vkCreateCommandPool(m_Device, &poolInfo, nullptr, &m_CommandPool); result != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create command pool!");
+			KBR_CORE_ASSERT(false, "Failed to create command pool! Result: {0}", VulkanHelpers::VkResultToString(result))
 		}
 	}
 
@@ -613,7 +616,7 @@ namespace Kerberos
 
 		if (const VkResult result = vkAllocateCommandBuffers(m_Device, &allocInfo, &m_CommandBuffer); result != VK_SUCCESS)
 		{
-			KBR_ASSERT(false, "Failed to allocate command buffers! Result: {0}", VulkanHelpers::VkResultToString(result))
+			KBR_CORE_ASSERT(false, "Failed to allocate command buffers! Result: {0}", VulkanHelpers::VkResultToString(result))
 		}
 	}
 
