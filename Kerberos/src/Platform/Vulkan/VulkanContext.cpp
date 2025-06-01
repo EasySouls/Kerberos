@@ -48,6 +48,12 @@ namespace Kerberos
 
 	VulkanContext::~VulkanContext()
 	{
+		vkDeviceWaitIdle(m_Device);
+
+		vkDestroySemaphore(m_Device, m_ImageAvailableSemaphore, nullptr);
+		vkDestroySemaphore(m_Device, m_RenderFinishedSemaphore, nullptr);
+		vkDestroyFence(m_Device, m_InFlightFence, nullptr);
+
 		vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
 
 		for (const auto framebuffer : m_SwapChainFramebuffers)
@@ -89,11 +95,58 @@ namespace Kerberos
 		CreateFramebuffers();
 		CreateCommandPool();
 		CreateCommandBuffer();
+		CreateSyncObjects();
 	}
 
 	void VulkanContext::SwapBuffers()
 	{
-		// TODO: Implement
+		/// Wait for the fence to be signaled, then reset it
+		vkWaitForFences(m_Device, 1, &m_InFlightFence, VK_TRUE, UINT64_MAX);
+		vkResetFences(m_Device, 1, &m_InFlightFence);
+
+		uint32_t imageIndex;
+		if (const VkResult result = vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex); result != VK_SUCCESS)
+		{
+			KBR_CORE_ASSERT(false, "Failed to acquire swapchain image! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to acquire swap chain image!");
+		}
+
+		vkResetCommandBuffer(m_CommandBuffer, 0);
+
+		RecordCommandBuffer(m_CommandBuffer, imageIndex);
+
+		VkSubmitInfo submitInfo{};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+		const VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphore };
+		constexpr VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+		submitInfo.waitSemaphoreCount = 1;
+		submitInfo.pWaitSemaphores = waitSemaphores;
+		submitInfo.pWaitDstStageMask = waitStages;
+
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &m_CommandBuffer;
+
+		const VkSemaphore signalSemaphores[] = { m_RenderFinishedSemaphore };
+		submitInfo.signalSemaphoreCount = 1;
+		submitInfo.pSignalSemaphores = signalSemaphores;
+
+		if (const VkResult result = vkQueueSubmit(m_GraphicsQueue, 1, &submitInfo, m_InFlightFence); result != VK_SUCCESS) {
+			KBR_CORE_ASSERT(false, "Failed to submit draw command buffer! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to submit draw command buffer!");
+		}
+
+		VkPresentInfoKHR presentInfo{};
+		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+		presentInfo.waitSemaphoreCount = 1;
+		presentInfo.pWaitSemaphores = signalSemaphores;
+
+		const VkSwapchainKHR swapChains[] = { m_SwapChain };
+		presentInfo.swapchainCount = 1;
+		presentInfo.pSwapchains = swapChains;
+		presentInfo.pImageIndices = &imageIndex;
+
+		vkQueuePresentKHR(m_PresentQueue, &presentInfo);
 	}
 
 	void VulkanContext::RecordCommandBuffer(const VkCommandBuffer commandBuffer, const uint32_t imageIndex) const
@@ -442,7 +495,7 @@ namespace Kerberos
 		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
-		VkAttachmentReference colorAttachmentRef{};
+		VkAttachmentReference colorAttachmentRef;
 		colorAttachmentRef.attachment = 0;
 		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
@@ -451,12 +504,23 @@ namespace Kerberos
 		subpass.colorAttachmentCount = 1;
 		subpass.pColorAttachments = &colorAttachmentRef;
 
+		/// This makes sure that the render pass waits for the swap chain to be ready before starting to render
+		VkSubpassDependency dependency{};
+		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+		dependency.dstSubpass = 0;
+		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.srcAccessMask = 0;
+		dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
 		VkRenderPassCreateInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 		renderPassInfo.attachmentCount = 1;
 		renderPassInfo.pAttachments = &colorAttachment;
 		renderPassInfo.subpassCount = 1;
 		renderPassInfo.pSubpasses = &subpass;
+		renderPassInfo.dependencyCount = 1;
+		renderPassInfo.pDependencies = &dependency;
 
 		if (const VkResult result = vkCreateRenderPass(m_Device, &renderPassInfo, nullptr, &m_RenderPass); result != VK_SUCCESS)
 		{
@@ -671,6 +735,24 @@ namespace Kerberos
 		if (const VkResult result = vkAllocateCommandBuffers(m_Device, &allocInfo, &m_CommandBuffer); result != VK_SUCCESS)
 		{
 			KBR_CORE_ASSERT(false, "Failed to allocate command buffers! Result: {0}", VulkanHelpers::VkResultToString(result))
+		}
+	}
+
+	void VulkanContext::CreateSyncObjects()
+	{
+		VkSemaphoreCreateInfo semaphoreInfo{};
+		semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+		/// Create the fence in a signaled state, since the first frame would wait
+		/// infinitely for the fence to be reset before starting to render.
+		VkFenceCreateInfo fenceInfo{};
+		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; 
+
+		if (vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore) != VK_SUCCESS ||
+			vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore) != VK_SUCCESS ||
+			vkCreateFence(m_Device, &fenceInfo, nullptr, &m_InFlightFence) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create semaphores or fences!");
 		}
 	}
 

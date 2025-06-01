@@ -63,6 +63,7 @@ namespace Kerberos
 		void CreateFramebuffers();
 		void CreateCommandPool();
 		void CreateCommandBuffer();
+		void CreateSyncObjects();
 
 		/////////////////////////////////////////////////////////
 		//////////////////// Helper methods  ////////////////////
@@ -106,6 +107,10 @@ namespace Kerberos
 		std::vector<VkFramebuffer> m_SwapChainFramebuffers;
 		VkCommandPool m_CommandPool = VK_NULL_HANDLE;
 		VkCommandBuffer m_CommandBuffer = VK_NULL_HANDLE;
+
+		VkSemaphore m_ImageAvailableSemaphore;
+		VkSemaphore m_RenderFinishedSemaphore;
+		VkFence m_InFlightFence;
 
 		static VulkanContext* s_Instance;
 	};
