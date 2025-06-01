@@ -41,6 +41,10 @@ namespace Kerberos
 		VkQueue GetPresentQueue() const { return m_PresentQueue; }
 		uint32_t GetGraphicsQueueFamilyIndex() const { return m_GraphicsQueueFamilyIndex; }
 		uint32_t GetPresentQueueFamilyIndex() const { return m_PresentQueueFamilyIndex; }
+		VkCommandBuffer GetCommandBuffer() const { return m_CommandBuffer; }
+		VkRenderPass GetRenderPass() const { return m_RenderPass; }
+		VkPipeline GetPipeline() const { return m_GraphicsPipeline; }
+		std::vector<VkFramebuffer> GetSwapChainFramebuffers() const { return m_SwapChainFramebuffers; }
 
 		static VulkanContext& Get() { return *s_Instance; }
 
@@ -52,6 +56,11 @@ namespace Kerberos
 		void CreateLogicalDevice();
 		void CreateSwapChain();
 		void CreateImageViews();
+		void CreateRenderPass();
+		void CreateGraphicsPipeline();
+		void CreateFramebuffers();
+		void CreateCommandPool();
+		void CreateCommandBuffer();
 
 		/////////////////////////////////////////////////////////
 		//////////////////// Helper methods  ////////////////////
@@ -88,6 +97,13 @@ namespace Kerberos
 		VkFormat m_SwapChainImageFormat;
 		VkExtent2D m_SwapChainExtent;
 		std::vector<VkImageView> m_SwapChainImageViews;
+
+		VkRenderPass m_RenderPass = VK_NULL_HANDLE;
+		VkPipelineLayout m_PipelineLayout = VK_NULL_HANDLE;
+		VkPipeline m_GraphicsPipeline = VK_NULL_HANDLE;
+		std::vector<VkFramebuffer> m_SwapChainFramebuffers;
+		VkCommandPool m_CommandPool = VK_NULL_HANDLE;
+		VkCommandBuffer m_CommandBuffer = VK_NULL_HANDLE;
 
 		static VulkanContext* s_Instance;
 	};

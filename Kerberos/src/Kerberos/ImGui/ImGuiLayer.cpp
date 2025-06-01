@@ -83,7 +83,9 @@ namespace Kerberos
 			init_info.QueueFamily = VulkanContext::Get().GetGraphicsQueueFamilyIndex();
 			init_info.Queue = VulkanContext::Get().GetGraphicsQueue();
 			init_info.PipelineCache = VK_NULL_HANDLE;
-			init_info.DescriptorPool = VulkanContext::Get().GetDescriptorPool();
+			init_info.DescriptorPool = nullptr;
+			init_info.DescriptorPoolSize = 1;
+			//init_info.DescriptorPool = VulkanContext::Get().GetDescriptorPool();
 			init_info.Subpass = 0; // Subpass index for the ImGui render pass
 			init_info.MinImageCount = 2;
 			init_info.ImageCount = static_cast<uint32_t>(VulkanContext::Get().GetSwapChainImages().size());
