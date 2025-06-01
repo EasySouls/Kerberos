@@ -49,6 +49,8 @@ namespace Kerberos
 		static VulkanContext& Get() { return *s_Instance; }
 
 	private:
+		void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) const;
+
 		void CreateInstance();
 		void SetupDebugMessenger();
 		void CreateSurface();

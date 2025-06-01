@@ -24,6 +24,6 @@ namespace Kerberos
 		void DrawArray(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) override;
 
 	private:
-		void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) const;
+		glm::vec4 m_ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 	};
 }
