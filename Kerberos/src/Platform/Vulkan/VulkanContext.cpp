@@ -103,8 +103,6 @@ namespace Kerberos
 			throw std::runtime_error("validation layers requested, but not available!");
 		}
 
-		//glfwMakeContextCurrent(m_WindowHandle);
-
 		VkApplicationInfo appInfo{};
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 		appInfo.pApplicationName = "Kerberos";
@@ -377,10 +375,8 @@ namespace Kerberos
 
 	void VulkanContext::CreateRenderPass()
 	{
-		const auto swapChainImageFormat = VulkanContext::Get().GetSwapChainImageFormat();
-
 		VkAttachmentDescription colorAttachment{};
-		colorAttachment.format = swapChainImageFormat;
+		colorAttachment.format = m_SwapChainImageFormat;
 		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -405,9 +401,7 @@ namespace Kerberos
 		renderPassInfo.subpassCount = 1;
 		renderPassInfo.pSubpasses = &subpass;
 
-		const auto device = VulkanContext::Get().GetDevice();
-
-		if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &m_RenderPass) != VK_SUCCESS)
+		if (vkCreateRenderPass(m_Device, &renderPassInfo, nullptr, &m_RenderPass) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create render pass!");
 		}
@@ -449,20 +443,18 @@ namespace Kerberos
 		inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-		const VkExtent2D swapChainExtent = VulkanContext::Get().GetSwapChainExtent();
-
 		// The viewport and scissor can be dynamically set in the command buffer
 		VkViewport viewport{};
 		viewport.x = 0.0f;
 		viewport.y = 0.0f;
-		viewport.width = static_cast<float>(swapChainExtent.width);
-		viewport.height = static_cast<float>(swapChainExtent.height);
+		viewport.width = static_cast<float>(m_SwapChainExtent.width);
+		viewport.height = static_cast<float>(m_SwapChainExtent.height);
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 
 		VkRect2D scissor{};
 		scissor.offset = { .x = 0, .y = 0 };
-		scissor.extent = swapChainExtent;
+		scissor.extent = m_SwapChainExtent;
 
 		VkPipelineViewportStateCreateInfo viewportState{};
 		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -526,9 +518,7 @@ namespace Kerberos
 		pipelineLayoutInfo.pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size());
 		pipelineLayoutInfo.pPushConstantRanges = pushConstantRanges.data();
 
-		const auto device = VulkanContext::Get().GetDevice();
-
-		if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
+		if (vkCreatePipelineLayout(m_Device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create pipeline layout!");
 		}
@@ -554,7 +544,7 @@ namespace Kerberos
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
 		pipelineInfo.basePipelineIndex = -1; // Optional
 
-		if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
+		if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create graphics pipeline!");
 		}
@@ -562,31 +552,27 @@ namespace Kerberos
 
 	void VulkanContext::CreateFramebuffers()
 	{
-		const auto& context = VulkanContext::Get();
-		const auto& swapChainImageViews = context.GetSwapChainImageViews();
-		const VkExtent2D swapChainExtent = context.GetSwapChainExtent();
+		m_SwapChainFramebuffers.resize(m_SwapChainImageViews.size());
 
-		m_SwapChainFramebuffers.resize(swapChainImageViews.size());
-
-		for (size_t i = 0; i < swapChainImageViews.size(); ++i)
+		for (size_t i = 0; i < m_SwapChainImageViews.size(); ++i)
 		{
 			VkImageView attachments[] = {
-				swapChainImageViews[i]
+				m_SwapChainImageViews[i]
 			};
 
 			VkFramebufferCreateInfo framebufferInfo{
 				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+				.pNext = nullptr,
+				.flags = 0,
 				.renderPass = m_RenderPass,
 				.attachmentCount = 1,
 				.pAttachments = attachments,
-				.width = swapChainExtent.width,
-				.height = swapChainExtent.height,
-				.layers = 1
+				.width = m_SwapChainExtent.width,
+				.height = m_SwapChainExtent.height,
+				.layers = 1,
 			};
 
-			const auto device = VulkanContext::Get().GetDevice();
-
-			if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]) != VK_SUCCESS)
+			if (vkCreateFramebuffer(m_Device, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("failed to create framebuffer!");
 			}
@@ -595,8 +581,7 @@ namespace Kerberos
 
 	void VulkanContext::CreateCommandPool()
 	{
-		const auto& context = VulkanContext::Get();
-		const auto [graphicsFamily, presentFamily] = context.FindQueueFamilies();
+		const auto [graphicsFamily, presentFamily] = FindQueueFamilies(m_PhysicalDevice);
 
 		if (!graphicsFamily.has_value())
 		{
@@ -610,9 +595,7 @@ namespace Kerberos
 			.queueFamilyIndex = graphicsFamily.value(),
 		};
 
-		const auto device = VulkanContext::Get().GetDevice();
-
-		if (vkCreateCommandPool(device, &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS)
+		if (vkCreateCommandPool(m_Device, &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create command pool!");
 		}
@@ -628,9 +611,7 @@ namespace Kerberos
 			.commandBufferCount = 1,
 		};
 
-		const auto device = VulkanContext::Get().GetDevice();
-
-		if (const VkResult result = vkAllocateCommandBuffers(device, &allocInfo, &m_CommandBuffer); result != VK_SUCCESS)
+		if (const VkResult result = vkAllocateCommandBuffers(m_Device, &allocInfo, &m_CommandBuffer); result != VK_SUCCESS)
 		{
 			KBR_ASSERT(false, "Failed to allocate command buffers! Result: {0}", VulkanHelpers::VkResultToString(result))
 		}

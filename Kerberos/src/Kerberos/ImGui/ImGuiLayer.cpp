@@ -76,24 +76,26 @@ namespace Kerberos
 		else if (Renderer::GetAPI() == RendererAPI::API::Vulkan)
 		{
 			ImGui_ImplGlfw_InitForVulkan(window, true);
-			ImGui_ImplVulkan_InitInfo init_info = {};
-			init_info.Instance = VulkanContext::Get().GetInstance();
-			init_info.PhysicalDevice = VulkanContext::Get().GetPhysicalDevice();
-			init_info.Device = VulkanContext::Get().GetDevice();
-			init_info.QueueFamily = VulkanContext::Get().GetGraphicsQueueFamilyIndex();
-			init_info.Queue = VulkanContext::Get().GetGraphicsQueue();
-			init_info.PipelineCache = VK_NULL_HANDLE;
-			init_info.DescriptorPool = nullptr;
-			init_info.DescriptorPoolSize = 1;
-			//init_info.DescriptorPool = VulkanContext::Get().GetDescriptorPool();
-			init_info.Subpass = 0; // Subpass index for the ImGui render pass
-			init_info.MinImageCount = 2;
-			init_info.ImageCount = static_cast<uint32_t>(VulkanContext::Get().GetSwapChainImages().size());
-			init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT; // Use 1 sample for MSAA
-			init_info.Allocator = nullptr; // Use default allocator
-			init_info.CheckVkResultFn = nullptr; // Use default error checking function
 
-			ImGui_ImplVulkan_Init(&init_info);
+			ImGui_ImplVulkan_InitInfo initInfo = {};
+			initInfo.Instance = VulkanContext::Get().GetInstance();
+			initInfo.PhysicalDevice = VulkanContext::Get().GetPhysicalDevice();
+			initInfo.Device = VulkanContext::Get().GetDevice();
+			initInfo.QueueFamily = VulkanContext::Get().GetGraphicsQueueFamilyIndex();
+			initInfo.Queue = VulkanContext::Get().GetGraphicsQueue();
+			initInfo.RenderPass = VulkanContext::Get().GetRenderPass();
+			initInfo.PipelineCache = VK_NULL_HANDLE;
+			initInfo.DescriptorPool = nullptr;
+			initInfo.DescriptorPoolSize = 2;
+			//init_info.DescriptorPool = VulkanContext::Get().GetDescriptorPool();
+			initInfo.Subpass = 0; // Subpass index for the ImGui render pass
+			initInfo.MinImageCount = 2;
+			initInfo.ImageCount = static_cast<uint32_t>(VulkanContext::Get().GetSwapChainImages().size());
+			initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT; // Use 1 sample for MSAA
+			initInfo.Allocator = nullptr; // Use default allocator
+			initInfo.CheckVkResultFn = nullptr; // Use default error checking function
+
+			ImGui_ImplVulkan_Init(&initInfo);
 		}
 	}
 
