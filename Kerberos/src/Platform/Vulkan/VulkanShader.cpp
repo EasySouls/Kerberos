@@ -9,6 +9,7 @@
 #include <spirv_cross/spirv_glsl.hpp>
 
 #include "VulkanContext.h"
+#include "Kerberos/Core/Timer.h"
 
 namespace Kerberos
 {
@@ -65,6 +66,50 @@ namespace Kerberos
 			KBR_CORE_ASSERT(false, "Unknown or unsupported shader stage");
 			return "";
 		}
+
+		static VkFormat GetVulkanFormat(const spirv_cross::SPIRType& type) {
+			if (type.basetype == spirv_cross::SPIRType::Float) {
+				if (type.vecsize == 1 && type.width == 32) return VK_FORMAT_R32_SFLOAT;
+				if (type.vecsize == 2 && type.width == 32) return VK_FORMAT_R32G32_SFLOAT;
+				if (type.vecsize == 3 && type.width == 32) return VK_FORMAT_R32G32B32_SFLOAT;
+				if (type.vecsize == 4 && type.width == 32) return VK_FORMAT_R32G32B32A32_SFLOAT;
+			}
+			if (type.basetype == spirv_cross::SPIRType::Int) {
+				if (type.vecsize == 1 && type.width == 32) return VK_FORMAT_R32_SINT;
+				if (type.vecsize == 2 && type.width == 32) return VK_FORMAT_R32G32_SINT;
+				if (type.vecsize == 3 && type.width == 32) return VK_FORMAT_R32G32B32_SINT;
+				if (type.vecsize == 4 && type.width == 32) return VK_FORMAT_R32G32B32A32_SINT;
+			}
+			if (type.basetype == spirv_cross::SPIRType::UInt) {
+				if (type.vecsize == 1 && type.width == 32) return VK_FORMAT_R32_UINT;
+				if (type.vecsize == 2 && type.width == 32) return VK_FORMAT_R32G32_UINT;
+				if (type.vecsize == 3 && type.width == 32) return VK_FORMAT_R32G32B32_UINT;
+				if (type.vecsize == 4 && type.width == 32) return VK_FORMAT_R32G32B32A32_UINT;
+			}
+
+			KBR_CORE_ERROR("Failed to determine VkFormat for SPIR-V type. BaseType: {0}, VecSize: {1}, Width: {2}",
+				static_cast<int>(type.basetype), type.vecsize, type.width);
+			return VK_FORMAT_UNDEFINED;
+		}
+
+		static uint32_t GetFormatSize(const VkFormat format) {
+			switch (format) {
+			case VK_FORMAT_R32_SFLOAT:          return 4;
+			case VK_FORMAT_R32G32_SFLOAT:       return 8;
+			case VK_FORMAT_R32G32B32_SFLOAT:    return 12;
+			case VK_FORMAT_R32G32B32A32_SFLOAT: return 16;
+			case VK_FORMAT_R32_SINT:            return 4;
+			case VK_FORMAT_R32G32_SINT:         return 8;
+			case VK_FORMAT_R32G32B32_SINT:      return 12;
+			case VK_FORMAT_R32G32B32A32_SINT:   return 16;
+			case VK_FORMAT_R32_UINT:            return 4;
+			case VK_FORMAT_R32G32_UINT:         return 8;
+			case VK_FORMAT_R32G32B32_UINT:      return 12;
+			case VK_FORMAT_R32G32B32A32_UINT:   return 16;
+
+			default: KBR_CORE_ERROR("Unknown VkFormat for size calculation: {0}", static_cast<int>(format)); return 0;
+			}
+		}
 	}
 
 	VulkanShader::VulkanShader(const std::string& filepath)
@@ -72,13 +117,28 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
+		/// I haven't converted the other shaders to be Vulkan compatible yet,
+		/// and i don't want to modify the source code of the Editor
+		if (filepath != "assets/shaders/shader3d-vulkan.glsl")
+			return;
+
 		Utils::CreateCacheDirectoryIfNeeded();
 
 		const std::string source = ReadShaderFile(filepath);
 		const auto shaderSources = SplitShaderSource(source);
 
 		{
-			// TODO: Time shader compilation and caching
+			struct ProfileResult
+			{
+				const char* Name;
+				float Time;
+			};
+
+			Timer timer("VulkanShader - Shader compilation", [&](const ProfileResult& res)
+			{
+					KBR_CORE_TRACE("Shader compilation took {0} ms", res.Time);
+			});
+
 			CompileOrGetVulkanBinaries(shaderSources);
 			CreateShaderModules();
 			ReflectAllStages();
@@ -129,6 +189,9 @@ namespace Kerberos
 			}
 		}
 		m_DescriptorSetLayouts.clear();
+
+		m_VertexInputAttributeDescriptions.clear();
+		m_VertexInputBindingDescriptions.clear();
 	}
 
 	void VulkanShader::Bind() const
@@ -251,7 +314,7 @@ namespace Kerberos
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
 			if (in.is_open()) {
 				/// The file exists, read the SPIR-V binary from cache
-				
+
 				in.seekg(0, std::ios::end);
 				auto size = in.tellg();
 				in.seekg(0, std::ios::beg);
@@ -339,7 +402,7 @@ namespace Kerberos
 
 		KBR_CORE_TRACE("Shader reflection for {0}", m_Filepath.empty() ? m_Name : m_Filepath);
 
-		for (auto const & [stage, spirvCode] : m_VulkanSPIRV)
+		for (auto const& [stage, spirvCode] : m_VulkanSPIRV)
 		{
 			if (!spirvCode.empty())
 			{
@@ -451,8 +514,6 @@ namespace Kerberos
 			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 			uint32_t descriptorCount = 1;
 
-			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}", resource.name, set, binding);
-			
 			// Check if it's an array of textures (e.g., `sampler2D textures[4]`)
 			const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
 			if (!type.array.empty()) {
@@ -570,7 +631,7 @@ namespace Kerberos
 				if (existingRange.offset == 0 && existingRange.size == size) {
 					existingRange.stageFlags |= stage; // Merge stage flags
 					found = true;
-					KBR_CORE_TRACE("      Merged Push Constant Range: Name: {0}}", resource.name);
+					//KBR_CORE_TRACE("      Merged Push Constant Range: Name: {0}}", resource.name);
 					break;
 				}
 			}
@@ -582,6 +643,73 @@ namespace Kerberos
 				pushConstantRange.size = static_cast<uint32_t>(size);
 				m_PushConstantRanges.push_back(pushConstantRange);
 			}
+		}
+
+		/// Vertex Input Attributes
+		if (stage == VK_SHADER_STAGE_VERTEX_BIT)
+		{
+			KBR_CORE_TRACE("    Vertex Input Attributes: {0}", resources.stage_inputs.size());
+
+			m_VertexInputAttributeDescriptions.clear();
+			m_VertexInputBindingDescriptions.clear();
+
+			/// Temporary struct to hold reflection data and sort it by location
+			struct VertexAttributeTemp {
+				spirv_cross::Resource resource;
+				uint32_t location;
+				VkFormat format;
+				uint32_t size;
+			};
+			std::vector<VertexAttributeTemp> tempAttributes;
+
+			for (const auto& resource : resources.stage_inputs) {
+				const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+				uint32_t location = compiler.get_decoration(resource.id, spv::DecorationLocation);
+				VkFormat format = Utils::GetVulkanFormat(type);
+				uint32_t size = Utils::GetFormatSize(format);
+
+				if (format == VK_FORMAT_UNDEFINED || size == 0) {
+					KBR_CORE_ERROR("Vulkan Shader: Failed to get format or size for vertex attribute '{0}' at location {1}", resource.name, location);
+					continue;
+				}
+
+				tempAttributes.push_back({ resource, location, format, size });
+			}
+
+			/// Sort attributes by location to ensure correct offset calculation for interleaved data
+			std::ranges::sort(tempAttributes,
+			                  [](const VertexAttributeTemp& a, const VertexAttributeTemp& b) {
+				                  return a.location < b.location;
+			                  });
+
+			uint32_t currentOffset = 0;
+			uint32_t currentBinding = 0;
+			uint32_t totalStride = 0;
+
+			for (const auto& attr : tempAttributes)
+			{
+				VkVertexInputAttributeDescription attributeDesc{};
+				attributeDesc.binding = currentBinding;
+				attributeDesc.location = attr.location;
+				attributeDesc.format = attr.format;
+				attributeDesc.offset = currentOffset;
+
+				m_VertexInputAttributeDescriptions.push_back(attributeDesc);
+
+				currentOffset += attr.size;
+				totalStride += attr.size;
+
+				KBR_CORE_TRACE("      Input: {0}, Location: {1}, Format: {2}, Offset: {3}, Size: {4}", attr.resource.name, attr.location, static_cast<int>(attr.format), currentOffset, attr.size);
+			}
+
+			VkVertexInputBindingDescription bindingDesc{};
+			bindingDesc.binding = currentBinding;
+			bindingDesc.stride = totalStride;
+			bindingDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+			m_VertexInputBindingDescriptions.push_back(bindingDesc);
+
+			KBR_CORE_TRACE("    Vertex Binding Description: Binding: {0}, Stride: {1}, InputRate: {2}", bindingDesc.binding, bindingDesc.stride, static_cast<int>(bindingDesc.inputRate));
 		}
 	}
 }

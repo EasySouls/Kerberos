@@ -32,6 +32,8 @@ namespace Kerberos
 		std::unordered_map<VkShaderStageFlagBits, VkPipelineShaderStageCreateInfo>& GetPipelineShaderStageCreateInfos() { return m_PipelineShaderStageCreateInfos; }
 		const std::vector<VkDescriptorSetLayout>& GetDescriptorSetLayouts() const { return m_DescriptorSetLayouts; }
 		const std::vector<VkPushConstantRange>& GetPushConstantRanges() const { return m_PushConstantRanges; }
+		const std::vector<VkVertexInputBindingDescription>& GetVertexInputBindingDescriptions() const { return m_VertexInputBindingDescriptions; }
+		const std::vector<VkVertexInputAttributeDescription>& GetVertexInputAttributeDescriptions() const { return m_VertexInputAttributeDescriptions; }
 
 	private:
 		static std::string ReadShaderFile(const std::string& filename);
@@ -58,5 +60,8 @@ namespace Kerberos
 		std::map<uint32_t, std::map<uint32_t, VkDescriptorSetLayoutBinding>> m_DescriptorSetLayoutsInfo;
 		std::vector<VkDescriptorSetLayout> m_DescriptorSetLayouts;
 		std::vector<VkPushConstantRange> m_PushConstantRanges;
+
+		std::vector<VkVertexInputBindingDescription> m_VertexInputBindingDescriptions;
+		std::vector<VkVertexInputAttributeDescription> m_VertexInputAttributeDescriptions;
 	};
 }

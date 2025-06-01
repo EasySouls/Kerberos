@@ -215,6 +215,9 @@ namespace Kerberos
 			throw std::runtime_error("Queue family indices are not complete!");
 		}
 
+		m_GraphicsQueueFamilyIndex = graphicsFamily.value();
+		m_PresentQueueFamilyIndex = presentFamily.value();
+
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 		std::set<uint32_t> uniqueQueueFamilies = { graphicsFamily.value(), presentFamily.value() };
 

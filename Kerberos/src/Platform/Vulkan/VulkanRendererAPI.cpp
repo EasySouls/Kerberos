@@ -51,6 +51,13 @@ namespace Kerberos
 	{
 		// TODO: I am really not sure about this
 
+		VkCommandBufferBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+		beginInfo.pNext = nullptr;
+
+		vkBeginCommandBuffer(m_CommandBuffer, &beginInfo);
+
 		VkClearValue clearValue;
 		clearValue.color = { { color.r, color.g, color.b, color.a } };
 
@@ -60,6 +67,8 @@ namespace Kerberos
 		// Specify the clear values for attachments
 		renderPassBeginInfo.pClearValues = &clearValue;
 		renderPassBeginInfo.clearValueCount = 1; // If you have multiple attachments
+		renderPassBeginInfo.renderPass = m_RenderPass;
+		renderPassBeginInfo.framebuffer = m_SwapChainFramebuffers[0]; // Use the first framebuffer for now
 
 		vkCmdBeginRenderPass(m_CommandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -70,14 +79,38 @@ namespace Kerberos
 		imageSubresourceRange.baseArrayLayer = 0;
 		imageSubresourceRange.layerCount = 1;
 
-		vkCmdClearColorImage(
-			m_CommandBuffer,
-			m_Image,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, // Example layout
-			&clearValue.color,
-			1,
-			&imageSubresourceRange
-		);
+		const std::vector<VkImage>& swapChainImages = VulkanContext::Get().GetSwapChainImages();
+		for (const auto& image : swapChainImages)
+		{
+			// Transition the image layout to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL before clearing
+			VkImageMemoryBarrier barrier = {};
+			barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			barrier.srcAccessMask = 0; // No access mask needed for clearing
+			barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			barrier.image = image;
+			barrier.subresourceRange = imageSubresourceRange;
+			vkCmdPipelineBarrier(
+				m_CommandBuffer,
+				VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+				VK_PIPELINE_STAGE_TRANSFER_BIT,
+				0, // No flags
+				0, nullptr, // No memory barriers
+				0, nullptr, // No buffer barriers
+				1, &barrier // Image barrier
+			);
+
+			vkCmdClearColorImage(
+				m_CommandBuffer,
+				image,
+				VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, // Example layout
+				&clearValue.color,
+				1,
+				&imageSubresourceRange
+			);
+		}
+		
 	}
 
 	void VulkanRendererAPI::Clear()
@@ -231,7 +264,8 @@ namespace Kerberos
 		VulkanShader basic3DShader("assets/shaders/shader3d-vulkan.glsl");
 		const auto& createShaderStages = basic3DShader.GetPipelineShaderStageCreateInfos();
 
-		// TODO: Load shaders before creating the pipeline
+		// TODO: Somehow we should check all the used shaders and their stages before creating the pipeline
+
 		VkPipelineShaderStageCreateInfo shaderStages[2] = {};
 		shaderStages[0] = createShaderStages.at(VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1] = createShaderStages.at(VK_SHADER_STAGE_FRAGMENT_BIT);
@@ -246,13 +280,15 @@ namespace Kerberos
 		dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
 		dynamicState.pDynamicStates = dynamicStateEnables.data();
 
-		// TODO: Change this later, this assumes that vertex data is hardcoded into the shader
+		const std::vector<VkVertexInputBindingDescription>& bindingDescriptions = basic3DShader.GetVertexInputBindingDescriptions();
+		const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions = basic3DShader.GetVertexInputAttributeDescriptions();
+
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputInfo.vertexBindingDescriptionCount = 0;
-		vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-		vertexInputInfo.vertexAttributeDescriptionCount = 0;
-		vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+		vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

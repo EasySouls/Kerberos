@@ -29,6 +29,7 @@ namespace Kerberos
 
 		QueueFamilyIndices FindQueueFamilies() const;
 
+		VkInstance GetInstance() const { return m_Instance; }
 		VkSurfaceKHR GetSurface() const { return m_Surface; }
 		VkDevice GetDevice() const { return m_Device; }
 		VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
@@ -36,6 +37,10 @@ namespace Kerberos
 		VkExtent2D GetSwapChainExtent() const { return m_SwapChainExtent; }
 		const std::vector<VkImage>& GetSwapChainImages() const { return m_SwapChainImages; }
 		const std::vector<VkImageView>& GetSwapChainImageViews() const { return m_SwapChainImageViews; }
+		VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
+		VkQueue GetPresentQueue() const { return m_PresentQueue; }
+		uint32_t GetGraphicsQueueFamilyIndex() const { return m_GraphicsQueueFamilyIndex; }
+		uint32_t GetPresentQueueFamilyIndex() const { return m_PresentQueueFamilyIndex; }
 
 		static VulkanContext& Get() { return *s_Instance; }
 
@@ -75,6 +80,8 @@ namespace Kerberos
 
 		VkQueue m_GraphicsQueue = VK_NULL_HANDLE;
 		VkQueue m_PresentQueue = VK_NULL_HANDLE;
+		uint32_t m_GraphicsQueueFamilyIndex = UINT32_MAX;
+		uint32_t m_PresentQueueFamilyIndex = UINT32_MAX;
 
 		VkSwapchainKHR m_SwapChain = VK_NULL_HANDLE;
 		std::vector<VkImage> m_SwapChainImages;
