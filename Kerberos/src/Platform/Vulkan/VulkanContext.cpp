@@ -155,7 +155,10 @@ namespace Kerberos
 		presentInfo.pSwapchains = swapChains;
 		presentInfo.pImageIndices = &imageIndex;
 
-		vkQueuePresentKHR(m_PresentQueue, &presentInfo);
+		if (const VkResult result = vkQueuePresentKHR(m_PresentQueue, &presentInfo); result != VK_SUCCESS)
+		{
+			KBR_CORE_ERROR("Failed to present swapchain image! Result: {0}", VulkanHelpers::VkResultToString(result));
+		}
 
 		m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 	}
@@ -236,7 +239,7 @@ namespace Kerberos
 		constexpr VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-		vkCmdDraw(commandBuffer, 8, 1, 0, 0);
+		vkCmdDraw(commandBuffer, 32, 1, 0, 0);
 
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 
@@ -290,8 +293,8 @@ namespace Kerberos
 
 		if (const VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance); result != VK_SUCCESS)
 		{
-			KBR_CORE_ASSERT(false, "Failed to create instance! Result: {0}", VulkanHelpers::VkResultToString(result))
-				throw std::runtime_error("failed to create instance!");
+			KBR_CORE_ASSERT(false, "Failed to create instance! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to create instance!");
 		}
 	}
 
@@ -312,8 +315,8 @@ namespace Kerberos
 	{
 		if (const VkResult result = glfwCreateWindowSurface(m_Instance, m_WindowHandle, nullptr, &m_Surface); result != VK_SUCCESS)
 		{
-			KBR_CORE_ASSERT(false, "Failed to create window surface! Result: {0}", VulkanHelpers::VkResultToString(result))
-				throw std::runtime_error("failed to create window surface!");
+			KBR_CORE_ASSERT(false, "Failed to create window surface! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to create window surface!");
 		}
 	}
 
@@ -428,8 +431,8 @@ namespace Kerberos
 
 		if (const VkResult result = vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device); result != VK_SUCCESS)
 		{
-			KBR_CORE_ASSERT(false, "Failed to create logical device! Result: {0}", VulkanHelpers::VkResultToString(result))
-				throw std::runtime_error("failed to create logical device!");
+			KBR_CORE_ASSERT(false, "Failed to create logical device! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to create logical device!");
 		}
 
 		vkGetDeviceQueue(m_Device, graphicsFamily.value(), 0, &m_GraphicsQueue);
@@ -488,7 +491,8 @@ namespace Kerberos
 
 		if (const VkResult result = vkCreateSwapchainKHR(m_Device, &createInfo, nullptr, &m_SwapChain); result != VK_SUCCESS)
 		{
-			KBR_CORE_ASSERT(false, "Failed to create swapchain! Result: {0}", VulkanHelpers::VkResultToString(result))
+			KBR_CORE_ASSERT(false, "Failed to create swapchain! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to create swapchain!");
 		}
 
 		vkGetSwapchainImagesKHR(m_Device, m_SwapChain, &imageCount, nullptr);
@@ -524,7 +528,8 @@ namespace Kerberos
 
 			if (const VkResult result = vkCreateImageView(m_Device, &createInfo, nullptr, &m_SwapChainImageViews[i]); result != VK_SUCCESS)
 			{
-				KBR_CORE_ASSERT(false, "Failed to create image views! Result: {0}", VulkanHelpers::VkResultToString(result))
+				KBR_CORE_ASSERT(false, "Failed to create image views! Result: {0}", VulkanHelpers::VkResultToString(result));
+				throw std::runtime_error("failed to create image views!");
 			}
 		}
 	}
@@ -570,7 +575,8 @@ namespace Kerberos
 
 		if (const VkResult result = vkCreateRenderPass(m_Device, &renderPassInfo, nullptr, &m_RenderPass); result != VK_SUCCESS)
 		{
-			KBR_CORE_ASSERT(false, "Failed to create render pass! Result: {0}", VulkanHelpers::VkResultToString(result))
+			KBR_CORE_ASSERT(false, "Failed to create render pass! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to create render pass!");
 		}
 	}
 
@@ -687,7 +693,8 @@ namespace Kerberos
 
 		if (const VkResult result = vkCreatePipelineLayout(m_Device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout); result != VK_SUCCESS)
 		{
-			KBR_CORE_ASSERT(false, "Failed to create pipeline layout! Result: {0}", VulkanHelpers::VkResultToString(result))
+			KBR_CORE_ASSERT(false, "Failed to create pipeline layout! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to create pipeline layout!");
 		}
 
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -713,7 +720,8 @@ namespace Kerberos
 
 		if (const VkResult result = vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline); result != VK_SUCCESS)
 		{
-			KBR_CORE_ASSERT(false, "Failed to create graphics pipeline! Result: {0}", VulkanHelpers::VkResultToString(result))
+			KBR_CORE_ASSERT(false, "Failed to create graphics pipeline! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to create graphics pipeline!");
 		}
 	}
 
@@ -783,7 +791,7 @@ namespace Kerberos
 		};
 		constexpr uint32_t cubeVerticesSize = std::size(cubeVertices);
 
-		m_VertexBuffer = new VulkanVertexBuffer(cubeVertices, cubeVerticesSize);
+		m_VertexBuffer = CreateScope<VulkanVertexBuffer>(cubeVertices, cubeVerticesSize);
 	}
 
 	void VulkanContext::CreateFramebuffers()
@@ -810,7 +818,8 @@ namespace Kerberos
 
 			if (const VkResult result = vkCreateFramebuffer(m_Device, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]); result != VK_SUCCESS)
 			{
-				KBR_CORE_ASSERT(false, "Failed to create framebuffer! Result: {0}", VulkanHelpers::VkResultToString(result))
+				KBR_CORE_ASSERT(false, "Failed to create framebuffer! Result: {0}", VulkanHelpers::VkResultToString(result));
+				throw std::runtime_error("failed to create framebuffer!");
 			}
 		}
 	}
@@ -833,7 +842,8 @@ namespace Kerberos
 
 		if (const VkResult result = vkCreateCommandPool(m_Device, &poolInfo, nullptr, &m_CommandPool); result != VK_SUCCESS)
 		{
-			KBR_CORE_ASSERT(false, "Failed to create command pool! Result: {0}", VulkanHelpers::VkResultToString(result))
+			KBR_CORE_ASSERT(false, "Failed to create command pool! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to create command pool!");
 		}
 	}
 
@@ -851,7 +861,8 @@ namespace Kerberos
 
 		if (const VkResult result = vkAllocateCommandBuffers(m_Device, &allocInfo, m_CommandBuffers.data()); result != VK_SUCCESS)
 		{
-			KBR_CORE_ASSERT(false, "Failed to allocate command buffers! Result: {0}", VulkanHelpers::VkResultToString(result))
+			KBR_CORE_ASSERT(false, "Failed to allocate command buffers! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to allocate command buffers!");
 		}
 	}
 
@@ -876,6 +887,7 @@ namespace Kerberos
 			if (vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore[i]) != VK_SUCCESS ||
 				vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore[i]) != VK_SUCCESS ||
 				vkCreateFence(m_Device, &fenceInfo, nullptr, &m_InFlightFence[i]) != VK_SUCCESS) {
+				KBR_CORE_ASSERT(false, "Failed to create semaphores or fences!");
 				throw std::runtime_error("failed to create semaphores or fences!");
 			}
 		}

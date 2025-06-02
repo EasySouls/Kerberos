@@ -123,7 +123,7 @@ namespace Kerberos
 
 		uint32_t m_CurrentFrame = 0;
 
-		VulkanVertexBuffer* m_VertexBuffer;
+		Scope<VulkanVertexBuffer> m_VertexBuffer;
 
 		static VulkanContext* s_Instance;
 	};
