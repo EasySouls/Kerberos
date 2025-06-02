@@ -7,6 +7,7 @@
 #include <backends/imgui_impl_vulkan.h>
 
 #include "imgui.h"
+#include "VulkanBuffer.h"
 #include "VulkanShader.h"
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
@@ -126,7 +127,7 @@ namespace Kerberos
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		const VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphore[m_CurrentFrame]};
+		const VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphore[m_CurrentFrame] };
 		constexpr VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
@@ -135,7 +136,7 @@ namespace Kerberos
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &m_CommandBuffers[m_CurrentFrame];
 
-		const VkSemaphore signalSemaphores[] = { m_RenderFinishedSemaphore[m_CurrentFrame]};
+		const VkSemaphore signalSemaphores[] = { m_RenderFinishedSemaphore[m_CurrentFrame] };
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
@@ -231,7 +232,77 @@ namespace Kerberos
 		scissor.extent = m_SwapChainExtent;
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-		vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+		const float cubeVertices[] = {
+			// Face 1: +X (Right)
+			// Position           Normal             TexCoord
+			// Triangle 1
+			1.0f, -1.0f, -1.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f, // Bottom-left
+			1.0f, -1.0f,  1.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f, // Bottom-right
+			1.0f,  1.0f,  1.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // Top-right
+			// Triangle 2
+			1.0f, -1.0f, -1.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f, // Bottom-left
+			1.0f,  1.0f,  1.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // Top-right
+			1.0f,  1.0f, -1.0f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f, // Top-left
+
+			// Face 2: -X (Left)
+			// Triangle 1
+			-1.0f, -1.0f,  1.0f,  -1.0f, 0.0f, 0.0f,   0.0f, 0.0f, // Bottom-left
+			-1.0f, -1.0f, -1.0f,  -1.0f, 0.0f, 0.0f,   1.0f, 0.0f, // Bottom-right
+			-1.0f,  1.0f, -1.0f,  -1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // Top-right
+			// Triangle 2
+			-1.0f, -1.0f,  1.0f,  -1.0f, 0.0f, 0.0f,   0.0f, 0.0f, // Bottom-left
+			-1.0f,  1.0f, -1.0f,  -1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // Top-right
+			-1.0f,  1.0f,  1.0f,  -1.0f, 0.0f, 0.0f,   0.0f, 1.0f, // Top-left
+
+			// Face 3: +Y (Top)
+			// Triangle 1
+			-1.0f,  1.0f, -1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f, // Bottom-left
+			-1.0f,  1.0f,  1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // Bottom-right
+			 1.0f,  1.0f,  1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f, // Top-right
+			 // Triangle 2
+			 -1.0f,  1.0f, -1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f, // Bottom-left
+			  1.0f,  1.0f,  1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f, // Top-right
+			  1.0f,  1.0f, -1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f, // Top-left
+
+			  // Face 4: -Y (Bottom)
+			  // Triangle 1
+			  -1.0f, -1.0f,  1.0f,   0.0f, -1.0f, 0.0f,   0.0f, 0.0f, // Bottom-left
+			  -1.0f, -1.0f, -1.0f,   0.0f, -1.0f, 0.0f,   1.0f, 0.0f, // Bottom-right
+			   1.0f, -1.0f, -1.0f,   0.0f, -1.0f, 0.0f,   1.0f, 1.0f, // Top-right
+			   // Triangle 2
+			   -1.0f, -1.0f,  1.0f,   0.0f, -1.0f, 0.0f,   0.0f, 0.0f, // Bottom-left
+				1.0f, -1.0f, -1.0f,   0.0f, -1.0f, 0.0f,   1.0f, 1.0f, // Top-right
+				1.0f, -1.0f,  1.0f,   0.0f, -1.0f, 0.0f,   0.0f, 1.0f, // Top-left
+
+				// Face 5: +Z (Front)
+				// Triangle 1
+				-1.0f, -1.0f,  1.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // Bottom-left
+				 1.0f, -1.0f,  1.0f,   0.0f, 0.0f, 1.0f,   1.0f, 0.0f, // Bottom-right
+				 1.0f,  1.0f,  1.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f, // Top-right
+				 // Triangle 2
+				 -1.0f, -1.0f,  1.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // Bottom-left
+				  1.0f,  1.0f,  1.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f, // Top-right
+				 -1.0f,  1.0f,  1.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f, // Top-left
+
+				 // Face 6: -Z (Back)
+				 // Triangle 1
+				  1.0f, -1.0f, -1.0f,   0.0f, 0.0f, -1.0f,   0.0f, 0.0f, // Bottom-left
+				 -1.0f, -1.0f, -1.0f,   0.0f, 0.0f, -1.0f,   1.0f, 0.0f, // Bottom-right
+				 -1.0f,  1.0f, -1.0f,   0.0f, 0.0f, -1.0f,   1.0f, 1.0f, // Top-right
+				 // Triangle 2
+				  1.0f, -1.0f, -1.0f,   0.0f, 0.0f, -1.0f,   0.0f, 0.0f, // Bottom-left
+				 -1.0f,  1.0f, -1.0f,   0.0f, 0.0f, -1.0f,   1.0f, 1.0f, // Top-right
+				  1.0f,  1.0f, -1.0f,   0.0f, 0.0f, -1.0f,   0.0f, 1.0f  // Top-left
+		};
+		constexpr uint32_t cubeVerticesSize = std::size(cubeVertices);
+
+		const VulkanVertexBuffer vertexBuffer(cubeVertices, cubeVerticesSize);
+
+		const VkBuffer vertexBuffers[] = { vertexBuffer.GetVkBuffer() };
+		constexpr VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+		vkCmdDraw(commandBuffer, 8, 1, 0, 0);
 
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 
