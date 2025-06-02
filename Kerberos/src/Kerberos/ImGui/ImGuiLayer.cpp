@@ -85,9 +85,9 @@ namespace Kerberos
 			initInfo.Queue = VulkanContext::Get().GetGraphicsQueue();
 			initInfo.RenderPass = VulkanContext::Get().GetRenderPass();
 			initInfo.PipelineCache = VK_NULL_HANDLE;
-			initInfo.DescriptorPool = nullptr;
-			initInfo.DescriptorPoolSize = 2;
-			//init_info.DescriptorPool = VulkanContext::Get().GetDescriptorPool();
+			//initInfo.DescriptorPool = nullptr;
+			//initInfo.DescriptorPoolSize = 2;
+			initInfo.DescriptorPool = VulkanContext::Get().GetImGuiDescriptorPool();
 			initInfo.Subpass = 0; // Subpass index for the ImGui render pass
 			initInfo.MinImageCount = 2;
 			initInfo.ImageCount = static_cast<uint32_t>(VulkanContext::Get().GetSwapChainImages().size());
@@ -180,7 +180,10 @@ namespace Kerberos
 		}
 		else if (Renderer::GetAPI() == RendererAPI::API::Vulkan)
 		{
-			ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), VulkanContext::Get().GetCommandBuffer());
+			/// For Vulkan, the rendering is done inside VulkanContext::RecordCommandBuffer
+			/// Later the structure of the command might have to be rethought to better support D3D12 and Vulkan
+			const uint32_t currentFrame = VulkanContext::Get().GetCurrentFrameIndex();
+			/*ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), VulkanContext::Get().GetCommandBuffers()[currentFrame]);*/
 		}
 
 		// Update and Render additional Platform Windows

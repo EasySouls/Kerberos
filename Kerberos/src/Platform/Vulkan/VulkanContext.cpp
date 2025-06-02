@@ -4,16 +4,20 @@
 #include "Kerberos/Core.h"
 
 #include <cstring>
+#include <backends/imgui_impl_vulkan.h>
 
+#include "imgui.h"
 #include "VulkanShader.h"
 
+constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
 };
 
 const std::vector<const char*> deviceExtensions = {
-	VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+
 };
 
 #ifdef KBR_DEBUG
@@ -42,7 +46,7 @@ namespace Kerberos
 	{
 		KBR_CORE_ASSERT(m_WindowHandle, "Window handle is null!")
 
-		KBR_CORE_ASSERT(!s_Instance, "VulkanContext already exists!");
+			KBR_CORE_ASSERT(!s_Instance, "VulkanContext already exists!");
 		s_Instance = this;
 	}
 
@@ -50,9 +54,12 @@ namespace Kerberos
 	{
 		vkDeviceWaitIdle(m_Device);
 
-		vkDestroySemaphore(m_Device, m_ImageAvailableSemaphore, nullptr);
-		vkDestroySemaphore(m_Device, m_RenderFinishedSemaphore, nullptr);
-		vkDestroyFence(m_Device, m_InFlightFence, nullptr);
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+		{
+			vkDestroySemaphore(m_Device, m_ImageAvailableSemaphore[i], nullptr);
+			vkDestroySemaphore(m_Device, m_RenderFinishedSemaphore[i], nullptr);
+			vkDestroyFence(m_Device, m_InFlightFence[i], nullptr);
+		}
 
 		vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
 
@@ -94,44 +101,45 @@ namespace Kerberos
 		CreateGraphicsPipeline();
 		CreateFramebuffers();
 		CreateCommandPool();
-		CreateCommandBuffer();
+		CreateCommandBuffers();
 		CreateSyncObjects();
+		CreateImGuiDescriptorPool();
 	}
 
 	void VulkanContext::SwapBuffers()
 	{
 		/// Wait for the fence to be signaled, then reset it
-		vkWaitForFences(m_Device, 1, &m_InFlightFence, VK_TRUE, UINT64_MAX);
-		vkResetFences(m_Device, 1, &m_InFlightFence);
+		vkWaitForFences(m_Device, 1, &m_InFlightFence[m_CurrentFrame], VK_TRUE, UINT64_MAX);
+		vkResetFences(m_Device, 1, &m_InFlightFence[m_CurrentFrame]);
 
 		uint32_t imageIndex;
-		if (const VkResult result = vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex); result != VK_SUCCESS)
+		if (const VkResult result = vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphore[m_CurrentFrame], VK_NULL_HANDLE, &imageIndex); result != VK_SUCCESS)
 		{
 			KBR_CORE_ASSERT(false, "Failed to acquire swapchain image! Result: {0}", VulkanHelpers::VkResultToString(result));
 			throw std::runtime_error("failed to acquire swap chain image!");
 		}
 
-		vkResetCommandBuffer(m_CommandBuffer, 0);
+		vkResetCommandBuffer(m_CommandBuffers[m_CurrentFrame], 0);
 
-		RecordCommandBuffer(m_CommandBuffer, imageIndex);
+		RecordCommandBuffer(m_CommandBuffers[m_CurrentFrame], imageIndex);
 
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		const VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphore };
+		const VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphore[m_CurrentFrame]};
 		constexpr VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
 		submitInfo.pWaitDstStageMask = waitStages;
 
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &m_CommandBuffer;
+		submitInfo.pCommandBuffers = &m_CommandBuffers[m_CurrentFrame];
 
-		const VkSemaphore signalSemaphores[] = { m_RenderFinishedSemaphore };
+		const VkSemaphore signalSemaphores[] = { m_RenderFinishedSemaphore[m_CurrentFrame]};
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		if (const VkResult result = vkQueueSubmit(m_GraphicsQueue, 1, &submitInfo, m_InFlightFence); result != VK_SUCCESS) {
+		if (const VkResult result = vkQueueSubmit(m_GraphicsQueue, 1, &submitInfo, m_InFlightFence[m_CurrentFrame]); result != VK_SUCCESS) {
 			KBR_CORE_ASSERT(false, "Failed to submit draw command buffer! Result: {0}", VulkanHelpers::VkResultToString(result));
 			throw std::runtime_error("failed to submit draw command buffer!");
 		}
@@ -147,6 +155,37 @@ namespace Kerberos
 		presentInfo.pImageIndices = &imageIndex;
 
 		vkQueuePresentKHR(m_PresentQueue, &presentInfo);
+
+		m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+	}
+
+	void VulkanContext::CreateImGuiDescriptorPool()
+	{
+		// These pool sizes are typical for ImGui and should be sufficient.
+		const VkDescriptorPoolSize poolSizes[] =
+		{
+			{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+			{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+		};
+		VkDescriptorPoolCreateInfo poolInfo = {};
+		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+		poolInfo.maxSets = 1000 * IM_ARRAYSIZE(poolSizes);
+		poolInfo.poolSizeCount = static_cast<uint32_t>(IM_ARRAYSIZE(poolSizes));
+		poolInfo.pPoolSizes = poolSizes;
+
+		if (vkCreateDescriptorPool(m_Device, &poolInfo, nullptr, &m_ImGuiDescriptorPool) != VK_SUCCESS)
+		{
+			KBR_CORE_ASSERT(false, "Failed to create ImGui descriptor pool!");
+			throw std::runtime_error("failed to create ImGui descriptor pool!");
+		}
 	}
 
 	void VulkanContext::RecordCommandBuffer(const VkCommandBuffer commandBuffer, const uint32_t imageIndex) const
@@ -193,6 +232,8 @@ namespace Kerberos
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
 		vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+
+		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 
 		vkCmdEndRenderPass(commandBuffer);
 
@@ -245,7 +286,7 @@ namespace Kerberos
 		if (const VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance); result != VK_SUCCESS)
 		{
 			KBR_CORE_ASSERT(false, "Failed to create instance! Result: {0}", VulkanHelpers::VkResultToString(result))
-			throw std::runtime_error("failed to create instance!");
+				throw std::runtime_error("failed to create instance!");
 		}
 	}
 
@@ -267,7 +308,7 @@ namespace Kerberos
 		if (const VkResult result = glfwCreateWindowSurface(m_Instance, m_WindowHandle, nullptr, &m_Surface); result != VK_SUCCESS)
 		{
 			KBR_CORE_ASSERT(false, "Failed to create window surface! Result: {0}", VulkanHelpers::VkResultToString(result))
-			throw std::runtime_error("failed to create window surface!");
+				throw std::runtime_error("failed to create window surface!");
 		}
 	}
 
@@ -383,7 +424,7 @@ namespace Kerberos
 		if (const VkResult result = vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device); result != VK_SUCCESS)
 		{
 			KBR_CORE_ASSERT(false, "Failed to create logical device! Result: {0}", VulkanHelpers::VkResultToString(result))
-			throw std::runtime_error("failed to create logical device!");
+				throw std::runtime_error("failed to create logical device!");
 		}
 
 		vkGetDeviceQueue(m_Device, graphicsFamily.value(), 0, &m_GraphicsQueue);
@@ -693,7 +734,7 @@ namespace Kerberos
 				.layers = 1,
 			};
 
-			if (const VkResult result = vkCreateFramebuffer(m_Device, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]); result  != VK_SUCCESS)
+			if (const VkResult result = vkCreateFramebuffer(m_Device, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]); result != VK_SUCCESS)
 			{
 				KBR_CORE_ASSERT(false, "Failed to create framebuffer! Result: {0}", VulkanHelpers::VkResultToString(result))
 			}
@@ -722,17 +763,19 @@ namespace Kerberos
 		}
 	}
 
-	void VulkanContext::CreateCommandBuffer()
+	void VulkanContext::CreateCommandBuffers()
 	{
+		m_CommandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+
 		const VkCommandBufferAllocateInfo allocInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 			.pNext = nullptr,
 			.commandPool = m_CommandPool,
 			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-			.commandBufferCount = 1,
+			.commandBufferCount = static_cast<uint32_t>(m_CommandBuffers.size()),
 		};
 
-		if (const VkResult result = vkAllocateCommandBuffers(m_Device, &allocInfo, &m_CommandBuffer); result != VK_SUCCESS)
+		if (const VkResult result = vkAllocateCommandBuffers(m_Device, &allocInfo, m_CommandBuffers.data()); result != VK_SUCCESS)
 		{
 			KBR_CORE_ASSERT(false, "Failed to allocate command buffers! Result: {0}", VulkanHelpers::VkResultToString(result))
 		}
@@ -740,6 +783,11 @@ namespace Kerberos
 
 	void VulkanContext::CreateSyncObjects()
 	{
+		m_ImageAvailableSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
+		m_RenderFinishedSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
+		m_InFlightFence.resize(MAX_FRAMES_IN_FLIGHT);
+
+
 		VkSemaphoreCreateInfo semaphoreInfo{};
 		semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -747,12 +795,15 @@ namespace Kerberos
 		/// infinitely for the fence to be reset before starting to render.
 		VkFenceCreateInfo fenceInfo{};
 		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; 
+		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-		if (vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore) != VK_SUCCESS ||
-			vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore) != VK_SUCCESS ||
-			vkCreateFence(m_Device, &fenceInfo, nullptr, &m_InFlightFence) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create semaphores or fences!");
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+		{
+			if (vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore[i]) != VK_SUCCESS ||
+				vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore[i]) != VK_SUCCESS ||
+				vkCreateFence(m_Device, &fenceInfo, nullptr, &m_InFlightFence[i]) != VK_SUCCESS) {
+				throw std::runtime_error("failed to create semaphores or fences!");
+			}
 		}
 	}
 
@@ -845,7 +896,7 @@ namespace Kerberos
 		return requiredExtensions.empty();
 	}
 
-	QueueFamilyIndices VulkanContext::FindQueueFamilies() const 
+	QueueFamilyIndices VulkanContext::FindQueueFamilies() const
 	{
 		return FindQueueFamilies(m_PhysicalDevice);
 	}

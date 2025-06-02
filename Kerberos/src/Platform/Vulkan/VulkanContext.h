@@ -8,7 +8,6 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 
-
 namespace Kerberos
 {
 	class VulkanContext : public GraphicsContext
@@ -41,10 +40,13 @@ namespace Kerberos
 		VkQueue GetPresentQueue() const { return m_PresentQueue; }
 		uint32_t GetGraphicsQueueFamilyIndex() const { return m_GraphicsQueueFamilyIndex; }
 		uint32_t GetPresentQueueFamilyIndex() const { return m_PresentQueueFamilyIndex; }
-		VkCommandBuffer GetCommandBuffer() const { return m_CommandBuffer; }
+		std::vector<VkCommandBuffer> GetCommandBuffers() const { return m_CommandBuffers; }
 		VkRenderPass GetRenderPass() const { return m_RenderPass; }
 		VkPipeline GetPipeline() const { return m_GraphicsPipeline; }
 		std::vector<VkFramebuffer> GetSwapChainFramebuffers() const { return m_SwapChainFramebuffers; }
+		uint32_t GetCurrentFrameIndex() const { return m_CurrentFrame; }
+
+		VkDescriptorPool GetImGuiDescriptorPool() const { return m_ImGuiDescriptorPool; }
 
 		static VulkanContext& Get() { return *s_Instance; }
 
@@ -62,8 +64,9 @@ namespace Kerberos
 		void CreateGraphicsPipeline();
 		void CreateFramebuffers();
 		void CreateCommandPool();
-		void CreateCommandBuffer();
+		void CreateCommandBuffers();
 		void CreateSyncObjects();
+		void CreateImGuiDescriptorPool();
 
 		/////////////////////////////////////////////////////////
 		//////////////////// Helper methods  ////////////////////
@@ -83,6 +86,7 @@ namespace Kerberos
 
 	private:
 		GLFWwindow* m_WindowHandle;
+
 
 		VkInstance m_Instance = VK_NULL_HANDLE;
 		VkDebugUtilsMessengerEXT m_DebugMessenger = VK_NULL_HANDLE;
@@ -106,11 +110,15 @@ namespace Kerberos
 		VkPipeline m_GraphicsPipeline = VK_NULL_HANDLE;
 		std::vector<VkFramebuffer> m_SwapChainFramebuffers;
 		VkCommandPool m_CommandPool = VK_NULL_HANDLE;
-		VkCommandBuffer m_CommandBuffer = VK_NULL_HANDLE;
+		std::vector<VkCommandBuffer> m_CommandBuffers;
 
-		VkSemaphore m_ImageAvailableSemaphore;
-		VkSemaphore m_RenderFinishedSemaphore;
-		VkFence m_InFlightFence;
+		VkDescriptorPool m_ImGuiDescriptorPool = VK_NULL_HANDLE;
+
+		std::vector<VkSemaphore> m_ImageAvailableSemaphore;
+		std::vector<VkSemaphore> m_RenderFinishedSemaphore;
+		std::vector<VkFence> m_InFlightFence;
+
+		uint32_t m_CurrentFrame = 0;
 
 		static VulkanContext* s_Instance;
 	};

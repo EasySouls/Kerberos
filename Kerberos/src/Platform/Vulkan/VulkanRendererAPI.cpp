@@ -19,17 +19,17 @@ namespace Kerberos
 	void VulkanRendererAPI::SetViewport(const uint32_t x, const uint32_t y, const uint32_t width,
 		const uint32_t height) 
 	{
-		VkViewport viewport = {};
-		viewport.x = static_cast<float>(x);
-		viewport.y = static_cast<float>(y);
-		viewport.width = static_cast<float>(width);
-		viewport.height = static_cast<float>(height);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
+		//VkViewport viewport = {};
+		//viewport.x = static_cast<float>(x);
+		//viewport.y = static_cast<float>(y);
+		//viewport.width = static_cast<float>(width);
+		//viewport.height = static_cast<float>(height);
+		//viewport.minDepth = 0.0f;
+		//viewport.maxDepth = 1.0f;
 
-		const VkCommandBuffer commandBuffer = VulkanContext::Get().GetCommandBuffer();
+		//const VkCommandBuffer commandBuffer = VulkanContext::Get().GetCommandBuffers();
 
-		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+		//vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 	}
 
 	void VulkanRendererAPI::SetClearColor(const glm::vec4& color)
@@ -41,7 +41,7 @@ namespace Kerberos
 	{
 		// TODO: I am really not sure about this
 
-		//const VkCommandBuffer commandBuffer = VulkanContext::Get().GetCommandBuffer();
+		//const VkCommandBuffer commandBuffer = VulkanContext::Get().GetCommandBuffers();
 
 		//VkCommandBufferBeginInfo cmdBeginInfo;
 		//cmdBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
