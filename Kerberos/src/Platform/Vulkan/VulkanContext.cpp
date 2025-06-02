@@ -54,6 +54,13 @@ namespace Kerberos
 	{
 		vkDeviceWaitIdle(m_Device);
 
+		CleanupSwapChain();
+
+		vkDestroyPipeline(m_Device, m_GraphicsPipeline, nullptr);
+		vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
+
+		vkDestroyRenderPass(m_Device, m_RenderPass, nullptr);
+
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
 		{
 			vkDestroySemaphore(m_Device, m_ImageAvailableSemaphore[i], nullptr);
@@ -63,29 +70,15 @@ namespace Kerberos
 
 		vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
 
-		for (const auto framebuffer : m_SwapChainFramebuffers)
-		{
-			vkDestroyFramebuffer(m_Device, framebuffer, nullptr);
-		}
-
-		vkDestroyPipeline(m_Device, m_GraphicsPipeline, nullptr);
-		vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
-		vkDestroyRenderPass(m_Device, m_RenderPass, nullptr);
-
-		for (const auto imageView : m_SwapChainImageViews)
-		{
-			vkDestroyImageView(m_Device, imageView, nullptr);
-		}
-
-		vkDestroySwapchainKHR(m_Device, m_SwapChain, nullptr);
 		vkDestroyDevice(m_Device, nullptr);
-		vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
-		vkDestroyInstance(m_Instance, nullptr);
 
 		if (enableValidationLayers)
 		{
 			VulkanHelpers::DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
 		}
+
+		vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
+		vkDestroyInstance(m_Instance, nullptr);
 	}
 
 	void VulkanContext::Init()
@@ -111,14 +104,26 @@ namespace Kerberos
 	{
 		/// Wait for the fence to be signaled, then reset it
 		vkWaitForFences(m_Device, 1, &m_InFlightFence[m_CurrentFrame], VK_TRUE, UINT64_MAX);
-		vkResetFences(m_Device, 1, &m_InFlightFence[m_CurrentFrame]);
 
 		uint32_t imageIndex;
 		if (const VkResult result = vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphore[m_CurrentFrame], VK_NULL_HANDLE, &imageIndex); result != VK_SUCCESS)
 		{
-			KBR_CORE_ASSERT(false, "Failed to acquire swapchain image! Result: {0}", VulkanHelpers::VkResultToString(result));
-			throw std::runtime_error("failed to acquire swap chain image!");
+			if (result == VK_ERROR_OUT_OF_DATE_KHR)
+			{
+				KBR_CORE_WARN("Swap chain out of date, recreating swap chain...");
+				RecreateSwapChain();
+				return;
+			}
+			if (result != VK_SUBOPTIMAL_KHR)
+			{
+				KBR_CORE_ERROR("Failed to acquire swap chain image! Result: {0}", VulkanHelpers::VkResultToString(result));
+				throw std::runtime_error("failed to acquire swap chain image!");
+			}
 		}
+
+		/// We only reset the fence here, because if we return early due to an out of date swap chain,
+		/// and the fence stays signaled, we might get into a deadlock
+		vkResetFences(m_Device, 1, &m_InFlightFence[m_CurrentFrame]);
 
 		vkResetCommandBuffer(m_CommandBuffers[m_CurrentFrame], 0);
 
@@ -141,7 +146,8 @@ namespace Kerberos
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
 		if (const VkResult result = vkQueueSubmit(m_GraphicsQueue, 1, &submitInfo, m_InFlightFence[m_CurrentFrame]); result != VK_SUCCESS) {
-			KBR_CORE_ASSERT(false, "Failed to submit draw command buffer! Result: {0}", VulkanHelpers::VkResultToString(result));
+			KBR_CORE_ERROR("Failed to submit draw command buffer! Result: {0}", VulkanHelpers::VkResultToString(result));
+			KBR_CORE_ASSERT(false, "Failed to submit draw command buffer!");
 			throw std::runtime_error("failed to submit draw command buffer!");
 		}
 
@@ -157,7 +163,16 @@ namespace Kerberos
 
 		if (const VkResult result = vkQueuePresentKHR(m_PresentQueue, &presentInfo); result != VK_SUCCESS)
 		{
-			KBR_CORE_ERROR("Failed to present swapchain image! Result: {0}", VulkanHelpers::VkResultToString(result));
+			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+			{
+				RecreateSwapChain();
+			}
+			else 
+			{
+				KBR_CORE_ERROR("Failed to present swapchain image! Result: {0}", VulkanHelpers::VkResultToString(result));
+				KBR_CORE_ASSERT(false, "Failed to present swapchain image!");
+				throw std::runtime_error("failed to present swap chain image!");
+			}
 		}
 
 		m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
@@ -190,6 +205,40 @@ namespace Kerberos
 			KBR_CORE_ASSERT(false, "Failed to create ImGui descriptor pool!");
 			throw std::runtime_error("failed to create ImGui descriptor pool!");
 		}
+	}
+
+	void VulkanContext::CleanupSwapChain() const 
+	{
+		for (const auto framebuffer : m_SwapChainFramebuffers)
+		{
+			vkDestroyFramebuffer(m_Device, framebuffer, nullptr);
+		}
+
+		for (const auto imageView : m_SwapChainImageViews)
+		{
+			vkDestroyImageView(m_Device, imageView, nullptr);
+		}
+
+		vkDestroySwapchainKHR(m_Device, m_SwapChain, nullptr);
+	}
+
+	void VulkanContext::RecreateSwapChain() 
+	{
+		int width = 0, height = 0;
+		glfwGetFramebufferSize(m_WindowHandle, &width, &height);
+		while (width == 0 || height == 0)
+		{
+			glfwGetFramebufferSize(m_WindowHandle, &width, &height);
+			glfwWaitEvents();
+		}
+
+		vkDeviceWaitIdle(m_Device);
+
+		CleanupSwapChain();
+
+		CreateSwapChain();
+		CreateImageViews();
+		CreateFramebuffers();
 	}
 
 	void VulkanContext::RecordCommandBuffer(const VkCommandBuffer commandBuffer, const uint32_t imageIndex) const
