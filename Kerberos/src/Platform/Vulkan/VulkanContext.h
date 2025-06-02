@@ -8,6 +8,8 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 
+#include "VulkanBuffer.h"
+
 namespace Kerberos
 {
 	class VulkanContext : public GraphicsContext
@@ -62,6 +64,7 @@ namespace Kerberos
 		void CreateImageViews();
 		void CreateRenderPass();
 		void CreateGraphicsPipeline();
+		void CreateVertexBuffer();
 		void CreateFramebuffers();
 		void CreateCommandPool();
 		void CreateCommandBuffers();
@@ -119,6 +122,8 @@ namespace Kerberos
 		std::vector<VkFence> m_InFlightFence;
 
 		uint32_t m_CurrentFrame = 0;
+
+		VulkanVertexBuffer* m_VertexBuffer;
 
 		static VulkanContext* s_Instance;
 	};
