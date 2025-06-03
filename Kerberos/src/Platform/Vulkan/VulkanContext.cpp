@@ -93,6 +93,7 @@ namespace Kerberos
 		CreateRenderPass();
 		CreateGraphicsPipeline();
 		CreateVertexBuffer();
+		CreateIndexBuffer();
 		CreateFramebuffers();
 		CreateCommandPool();
 		CreateCommandBuffers();
@@ -288,7 +289,11 @@ namespace Kerberos
 		constexpr VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-		vkCmdDraw(commandBuffer, 32, 1, 0, 0);
+		vkCmdBindIndexBuffer(commandBuffer, m_IndexBuffer->GetVkBuffer(), 0, static_cast<VkIndexType>(m_IndexBuffer->GetType()));
+
+		//vkCmdDraw(commandBuffer, 32, 1, 0, 0);
+
+		vkCmdDrawIndexed(commandBuffer, m_IndexBuffer->GetCount(), 1, 0, 0, 0);
 
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 
@@ -631,7 +636,7 @@ namespace Kerberos
 
 	void VulkanContext::CreateGraphicsPipeline()
 	{
-		VulkanShader basic3DShader("assets/shaders/shader3d-vulkan.glsl");
+		VulkanShader basic3DShader("assets/shaders/shader3d-basic-vulkan.glsl");
 		const auto& createShaderStages = basic3DShader.GetPipelineShaderStageCreateInfos();
 
 		// TODO: Somehow we should check all the used shaders and their stages before creating the pipeline
@@ -841,6 +846,32 @@ namespace Kerberos
 		constexpr uint32_t cubeVerticesSize = std::size(cubeVertices);
 
 		m_VertexBuffer = CreateScope<VulkanVertexBuffer>(cubeVertices, cubeVerticesSize);
+	}
+
+	void VulkanContext::CreateIndexBuffer()
+	{
+				const uint32_t cubeIndices[] = {
+			// Face 1: +X (Right)
+			0, 1, 2, // Triangle 1
+			0, 2, 3, // Triangle 2
+			// Face 2: -X (Left)
+			4, 5, 6, // Triangle 1
+			4, 6, 7, // Triangle 2
+			// Face 3: +Y (Top)
+			8, 9, 10, // Triangle 1
+			8, 10, 11, // Triangle 2
+			// Face 4: -Y (Bottom)
+			12, 13, 14, // Triangle 1
+			12, 14, 15, // Triangle 2
+			// Face 5: +Z (Front)
+			16, 17, 18, // Triangle 1
+			16, 18, 19, // Triangle 2
+			// Face 6: -Z (Back)
+			20, 21, 22, // Triangle 1
+			20, 22, 23 // Triangle 2
+		};
+		constexpr uint32_t cubeIndicesSize = std::size(cubeIndices);
+		m_IndexBuffer = CreateScope<VulkanIndexBuffer>(cubeIndices, cubeIndicesSize);
 	}
 
 	void VulkanContext::CreateFramebuffers()

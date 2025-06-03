@@ -38,6 +38,9 @@ namespace Kerberos
 		void Unbind() const override;
 
 		uint32_t GetCount() const override;
+		int GetType() const { return VK_INDEX_TYPE_UINT16; }
+
+		VkBuffer GetVkBuffer() const { return m_Buffer; }
 
 	private:
 		VkBuffer m_Buffer = VK_NULL_HANDLE;

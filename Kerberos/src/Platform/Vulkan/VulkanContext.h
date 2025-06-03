@@ -65,6 +65,7 @@ namespace Kerberos
 		void CreateRenderPass();
 		void CreateGraphicsPipeline();
 		void CreateVertexBuffer();
+		void CreateIndexBuffer();
 		void CreateFramebuffers();
 		void CreateCommandPool();
 		void CreateCommandBuffers();
@@ -127,6 +128,7 @@ namespace Kerberos
 		uint32_t m_CurrentFrame = 0;
 
 		Scope<VulkanVertexBuffer> m_VertexBuffer;
+		Scope<VulkanIndexBuffer> m_IndexBuffer;
 
 		static VulkanContext* s_Instance;
 	};

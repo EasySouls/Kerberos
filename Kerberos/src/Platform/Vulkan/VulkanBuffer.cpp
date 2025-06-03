@@ -72,6 +72,9 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		const VkDevice device = VulkanContext::Get().GetDevice();
+
+		vkDeviceWaitIdle(device);
+
 		vkDestroyBuffer(device, m_Buffer, nullptr);
 		vkFreeMemory(device, m_BufferMemory, nullptr);
 	}
@@ -142,6 +145,9 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		const VkDevice device = VulkanContext::Get().GetDevice();
+
+		vkDeviceWaitIdle(device);
+
 		vkDestroyBuffer(device, m_Buffer, nullptr);
 		vkFreeMemory(device, m_BufferMemory, nullptr);
 	}
