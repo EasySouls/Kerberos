@@ -32,12 +32,17 @@ namespace Kerberos
 	{
 	public:
 		VulkanIndexBuffer(const uint32_t* indices, uint32_t count);
-		~VulkanIndexBuffer() override = default;
+		~VulkanIndexBuffer() override;
 
 		void Bind() const override;
 		void Unbind() const override;
 
 		uint32_t GetCount() const override;
+
+	private:
+		VkBuffer m_Buffer = VK_NULL_HANDLE;
+		VkDeviceMemory m_BufferMemory = VK_NULL_HANDLE;
+		uint32_t m_Count = 0;
 	};
 }
 

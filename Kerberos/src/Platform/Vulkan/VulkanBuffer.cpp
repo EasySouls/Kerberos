@@ -97,8 +97,53 @@ namespace Kerberos
 		return BufferLayout(); /// TODO: Placeholder return value, replace with actual layout
 	}
 
-	VulkanIndexBuffer::VulkanIndexBuffer(const uint32_t* indices, uint32_t count)
+	VulkanIndexBuffer::VulkanIndexBuffer(const uint32_t* indices, const uint32_t count)
+		:	m_Count(count)
 	{
+		KBR_PROFILE_FUNCTION();
+
+		const VkDevice device = VulkanContext::Get().GetDevice();
+
+		VkBufferCreateInfo bufferInfo{};
+		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferInfo.size = sizeof(uint32_t) * count;
+		bufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		if (vkCreateBuffer(device, &bufferInfo, nullptr, &m_Buffer) != VK_SUCCESS)
+		{
+			KBR_CORE_ERROR("Failed to create index buffer!");
+			return;
+		}
+
+		VkMemoryRequirements memRequirements;
+		vkGetBufferMemoryRequirements(VulkanContext::Get().GetDevice(), m_Buffer, &memRequirements);
+
+		VkMemoryAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocInfo.allocationSize = memRequirements.size;
+		allocInfo.memoryTypeIndex = Utils::FindMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+		if (vkAllocateMemory(device, &allocInfo, nullptr, &m_BufferMemory) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to allocate index buffer memory!");
+		}
+
+		vkBindBufferMemory(device, m_Buffer, m_BufferMemory, 0);
+
+		void* data;
+		vkMapMemory(device, m_BufferMemory, 0, bufferInfo.size, 0, &data);
+		memcpy(data, indices, bufferInfo.size);
+		vkUnmapMemory(device, m_BufferMemory);
+	}
+
+	VulkanIndexBuffer::~VulkanIndexBuffer() 
+	{
+		KBR_PROFILE_FUNCTION();
+
+		const VkDevice device = VulkanContext::Get().GetDevice();
+		vkDestroyBuffer(device, m_Buffer, nullptr);
+		vkFreeMemory(device, m_BufferMemory, nullptr);
 	}
 
 	void VulkanIndexBuffer::Bind() const
@@ -111,6 +156,6 @@ namespace Kerberos
 
 	uint32_t VulkanIndexBuffer::GetCount() const
 	{
-		return 0; /// TODO: Placeholder return value, replace with actual count
+		return m_Count;
 	}
 }
