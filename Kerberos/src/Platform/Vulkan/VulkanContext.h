@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 
+#include "VulkanBuffer.h"
 
 namespace Kerberos
 {
@@ -41,10 +42,19 @@ namespace Kerberos
 		VkQueue GetPresentQueue() const { return m_PresentQueue; }
 		uint32_t GetGraphicsQueueFamilyIndex() const { return m_GraphicsQueueFamilyIndex; }
 		uint32_t GetPresentQueueFamilyIndex() const { return m_PresentQueueFamilyIndex; }
+		std::vector<VkCommandBuffer> GetCommandBuffers() const { return m_CommandBuffers; }
+		VkRenderPass GetRenderPass() const { return m_RenderPass; }
+		VkPipeline GetPipeline() const { return m_GraphicsPipeline; }
+		std::vector<VkFramebuffer> GetSwapChainFramebuffers() const { return m_SwapChainFramebuffers; }
+		uint32_t GetCurrentFrameIndex() const { return m_CurrentFrame; }
+
+		VkDescriptorPool GetImGuiDescriptorPool() const { return m_ImGuiDescriptorPool; }
 
 		static VulkanContext& Get() { return *s_Instance; }
 
 	private:
+		void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) const;
+
 		void CreateInstance();
 		void SetupDebugMessenger();
 		void CreateSurface();
@@ -52,6 +62,18 @@ namespace Kerberos
 		void CreateLogicalDevice();
 		void CreateSwapChain();
 		void CreateImageViews();
+		void CreateRenderPass();
+		void CreateGraphicsPipeline();
+		void CreateVertexBuffer();
+		void CreateIndexBuffer();
+		void CreateFramebuffers();
+		void CreateCommandPool();
+		void CreateCommandBuffers();
+		void CreateSyncObjects();
+		void CreateImGuiDescriptorPool();
+
+		void CleanupSwapChain() const;
+		void RecreateSwapChain();
 
 		/////////////////////////////////////////////////////////
 		//////////////////// Helper methods  ////////////////////
@@ -72,6 +94,7 @@ namespace Kerberos
 	private:
 		GLFWwindow* m_WindowHandle;
 
+
 		VkInstance m_Instance = VK_NULL_HANDLE;
 		VkDebugUtilsMessengerEXT m_DebugMessenger = VK_NULL_HANDLE;
 		VkSurfaceKHR m_Surface = VK_NULL_HANDLE;
@@ -88,6 +111,24 @@ namespace Kerberos
 		VkFormat m_SwapChainImageFormat;
 		VkExtent2D m_SwapChainExtent;
 		std::vector<VkImageView> m_SwapChainImageViews;
+
+		VkRenderPass m_RenderPass = VK_NULL_HANDLE;
+		VkPipelineLayout m_PipelineLayout = VK_NULL_HANDLE;
+		VkPipeline m_GraphicsPipeline = VK_NULL_HANDLE;
+		std::vector<VkFramebuffer> m_SwapChainFramebuffers;
+		VkCommandPool m_CommandPool = VK_NULL_HANDLE;
+		std::vector<VkCommandBuffer> m_CommandBuffers;
+
+		VkDescriptorPool m_ImGuiDescriptorPool = VK_NULL_HANDLE;
+
+		std::vector<VkSemaphore> m_ImageAvailableSemaphore;
+		std::vector<VkSemaphore> m_RenderFinishedSemaphore;
+		std::vector<VkFence> m_InFlightFence;
+
+		uint32_t m_CurrentFrame = 0;
+
+		Scope<VulkanVertexBuffer> m_VertexBuffer;
+		Scope<VulkanIndexBuffer> m_IndexBuffer;
 
 		static VulkanContext* s_Instance;
 	};
