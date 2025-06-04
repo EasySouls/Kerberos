@@ -78,6 +78,7 @@ namespace Kerberos
 			ImGui_ImplGlfw_InitForVulkan(window, true);
 
 			ImGui_ImplVulkan_InitInfo initInfo = {};
+			ZeroMemory(&initInfo, sizeof(ImGui_ImplVulkan_InitInfo));
 			initInfo.Instance = VulkanContext::Get().GetInstance();
 			initInfo.PhysicalDevice = VulkanContext::Get().GetPhysicalDevice();
 			initInfo.Device = VulkanContext::Get().GetDevice();
@@ -85,17 +86,18 @@ namespace Kerberos
 			initInfo.Queue = VulkanContext::Get().GetGraphicsQueue();
 			initInfo.RenderPass = VulkanContext::Get().GetRenderPass();
 			initInfo.PipelineCache = VK_NULL_HANDLE;
-			//initInfo.DescriptorPool = nullptr;
-			//initInfo.DescriptorPoolSize = 2;
 			initInfo.DescriptorPool = VulkanContext::Get().GetImGuiDescriptorPool();
 			initInfo.Subpass = 0; // Subpass index for the ImGui render pass
 			initInfo.MinImageCount = 2;
 			initInfo.ImageCount = static_cast<uint32_t>(VulkanContext::Get().GetSwapChainImages().size());
 			initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT; // Use 1 sample for MSAA
 			initInfo.Allocator = nullptr; // Use default allocator
-			initInfo.CheckVkResultFn = nullptr; // Use default error checking function
+			initInfo.CheckVkResultFn = VulkanHelpers::ImGuiVulkanCheckResult;
 
 			ImGui_ImplVulkan_Init(&initInfo);
+
+			// Upload Fonts
+			ImGui_ImplVulkan_CreateFontsTexture();
 		}
 	}
 
@@ -187,7 +189,7 @@ namespace Kerberos
 		}
 
 		// Update and Render additional Platform Windows
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable && Renderer::GetAPI() != RendererAPI::API::Vulkan)
 		{
 			GLFWwindow* backupCurrentContext = glfwGetCurrentContext();
 			ImGui::UpdatePlatformWindows();

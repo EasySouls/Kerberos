@@ -149,5 +149,13 @@ namespace Kerberos
                 return "UNKNOWN_ERROR";
             }
 		}
+
+        static void ImGuiVulkanCheckResult(const VkResult err)
+        {
+            if (err == VK_SUCCESS) return;
+
+            KBR_CORE_ERROR("ImGui Vulkan Error: {0}", VulkanHelpers::VkResultToString(err));
+            KBR_CORE_ASSERT(false, "ImGui Vulkan Error: {0}", VulkanHelpers::VkResultToString(err));
+        }
 	};
 }

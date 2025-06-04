@@ -119,7 +119,7 @@ namespace Kerberos
 
 		/// I haven't converted the other shaders to be Vulkan compatible yet,
 		/// and i don't want to modify the source code of the Editor
-		if (filepath != "assets/shaders/shader3d-vulkan.glsl")
+		if (filepath != "assets/shaders/shader3d-vulkan.glsl" && filepath != "assets/shaders/shader3d-basic-vulkan.glsl")
 			return;
 
 		Utils::CreateCacheDirectoryIfNeeded();
