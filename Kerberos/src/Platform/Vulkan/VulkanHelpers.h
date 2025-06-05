@@ -31,7 +31,7 @@ namespace Kerberos
                 }
             }
             KBR_CORE_ASSERT(false, "Failed to find suitable memory type!");
-            return 0;
+            return 0xFFFFFFFF;
 		}
 
         static VkResult CreateDebugUtilsMessengerEXT(const VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)

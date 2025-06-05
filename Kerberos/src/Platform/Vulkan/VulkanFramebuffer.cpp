@@ -310,7 +310,7 @@ namespace Kerberos
 		}
 
 		std::vector<VkClearValue> clearValues;
-		clearValues.push_back({{0.0f, 0.0f, 0.0f, 1.0f}});
+		clearValues.push_back({{{0.0f, 0.0f, 0.0f, 1.0f}}});
 		if (m_DepthAttachmentSpec.TextureFormat != FramebufferTextureFormat::None)
 		{
 			clearValues.push_back({{{1.0f, 0}}});
@@ -320,7 +320,7 @@ namespace Kerberos
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfo.renderPass = m_RenderPass;
 		renderPassInfo.framebuffer = m_Framebuffer;
-		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.offset = { .x = 0, .y = 0 };
 		renderPassInfo.renderArea.extent.width = m_Specification.Width;
 		renderPassInfo.renderArea.extent.height = m_Specification.Height;
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());

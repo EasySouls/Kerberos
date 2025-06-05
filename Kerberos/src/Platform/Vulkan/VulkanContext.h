@@ -47,6 +47,7 @@ namespace Kerberos
 		VkPipeline GetPipeline() const { return m_GraphicsPipeline; }
 		std::vector<VkFramebuffer> GetSwapChainFramebuffers() const { return m_SwapChainFramebuffers; }
 		uint32_t GetCurrentFrameIndex() const { return m_CurrentFrame; }
+		VkCommandPool GetCommandPool() const { return m_CommandPool; }
 
 		VkDescriptorPool GetImGuiDescriptorPool() const { return m_ImGuiDescriptorPool; }
 

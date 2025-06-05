@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vulkan/vulkan_core.h>
+
 #include "Kerberos/Renderer/Texture.h"
 
 namespace Kerberos
@@ -28,9 +30,21 @@ namespace Kerberos
 		}
 
 	private:
+		void CleanupResources() const;
+
+	private:
 		RendererID m_RendererID = 0;
 		uint32_t m_Width = 0;
 		uint32_t m_Height = 0;
+		std::string m_Path;
+
+		VkImage         m_Image;
+		VkImageView     m_ImageView;
+		VkDeviceMemory  m_ImageMemory;
+		VkSampler       m_Sampler;
+		VkBuffer        m_UploadBuffer;
+		VkDeviceMemory  m_UploadBufferMemory;
+		VkDescriptorSet m_DescriptorSet;
 	};
 }
 
