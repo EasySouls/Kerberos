@@ -24,10 +24,10 @@ namespace Kerberos
 		m_Window = Window::Create(props);
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 
-		Renderer::Init();
-
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
+
+		Renderer::Init();
 	}
 
 	Application::~Application() = default;

@@ -14,7 +14,7 @@ namespace Kerberos
 		RenderCommand::SetupRendererAPI();
 		RenderCommand::Init();
 
-		//Renderer2D::Init();
+		Renderer2D::Init();
 		Renderer3D::Init();
 	}
 
