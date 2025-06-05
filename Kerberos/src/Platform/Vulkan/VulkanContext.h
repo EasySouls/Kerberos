@@ -50,6 +50,17 @@ namespace Kerberos
 
 		VkDescriptorPool GetImGuiDescriptorPool() const { return m_ImGuiDescriptorPool; }
 
+		/**
+		* @brief Returns a one-time use command buffer that can be used to record commands.
+		* The command buffer must be submitted using SubmitCommandBuffer() after recording.
+		*/
+		VkCommandBuffer GetCommandBuffer() const;
+
+		/**
+		* Submit a command buffer for execution.
+		*/
+		void SubmitCommandBuffer(VkCommandBuffer commandBuffer) const;
+
 		static VulkanContext& Get() { return *s_Instance; }
 
 	private:

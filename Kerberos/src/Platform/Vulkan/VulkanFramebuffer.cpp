@@ -1,8 +1,30 @@
 #include "kbrpch.h"
 #include "VulkanFramebuffer.h"
 
+#include "VulkanHelpers.h"
+
 namespace Kerberos
 {
+	namespace Utils
+	{
+		static VkFormat FramebufferTextureFormatToVulkanFormat(const FramebufferTextureFormat format)
+		{
+			switch (format)
+			{
+			case FramebufferTextureFormat::RGBA8:           return VK_FORMAT_R8G8B8A8_UNORM;
+			case FramebufferTextureFormat::DEPTH24STENCIL8: return VK_FORMAT_D24_UNORM_S8_UINT;
+			case FramebufferTextureFormat::None:            return VK_FORMAT_UNDEFINED;
+			}
+			KBR_CORE_ASSERT(false, "Unknown FramebufferTextureFormat!");
+			return VK_FORMAT_UNDEFINED;
+		}
+
+		static bool IsDepthFormat(const FramebufferTextureFormat format)
+		{
+			return format == FramebufferTextureFormat::DEPTH24STENCIL8;
+		}
+	}
+
 	VulkanFramebuffer::VulkanFramebuffer(const FramebufferSpecification& spec)
 		: m_Specification(spec)
 	{
