@@ -9,8 +9,8 @@ namespace Kerberos
 	class VulkanFramebuffer final : public Framebuffer
 	{
 	public:
-		explicit VulkanFramebuffer(const FramebufferSpecification& spec);
-		~VulkanFramebuffer() override = default;
+		explicit VulkanFramebuffer(FramebufferSpecification spec);
+		~VulkanFramebuffer() override;
 
 		void Invalidate();
 
@@ -25,12 +25,35 @@ namespace Kerberos
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 
 	private:
-		void ReleaseResources() const;
+		void ReleaseResources();
+
+		void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& memory) const;
+		void CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags flags, VkImageView& imageView) const;
 
 	private:
 		FramebufferSpecification m_Specification;
 
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecs;
 		FramebufferTextureSpecification m_DepthAttachmentSpec = FramebufferTextureFormat::None;
+
+		VkFramebuffer m_Framebuffer = VK_NULL_HANDLE;
+		VkRenderPass m_RenderPass = VK_NULL_HANDLE;
+
+		std::vector<VkImage> m_ColorAttachments;
+		std::vector<VkImageView> m_ColorAttachmentViews;
+		std::vector<VkDeviceMemory> m_ColorAttachmentMemories;
+
+		VkImage m_DepthAttachment = VK_NULL_HANDLE;
+		VkImageView m_DepthAttachmentView = VK_NULL_HANDLE;
+		VkDeviceMemory m_DepthAttachmentMemory = VK_NULL_HANDLE;
+
+		VkSampler m_ColorAttachmentSampler = VK_NULL_HANDLE;
+
+		VkCommandPool m_CommandPool = VK_NULL_HANDLE;
+		VkCommandBuffer m_CommandBuffer = VK_NULL_HANDLE;
+
+		VkFence m_Fence = VK_NULL_HANDLE;
+
+		VkDescriptorSet m_ColorAttachmentDescriptorSet = VK_NULL_HANDLE;
 	};
 }
