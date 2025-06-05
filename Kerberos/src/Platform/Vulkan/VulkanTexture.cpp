@@ -35,7 +35,7 @@ namespace Kerberos
 		const VkDevice device = context.GetDevice();
 		const VkPhysicalDevice physicalDevice = context.GetPhysicalDevice();
 
-        VkResult err;
+		VkResult err = VK_SUCCESS;
 
         /// Create the image.
         {
@@ -53,7 +53,12 @@ namespace Kerberos
             imageInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
             imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
             imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-            err = vkCreateImage(device, &imageInfo, nullptr, &m_Image);
+
+            if (err = vkCreateImage(device, &imageInfo, nullptr, &m_Image); err != VK_SUCCESS)
+            {
+                KBR_ERROR("Failed to create Vulkan image: {}", VulkanHelpers::VkResultToString(err));
+                return;
+			}
 
             VkMemoryRequirements req;
             vkGetImageMemoryRequirements(device, m_Image, &req);
@@ -64,8 +69,18 @@ namespace Kerberos
             allocInfo.memoryTypeIndex = VulkanHelpers::FindMemoryType(physicalDevice, req.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
             err = vkAllocateMemory(device, &allocInfo, nullptr, &m_ImageMemory);
+            if (err != VK_SUCCESS)
+            {
+                KBR_ERROR("Failed to allocate Vulkan image memory: {}", VulkanHelpers::VkResultToString(err));
+                return;
+			}
 
             err = vkBindImageMemory(device, m_Image, m_ImageMemory, 0);
+            if (err != VK_SUCCESS)
+            {
+                KBR_ERROR("Failed to bind Vulkan image memory: {}", VulkanHelpers::VkResultToString(err));
+                return;
+            }
         }
 
         /// Create the Image View
@@ -80,6 +95,11 @@ namespace Kerberos
             imageViewInfo.subresourceRange.layerCount = 1;
 
             err = vkCreateImageView(device, &imageViewInfo, nullptr, &m_ImageView);
+            if (err != VK_SUCCESS)
+            {
+                KBR_ERROR("Failed to create Vulkan image view: {}", VulkanHelpers::VkResultToString(err));
+                return;
+			}
         }
 
         /// Create Sampler
@@ -97,6 +117,11 @@ namespace Kerberos
             samplerInfo.maxAnisotropy = 1.0f;
 
             err = vkCreateSampler(device, &samplerInfo, nullptr, &m_Sampler);
+            if (err != VK_SUCCESS)
+            {
+                KBR_ERROR("Failed to create Vulkan sampler: {}", VulkanHelpers::VkResultToString(err));
+                return;
+            }
         }
 
         /// Create Descriptor Set using ImGUI's implementation
@@ -111,6 +136,11 @@ namespace Kerberos
             bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
             err = vkCreateBuffer(device, &bufferInfo, nullptr, &m_UploadBuffer);
+            if (err != VK_SUCCESS)
+            {
+                KBR_ERROR("Failed to create Vulkan upload buffer: {}", VulkanHelpers::VkResultToString(err));
+                return;
+			}
 
             VkMemoryRequirements req;
             vkGetBufferMemoryRequirements(device, m_UploadBuffer, &req);
@@ -121,8 +151,18 @@ namespace Kerberos
             allocInfo.memoryTypeIndex = VulkanHelpers::FindMemoryType(physicalDevice, req.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
             err = vkAllocateMemory(device, &allocInfo, nullptr, &m_UploadBufferMemory);
+            if (err != VK_SUCCESS)
+            {
+                KBR_ERROR("Failed to allocate Vulkan upload buffer memory: {}", VulkanHelpers::VkResultToString(err));
+                return;
+            }
 
             err = vkBindBufferMemory(device, m_UploadBuffer, m_UploadBufferMemory, 0);
+            if (err != VK_SUCCESS)
+            {
+                KBR_ERROR("Failed to bind Vulkan upload buffer memory: {}", VulkanHelpers::VkResultToString(err));
+                return;
+			}
         }
 
         /// Upload to Buffer:
@@ -130,6 +170,11 @@ namespace Kerberos
             void* map = nullptr;
 
             err = vkMapMemory(device, m_UploadBufferMemory, 0, imageSize, 0, &map);
+            if (err != VK_SUCCESS)
+            {
+                KBR_ERROR("Failed to map Vulkan upload buffer memory: {}", VulkanHelpers::VkResultToString(err));
+                return;
+            }
 
             memcpy(map, imageData, imageSize);
 
@@ -139,6 +184,11 @@ namespace Kerberos
             range[0].size = imageSize;
 
             err = vkFlushMappedMemoryRanges(device, 1, range);
+            if (err != VK_SUCCESS)
+            {
+                KBR_ERROR("Failed to flush Vulkan upload buffer memory: {}", VulkanHelpers::VkResultToString(err));
+                return;
+			}
 
             vkUnmapMemory(device, m_UploadBufferMemory);
         }
@@ -147,21 +197,6 @@ namespace Kerberos
 
 		VkCommandPool commandPool = context.GetCommandPool();
 		VkCommandBuffer commandBuffer = context.GetCommandBuffer();
-        /*{
-            VkCommandBufferAllocateInfo allocInfo{};
-            allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-            allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-            allocInfo.commandPool = commandPool;
-            allocInfo.commandBufferCount = 1;
-
-            err = vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
-
-            VkCommandBufferBeginInfo beginInfo = {};
-            beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-            beginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-            err = vkBeginCommandBuffer(commandBuffer, &beginInfo);
-        }*/
 
         /// Copy to Image
         {
@@ -205,18 +240,6 @@ namespace Kerberos
 
         /// End command buffer
 		context.SubmitCommandBuffer(commandBuffer);
-        /*{
-            VkSubmitInfo endInfo = {};
-            endInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            endInfo.commandBufferCount = 1;
-            endInfo.pCommandBuffers = &commandBuffer;
-
-            err = vkEndCommandBuffer(commandBuffer);
-
-            err = vkQueueSubmit(g_Queue, 1, &endInfo, VK_NULL_HANDLE);
-
-            err = vkDeviceWaitIdle(device);
-        }*/
 
         m_RendererID = reinterpret_cast<ImTextureID>(m_DescriptorSet);
 	}
