@@ -63,6 +63,12 @@ namespace Kerberos
 		virtual FramebufferSpecification& GetSpecification() = 0;
 		virtual const FramebufferSpecification& GetSpecification() const = 0;
 
+		template<typename T>
+		T& As()
+		{
+			return *static_cast<T*>(this);
+		}
+
 		static Ref<Framebuffer> Create(const FramebufferSpecification& spec);
 	};
 }

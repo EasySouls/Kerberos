@@ -19,6 +19,12 @@ namespace Kerberos
 		virtual void SetData(void* data, uint32_t size) = 0;
 
 		virtual bool operator==(const Texture& other) const = 0;
+
+		template<typename T>
+		T& As()
+		{
+			return *static_cast<T*>(this);
+		}
 	};
 
 	class Texture2D : public Texture

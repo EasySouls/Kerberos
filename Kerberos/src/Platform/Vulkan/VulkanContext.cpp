@@ -296,11 +296,15 @@ namespace Kerberos
 		scissor.extent = m_SwapChainExtent;
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-		const VkBuffer vertexBuffers[] = { m_VertexBuffer->GetVkBuffer() };
+		const auto& vertexBuffer = m_VertexBuffer->As<VulkanVertexBuffer>();
+
+		const VkBuffer vertexBuffers[] = { vertexBuffer.GetVkBuffer() };
 		constexpr VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-		vkCmdBindIndexBuffer(commandBuffer, m_IndexBuffer->GetVkBuffer(), 0, static_cast<VkIndexType>(m_IndexBuffer->GetType()));
+		const auto& indexBuffer = m_IndexBuffer->As<VulkanIndexBuffer>();
+
+		vkCmdBindIndexBuffer(commandBuffer, indexBuffer.GetVkBuffer(), 0, static_cast<VkIndexType>(indexBuffer.GetType()));
 
 		//vkCmdDraw(commandBuffer, 32, 1, 0, 0);
 
@@ -982,6 +986,77 @@ namespace Kerberos
 				throw std::runtime_error("failed to create semaphores or fences!");
 			}
 		}
+	}
+
+	VkCommandBuffer VulkanContext::GetOneTimeCommandBuffer() const 
+	{
+		const VkCommandPool commandPool = m_CommandPool;
+
+		VkCommandBufferAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocInfo.commandPool = commandPool;
+		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocInfo.commandBufferCount = 1;
+
+		VkCommandBuffer commandBuffer;
+		if (const VkResult result = vkAllocateCommandBuffers(m_Device, &allocInfo, &commandBuffer); result != VK_SUCCESS)
+		{
+			KBR_CORE_ASSERT(false, "Failed to allocate command buffer! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to allocate command buffer!");
+		}
+
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+		if (const VkResult result = vkBeginCommandBuffer(commandBuffer, &beginInfo); result != VK_SUCCESS)
+		{
+			KBR_CORE_ASSERT(false, "Failed to begin command buffer! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to begin command buffer!");
+		}
+
+		return commandBuffer;
+	}
+
+	void VulkanContext::SubmitCommandBuffer(const VkCommandBuffer commandBuffer) const 
+	{
+		constexpr uint64_t fenceWaitTimeout = 10000000000000;
+
+		VkSubmitInfo submitInfo{};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBuffer;
+
+		if (const VkResult result = vkEndCommandBuffer(commandBuffer); result != VK_SUCCESS)
+		{
+			KBR_CORE_ASSERT(false, "Failed to end command buffer! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to end command buffer!");
+		}
+
+		VkFenceCreateInfo fenceInfo{};
+		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		fenceInfo.flags = 0;
+
+		VkFence fence;
+		if (const VkResult result = vkCreateFence(m_Device, &fenceInfo, nullptr, &fence); result != VK_SUCCESS)
+		{
+			KBR_CORE_ASSERT(false, "Failed to create fence! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to create fence!");
+		}
+
+		if (const VkResult result = vkQueueSubmit(m_GraphicsQueue, 1, &submitInfo, fence); result != VK_SUCCESS)
+		{
+			KBR_CORE_ASSERT(false, "Failed to submit command buffer! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to submit command buffer!");
+		}
+
+		if (const VkResult result = vkWaitForFences(m_Device, 1, &fence, VK_TRUE, fenceWaitTimeout); result != VK_SUCCESS)
+		{
+			KBR_CORE_ASSERT(false, "Failed to wait for fence! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to wait for fence!");
+		}
+
+		vkDestroyFence(m_Device, fence, nullptr);
 	}
 
 

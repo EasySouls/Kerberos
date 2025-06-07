@@ -47,8 +47,20 @@ namespace Kerberos
 		VkPipeline GetPipeline() const { return m_GraphicsPipeline; }
 		std::vector<VkFramebuffer> GetSwapChainFramebuffers() const { return m_SwapChainFramebuffers; }
 		uint32_t GetCurrentFrameIndex() const { return m_CurrentFrame; }
+		VkCommandPool GetCommandPool() const { return m_CommandPool; }
 
 		VkDescriptorPool GetImGuiDescriptorPool() const { return m_ImGuiDescriptorPool; }
+
+		/**
+		* @brief Returns a one-time use command buffer that can be used to record commands.
+		* The command buffer must be submitted using SubmitCommandBuffer() after recording.
+		*/
+		VkCommandBuffer GetOneTimeCommandBuffer() const;
+
+		/**
+		* Submit a command buffer for execution.
+		*/
+		void SubmitCommandBuffer(VkCommandBuffer commandBuffer) const;
 
 		static VulkanContext& Get() { return *s_Instance; }
 
@@ -127,8 +139,8 @@ namespace Kerberos
 
 		uint32_t m_CurrentFrame = 0;
 
-		Scope<VulkanVertexBuffer> m_VertexBuffer;
-		Scope<VulkanIndexBuffer> m_IndexBuffer;
+		Scope<VertexBuffer> m_VertexBuffer;
+		Scope<IndexBuffer> m_IndexBuffer;
 
 		static VulkanContext* s_Instance;
 	};

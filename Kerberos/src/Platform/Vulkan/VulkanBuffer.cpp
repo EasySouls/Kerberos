@@ -93,11 +93,12 @@ namespace Kerberos
 
 	void VulkanVertexBuffer::SetLayout(const BufferLayout& layout)
 	{
+		m_Layout = layout;
 	}
 
 	const BufferLayout& VulkanVertexBuffer::GetLayout() const
 	{
-		return BufferLayout(); /// TODO: Placeholder return value, replace with actual layout
+		return m_Layout;
 	}
 
 	VulkanIndexBuffer::VulkanIndexBuffer(const uint32_t* indices, const uint32_t count)
