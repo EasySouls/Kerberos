@@ -19,6 +19,12 @@ namespace Kerberos
 		virtual const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const = 0;
 		virtual const Ref<IndexBuffer>& GetIndexBuffer() const = 0;
 
+		template<typename T>
+		T& As()
+		{
+			return *reinterpret_cast<T*>(this);
+		}
+
 		static Ref<VertexArray> Create();
 	};
 }

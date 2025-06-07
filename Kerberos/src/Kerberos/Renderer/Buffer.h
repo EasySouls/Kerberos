@@ -116,6 +116,12 @@ namespace Kerberos
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 		virtual const BufferLayout& GetLayout() const = 0;
 
+		template<typename T>
+		T& As()
+		{
+			return *reinterpret_cast<T*>(this);
+		}
+
 		static Ref<VertexBuffer> Create(const float* vertices, uint32_t size);
 		static Ref<VertexBuffer> Create(uint32_t size);
 	};
@@ -129,6 +135,12 @@ namespace Kerberos
 		virtual void Unbind() const = 0;
 
 		virtual uint32_t GetCount() const = 0;
+
+        template<typename T>
+		T& As()
+		{
+			return *reinterpret_cast<T*>(this);
+		}
 
 		static Ref<IndexBuffer> Create(const uint32_t* indices, uint32_t count);
 	};

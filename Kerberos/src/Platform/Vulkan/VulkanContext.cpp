@@ -296,11 +296,15 @@ namespace Kerberos
 		scissor.extent = m_SwapChainExtent;
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-		const VkBuffer vertexBuffers[] = { m_VertexBuffer->GetVkBuffer() };
+		const auto& vertexBuffer = m_VertexBuffer->As<VulkanVertexBuffer>();
+
+		const VkBuffer vertexBuffers[] = { vertexBuffer.GetVkBuffer() };
 		constexpr VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-		vkCmdBindIndexBuffer(commandBuffer, m_IndexBuffer->GetVkBuffer(), 0, static_cast<VkIndexType>(m_IndexBuffer->GetType()));
+		const auto& indexBuffer = m_IndexBuffer->As<VulkanIndexBuffer>();
+
+		vkCmdBindIndexBuffer(commandBuffer, indexBuffer.GetVkBuffer(), 0, static_cast<VkIndexType>(indexBuffer.GetType()));
 
 		//vkCmdDraw(commandBuffer, 32, 1, 0, 0);
 
