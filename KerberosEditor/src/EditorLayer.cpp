@@ -348,14 +348,14 @@ namespace Kerberos
 
 			if (ImGuizmo::IsUsing())
 			{
-				glm::vec3 translation, rotation, scale;
-				ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
+				glm::vec3 translation, rotationDegrees, scale;
+				ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), glm::value_ptr(translation), glm::value_ptr(rotationDegrees), glm::value_ptr(scale));
 
 				//glm::vec3 deltaRotation = rotation - originalRotation;
 
 				tc.Translation = translation;
 				//tc.Rotation += deltaRotation;
-				tc.Rotation = rotation;
+				tc.Rotation = glm::radians(rotationDegrees);
 				tc.Scale = scale;
 			}
 		}
