@@ -262,7 +262,7 @@ namespace Kerberos
 
         stbi_image_free(imageData);
 
-		VkCommandBuffer commandBuffer = context.GetCommandBuffer();
+		VkCommandBuffer commandBuffer = context.GetOneTimeCommandBuffer();
 
         /// Copy to Image
         {
@@ -306,8 +306,6 @@ namespace Kerberos
 
         /// End command buffer
 		context.SubmitCommandBuffer(commandBuffer);
-
-        m_RendererID = reinterpret_cast<ImTextureID>(m_DescriptorSet);
 	}
 
 	VulkanTexture2D::VulkanTexture2D(const uint32_t width, const uint32_t height)
@@ -468,12 +466,11 @@ namespace Kerberos
             }
         }
 
-        VkCommandBuffer commandBuffer = context.GetCommandBuffer();
+        VkCommandBuffer commandBuffer = context.GetOneTimeCommandBuffer();
         Utils::TransitionImageLayout(commandBuffer, m_Image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         context.SubmitCommandBuffer(commandBuffer);
 
         m_DescriptorSet = ImGui_ImplVulkan_AddTexture(m_Sampler, m_ImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-        m_RendererID = reinterpret_cast<ImTextureID>(m_DescriptorSet);
 	}
 
 	VulkanTexture2D::~VulkanTexture2D()
@@ -481,9 +478,14 @@ namespace Kerberos
 		CleanupResources();
 	}
 
+	uint64_t VulkanTexture2D::GetRendererID() const 
+    {
+        return reinterpret_cast<ImTextureID>(m_DescriptorSet);
+    }
+
 	void VulkanTexture2D::Bind(uint32_t slot) const
 	{
-        // vkCmdBindDescriptorSets()
+        //vkCmdBindDescriptorSets()
 	}
 
 	void VulkanTexture2D::SetData(void* data, uint32_t size)
@@ -523,7 +525,7 @@ namespace Kerberos
             vkUnmapMemory(device, m_UploadBufferMemory);
         }
 
-        const VkCommandBuffer commandBuffer = context.GetCommandBuffer();
+        const VkCommandBuffer commandBuffer = context.GetOneTimeCommandBuffer();
 
         /// Transition image from SHADER_READ_ONLY (current) to TRANSFER_DST
         Utils::TransitionImageLayout(commandBuffer, m_Image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);

@@ -55,7 +55,7 @@ namespace Kerberos
 		* @brief Returns a one-time use command buffer that can be used to record commands.
 		* The command buffer must be submitted using SubmitCommandBuffer() after recording.
 		*/
-		VkCommandBuffer GetCommandBuffer() const;
+		VkCommandBuffer GetOneTimeCommandBuffer() const;
 
 		/**
 		* Submit a command buffer for execution.

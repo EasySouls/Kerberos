@@ -984,7 +984,7 @@ namespace Kerberos
 		}
 	}
 
-	VkCommandBuffer VulkanContext::GetCommandBuffer() const 
+	VkCommandBuffer VulkanContext::GetOneTimeCommandBuffer() const 
 	{
 		const VkCommandPool commandPool = m_CommandPool;
 

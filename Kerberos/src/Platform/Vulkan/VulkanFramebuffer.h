@@ -27,8 +27,8 @@ namespace Kerberos
 	private:
 		void ReleaseResources();
 
-		void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& memory) const;
-		void CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags flags, VkImageView& imageView) const;
+		static void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& memory);
+		static void CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags flags, VkImageView& imageView);
 
 	private:
 		FramebufferSpecification m_Specification;

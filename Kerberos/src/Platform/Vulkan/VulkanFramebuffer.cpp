@@ -433,7 +433,7 @@ namespace Kerberos
 	}
 
 	void VulkanFramebuffer::CreateImage(const uint32_t width, const uint32_t height, const VkFormat format, const VkImageTiling tiling,
-		const VkImageUsageFlags usage, const VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& memory) const 
+		const VkImageUsageFlags usage, const VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& memory) 
 	{
 		const VulkanContext& context = VulkanContext::Get();
 
@@ -479,7 +479,7 @@ namespace Kerberos
 	}
 
 	void VulkanFramebuffer::CreateImageView(const VkImage image, const VkFormat format, const VkImageAspectFlags flags,
-		VkImageView& imageView) const 
+		VkImageView& imageView) 
 	{
 		VkImageViewCreateInfo viewInfo{};
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
