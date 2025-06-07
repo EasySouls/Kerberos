@@ -262,9 +262,10 @@ namespace Kerberos
 	{
 		m_VertexArray = VertexArray::Create();
 
-		const auto vertexBuffer = VertexBuffer::Create(vertices.size() * sizeof(Vertex));
+		const uint32_t vbSize = static_cast<uint32_t>(vertices.size()) * sizeof(Vertex);
+		const auto vertexBuffer = VertexBuffer::Create(vbSize);
 		vertexBuffer->SetLayout(Vertex::GetLayout());
-		vertexBuffer->SetData(vertices.data(), vertices.size() * sizeof(Vertex));
+		vertexBuffer->SetData(vertices.data(), vbSize);
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 
 		const auto indexBuffer = IndexBuffer::Create(indices.data(), static_cast<uint32_t>(indices.size()));

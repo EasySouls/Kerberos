@@ -14,7 +14,7 @@ namespace Kerberos
 	class D3D11Shader final : public Shader
 	{
 	public:
-		explicit D3D11Shader(const std::string& filepath);
+		explicit D3D11Shader(std::string filepath);
 		D3D11Shader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc, const std::string& geometrySrc = "");
 		~D3D11Shader() override;
 
@@ -30,7 +30,7 @@ namespace Kerberos
 
 		void SetMaterial(const std::string& name, const Ref<Material>& material) override {}
 
-		const std::string& GetName() const override { return "D3D11 Shader"; }
+		const std::string& GetName() const override { return m_Name; }
 
 	private:
 		/*
@@ -62,6 +62,8 @@ namespace Kerberos
 		static std::string ReadFile(const std::string& filepath);
 
 	private:
+		std::string m_Name;
+
 		friend class D3D11Context;
 	};
 }

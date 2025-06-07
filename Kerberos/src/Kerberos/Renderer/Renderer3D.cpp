@@ -115,7 +115,7 @@ namespace Kerberos
 		 1.0f, -1.0f,  1.0f
 		};
 		s_RendererData.SkyboxVertexArray = VertexArray::Create();
-		const Ref<VertexBuffer> skyboxVertexBuffer = VertexBuffer::Create(skyboxVertices.data(), skyboxVertices.size() * sizeof(float));
+		const Ref<VertexBuffer> skyboxVertexBuffer = VertexBuffer::Create(skyboxVertices.data(), static_cast<uint32_t>(skyboxVertices.size()) * sizeof(float));
 		skyboxVertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "a_Position" }
 			});

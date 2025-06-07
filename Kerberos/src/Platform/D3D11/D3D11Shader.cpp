@@ -8,10 +8,13 @@
 
 namespace Kerberos
 {
-	D3D11Shader::D3D11Shader(const std::string& filepath) {}
+	D3D11Shader::D3D11Shader(std::string filepath)
+		: m_Name(std::move(filepath))
+	{}
 
 	D3D11Shader::D3D11Shader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc,
 		const std::string& geometrySrc)
+		: m_Name(std::move(name))
 	{}
 
 	D3D11Shader::~D3D11Shader() {}
