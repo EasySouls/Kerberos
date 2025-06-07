@@ -31,7 +31,7 @@ namespace Kerberos
 		template<typename T>
 		T& As()
 		{
-			return *reinterpret_cast<T*>(this);
+			return *static_cast<T*>(this);
 		}
 
 		static Ref<Shader> Create(const std::string& filepath);

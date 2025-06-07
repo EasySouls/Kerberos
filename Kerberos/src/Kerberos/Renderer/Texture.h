@@ -23,7 +23,7 @@ namespace Kerberos
 		template<typename T>
 		T& As()
 		{
-			return *reinterpret_cast<T*>(this);
+			return *static_cast<T*>(this);
 		}
 	};
 

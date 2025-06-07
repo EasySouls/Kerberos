@@ -119,7 +119,7 @@ namespace Kerberos
 		template<typename T>
 		T& As()
 		{
-			return *reinterpret_cast<T*>(this);
+			return *static_cast<T*>(this);
 		}
 
 		static Ref<VertexBuffer> Create(const float* vertices, uint32_t size);
@@ -139,7 +139,7 @@ namespace Kerberos
         template<typename T>
 		T& As()
 		{
-			return *reinterpret_cast<T*>(this);
+			return *static_cast<T*>(this);
 		}
 
 		static Ref<IndexBuffer> Create(const uint32_t* indices, uint32_t count);

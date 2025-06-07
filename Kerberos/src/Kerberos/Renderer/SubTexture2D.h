@@ -17,7 +17,7 @@ namespace Kerberos
 		template<typename T>
 		T& As()
 		{
-			return *reinterpret_cast<T*>(this);
+			return *static_cast<T*>(this);
 		}
 
 		static Ref<SubTexture2D> CreateFromCoords(const Ref<Texture2D>& texture, const glm::vec2& coords, const glm::vec2& cellSize, const glm::vec2& spriteSize);
