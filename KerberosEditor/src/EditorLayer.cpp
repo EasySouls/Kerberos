@@ -187,10 +187,11 @@ namespace Kerberos
 				if (pixelData < 0)
 				{
 					m_HoveredEntity = {};
-					return;
 				}
-
-				m_HoveredEntity = Entity{ static_cast<entt::entity>(pixelData), m_ActiveScene.get() };
+				else
+				{
+					m_HoveredEntity = Entity{ static_cast<entt::entity>(pixelData), m_ActiveScene.get() };
+				}
 			}
 		}
 
@@ -385,7 +386,6 @@ namespace Kerberos
 			/// Entity transform
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
 			auto transform = tc.GetTransform();
-			glm::vec3 originalRotation = tc.Rotation;
 
 			/// Snapping 
 			const bool snap = Input::IsKeyPressed(Key::LeftControl);
@@ -403,10 +403,7 @@ namespace Kerberos
 				glm::vec3 translation, rotationDegrees, scale;
 				ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), glm::value_ptr(translation), glm::value_ptr(rotationDegrees), glm::value_ptr(scale));
 
-				//glm::vec3 deltaRotation = rotation - originalRotation;
-
 				tc.Translation = translation;
-				//tc.Rotation += deltaRotation;
 				tc.Rotation = glm::radians(rotationDegrees);
 				tc.Scale = scale;
 			}
@@ -424,6 +421,7 @@ namespace Kerberos
 
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(KBR_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(KBR_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	}
 
 	bool EditorLayer::OnKeyPressed(const KeyPressedEvent& event)
@@ -473,7 +471,22 @@ namespace Kerberos
 		case Key::R:
 			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
 			break;
+		default:
+			break;
 		}
+
+		return false;
+	}
+
+	bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event) 
+	{
+		/// Handle mouse picking
+		/// Only select the entity if we are not using the gizmos or the camera
+		if (event.GetMouseButton() == Mouse::ButtonLeft && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
+		{
+			m_HierarchyPanel.SetSelectedEntity(m_HoveredEntity);
+		}
+		return false;
 	}
 
 	void EditorLayer::NewScene()

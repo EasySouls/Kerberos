@@ -109,6 +109,11 @@ namespace Kerberos
 		ImGui::End();
 	}
 
+	void HierarchyPanel::SetSelectedEntity(const Entity entity) 
+	{
+		m_SelectedEntity = entity;
+	}
+
 	void HierarchyPanel::DrawEntityNode(const Entity& entity)
 	{
 		const auto& tag = entity.GetComponent<TagComponent>().Tag;

@@ -22,6 +22,7 @@ namespace Kerberos
 		void DrawComponents(Entity entity) const;
 
 		Entity GetSelectedEntity() const { return m_SelectedEntity; }
+		void SetSelectedEntity(Entity entity);
 
 	private:
 		void DrawEntityNode(const Entity& entity);

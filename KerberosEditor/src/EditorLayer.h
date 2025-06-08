@@ -21,6 +21,7 @@ namespace Kerberos
 
 	private:
 		bool OnKeyPressed(const KeyPressedEvent& event);
+		bool OnMouseButtonPressed(const MouseButtonPressedEvent& event);
 
 		void SaveScene() const;
 		void SaveSceneAs() const;
