@@ -277,6 +277,12 @@ namespace Kerberos
         Invalidate(); 
 	}
 
+	int D3D11Framebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y) 
+    {
+        // TODO
+        return -1;
+    }
+
 	uint64_t D3D11Framebuffer::GetColorAttachmentRendererID(const uint32_t index) const
 	{
         KBR_CORE_ASSERT(index < m_ColorAttachmentSpecs.size(), "Index out of bounds for color attachment!");

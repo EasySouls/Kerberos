@@ -24,7 +24,7 @@ namespace Kerberos
 		FramebufferSpecification frameBufferSpec;
 		frameBufferSpec.Width = 1280;
 		frameBufferSpec.Height = 720;
-		frameBufferSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
+		frameBufferSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
 		m_Framebuffer = Framebuffer::Create(frameBufferSpec);
 
 		m_ActiveScene = CreateRef<Scene>();
@@ -160,8 +160,28 @@ namespace Kerberos
 			m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera, m_RenderSkybox);
 			//m_ActiveScene->OnUpdateRuntime(deltaTime);
 
-			m_Framebuffer->Unbind();
 		}
+
+		{
+			auto [mx, my] = ImGui::GetMousePos();
+			mx -= m_ViewportBounds[0].x;
+			my -= m_ViewportBounds[0].y;
+			const glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+
+			/// Flip the y coord (works with opengl)
+			my = viewportSize.y - my;
+
+			const int mouseX = static_cast<int>(mx);
+			const int mouseY = static_cast<int>(my);
+
+			if (mouseX >= 0 && mouseY >= 0 && mouseX <= static_cast<int>(viewportSize.x) && mouseY <= static_cast<int>(viewportSize.y))
+			{
+				int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+				KBR_WARN("Pixel data: {}", pixelData);
+			}
+		}
+
+		m_Framebuffer->Unbind();
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -300,6 +320,8 @@ namespace Kerberos
 		ImGui::Begin("Viewport");
 		ImGui::PopStyleVar();
 
+		const auto viewportOffset = ImGui::GetCursorPos(); // Includes the tab bar
+
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 
@@ -309,6 +331,16 @@ namespace Kerberos
 
 		const uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		ImGui::Image(textureID, ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		/// Set the bounds of the viewport
+		const auto windowSize = ImGui::GetWindowSize();
+		ImVec2 minBound = ImGui::GetWindowPos();
+		minBound.x += viewportOffset.x;
+		minBound.y += viewportOffset.y;
+
+		ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+		m_ViewportBounds[0] = { minBound.x, minBound.y };
+		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
 		/// Gizmos
 		if (const Entity selectedEntity = m_HierarchyPanel.GetSelectedEntity(); selectedEntity && m_GizmoType != -1)

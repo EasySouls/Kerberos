@@ -19,6 +19,8 @@ namespace Kerberos
 
 		void Resize(uint32_t width, uint32_t height) override;
 
+		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
+
 		uint64_t GetColorAttachmentRendererID(const uint32_t index = 0) const override 
 		{
 			KBR_CORE_ASSERT(index < m_ColorAttachments.size(), "Index out of bounds!");

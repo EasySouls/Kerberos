@@ -15,6 +15,7 @@ namespace Kerberos
 				return true;
 			case FramebufferTextureFormat::None:
 			case FramebufferTextureFormat::RGBA8:
+			case FramebufferTextureFormat::RED_INTEGER:
 				return false;
 			}
 
@@ -37,7 +38,7 @@ namespace Kerberos
 			glBindTexture(TextureTarget(multisampled), id);
 		}
 
-		static void AttachColorTexture(const uint32_t id, const uint32_t samples, const GLint format, const uint32_t width, const uint32_t height, const int index)
+		static void AttachColorTexture(const uint32_t id, const uint32_t samples, const GLint internalFormat, const GLenum format, const uint32_t width, const uint32_t height, const int index)
 		{
 			const int texWidth = static_cast<int>(width);
 			const int texHeight = static_cast<int>(height);
@@ -47,11 +48,11 @@ namespace Kerberos
 
 			if (multisampled)
 			{
-				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, texSamples, format, texWidth, texHeight, GL_FALSE);
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, texSamples, internalFormat, texWidth, texHeight, GL_FALSE);
 			}
 			else
 			{
-				glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+				glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texWidth, texHeight, 0, format, GL_UNSIGNED_BYTE, nullptr);
 
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -155,7 +156,12 @@ namespace Kerberos
 				{
 					case FramebufferTextureFormat::RGBA8:
 					{
-						Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_RGBA8, m_Specification.Width, m_Specification.Height, i);
+						Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_RGBA8, GL_RGBA,  m_Specification.Width, m_Specification.Height, i);
+						break;
+					}
+					case FramebufferTextureFormat::RED_INTEGER:
+					{
+						Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_R32I, GL_RED_INTEGER, m_Specification.Width, m_Specification.Height, i);
 						break;
 					}
 					default:
@@ -255,4 +261,16 @@ namespace Kerberos
 
 		Invalidate();
 	}
+
+	int OpenGLFramebuffer::ReadPixel(const uint32_t attachmentIndex, int x, int y) 
+	{
+		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmenIndex is out of bounds");
+
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+
+		int pixelData;
+		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
+		return pixelData;
+	}
+
 }

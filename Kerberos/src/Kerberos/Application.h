@@ -40,8 +40,8 @@ namespace Kerberos
 		float m_LastFrameTime = 0;
 
 		Scope<Window> m_Window;
-		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
+		ImGuiLayer* m_ImGuiLayer;
 
 		static Application* s_Instance;
 	};

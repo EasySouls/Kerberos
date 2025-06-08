@@ -1,7 +1,7 @@
 #pragma once
 #include <Kerberos.h>
 
-#include "ParticleSystem.h"
+//#include "ParticleSystem.h"
 #include "Editor/HierarchyPanel.h"
 
 
@@ -39,6 +39,7 @@ namespace Kerberos
 		Entity m_SunlightEntity;
 
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
+		std::array<glm::vec2, 2> m_ViewportBounds;
 
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;

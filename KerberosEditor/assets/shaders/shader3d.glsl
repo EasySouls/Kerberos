@@ -30,6 +30,7 @@ void main()
 #version 460 core
 
 layout(location = 0) out vec4 color;
+layout(location = 1) out int color2;
 
 in vec3 v_FragPos_WorldSpace;
 in vec3 v_Normal_WorldSpace;
@@ -146,4 +147,6 @@ void main()
     }
 
     color = vec4(totalLighting, alpha);
+
+    color2 = 20;
 }
