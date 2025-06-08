@@ -433,9 +433,11 @@ namespace Kerberos
 		shaderc::Compiler compiler;
 		shaderc::CompileOptions options;
 		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
-		options.SetSourceLanguage(shaderc_source_language_glsl);
-		options.SetVulkanRulesRelaxed(true);
-		options.SetForcedVersionProfile(450, shaderc_profile_core);
+		//options.SetAutoBindUniforms(true);
+		options.SetAutoMapLocations(true);
+		//options.SetSourceLanguage(shaderc_source_language_glsl);
+		//options.SetVulkanRulesRelaxed(true);
+		//options.SetForcedVersionProfile(450, shaderc_profile_core);
 		if (constexpr bool optimize = true)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
 

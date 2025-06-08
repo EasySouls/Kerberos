@@ -57,7 +57,7 @@ layout(location = 1) in vec3 v_Normal_WorldSpace;
 layout(location = 2) in vec2 v_TexCoord;
 layout(location = 3) in flat int v_EntityID;
 
-layout(binding = 0) uniform sampler2D u_Texture;
+layout(binding = 2) uniform sampler2D u_Texture;
 
 #define MAX_POINT_LIGHTS 10
 
