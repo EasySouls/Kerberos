@@ -2,17 +2,14 @@
 #include "Renderer3D.h"
 #include "RenderCommand.h"
 #include "TextureCube.h"
+#include "UniformBuffer.h"
 
 namespace Kerberos
 {
 	struct Renderer3DData
 	{
-		glm::mat4 ViewMatrix;
-		glm::mat4 ProjectionMatrix;
-		glm::mat4 ViewProjectionMatrix;
 		Ref<Shader> ActiveShader;
 		Ref<Texture2D> WhiteTexture;
-		glm::vec3 CameraPosition;
 
 		Ref<Shader> BaseShader = nullptr;
 		Ref<Shader> WireframeShader = nullptr;
@@ -30,6 +27,16 @@ namespace Kerberos
 		Ref<TextureCube> StarmapSkyboxTexture = nullptr;
 		Ref<TextureCube> OceanSkyboxTexture = nullptr;
 		Ref<VertexArray> SkyboxVertexArray = nullptr;
+
+		struct CameraData
+		{
+			glm::vec3 Position;
+			glm::mat4 ViewMatrix;
+			glm::mat4 ProjectionMatrix;
+			glm::mat4 ViewProjectionMatrix;
+		} CameraData;
+
+		Ref<UniformBuffer> CameraUniformBuffer = nullptr;
 	};
 
 	static Renderer3DData s_RendererData;
@@ -121,6 +128,8 @@ namespace Kerberos
 			});
 		s_RendererData.SkyboxVertexArray->AddVertexBuffer(skyboxVertexBuffer);
 
+		s_RendererData.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::CameraData), 0);
+
 		ResetStatistics();
 	}
 
@@ -135,14 +144,13 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		const auto& viewProjection = camera.GetViewProjectionMatrix();
-		s_RendererData.ViewMatrix = camera.GetViewMatrix();
-		s_RendererData.ProjectionMatrix = camera.GetProjection();
-		s_RendererData.ViewProjectionMatrix = viewProjection;
-		s_RendererData.CameraPosition = camera.GetPosition();
+		s_RendererData.CameraData.ViewMatrix = camera.GetViewMatrix();
+		s_RendererData.CameraData.ProjectionMatrix = camera.GetProjection();
+		s_RendererData.CameraData.ViewProjectionMatrix = viewProjection;
+		s_RendererData.CameraData.Position = camera.GetPosition();
 
 		s_RendererData.ActiveShader->Bind();
-		s_RendererData.ActiveShader->SetMat4("u_ViewProjection", viewProjection);
-		s_RendererData.ActiveShader->SetFloat3("u_ViewPos", s_RendererData.CameraPosition);
+		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData, sizeof(Renderer3DData::CameraData), 0);
 
 		s_RendererData.SunLight = sun;
 		s_RendererData.PointLights.clear();
@@ -168,13 +176,13 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		const auto& viewProjection = camera.GetProjection() * glm::inverse(transform);
-		s_RendererData.ViewMatrix = glm::inverse(transform);
-		s_RendererData.ProjectionMatrix = camera.GetProjection();
-		s_RendererData.CameraPosition = transform[3];
+		s_RendererData.CameraData.ViewMatrix = glm::inverse(transform);
+		s_RendererData.CameraData.ProjectionMatrix = camera.GetProjection();
+		s_RendererData.CameraData.ViewProjectionMatrix = viewProjection;
+		s_RendererData.CameraData.Position = transform[3];
 
 		s_RendererData.ActiveShader->Bind();
-		s_RendererData.ActiveShader->SetMat4("u_ViewProjection", viewProjection);
-		s_RendererData.ActiveShader->SetFloat3("u_ViewPos", s_RendererData.CameraPosition);
+		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData, sizeof(Renderer3DData::CameraData), 0);
 
 		s_RendererData.SunLight = sun;
 		s_RendererData.PointLights.clear();
@@ -205,10 +213,10 @@ namespace Kerberos
 		s_RendererData.SkyboxShader->Bind();
 
 		/// Remove translation from view matrix
-		const glm::mat4 skyboxView = glm::mat4(glm::mat3(s_RendererData.ViewMatrix)); 
+		const glm::mat4 skyboxView = glm::mat4(glm::mat3(s_RendererData.CameraData.ViewMatrix)); 
 
 		s_RendererData.SkyboxShader->SetMat4("u_View", skyboxView);
-		s_RendererData.SkyboxShader->SetMat4("u_Projection", s_RendererData.ProjectionMatrix);
+		s_RendererData.SkyboxShader->SetMat4("u_Projection", s_RendererData.CameraData.ProjectionMatrix);
 
 		/// Set the hovered entity's id to an invalid value
 		s_RendererData.SkyboxShader->SetInt("u_EntityID", -1);
@@ -240,7 +248,7 @@ namespace Kerberos
 		const Ref<Shader> shaderToUse = material->MaterialShader ? material->MaterialShader : s_RendererData.ActiveShader;
 		shaderToUse->Bind();
 
-		shaderToUse->SetMat4("u_ViewProjection", s_RendererData.ViewProjectionMatrix);
+		shaderToUse->SetMat4("u_ViewProjection", s_RendererData.CameraData.ViewProjectionMatrix);
 		shaderToUse->SetMat4("u_Model", transform);
 
 		shaderToUse->SetMaterial("u_Material", material);

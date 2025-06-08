@@ -182,7 +182,6 @@ namespace Kerberos
 			if (mouseX >= 0 && mouseY >= 0 && mouseX <= static_cast<int>(viewportSize.x) && mouseY <= static_cast<int>(viewportSize.y))
 			{
 				int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-				KBR_WARN("Pixel data: {}", pixelData);
 
 				if (pixelData < 0)
 				{

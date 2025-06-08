@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <glm/glm.hpp>
 
+#include "glad/glad.h"
+
 
 namespace Kerberos
 {
@@ -29,6 +31,15 @@ namespace Kerberos
 		void SetMaterial(const std::string& name, const Ref<Material>& material) override;
 
 	private:
+		static std::string ReadFile(const std::string& filepath);
+		static std::unordered_map<unsigned int, std::string> Preprocess(const std::string& shaderSource);
+		void Compile(const std::unordered_map<unsigned int, std::string>& shaderSources);
+
+		void CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
+		void CompileOrGetOpenGLBinaries();
+		void CreateProgram();
+		void Reflect(GLenum stage, const std::vector<uint32_t>& shaderData);
+
 		void UploadUniformInt(const std::string& name, int value) const;
 		void UploadUniformIntArray(const std::string& name, const int* values, uint32_t count) const;
 
@@ -40,12 +51,14 @@ namespace Kerberos
 		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const;
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const;
 
-		static std::string ReadFile(const std::string& filepath);
-		static std::unordered_map<unsigned int, std::string> Preprocess(const std::string& shaderSource);
-		void Compile(const std::unordered_map<unsigned int, std::string>& shaderSources);
-
 	private:
 		uint32_t m_RendererID;
+		std::string m_FilePath;
 		std::string m_Name;
+
+		std::unordered_map<GLenum, std::vector<uint32_t>> m_VulkanSPIRV;
+		std::unordered_map<GLenum, std::vector<uint32_t>> m_OpenGLSPIRV;
+
+		std::unordered_map<GLenum, std::string> m_OpenGLSourceCode;
 	};
 }

@@ -47,6 +47,18 @@ namespace Kerberos
 			return nullptr;
 		}
 
+		static GLenum ShaderTypeFromString(const std::string& type)
+		{
+			if (type == "vertex")
+				return GL_VERTEX_SHADER;
+			if (type == "fragment" || type == "pixel")
+				return GL_FRAGMENT_SHADER;
+			if (type == "geometry")
+				return GL_GEOMETRY_SHADER;
+			KBR_CORE_ASSERT(false, "Unknown shader type!")
+				return 0;
+		}
+
 		static const char* GetCacheDirectory() {
 			return "assets/cache/shader/vulkan";
 		}
@@ -119,8 +131,8 @@ namespace Kerberos
 
 		/// I haven't converted the other shaders to be Vulkan compatible yet,
 		/// and i don't want to modify the source code of the Editor
-		if (filepath != "assets/shaders/shader3d-vulkan.glsl" && filepath != "assets/shaders/shader3d-basic-vulkan.glsl")
-			return;
+		/*if (filepath != "assets/shaders/shader3d-vulkan.glsl" && filepath != "assets/shaders/shader3d-basic-vulkan.glsl")
+			return;*/
 
 		Utils::CreateCacheDirectoryIfNeeded();
 
@@ -161,6 +173,9 @@ namespace Kerberos
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
+		if (!geometrySrc.empty()) {
+			sources[GL_GEOMETRY_SHADER] = geometrySrc;
+		}
 
 		CompileOrGetVulkanBinaries(sources);
 		CreateShaderModules();
@@ -262,28 +277,26 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		/// TODO: This should look for #type directive to determine the shader stages
-
-		const size_t vertexPos = source.find("#type vertex");
-		const size_t fragmentPos = source.find("#type fragment");
-		const size_t geometryPos = source.find("#type geometry");
-
-		if (vertexPos == std::string::npos || fragmentPos == std::string::npos)
-		{
-			throw std::runtime_error(
-				"Shader file must contain '#type vertex' and '#type fragment' "
-				"directives.");
-		}
-
-		const std::string vertexSource = source.substr(vertexPos + std::string("#type vertex").length(),
-			fragmentPos - vertexPos -
-			std::string("#type vertex").length());
-		const std::string fragmentSource = source.substr(fragmentPos +
-			std::string("#type fragment").length());
-
 		std::unordered_map<GLenum, std::string> shaderSources;
-		shaderSources[GL_VERTEX_SHADER] = vertexSource;
-		shaderSources[GL_FRAGMENT_SHADER] = fragmentSource;
+
+		const char* typeToken = "#type";
+		const size_t typeTokenLength = strlen(typeToken);
+		size_t pos = source.find(typeToken, 0);
+
+		while (pos != std::string::npos)
+		{
+			const size_t eol = source.find_first_of("\r\n", pos);
+			KBR_CORE_ASSERT(eol != std::string::npos, "Syntax error!");
+			const size_t begin = pos + typeTokenLength + 1;
+			std::string type = source.substr(begin, eol - begin);
+			KBR_CORE_ASSERT(type == "vertex" || type == "fragment" || type == "pixel" || type == "geometry", "Invalid shader type specified!");
+
+			const size_t nextLinePos = source.find_first_not_of("\r\n", eol);
+			pos = source.find(typeToken, nextLinePos);
+
+			shaderSources[Utils::ShaderTypeFromString(type)]
+				= source.substr(nextLinePos, pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));
+		}
 
 		return shaderSources;
 	}

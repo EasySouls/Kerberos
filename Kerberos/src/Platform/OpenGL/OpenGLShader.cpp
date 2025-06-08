@@ -7,27 +7,120 @@
 #include <filesystem>
 #include <glm/gtc/type_ptr.hpp>
 #include <glad/glad.h>
+#include <shaderc/shaderc.h>
+#include <shaderc/shaderc.hpp>
+#include <spirv_cross/spirv_glsl.hpp>
+
+#include "Kerberos/Core/Timer.h"
 
 
 namespace Kerberos
 {
-	static GLenum ShaderTypeFromString(const std::string& type)
+	namespace Utils
 	{
-		if (type == "vertex")
-			return GL_VERTEX_SHADER;
-		if (type == "fragment" || type == "pixel")
-			return GL_FRAGMENT_SHADER;
-		if (type == "geometry")
-			return GL_GEOMETRY_SHADER;
-		KBR_CORE_ASSERT(false, "Unknown shader type!")
-			return 0;
+		static GLenum ShaderTypeFromString(const std::string& type)
+		{
+			if (type == "vertex")
+				return GL_VERTEX_SHADER;
+			if (type == "fragment" || type == "pixel")
+				return GL_FRAGMENT_SHADER;
+			if (type == "geometry")
+				return GL_GEOMETRY_SHADER;
+			KBR_CORE_ASSERT(false, "Unknown shader type!")
+				return 0;
+		}
+
+		static shaderc_shader_kind GLShaderStageToShaderC(const GLenum stage)
+		{
+			switch (stage)
+			{
+			case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
+			case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
+			case GL_GEOMETRY_SHADER: return shaderc_glsl_geometry_shader;
+			}
+			KBR_CORE_ASSERT(false, "Not supported shader type");
+			return static_cast<shaderc_shader_kind>(0);
+		}
+
+		static const char* GLShaderStageToString(const GLenum stage)
+		{
+			switch (stage)
+			{
+			case GL_VERTEX_SHADER:   return "GL_VERTEX_SHADER";
+			case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
+			case GL_GEOMETRY_SHADER: return "GL_GEOMETRY_SHADER";
+			}
+			KBR_CORE_ASSERT(false, "Not supported shader type");
+			return nullptr;
+		}
+
+		static const char* GetCacheDirectory()
+		{
+			return "assets/cache/shader/opengl";
+		}
+
+		static void CreateCacheDirectoryIfNeeded()
+		{
+			const std::string cacheDirectory = GetCacheDirectory();
+			if (!std::filesystem::exists(cacheDirectory))
+				std::filesystem::create_directories(cacheDirectory);
+		}
+
+		static const char* GLShaderStageCachedOpenGLFileExtension(const uint32_t stage)
+		{
+			switch (stage)
+			{
+			case GL_VERTEX_SHADER:    return ".cached_opengl.vert";
+			case GL_FRAGMENT_SHADER:  return ".cached_opengl.frag";
+			case GL_GEOMETRY_SHADER:  return ".cached_opengl.geom";
+			default: 
+				KBR_CORE_ASSERT(false, "Unknown shader stage for OpenGL cached file extension!");
+				return "";
+			}
+		}
+
+		static const char* GLShaderStageCachedVulkanFileExtension(const uint32_t stage)
+		{
+			switch (stage)
+			{
+			case GL_VERTEX_SHADER:    return ".cached_vulkan.vert";
+			case GL_FRAGMENT_SHADER:  return ".cached_vulkan.frag";
+			case GL_GEOMETRY_SHADER:  return ".cached_vulkan.geom";
+				default: 
+				KBR_CORE_ASSERT(false, "Unknown shader stage for Vulkan cached file extension!");
+				return "";
+			}
+		}
 	}
+	
 
 	OpenGLShader::OpenGLShader(const std::string& filepath)
+		: m_FilePath(filepath)
 	{
+		KBR_PROFILE_FUNCTION();
+
+		Utils::CreateCacheDirectoryIfNeeded();
+
 		const std::string source = ReadFile(filepath);
 		const auto shaderSources = Preprocess(source);
-		Compile(shaderSources);
+		//Compile(shaderSources);
+
+		{
+			struct ProfileResult
+			{
+				const char* Name;
+				float Time;
+			};
+
+			Timer timer("OpenGLShader - Shader compilation", [&](const ProfileResult& res)
+				{
+					KBR_CORE_TRACE("Shader compilation took {0} ms", res.Time);
+				});
+
+			CompileOrGetVulkanBinaries(shaderSources);
+			CompileOrGetOpenGLBinaries();
+			CreateProgram();
+		}
 
 		const std::filesystem::path path = filepath;
 		m_Name = path.stem().string();
@@ -41,7 +134,11 @@ namespace Kerberos
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
 		if (!geometrySrc.empty())
 			sources[GL_GEOMETRY_SHADER] = geometrySrc;
-		Compile(sources);
+
+		CompileOrGetVulkanBinaries(sources);
+		CompileOrGetOpenGLBinaries();
+		CreateProgram();
+		//Compile(sources);
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -189,7 +286,7 @@ namespace Kerberos
 			const size_t nextLinePos = shaderSource.find_first_not_of("\r\n", eol);
 			pos = shaderSource.find(typeToken, nextLinePos);
 
-			shaderSources[ShaderTypeFromString(type)]
+			shaderSources[Utils::ShaderTypeFromString(type)]
 				= shaderSource.substr(nextLinePos, pos - (nextLinePos == std::string::npos ? shaderSource.size() - 1 : nextLinePos));
 		}
 
@@ -269,5 +366,262 @@ namespace Kerberos
 
 		// Assign the programId to the class member only when compilation succeeded
 		m_RendererID = program;
+	}
+
+	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources) 
+	{
+		GLuint program = glCreateProgram();
+
+		shaderc::Compiler compiler;
+		shaderc::CompileOptions options;
+		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_4);
+		if (constexpr bool optimize = true)
+			options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
+
+		auto& shaderData = m_VulkanSPIRV;
+		shaderData.clear();
+		for (auto&& [stage, source] : shaderSources)
+		{
+			std::filesystem::path shaderFilePath = m_FilePath;
+			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedVulkanFileExtension(stage));
+
+			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
+			if (in.is_open())
+			{
+				in.seekg(0, std::ios::end);
+				auto size = in.tellg();
+				in.seekg(0, std::ios::beg);
+
+				auto& data = shaderData[stage];
+				data.resize(size / sizeof(uint32_t));
+				in.read(reinterpret_cast<char*>(data.data()), size);
+			}
+			else
+			{
+				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str(), options);
+				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
+				{
+					KBR_CORE_ERROR(module.GetErrorMessage());
+					const std::string message = std::format("Shader compilation failed to vulkan binary! Stage: {}, File: {}", Utils::GLShaderStageToString(stage), m_FilePath);
+					KBR_CORE_ASSERT(false, message);
+					return;
+				}
+
+				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
+
+				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
+				if (out.is_open())
+				{
+					auto& data = shaderData[stage];
+					out.write(reinterpret_cast<char*>(data.data()), data.size() * sizeof(uint32_t));
+					out.flush();
+					out.close();
+				}
+			}
+		}
+
+		for (auto&& [stage, data] : shaderData)
+			Reflect(stage, data);
+	}
+
+	void OpenGLShader::CompileOrGetOpenGLBinaries() 
+	{
+		auto& shaderData = m_OpenGLSPIRV;
+
+		shaderc::Compiler compiler;
+		shaderc::CompileOptions options;
+		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
+		options.SetSourceLanguage(shaderc_source_language_glsl);
+		options.SetVulkanRulesRelaxed(true);
+		options.SetForcedVersionProfile(450, shaderc_profile_core);
+		if (constexpr bool optimize = true)
+			options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
+
+		shaderData.clear();
+		m_OpenGLSourceCode.clear();
+		for (auto&& [stage, spirv] : m_VulkanSPIRV)
+		{
+			std::filesystem::path shaderFilePath = m_FilePath;
+			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedOpenGLFileExtension(stage));
+
+			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
+			if (in.is_open())
+			{
+				in.seekg(0, std::ios::end);
+				auto size = in.tellg();
+				in.seekg(0, std::ios::beg);
+
+				auto& data = shaderData[stage];
+				data.resize(size / sizeof(uint32_t));
+				in.read(reinterpret_cast<char*>(data.data()), size);
+			}
+			else
+			{
+				spirv_cross::CompilerGLSL glslCompiler(spirv);
+				spirv_cross::CompilerGLSL::Options glslOptions = glslCompiler.get_common_options();
+				glslOptions.emit_push_constant_as_uniform_buffer = false;
+				glslOptions.vulkan_semantics = false;
+				glslCompiler.set_common_options(glslOptions);
+
+				m_OpenGLSourceCode[stage] = glslCompiler.compile();
+				auto& source = m_OpenGLSourceCode[stage];
+
+				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str(), options);
+				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
+				{
+					KBR_CORE_ERROR(module.GetErrorMessage());
+					const std::string message = std::format("Shader compilation failed to opengl binary! Stage: {}, File: {}", Utils::GLShaderStageToString(stage), m_FilePath);
+					KBR_CORE_ASSERT(false, message);
+					return;
+				}
+
+				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
+
+				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
+				if (out.is_open())
+				{
+					auto& data = shaderData[stage];
+					out.write(reinterpret_cast<char*>(data.data()), data.size() * sizeof(uint32_t));
+					out.flush();
+					out.close();
+				}
+			}
+		}
+	}
+
+	void OpenGLShader::CreateProgram() 
+	{
+		const GLuint program = glCreateProgram();
+
+		std::vector<GLuint> shaderIDs;
+		for (auto&& [stage, spirv] : m_OpenGLSPIRV)
+		{
+			GLuint shaderID = shaderIDs.emplace_back(glCreateShader(stage));
+			glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t));
+			glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
+			glAttachShader(program, shaderID);
+		}
+
+		glLinkProgram(program);
+
+		GLint isLinked;
+		glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
+		if (isLinked == GL_FALSE)
+		{
+			GLint maxLength;
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+
+			std::vector<GLchar> infoLog(maxLength);
+			glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data());
+			KBR_CORE_ERROR("Shader linking failed ({0}):\n{1}", m_FilePath, infoLog.data());
+
+			glDeleteProgram(program);
+
+			for (const auto id : shaderIDs)
+				glDeleteShader(id);
+		}
+
+		for (const auto id : shaderIDs)
+		{
+			glDetachShader(program, id);
+			glDeleteShader(id);
+		}
+
+		m_RendererID = program;
+	}
+
+	void OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData) 
+	{
+		const spirv_cross::Compiler compiler(shaderData);
+		spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+
+		const char* stageName = nullptr;
+		switch (stage)
+		{
+		case GL_VERTEX_SHADER:   stageName = "Vertex"; break;
+		case GL_FRAGMENT_SHADER: stageName = "Fragment"; break;
+		case GL_GEOMETRY_SHADER: stageName = "Geometry"; break;
+		}
+
+		KBR_CORE_TRACE("  Stage: {0}", stageName);
+		KBR_CORE_TRACE("    Uniform Buffers: {0}", resources.uniform_buffers.size());
+		for (const auto& resource : resources.uniform_buffers)
+		{
+			const auto& bufferType = compiler.get_type(resource.base_type_id);
+			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+			size_t bufferSize = compiler.get_declared_struct_size(bufferType);
+
+			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}, Size: {3}", resource.name, set, binding, bufferSize);
+		}
+
+		KBR_CORE_TRACE("    Sampled Images (Textures/Samplers): {0}", resources.sampled_images.size());
+		for (const auto& resource : resources.sampled_images)
+		{
+			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+			uint32_t descriptorCount = 1;
+
+			// Check if it's an array of textures (e.g., `sampler2D textures[4]`)
+			const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+			if (!type.array.empty())
+			{
+				descriptorCount = type.array[0]; // Assuming 1D array for simplicity
+				if (descriptorCount == 0) // Unsized array (e.g., `sampler2D textures[]`)
+					//descriptorCount = VulkanContext::Get().GetCapabilities().maxSamplerAllocationCount; // Or some max you define
+					descriptorCount = 1; // Default to 1 if unsized
+			}
+
+			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}, Count: {3}", resource.name, set, binding, descriptorCount);
+		}
+
+		KBR_CORE_TRACE("    Storage Buffers: {0}", resources.storage_buffers.size());
+		for (const auto& resource : resources.storage_buffers)
+		{
+			const auto& bufferType = compiler.get_type(resource.base_type_id);
+			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+			size_t bufferSize = compiler.get_declared_struct_size(bufferType);
+
+			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}, Approx Size: {3}", resource.name, set, binding, bufferSize);
+		}
+
+		KBR_CORE_TRACE("    Storage Images: {0}", resources.storage_images.size());
+		for (const auto& resource : resources.storage_images)
+		{
+			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+			uint32_t descriptorCount = 1;
+			const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+			if (!type.array.empty())
+			{
+				descriptorCount = type.array[0];
+				if (descriptorCount == 0)
+					//descriptorCount = VulkanContext::Get().GetCapabilities().maxStorageImageAllocationCount; // Or some max
+					descriptorCount = 1; // Default to 1 if unsized
+			}
+
+			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}", resource.name, set, binding);
+		}
+
+		KBR_CORE_TRACE("    Push Constant Buffers: {0}", resources.push_constant_buffers.size());
+		for (const auto& resource : resources.push_constant_buffers)
+		{
+			const auto& bufferType = compiler.get_type(resource.base_type_id);
+			uint32_t offset = 0; // Typically
+			// SPIRV-Cross might need a bit more work to get exact offset for members if it's a struct.
+		   // For a single push constant block, its range covers the whole block.
+			size_t size = compiler.get_declared_struct_size(bufferType);
+
+			// Get shader stage for this push constant more accurately
+			// auto ranges = compiler.get_active_buffer_ranges(resource.id);
+			// For now, we assume the 'stage' passed to Reflect applies.
+
+			KBR_CORE_TRACE("      Name: {0}, Offset: {1}, Size: {2}", resource.name, offset, size);
+		}
 	}
 }

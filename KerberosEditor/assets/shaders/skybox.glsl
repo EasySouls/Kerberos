@@ -6,9 +6,18 @@ layout(location = 0) in vec3 a_Position;
 layout(location = 0) out vec3 v_TexCoords;
 layout(location = 1) out flat int v_EntityID;
 
-uniform mat4 u_Projection;
-uniform mat4 u_View;
-uniform int u_EntityID;
+layout(binding = 0) uniform CameraData
+{
+    vec3 u_ViewPos;
+    mat4 u_View;
+    mat4 u_Projection;
+    mat4 u_ViewProjection;
+};
+
+layout(push_constant) uniform EntityData
+{
+    int u_EntityID;
+};
 
 void main()
 {
@@ -22,13 +31,13 @@ void main()
 #type fragment
 #version 460 core
 
-out vec4 FragColor;
-out int EntityIDColor;
+layout(location = 0) out vec4 FragColor;
+layout(location = 1) out int EntityIDColor;
 
 layout(location = 0) in vec3 v_TexCoords;
 layout(location = 1) in flat int v_EntityID;
 
-uniform samplerCube u_Skybox;
+layout(binding = 0) uniform samplerCube u_Skybox;
 
 void main()
 {

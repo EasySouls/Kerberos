@@ -1,5 +1,5 @@
 #type vertex
-#version 460 core
+#version 450 core
 
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Normal;
@@ -7,14 +7,23 @@ layout(location = 2) in vec2 a_TexCoord;
 //layout(location = 3) in float a_TexIndex;
 //layout(location = 4) in float a_TilingFactor;
 
-uniform mat4 u_ViewProjection;
-uniform mat4 u_Model;
-uniform int u_EntityID;
+layout(binding = 0) uniform Camera
+{
+	vec3 u_CameraPosition;
+    mat4 u_ViewMatrix;
+	mat4 u_ProjectionMatrix;
+    mat4 u_ViewProjection;
+};
 
-out vec3 v_FragPos_WorldSpace;
-out vec3 v_Normal_WorldSpace;
-out vec2 v_TexCoord;
-out flat int v_EntityID;
+layout(push_constant) uniform PerObjectData {
+    mat4 u_Model;
+    int u_EntityID;
+};
+
+layout(location = 0) out vec3 v_FragPos_WorldSpace;
+layout(location = 1) out vec3 v_Normal_WorldSpace;
+layout(location = 2) out vec2 v_TexCoord;
+layout(location = 3) out flat int v_EntityID;
 
 void main()
 {
@@ -30,32 +39,27 @@ void main()
 }
 
 #type fragment
-#version 460 core
+#version 450 core
+
+layout(binding = 0) uniform Camera
+{
+    vec3 u_ViewPos;
+    mat4 u_ViewMatrix;
+    mat4 u_ProjectionMatrix;
+    mat4 u_ViewProjection;
+};
 
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
 
-in vec3 v_FragPos_WorldSpace;
-in vec3 v_Normal_WorldSpace;
-in vec2 v_TexCoord;
-in flat int v_EntityID;
+layout(location = 0) in vec3 v_FragPos_WorldSpace;
+layout(location = 1) in vec3 v_Normal_WorldSpace;
+layout(location = 2) in vec2 v_TexCoord;
+layout(location = 3) in flat int v_EntityID;
 
-uniform float u_TilingFactor;
-uniform sampler2D u_Texture;
-uniform float u_Shininess;
-uniform vec3 u_ViewPos;
+layout(binding = 0) uniform sampler2D u_Texture;
 
-uniform vec3 u_GlobalAmbientColor;
-uniform float u_GlobalAmbientIntensity;
-
-struct Material 
-{
-    vec3 diffuse;
-    vec3 specular;
-    vec3 ambient;
-    float shininess;
-};
-uniform Material u_Material;
+#define MAX_POINT_LIGHTS 10
 
 struct DirectionalLight
 {
@@ -64,7 +68,6 @@ struct DirectionalLight
     vec3 color;
     float intensity;
 };
-uniform DirectionalLight u_DirectionalLight;
 
 struct PointLight
 {
@@ -77,9 +80,28 @@ struct PointLight
     float quadratic;
 };
 
-#define MAX_POINT_LIGHTS 10
-uniform PointLight u_PointLights[MAX_POINT_LIGHTS];
-uniform int u_NumPointLights;
+layout(binding = 1) uniform Lights
+{
+    vec3 u_GlobalAmbientColor;
+    float u_GlobalAmbientIntensity;
+
+    DirectionalLight u_DirectionalLight;
+    PointLight u_PointLights[MAX_POINT_LIGHTS];
+    int u_NumPointLights;
+};
+
+struct Material
+{
+    vec3 diffuse;
+    vec3 specular;
+    vec3 ambient;
+    float shininess;
+};
+layout(push_constant) uniform MaterialData
+{
+    Material u_Material;
+    float u_TilingFactor;
+};
 
 vec3 CalculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 albedo)
 {
