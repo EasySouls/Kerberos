@@ -3,14 +3,17 @@
 
 layout(location = 0) in vec3 a_Position;
 
-out vec3 TexCoords;
+layout(location = 0) out vec3 v_TexCoords;
+layout(location = 1) out flat int v_EntityID;
 
 uniform mat4 u_Projection;
 uniform mat4 u_View;
+uniform int u_EntityID;
 
 void main()
 {
-    TexCoords = a_Position;
+    v_TexCoords = a_Position;
+    v_EntityID = u_EntityID;
 
     vec4 pos = u_Projection * u_View * vec4(a_Position, 1.0);
     gl_Position = pos.xyww;
@@ -20,12 +23,18 @@ void main()
 #version 460 core
 
 out vec4 FragColor;
+out int EntityIDColor;
 
-in vec3 TexCoords;
+layout(location = 0) in vec3 v_TexCoords;
+layout(location = 1) in flat int v_EntityID;
 
 uniform samplerCube u_Skybox;
 
 void main()
 {
-    FragColor = texture(u_Skybox, TexCoords);
+    FragColor = texture(u_Skybox, v_TexCoords);
+
+    // We could just output a constant -1 instead of taking in a uniform then passing
+    // it to the fragment shader, but it might come in handy later
+    EntityIDColor = v_EntityID;
 }

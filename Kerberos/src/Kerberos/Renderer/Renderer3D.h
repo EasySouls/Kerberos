@@ -24,7 +24,7 @@ namespace Kerberos
         static void BeginScene(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights);
         static void EndScene();
 
-		static void SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture = nullptr, float tilingFactor = 1.0f);
+		static void SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture = nullptr, float tilingFactor = 1.0f, int entityID = -1);
 
 		static void SetGlobalAmbientLight(const glm::vec3& color, float intensity);
 		static void ToggleSkyboxTexture();

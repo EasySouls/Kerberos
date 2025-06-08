@@ -183,6 +183,14 @@ namespace Kerberos
 			{
 				int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
 				KBR_WARN("Pixel data: {}", pixelData);
+
+				if (pixelData < 0)
+				{
+					m_HoveredEntity = {};
+					return;
+				}
+
+				m_HoveredEntity = Entity{ static_cast<entt::entity>(pixelData), m_ActiveScene.get() };
 			}
 		}
 
@@ -310,6 +318,13 @@ namespace Kerberos
 		ImGui::Text("Viewport Size: %.0f x %.0f", m_ViewportSize.x, m_ViewportSize.y);
 		ImGui::Text("Viewport Focused: %s", m_ViewportFocused ? "Yes" : "No");
 		ImGui::Text("Viewport Hovered: %s", m_ViewportHovered ? "Yes" : "No");
+
+		std::string hoveredEntityName = "None";
+		if (m_HoveredEntity)
+		{
+			hoveredEntityName = m_HoveredEntity.GetComponent<TagComponent>().Tag;
+		}
+		ImGui::Text("Hovered entity: %s", hoveredEntityName.c_str());
 
 		ImGui::Separator();
 

@@ -9,10 +9,12 @@ layout(location = 2) in vec2 a_TexCoord;
 
 uniform mat4 u_ViewProjection;
 uniform mat4 u_Model;
+uniform int u_EntityID;
 
 out vec3 v_FragPos_WorldSpace;
 out vec3 v_Normal_WorldSpace;
 out vec2 v_TexCoord;
+out flat int v_EntityID;
 
 void main()
 {
@@ -23,6 +25,7 @@ void main()
     v_Normal_WorldSpace = normalize(normalMatrix * a_Normal);
 
     v_TexCoord = a_TexCoord;
+    v_EntityID = u_EntityID;
     gl_Position = u_ViewProjection * worldPos;
 }
 
@@ -35,6 +38,7 @@ layout(location = 1) out int color2;
 in vec3 v_FragPos_WorldSpace;
 in vec3 v_Normal_WorldSpace;
 in vec2 v_TexCoord;
+in flat int v_EntityID;
 
 uniform float u_TilingFactor;
 uniform sampler2D u_Texture;
@@ -148,5 +152,5 @@ void main()
 
     color = vec4(totalLighting, alpha);
 
-    color2 = 20;
+    color2 = v_EntityID;
 }

@@ -44,6 +44,8 @@ namespace Kerberos
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
 
+		Entity m_HoveredEntity;
+
 		glm::vec4 m_SquareColor = { 0.8f, 0.3f, 0.2f, 1.0f };
 
 		/// Used when toggling the cameras

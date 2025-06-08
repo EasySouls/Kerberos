@@ -206,8 +206,13 @@ namespace Kerberos
 
 		/// Remove translation from view matrix
 		const glm::mat4 skyboxView = glm::mat4(glm::mat3(s_RendererData.ViewMatrix)); 
+
 		s_RendererData.SkyboxShader->SetMat4("u_View", skyboxView);
 		s_RendererData.SkyboxShader->SetMat4("u_Projection", s_RendererData.ProjectionMatrix);
+
+		/// Set the hovered entity's id to an invalid value
+		s_RendererData.SkyboxShader->SetInt("u_EntityID", -1);
+
 		s_RendererData.SkyboxVertexArray->Bind();
 		if (s_RendererData.RenderOceanSkybox)
 			s_RendererData.OceanSkyboxTexture->Bind(0);
@@ -224,7 +229,7 @@ namespace Kerberos
 		s_Stats.DrawnMeshes++;
 	}
 
-	void Renderer3D::SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture, const float tilingFactor)
+	void Renderer3D::SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture, const float tilingFactor, const int entityID)
 	{
 		if (!mesh || !mesh->GetVertexArray() || mesh->GetIndexCount() == 0)
 		{
@@ -269,6 +274,7 @@ namespace Kerberos
 		textureToUse->Bind(textureSlot);
 		shaderToUse->SetInt("u_Texture", textureSlot);
 		shaderToUse->SetFloat("u_TilingFactor", tilingFactor);
+		shaderToUse->SetInt("u_EntityID", entityID);
 
 		mesh->GetVertexArray()->Bind();
 		

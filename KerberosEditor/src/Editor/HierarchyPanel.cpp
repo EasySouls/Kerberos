@@ -635,7 +635,7 @@ namespace Kerberos
 				{
 					ImGui::Separator();
 					ImGui::Text("Texture");
-					const uint32_t textureID = staticMesh.MeshTexture->GetRendererID();
+					const uint64_t textureID = staticMesh.MeshTexture->GetRendererID();
 					ImGui::Image(textureID, ImVec2{ 64, 64 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 				}
 
