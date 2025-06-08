@@ -387,6 +387,10 @@ namespace Kerberos
 		return -1;
 	}
 
+	void VulkanFramebuffer::ClearAttachment(uint32_t attachmentIndex, int value) 
+	{
+	}
+
 	uint64_t VulkanFramebuffer::GetColorAttachmentRendererID(uint32_t index) const
 	{
 		return reinterpret_cast<ImTextureID>(m_ColorAttachmentDescriptorSet);

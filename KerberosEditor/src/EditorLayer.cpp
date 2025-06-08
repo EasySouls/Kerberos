@@ -152,6 +152,11 @@ namespace Kerberos
 
 			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 			RenderCommand::Clear();
+
+			/// Clear our entity ID attachment to -1, so when rendering entities they fill that space with their entity ID,
+			/// and empty spacces will have -1, signaling that there is no entity.
+			/// Used for mouse picking.
+			m_Framebuffer->ClearAttachment(1, -1);
 		}
 
 		{

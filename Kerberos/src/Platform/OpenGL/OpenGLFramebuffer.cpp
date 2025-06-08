@@ -91,12 +91,44 @@ namespace Kerberos
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, TextureTarget(multisampled), id, 0);
 		}
+
+		static GLenum ToGLFormat(const FramebufferTextureFormat format)
+		{
+			switch (format)
+			{
+			case FramebufferTextureFormat::RGBA8:
+				return GL_RGBA8;
+			case FramebufferTextureFormat::RED_INTEGER:
+				return GL_RED_INTEGER;
+			default:
+				KBR_CORE_ASSERT(false, "This Kerbertos format doesn't have an opengl format equivalent");
+				break;
+			}
+
+			return -1;
+		}
+
+		static GLenum ToGLDataType(const FramebufferTextureFormat format)
+		{
+			switch (format)
+			{
+			case FramebufferTextureFormat::RGBA8:
+				return GL_UNSIGNED_BYTE;
+			case FramebufferTextureFormat::RED_INTEGER:
+				return GL_RED_INTEGER;
+			default:
+				KBR_CORE_ASSERT(false, "This Kerbertos format doesn't have an opengl format equivalent");
+				break;
+			}
+
+			return -1;
+		}
 	}
 
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification& spec) 
 		: m_Specification(spec)
 	{
-		for (auto format : spec.Attachments.Attachments)
+		for (auto& format : spec.Attachments.Attachments)
 		{
 			if (Utils::IsDepthFormat(format.TextureFormat))
 			{
@@ -273,4 +305,12 @@ namespace Kerberos
 		return pixelData;
 	}
 
+	void OpenGLFramebuffer::ClearAttachment(const uint32_t attachmentIndex, const int value) 
+	{
+		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmenIndex is out of bounds");
+
+		const auto& spec = m_ColorAttachmentSpecs[attachmentIndex];
+
+		glClearTexImage(m_ColorAttachments[attachmentIndex], 0, Utils::ToGLFormat(spec.TextureFormat), GL_INT, &value);
+	}
 }
