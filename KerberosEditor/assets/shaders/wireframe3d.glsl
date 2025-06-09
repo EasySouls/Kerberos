@@ -129,6 +129,7 @@ layout(binding = 0) uniform Camera
 };
 
 layout(location = 0) out vec4 color;
+layout(location = 1) out int entityIDColor;
 
 layout(location = 0) in vec3 g_FragPos_WorldSpace;
 layout(location = 1) in vec3 g_Normal_WorldSpace;
@@ -277,4 +278,5 @@ void main()
     color = vec4(totalLighting, alpha);
 
 	color = mix(color, wireframeColor, mixVal);
+    entityIDColor = u_EntityID;
 }

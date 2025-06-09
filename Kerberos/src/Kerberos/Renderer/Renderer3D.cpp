@@ -8,6 +8,14 @@ static constexpr int MAX_POINT_LIGHTS = 10;
 
 namespace Kerberos
 {
+	struct MaterialUbo
+	{
+		glm::vec3 Ambient = glm::vec3{ 0.1f };
+		glm::vec3 Diffuse = glm::vec3{ 1.0f };
+		glm::vec3 Specular = glm::vec3{ 0.1f };
+		float Shininess = 10.f;
+	};
+
 	struct Renderer3DData
 	{
 		Ref<Shader> ActiveShader;
@@ -50,7 +58,7 @@ namespace Kerberos
 		struct PerObjectData
 		{
 			glm::mat4 ModelMatrix;
-			Material Material;
+			MaterialUbo Material;
 			int EntityID = -1;
 		} PerObjectData;
 
@@ -214,8 +222,6 @@ namespace Kerberos
 
 		s_RendererData.LightsData.SunLight = *sun;
 		s_RendererData.pSunLight = sun;
-		//s_RendererData.LightsData.PointLights.clear();
-		//s_RendererData.LightsData.PointLights.reserve(pointLights.size());
 		for (size_t i = 0; i < pointLights.size(); ++i)
 		{
 			if (i >= MAX_POINT_LIGHTS)
@@ -225,33 +231,6 @@ namespace Kerberos
 			}
 			s_RendererData.LightsData.PointLights[i] = pointLights[i];
 		}
-
-		//if (s_RendererData.pSunLight)
-		//{
-		//	shaderToUse->SetInt("u_DirectionalLight.enabled", 1);
-		//	shaderToUse->SetFloat3("u_DirectionalLight.direction", s_RendererData.LightsData.SunLight.Direction);
-		//	shaderToUse->SetFloat3("u_DirectionalLight.color", s_RendererData.LightsData.SunLight.Color);
-		//	shaderToUse->SetFloat("u_DirectionalLight.intensity", s_RendererData.LightsData.SunLight.Intensity);
-		//}
-		//else
-		//{
-		//	shaderToUse->SetInt("u_DirectionalLight.enabled", 0);
-		//}
-
-		//shaderToUse->SetInt("u_NumPointLights", static_cast<int>(s_RendererData.LightsData.PointLights.size()));
-		//for (int i = 0; i < s_RendererData.LightsData.PointLights.size(); ++i)
-		//{
-		//	std::string prefix = "u_PointLights[" + std::to_string(i) + "].";
-		//	shaderToUse->SetFloat3(prefix + "position", s_RendererData.LightsData.PointLights[i].Position);
-		//	shaderToUse->SetFloat3(prefix + "color", s_RendererData.LightsData.PointLights[i].Color);
-		//	shaderToUse->SetFloat(prefix + "intensity", s_RendererData.LightsData.PointLights[i].Intensity);
-		//	shaderToUse->SetFloat(prefix + "constant", s_RendererData.LightsData.PointLights[i].Constant);
-		//	shaderToUse->SetFloat(prefix + "linear", s_RendererData.LightsData.PointLights[i].Linear);
-		//	shaderToUse->SetFloat(prefix + "quadratic", s_RendererData.LightsData.PointLights[i].Quadratic);
-		//}
-
-		s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.LightsData.GlobalAmbientColor);
-		s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.LightsData.GlobalAmbientIntensity);
 
 		s_RendererData.LightsUniformBuffer->SetData(&s_RendererData.LightsData, sizeof(Renderer3DData::LightsData), 0);
 	}
@@ -305,7 +284,8 @@ namespace Kerberos
 
 		s_RendererData.PerObjectData.ModelMatrix = transform;
 		s_RendererData.PerObjectData.EntityID = entityID;
-		s_RendererData.PerObjectData.Material = *material;
+		s_RendererData.PerObjectData.Material = {.Ambient = material->Ambient, .Diffuse = material->Diffuse,
+			.Specular = material->Specular, .Shininess = material->Shininess };
 
 		s_RendererData.PerObjectUniformBuffer->SetData(&s_RendererData.PerObjectData, sizeof(Renderer3DData::PerObjectData), 0);
 
