@@ -15,9 +15,18 @@ layout(binding = 0) uniform Camera
     mat4 u_ViewProjection;
 };
 
-layout(push_constant) uniform PerObjectData
+struct Material
+{
+    vec3 diffuse;
+    vec3 specular;
+    vec3 ambient;
+    float shininess;
+};
+
+layout(binding = 2) uniform PerObjectData
 {
     mat4 u_Model;
+    Material u_Material;
     int u_EntityID;
 };
 
@@ -167,10 +176,11 @@ struct Material
     float shininess;
 };
 
-layout(push_constant) uniform MaterialData
+layout(binding = 2) uniform PerObjectData
 {
+    mat4 u_Model;
     Material u_Material;
-    float u_TilingFactor;
+    int u_EntityID;
 };
 
 vec3 CalculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 albedo)
@@ -222,7 +232,8 @@ void main()
     vec3 viewDir = normalize(u_ViewPos - g_FragPos_WorldSpace);
 
     // Sample material's albedo texture
-    vec4 texSample = texture(u_Texture, g_TexCoord * u_TilingFactor);
+    //vec4 texSample = texture(u_Texture, g_TexCoord * u_TilingFactor);
+    vec4 texSample = texture(u_Texture, g_TexCoord * 1.0);
 
     vec3 albedo = baseColor.rgb * texSample.rgb;
     float alpha = baseColor.a * texSample.a;

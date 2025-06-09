@@ -370,12 +370,13 @@ namespace Kerberos
 
 	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources) 
 	{
-		GLuint program = glCreateProgram();
+		KBR_CORE_INFO("\nCompiling shader: {}", m_FilePath);
 
 		shaderc::Compiler compiler;
 		shaderc::CompileOptions options;
 		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_4);
-		if (constexpr bool optimize = true)
+		/// Turning on optimization will cause the shaders to have linking issues
+		if (constexpr bool optimize = false)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
@@ -433,12 +434,13 @@ namespace Kerberos
 		shaderc::Compiler compiler;
 		shaderc::CompileOptions options;
 		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
-		//options.SetAutoBindUniforms(true);
-		options.SetAutoMapLocations(true);
+		options.SetAutoBindUniforms(true);
+		//options.SetAutoMapLocations(true);
 		//options.SetSourceLanguage(shaderc_source_language_glsl);
 		//options.SetVulkanRulesRelaxed(true);
 		//options.SetForcedVersionProfile(450, shaderc_profile_core);
-		if (constexpr bool optimize = true)
+		/// Turning on optimization will cause the shaders to have linking issues
+		if (constexpr bool optimize = false)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
@@ -464,10 +466,10 @@ namespace Kerberos
 			else
 			{
 				spirv_cross::CompilerGLSL glslCompiler(spirv);
-				spirv_cross::CompilerGLSL::Options glslOptions = glslCompiler.get_common_options();
+				/*spirv_cross::CompilerGLSL::Options glslOptions = glslCompiler.get_common_options();
 				glslOptions.emit_push_constant_as_uniform_buffer = false;
 				glslOptions.vulkan_semantics = false;
-				glslCompiler.set_common_options(glslOptions);
+				glslCompiler.set_common_options(glslOptions);*/
 
 				m_OpenGLSourceCode[stage] = glslCompiler.compile();
 				auto& source = m_OpenGLSourceCode[stage];
@@ -536,7 +538,7 @@ namespace Kerberos
 		m_RendererID = program;
 	}
 
-	void OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData) 
+	void OpenGLShader::Reflect(const GLenum stage, const std::vector<uint32_t>& shaderData) 
 	{
 		const spirv_cross::Compiler compiler(shaderData);
 		spirv_cross::ShaderResources resources = compiler.get_shader_resources();

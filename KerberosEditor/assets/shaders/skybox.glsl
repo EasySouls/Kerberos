@@ -14,8 +14,18 @@ layout(binding = 0) uniform CameraData
     mat4 u_ViewProjection;
 };
 
-layout(push_constant) uniform EntityData
+struct Material
 {
+    vec3 diffuse;
+    vec3 specular;
+    vec3 ambient;
+    float shininess;
+};
+
+layout(binding = 2) uniform PerObjectData
+{
+    mat4 u_Model;
+    Material u_Material;
     int u_EntityID;
 };
 
