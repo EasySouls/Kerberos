@@ -45,12 +45,12 @@ namespace Kerberos
 
 		struct LightsDataUbo
 		{
-			alignas(16) glm::vec3 GlobalAmbientColor = { 0.5f, 0.5f, 0.5f };
+			glm::vec3 GlobalAmbientColor = { 0.5f, 0.5f, 0.5f };
 			alignas(4) float GlobalAmbientIntensity = 1.0f;
 
+			alignas(4) int NrOfPointLights = 0;
 			DirectionalLight SunLight;
 			std::array<PointLight, MAX_POINT_LIGHTS> PointLights;
-			alignas(4) int nrOfPointLights = 0;
 		} LightsData;
 
 		Ref<UniformBuffer> LightsUniformBuffer = nullptr;
@@ -194,7 +194,7 @@ namespace Kerberos
 		s_RendererData.pSunLight = sun;
 		
 		s_RendererData.LightsData.SunLight = *sun;
-		s_RendererData.LightsData.nrOfPointLights = static_cast<int>(pointLights.size());
+		s_RendererData.LightsData.NrOfPointLights = static_cast<int>(pointLights.size());
 		
 		for (size_t i = 0; i < pointLights.size(); ++i)
 		{
@@ -227,7 +227,7 @@ namespace Kerberos
 		s_RendererData.pSunLight = sun;
 		
 		s_RendererData.LightsData.SunLight = *sun;
-		s_RendererData.LightsData.nrOfPointLights = static_cast<int>(pointLights.size());
+		s_RendererData.LightsData.NrOfPointLights = static_cast<int>(pointLights.size());
 
 		for (size_t i = 0; i < pointLights.size(); ++i)
 		{
