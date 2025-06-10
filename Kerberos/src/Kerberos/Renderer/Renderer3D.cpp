@@ -33,7 +33,7 @@ namespace Kerberos
 		Ref<TextureCube> OceanSkyboxTexture = nullptr;
 		Ref<VertexArray> SkyboxVertexArray = nullptr;
 
-		struct CameraData
+		struct CameraDataUbo
 		{
 			alignas(16) glm::vec3 Position;
 			alignas(16) glm::mat4 ViewMatrix;
@@ -43,7 +43,7 @@ namespace Kerberos
 
 		Ref<UniformBuffer> CameraUniformBuffer = nullptr;
 
-		struct LightsData
+		struct LightsDataUbo
 		{
 			alignas(16) glm::vec3 GlobalAmbientColor = { 0.5f, 0.5f, 0.5f };
 			alignas(4) float GlobalAmbientIntensity = 1.0f;
@@ -55,7 +55,7 @@ namespace Kerberos
 
 		Ref<UniformBuffer> LightsUniformBuffer = nullptr;
 
-		struct PerObjectData
+		struct PerObjectDataUbo
 		{
 			int EntityID = -1;
 			alignas(16) glm::mat4 ModelMatrix;
@@ -191,10 +191,11 @@ namespace Kerberos
 		s_RendererData.ActiveShader->Bind();
 		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData, sizeof(Renderer3DData::CameraData), 0);
 
-		s_RendererData.LightsData.SunLight = *sun;
 		s_RendererData.pSunLight = sun;
-		//s_RendererData.LightsData.PointLights.clear();
-		//s_RendererData.LightsData.PointLights.reserve(pointLights.size());
+		
+		s_RendererData.LightsData.SunLight = *sun;
+		s_RendererData.LightsData.nrOfPointLights = static_cast<int>(pointLights.size());
+		
 		for (size_t i = 0; i < pointLights.size(); ++i)
 		{
 			if (i >= MAX_POINT_LIGHTS)
@@ -204,9 +205,6 @@ namespace Kerberos
 			}
 			s_RendererData.LightsData.PointLights[i] = pointLights[i];
 		}
-
-		s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.LightsData.GlobalAmbientColor);
-		s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.LightsData.GlobalAmbientIntensity);
 
 		s_RendererData.LightsUniformBuffer->SetData(&s_RendererData.LightsData, sizeof(Renderer3DData::LightsData), 0);
 
@@ -226,8 +224,11 @@ namespace Kerberos
 		s_RendererData.ActiveShader->Bind();
 		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData, sizeof(Renderer3DData::CameraData), 0);
 
-		s_RendererData.LightsData.SunLight = *sun;
 		s_RendererData.pSunLight = sun;
+		
+		s_RendererData.LightsData.SunLight = *sun;
+		s_RendererData.LightsData.nrOfPointLights = static_cast<int>(pointLights.size());
+
 		for (size_t i = 0; i < pointLights.size(); ++i)
 		{
 			if (i >= MAX_POINT_LIGHTS)
@@ -255,8 +256,13 @@ namespace Kerberos
 		/// Remove translation from view matrix
 		const glm::mat4 skyboxView = glm::mat4(glm::mat3(s_RendererData.CameraData.ViewMatrix)); 
 
-		s_RendererData.SkyboxShader->SetMat4("u_View", skyboxView);
-		s_RendererData.SkyboxShader->SetMat4("u_Projection", s_RendererData.CameraData.ProjectionMatrix);
+		/// Changing only the view matrix is enough
+		s_RendererData.CameraData.ViewMatrix = skyboxView;
+		constexpr int viewMatrixOffset = offsetof(Renderer3DData::CameraDataUbo, ViewMatrix);
+		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData.ViewMatrix, sizeof(Renderer3DData::CameraDataUbo::ViewMatrix), viewMatrixOffset);
+
+		//s_RendererData.SkyboxShader->SetMat4("u_View", skyboxView);
+		//s_RendererData.SkyboxShader->SetMat4("u_Projection", s_RendererData.CameraData.ProjectionMatrix);
 
 		/// Set the hovered entity's id to an invalid value
 		s_RendererData.SkyboxShader->SetInt("u_EntityID", -1);
