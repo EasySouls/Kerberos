@@ -30,9 +30,9 @@ struct Material
 //};
 layout(std140, binding = 2) uniform PerObjectData
 {
+    int u_EntityID;
     mat4 u_Model;
     Material u_Material;
-    int u_EntityID;
 };
 
 layout(location = 0) out vec3 v_FragPos_WorldSpace;
@@ -69,7 +69,7 @@ layout(location = 0) in vec3 v_FragPos_WorldSpace;
 layout(location = 1) in vec3 v_Normal_WorldSpace;
 layout(location = 2) in vec2 v_TexCoord;
 
-layout(binding = 2) uniform sampler2D u_Texture;
+layout(binding = 0) uniform sampler2D u_Texture;
 
 #define MAX_POINT_LIGHTS 10
 
@@ -97,9 +97,9 @@ layout(std140, binding = 1) uniform Lights
     vec3 u_GlobalAmbientColor;
     float u_GlobalAmbientIntensity;
 
+    int u_NumPointLights;
     DirectionalLight u_DirectionalLight;
     PointLight u_PointLights[MAX_POINT_LIGHTS];
-    int u_NumPointLights;
 };
 
 struct Material
@@ -118,9 +118,9 @@ struct Material
 //};
 layout(std140, binding = 2) uniform PerObjectData
 {
+    int u_EntityID;
     mat4 u_Model;
     Material u_Material;
-    int u_EntityID;
 };
 
 vec3 CalculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 albedo)

@@ -10,10 +10,10 @@ namespace Kerberos
 {
 	struct MaterialUbo
 	{
-		glm::vec3 Ambient = glm::vec3{ 0.1f };
-		glm::vec3 Diffuse = glm::vec3{ 1.0f };
-		glm::vec3 Specular = glm::vec3{ 0.1f };
-		float Shininess = 10.f;
+		alignas(16) glm::vec3 Diffuse = glm::vec3{ 1.0f };
+		alignas(16) glm::vec3 Specular = glm::vec3{ 0.1f };
+		alignas(16) glm::vec3 Ambient = glm::vec3{ 0.1f };
+		alignas(4) float Shininess = 10.f;
 	};
 
 	struct Renderer3DData
@@ -35,8 +35,8 @@ namespace Kerberos
 
 		struct CameraData
 		{
-			glm::vec3 Position;
-			glm::mat4 ViewMatrix;
+			alignas(16) glm::vec3 Position;
+			alignas(16) glm::mat4 ViewMatrix;
 			glm::mat4 ProjectionMatrix;
 			glm::mat4 ViewProjectionMatrix;
 		} CameraData;
@@ -45,21 +45,21 @@ namespace Kerberos
 
 		struct LightsData
 		{
-			glm::vec3 GlobalAmbientColor = { 0.5f, 0.5f, 0.5f };
-			float GlobalAmbientIntensity = 1.0f;
+			alignas(16) glm::vec3 GlobalAmbientColor = { 0.5f, 0.5f, 0.5f };
+			alignas(4) float GlobalAmbientIntensity = 1.0f;
 
 			DirectionalLight SunLight;
 			std::array<PointLight, MAX_POINT_LIGHTS> PointLights;
-			int nrOfPointLights = 0;
+			alignas(4) int nrOfPointLights = 0;
 		} LightsData;
 
 		Ref<UniformBuffer> LightsUniformBuffer = nullptr;
 
 		struct PerObjectData
 		{
-			glm::mat4 ModelMatrix;
-			MaterialUbo Material;
 			int EntityID = -1;
+			alignas(16) glm::mat4 ModelMatrix;
+			alignas(16) MaterialUbo Material;
 		} PerObjectData;
 
 		Ref<UniformBuffer> PerObjectUniformBuffer = nullptr;
@@ -69,9 +69,15 @@ namespace Kerberos
 
 	static Renderer3D::Statistics s_Stats;
 
+
 	void Renderer3D::Init() 
 	{
 		KBR_PROFILE_FUNCTION();
+
+		KBR_CORE_INFO("Renderer3D initialized with max point lights: {0}", MAX_POINT_LIGHTS);
+		KBR_CORE_INFO("Size of CameraData: {0} bytes", sizeof(Renderer3DData::CameraData));
+		KBR_CORE_INFO("Size of LightsData: {0} bytes", sizeof(Renderer3DData::LightsData));
+		KBR_CORE_INFO("Size of PerObjectData: {0} bytes", sizeof(Renderer3DData::PerObjectData));
 
 		s_RendererData = Renderer3DData();
 
@@ -284,8 +290,8 @@ namespace Kerberos
 
 		s_RendererData.PerObjectData.ModelMatrix = transform;
 		s_RendererData.PerObjectData.EntityID = entityID;
-		s_RendererData.PerObjectData.Material = {.Ambient = material->Ambient, .Diffuse = material->Diffuse,
-			.Specular = material->Specular, .Shininess = material->Shininess };
+		s_RendererData.PerObjectData.Material = { .Diffuse = material->Diffuse,
+			.Specular = material->Specular, .Ambient = material->Ambient, .Shininess = material->Shininess };
 
 		s_RendererData.PerObjectUniformBuffer->SetData(&s_RendererData.PerObjectData, sizeof(Renderer3DData::PerObjectData), 0);
 

@@ -495,6 +495,9 @@ namespace Kerberos
 				}
 			}
 		}
+
+		/*for (auto&& [stage, data] : shaderData)
+			Reflect(stage, data);*/
 	}
 
 	void OpenGLShader::CreateProgram() 
@@ -561,6 +564,27 @@ namespace Kerberos
 			size_t bufferSize = compiler.get_declared_struct_size(bufferType);
 
 			KBR_CORE_TRACE("      Name: {0}, Set: {1}, Binding: {2}, Size: {3}", resource.name, set, binding, bufferSize);
+
+			const size_t memberCount = bufferType.member_types.size();
+			for (size_t i = 0; i < memberCount; ++i)
+			{
+				const auto& memberType = compiler.get_type(bufferType.member_types[i]);
+				const std::string& memberName = compiler.get_member_name(bufferType.self, i);
+				size_t memberOffset = compiler.get_member_decoration(bufferType.self, i, spv::DecorationOffset);
+				size_t memberSize = compiler.get_declared_struct_member_size(bufferType, i);
+
+				KBR_CORE_TRACE("        Member: {0}, Offset: {1}, DeclaredSize: {2}",
+					memberName, memberOffset, memberSize);
+
+				// If a member is itself a struct, you can recurse or inspect it further
+				if (memberType.basetype == spirv_cross::SPIRType::Struct)
+				{
+					size_t innerStructSize = compiler.get_declared_struct_size(memberType);
+					KBR_CORE_TRACE("          (Is Struct of total size: {0})", innerStructSize);
+					// You can even iterate its members:
+					// for (size_t j = 0; j < member_type.member_types.size(); ++j) { ... }
+				}
+			}
 		}
 
 		KBR_CORE_TRACE("    Sampled Images (Textures/Samplers): {0}", resources.sampled_images.size());
