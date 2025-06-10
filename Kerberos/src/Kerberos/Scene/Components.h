@@ -198,9 +198,8 @@ namespace Kerberos
 		explicit SkyboxComponent(const Ref<TextureCube>& texture)
 			: SkyboxTexture(texture)
 		{}
-		SkyboxComponent(const SkyboxComponent&) = default;
-		SkyboxComponent(SkyboxComponent&&) = default;
-		SkyboxComponent& operator=(const SkyboxComponent&) = default;
-		SkyboxComponent& operator=(SkyboxComponent&&) = default;
+		SkyboxComponent(const Ref<TextureCube>& texture, const Ref<Shader>& shader)
+			: SkyboxTexture(texture), SkyboxShader(shader)
+		{}
 	};
 }

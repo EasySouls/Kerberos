@@ -7,7 +7,7 @@ layout(location = 2) in vec2 a_TexCoord;
 //layout(location = 3) in float a_TexIndex;
 //layout(location = 4) in float a_TilingFactor;
 
-layout(binding = 0) uniform Camera
+layout(std140, binding = 0) uniform Camera
 {
     vec3 u_ViewPos;
     mat4 u_ViewMatrix;
@@ -23,11 +23,11 @@ struct Material
     float shininess;
 };
 
-layout(binding = 2) uniform PerObjectData
+layout(std140, binding = 2) uniform PerObjectData
 {
+    int u_EntityID;
     mat4 u_Model;
     Material u_Material;
-    int u_EntityID;
 };
 
 layout(location = 0) out vec3 v_FragPos_WorldSpace;
@@ -61,7 +61,7 @@ layout(location = 1) out vec3 g_Normal_WorldSpace;
 layout(location = 2) out vec2 g_TexCoord;
 layout(location = 3) noperspective out vec3 g_EdgeDistance;
 
-layout(binding = 0) uniform Camera
+layout(std140, binding = 0) uniform Camera
 {
     vec3 u_ViewPos;
     mat4 u_ViewMatrix;
@@ -120,7 +120,7 @@ void main()
 #type fragment
 #version 450 core
 
-layout(binding = 0) uniform Camera
+layout(std140, binding = 0) uniform Camera
 {
     vec3 u_ViewPos;
     mat4 u_ViewMatrix;
@@ -129,6 +129,7 @@ layout(binding = 0) uniform Camera
 };
 
 layout(location = 0) out vec4 color;
+layout(location = 1) out int entityIDColor;
 
 layout(location = 0) in vec3 g_FragPos_WorldSpace;
 layout(location = 1) in vec3 g_Normal_WorldSpace;
@@ -158,14 +159,14 @@ struct PointLight
     float quadratic;
 };
 
-layout(binding = 1) uniform Lights
+layout(std140, binding = 1) uniform Lights
 {
     vec3 u_GlobalAmbientColor;
     float u_GlobalAmbientIntensity;
 
+    int u_NumPointLights;
     DirectionalLight u_DirectionalLight;
     PointLight u_PointLights[MAX_POINT_LIGHTS];
-    int u_NumPointLights;
 };
 
 struct Material
@@ -176,11 +177,11 @@ struct Material
     float shininess;
 };
 
-layout(binding = 2) uniform PerObjectData
+layout(std140, binding = 2) uniform PerObjectData
 {
+    int u_EntityID;
     mat4 u_Model;
     Material u_Material;
-    int u_EntityID;
 };
 
 vec3 CalculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 albedo)
@@ -277,4 +278,5 @@ void main()
     color = vec4(totalLighting, alpha);
 
 	color = mix(color, wireframeColor, mixVal);
+    entityIDColor = u_EntityID;
 }

@@ -7,7 +7,7 @@ layout(location = 2) in vec2 a_TexCoord;
 //layout(location = 3) in float a_TexIndex;
 //layout(location = 4) in float a_TilingFactor;
 
-layout(binding = 0) uniform Camera
+layout(std140, binding = 0) uniform Camera
 {
 	vec3 u_CameraPosition;
     mat4 u_ViewMatrix;
@@ -28,17 +28,16 @@ struct Material
 //    Material u_Material;
 //    int u_EntityID;
 //};
-layout(binding = 2) uniform PerObjectData
+layout(std140, binding = 2) uniform PerObjectData
 {
+    int u_EntityID;
     mat4 u_Model;
     Material u_Material;
-    int u_EntityID;
 };
 
 layout(location = 0) out vec3 v_FragPos_WorldSpace;
 layout(location = 1) out vec3 v_Normal_WorldSpace;
 layout(location = 2) out vec2 v_TexCoord;
-layout(location = 3) out flat int v_EntityID;
 
 void main()
 {
@@ -49,14 +48,13 @@ void main()
     v_Normal_WorldSpace = normalize(normalMatrix * a_Normal);
 
     v_TexCoord = a_TexCoord;
-    v_EntityID = u_EntityID;
     gl_Position = u_ViewProjection * worldPos;
 }
 
 #type fragment
 #version 450 core
 
-layout(binding = 0) uniform Camera
+layout(std140, binding = 0) uniform Camera
 {
     vec3 u_ViewPos;
     mat4 u_ViewMatrix;
@@ -70,9 +68,8 @@ layout(location = 1) out int color2;
 layout(location = 0) in vec3 v_FragPos_WorldSpace;
 layout(location = 1) in vec3 v_Normal_WorldSpace;
 layout(location = 2) in vec2 v_TexCoord;
-layout(location = 3) in flat int v_EntityID;
 
-layout(binding = 2) uniform sampler2D u_Texture;
+layout(binding = 0) uniform sampler2D u_Texture;
 
 #define MAX_POINT_LIGHTS 10
 
@@ -95,14 +92,14 @@ struct PointLight
     float quadratic;
 };
 
-layout(binding = 1) uniform Lights
+layout(std140, binding = 1) uniform Lights
 {
     vec3 u_GlobalAmbientColor;
     float u_GlobalAmbientIntensity;
 
+    int u_NumPointLights;
     DirectionalLight u_DirectionalLight;
     PointLight u_PointLights[MAX_POINT_LIGHTS];
-    int u_NumPointLights;
 };
 
 struct Material
@@ -119,11 +116,11 @@ struct Material
 //    Material u_Material;
 //    int u_EntityID;
 //};
-layout(binding = 2) uniform PerObjectData
+layout(std140, binding = 2) uniform PerObjectData
 {
+    int u_EntityID;
     mat4 u_Model;
     Material u_Material;
-    int u_EntityID;
 };
 
 vec3 CalculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 albedo)
@@ -197,6 +194,7 @@ void main()
     }
 
     color = vec4(totalLighting, alpha);
+    //color = vec4(albedo, 1.0);
 
-    color2 = v_EntityID;
+    color2 = u_EntityID;
 }

@@ -23,4 +23,9 @@ namespace Kerberos
 	{
 		glNamedBufferSubData(m_RendererID, offset, size, data);
 	}
+
+	void OpenGLUniformBuffer::SetDebugName(const std::string& debugName) 
+	{
+		glObjectLabel(GL_BUFFER, m_RendererID, static_cast<int>(debugName.size()), debugName.c_str());
+	}
 }

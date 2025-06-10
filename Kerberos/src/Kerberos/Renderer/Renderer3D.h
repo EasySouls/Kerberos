@@ -1,7 +1,5 @@
 #pragma once
 
-#include <glm/glm.hpp>
-
 #include "Camera.h"
 #include "Mesh.h"
 #include "OrthographicCamera.h"

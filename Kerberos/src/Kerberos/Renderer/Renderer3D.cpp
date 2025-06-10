@@ -4,8 +4,18 @@
 #include "TextureCube.h"
 #include "UniformBuffer.h"
 
+static constexpr int MAX_POINT_LIGHTS = 10;
+
 namespace Kerberos
 {
+	struct MaterialUbo
+	{
+		alignas(16) glm::vec3 Diffuse = glm::vec3{ 1.0f };
+		alignas(16) glm::vec3 Specular = glm::vec3{ 0.1f };
+		alignas(16) glm::vec3 Ambient = glm::vec3{ 0.1f };
+		alignas(4) float Shininess = 10.f;
+	};
+
 	struct Renderer3DData
 	{
 		Ref<Shader> ActiveShader;
@@ -14,12 +24,7 @@ namespace Kerberos
 		Ref<Shader> BaseShader = nullptr;
 		Ref<Shader> WireframeShader = nullptr;
 
-		const DirectionalLight* SunLight;
-		std::vector<PointLight> PointLights;
-		static constexpr size_t MaxPointLights = 10;
-
-		glm::vec3 GlobalAmbientColor = { 0.5f, 0.5f, 0.5f };
-		float GlobalAmbientIntensity = 1.0f;
+		const DirectionalLight* pSunLight = nullptr;
 
 		bool RenderSkybox = false;
 		bool RenderOceanSkybox = false;
@@ -28,24 +33,51 @@ namespace Kerberos
 		Ref<TextureCube> OceanSkyboxTexture = nullptr;
 		Ref<VertexArray> SkyboxVertexArray = nullptr;
 
-		struct CameraData
+		struct CameraDataUbo
 		{
-			glm::vec3 Position;
-			glm::mat4 ViewMatrix;
+			alignas(16) glm::vec3 Position;
+			alignas(16) glm::mat4 ViewMatrix;
 			glm::mat4 ProjectionMatrix;
 			glm::mat4 ViewProjectionMatrix;
 		} CameraData;
 
 		Ref<UniformBuffer> CameraUniformBuffer = nullptr;
+
+		struct LightsDataUbo
+		{
+			glm::vec3 GlobalAmbientColor = { 0.5f, 0.5f, 0.5f };
+			alignas(4) float GlobalAmbientIntensity = 1.0f;
+
+			alignas(4) int NrOfPointLights = 0;
+			DirectionalLight SunLight;
+			std::array<PointLight, MAX_POINT_LIGHTS> PointLights;
+		} LightsData;
+
+		Ref<UniformBuffer> LightsUniformBuffer = nullptr;
+
+		struct PerObjectDataUbo
+		{
+			int EntityID = -1;
+			alignas(16) glm::mat4 ModelMatrix;
+			alignas(16) MaterialUbo Material;
+		} PerObjectData;
+
+		Ref<UniformBuffer> PerObjectUniformBuffer = nullptr;
 	};
 
 	static Renderer3DData s_RendererData;
 
 	static Renderer3D::Statistics s_Stats;
 
+
 	void Renderer3D::Init() 
 	{
 		KBR_PROFILE_FUNCTION();
+
+		KBR_CORE_INFO("Renderer3D initialized with max point lights: {0}", MAX_POINT_LIGHTS);
+		KBR_CORE_INFO("Size of CameraData: {0} bytes", sizeof(Renderer3DData::CameraData));
+		KBR_CORE_INFO("Size of LightsData: {0} bytes", sizeof(Renderer3DData::LightsData));
+		KBR_CORE_INFO("Size of PerObjectData: {0} bytes", sizeof(Renderer3DData::PerObjectData));
 
 		s_RendererData = Renderer3DData();
 
@@ -129,6 +161,13 @@ namespace Kerberos
 		s_RendererData.SkyboxVertexArray->AddVertexBuffer(skyboxVertexBuffer);
 
 		s_RendererData.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::CameraData), 0);
+		s_RendererData.CameraUniformBuffer->SetDebugName("Camera Uniform Buffer");
+
+		s_RendererData.LightsUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::LightsData), 1);
+		s_RendererData.LightsUniformBuffer->SetDebugName("Lights Uniform Buffer");
+
+		s_RendererData.PerObjectUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::PerObjectData), 2);
+		s_RendererData.PerObjectUniformBuffer->SetDebugName("PerObject Uniform Buffer");
 
 		ResetStatistics();
 	}
@@ -152,21 +191,22 @@ namespace Kerberos
 		s_RendererData.ActiveShader->Bind();
 		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData, sizeof(Renderer3DData::CameraData), 0);
 
-		s_RendererData.SunLight = sun;
-		s_RendererData.PointLights.clear();
-		s_RendererData.PointLights.reserve(pointLights.size());
-		for (const auto& pointLight : pointLights)
+		s_RendererData.pSunLight = sun;
+		
+		s_RendererData.LightsData.SunLight = *sun;
+		s_RendererData.LightsData.NrOfPointLights = static_cast<int>(pointLights.size());
+		
+		for (size_t i = 0; i < pointLights.size(); ++i)
 		{
-			if (s_RendererData.PointLights.size() >= Renderer3DData::MaxPointLights)
+			if (i >= MAX_POINT_LIGHTS)
 			{
-				KBR_CORE_WARN("Maximum number of point lights exceeded! Only the first {0} will be used.", Renderer3DData::MaxPointLights);
+				KBR_CORE_WARN("Maximum number of point lights exceeded! Only the first {0} will be used.", MAX_POINT_LIGHTS);
 				break;
 			}
-			s_RendererData.PointLights.push_back(pointLight);
+			s_RendererData.LightsData.PointLights[i] = pointLights[i];
 		}
 
-		s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.GlobalAmbientColor);
-		s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.GlobalAmbientIntensity);
+		s_RendererData.LightsUniformBuffer->SetData(&s_RendererData.LightsData, sizeof(Renderer3DData::LightsData), 0);
 
 		s_RendererData.RenderSkybox = renderSkybox;
 	}
@@ -184,21 +224,22 @@ namespace Kerberos
 		s_RendererData.ActiveShader->Bind();
 		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData, sizeof(Renderer3DData::CameraData), 0);
 
-		s_RendererData.SunLight = sun;
-		s_RendererData.PointLights.clear();
-		s_RendererData.PointLights.reserve(pointLights.size());
-		for (const auto& pointLight : pointLights)
+		s_RendererData.pSunLight = sun;
+		
+		s_RendererData.LightsData.SunLight = *sun;
+		s_RendererData.LightsData.NrOfPointLights = static_cast<int>(pointLights.size());
+
+		for (size_t i = 0; i < pointLights.size(); ++i)
 		{
-			if (s_RendererData.PointLights.size() >= Renderer3DData::MaxPointLights)
+			if (i >= MAX_POINT_LIGHTS)
 			{
-				KBR_CORE_WARN("Maximum number of point lights exceeded! Only the first {0} will be used.", Renderer3DData::MaxPointLights);
+				KBR_CORE_WARN("Maximum number of point lights exceeded! Only the first {0} will be used.", MAX_POINT_LIGHTS);
 				break;
 			}
-			s_RendererData.PointLights.push_back(pointLight);
+			s_RendererData.LightsData.PointLights[i] = pointLights[i];
 		}
 
-		s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.GlobalAmbientColor);
-		s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.GlobalAmbientIntensity);
+		s_RendererData.LightsUniformBuffer->SetData(&s_RendererData.LightsData, sizeof(Renderer3DData::LightsData), 0);
 	}
 
 	void Renderer3D::EndScene() 
@@ -215,8 +256,13 @@ namespace Kerberos
 		/// Remove translation from view matrix
 		const glm::mat4 skyboxView = glm::mat4(glm::mat3(s_RendererData.CameraData.ViewMatrix)); 
 
-		s_RendererData.SkyboxShader->SetMat4("u_View", skyboxView);
-		s_RendererData.SkyboxShader->SetMat4("u_Projection", s_RendererData.CameraData.ProjectionMatrix);
+		/// Changing only the view matrix is enough
+		s_RendererData.CameraData.ViewMatrix = skyboxView;
+		constexpr int viewMatrixOffset = offsetof(Renderer3DData::CameraDataUbo, ViewMatrix);
+		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData.ViewMatrix, sizeof(Renderer3DData::CameraDataUbo::ViewMatrix), viewMatrixOffset);
+
+		//s_RendererData.SkyboxShader->SetMat4("u_View", skyboxView);
+		//s_RendererData.SkyboxShader->SetMat4("u_Projection", s_RendererData.CameraData.ProjectionMatrix);
 
 		/// Set the hovered entity's id to an invalid value
 		s_RendererData.SkyboxShader->SetInt("u_EntityID", -1);
@@ -248,41 +294,17 @@ namespace Kerberos
 		const Ref<Shader> shaderToUse = material->MaterialShader ? material->MaterialShader : s_RendererData.ActiveShader;
 		shaderToUse->Bind();
 
-		shaderToUse->SetMat4("u_ViewProjection", s_RendererData.CameraData.ViewProjectionMatrix);
-		shaderToUse->SetMat4("u_Model", transform);
+		s_RendererData.PerObjectData.ModelMatrix = transform;
+		s_RendererData.PerObjectData.EntityID = entityID;
+		s_RendererData.PerObjectData.Material = { .Diffuse = material->Diffuse,
+			.Specular = material->Specular, .Ambient = material->Ambient, .Shininess = material->Shininess };
 
-		shaderToUse->SetMaterial("u_Material", material);
-
-		if (s_RendererData.SunLight)
-		{
-			shaderToUse->SetInt("u_DirectionalLight.enabled", 1);
-			shaderToUse->SetFloat3("u_DirectionalLight.direction", s_RendererData.SunLight->Direction);
-			shaderToUse->SetFloat3("u_DirectionalLight.color", s_RendererData.SunLight->Color);
-			shaderToUse->SetFloat("u_DirectionalLight.intensity", s_RendererData.SunLight->Intensity);
-		}
-		else
-		{
-			shaderToUse->SetInt("u_DirectionalLight.enabled", 0);
-		}
-
-		shaderToUse->SetInt("u_NumPointLights", static_cast<int>(s_RendererData.PointLights.size()));
-		for (int i = 0; i < s_RendererData.PointLights.size(); ++i)
-		{
-			std::string prefix = "u_PointLights[" + std::to_string(i) + "].";
-			shaderToUse->SetFloat3(prefix + "position", s_RendererData.PointLights[i].Position);
-			shaderToUse->SetFloat3(prefix + "color", s_RendererData.PointLights[i].Color);
-			shaderToUse->SetFloat(prefix + "intensity", s_RendererData.PointLights[i].Intensity);
-			shaderToUse->SetFloat(prefix + "constant", s_RendererData.PointLights[i].Constant);
-			shaderToUse->SetFloat(prefix + "linear", s_RendererData.PointLights[i].Linear);
-			shaderToUse->SetFloat(prefix + "quadratic", s_RendererData.PointLights[i].Quadratic);
-		}
+		s_RendererData.PerObjectUniformBuffer->SetData(&s_RendererData.PerObjectData, sizeof(Renderer3DData::PerObjectData), 0);
 
 		const Ref<Texture2D> textureToUse = texture ? texture : s_RendererData.WhiteTexture;
 		constexpr int textureSlot = 0;
 		textureToUse->Bind(textureSlot);
 		shaderToUse->SetInt("u_Texture", textureSlot);
-		shaderToUse->SetFloat("u_TilingFactor", tilingFactor);
-		shaderToUse->SetInt("u_EntityID", entityID);
 
 		mesh->GetVertexArray()->Bind();
 		
@@ -294,13 +316,13 @@ namespace Kerberos
 
 	void Renderer3D::SetGlobalAmbientLight(const glm::vec3& color, const float intensity) 
 	{
-		s_RendererData.GlobalAmbientColor = color;
-		s_RendererData.GlobalAmbientIntensity = intensity;
+		s_RendererData.LightsData.GlobalAmbientColor = color;
+		s_RendererData.LightsData.GlobalAmbientIntensity = intensity;
 		if (s_RendererData.ActiveShader)
 		{
 			s_RendererData.ActiveShader->Bind();
-			s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.GlobalAmbientColor);
-			s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.GlobalAmbientIntensity);
+			s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.LightsData.GlobalAmbientColor);
+			s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.LightsData.GlobalAmbientIntensity);
 		}
 	}
 
