@@ -6,9 +6,12 @@
 #include <imgui/imgui.h>
 
 #include "imgui/imgui_internal.h"
+#include <filesystem>
 
 namespace Kerberos
 {
+	static const std::filesystem::path ASSETS_DIRECTORY = "Assets";
+
 	HierarchyPanel::HierarchyPanel(const Ref<Scene>& context)
 		: m_Context(context)
 	{
@@ -596,36 +599,6 @@ namespace Kerberos
 					ImGui::EndCombo();
 				}
 
-				const char* textures[] = { "Ice", "Sprite Sheet" };
-				const char* currentTextureString = textures[0];
-
-				if (ImGui::BeginCombo("Texture", currentTextureString))
-				{
-					for (int i = 0; i < 2; i++)
-					{
-						const bool isSelected = (currentTextureString == textures[i]);
-						if (ImGui::Selectable(textures[i], isSelected))
-						{
-							if (meshTypes[i] == "Cube")
-							{
-								staticMesh.MeshTexture = m_IceTexture;
-								currentTextureString = "Ice";
-							}
-							else if (meshTypes[i] == "Sphere")
-							{
-								staticMesh.MeshTexture = m_SpriteSheetTexture;
-								currentTextureString = "Sprite Sheet";
-							}
-						}
-						if (isSelected)
-						{
-							ImGui::SetItemDefaultFocus();
-						}
-					}
-
-					ImGui::EndCombo();
-				}
-
 				if (staticMesh.MeshMaterial)
 				{
 					ImGui::Separator();
@@ -642,6 +615,19 @@ namespace Kerberos
 					ImGui::Text("Texture");
 					const uint64_t textureID = staticMesh.MeshTexture->GetRendererID();
 					ImGui::Image(textureID, ImVec2{ 64, 64 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+					/// Handle drag and drop for textures
+					if (ImGui::BeginDragDropTarget())
+					{
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
+						{
+							/// TODO: Handle the case where the payload is not a texture
+							const auto& pathStr = static_cast<const char*>(payload->Data);
+							const std::filesystem::path path = ASSETS_DIRECTORY / pathStr;
+							staticMesh.MeshTexture = Texture2D::Create(path.string());
+						}
+						ImGui::EndDragDropTarget();
+					}
 				}
 
 				ImGui::TreePop();
