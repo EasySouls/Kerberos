@@ -73,6 +73,10 @@ namespace Kerberos
 		}
 
 		//glfwWindowHint(GLFW_DEPTH_BITS, 32);
+		if (props.Maximized)
+		{
+			glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+		}
 
 		m_Window = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Data.Title.c_str(), nullptr, nullptr);
 

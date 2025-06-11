@@ -10,11 +10,13 @@ namespace Kerberos
 		std::string Title;
 		uint32_t Width;
 		uint32_t Height;
+		bool Maximized = false;
 
 		explicit WindowProps(std::string title = "Kerberos Engine",
+			                 bool maximized = false,
 		                     const uint32_t width = 1280,
 		                     const uint32_t height = 720)
-			: Title(std::move(title)), Width(width), Height(height)
+			: Title(std::move(title)), Width(width), Height(height), Maximized(maximized)
 		{
 		}
 	};
