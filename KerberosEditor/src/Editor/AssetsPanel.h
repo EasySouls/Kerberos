@@ -16,6 +16,9 @@ namespace Kerberos
 		AssetsPanel();
 		~AssetsPanel() = default;
 
+		/**
+		* Updates the current directory to the specified path.
+		*/
 		void SetCurrentDir(const std::filesystem::path& path);
 
 		void OnImGuiRender();
@@ -24,12 +27,12 @@ namespace Kerberos
 		/**
 		* Context menu displayed when right-clicking on a file in the Assets panel.
 		*/
-		void ShowFileContextMenu(std::filesystem::path::iterator::reference path) const;
+		void ShowFileContextMenu(std::filesystem::path::iterator::reference path);
 
 		/**
 		* Context menu displayed when right-clicking on a folder in the Assets panel.
 		*/ 
-		void ShowFolderContextMenu(std::filesystem::path::iterator::reference path) const;
+		void ShowFolderContextMenu(std::filesystem::path::iterator::reference path);
 
 		/**
 		* Context menu displayed when right-clicking on an empty area of the Assets panel.

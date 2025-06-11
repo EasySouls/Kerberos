@@ -53,6 +53,8 @@ namespace Kerberos
 			const auto& relativePath = std::filesystem::relative(path, ASSETS_DIRECTORY);
 			const std::string fileName = relativePath.filename().string();
 
+			ImGui::PushID(path.string().c_str());
+
 			if (entry.is_directory())
 			{
 				ImGui::ImageButton(path.string().c_str(), m_FolderIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
@@ -60,10 +62,8 @@ namespace Kerberos
 				{
 					m_CurrentDirectory /= path.filename();
 				}
-				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-				{
-					ShowFolderContextMenu(path);
-				}
+
+				ShowFolderContextMenu(path);
 			}
 			else
 			{
@@ -78,21 +78,21 @@ namespace Kerberos
 						m_AssetImages[path] = Texture2D::Create(fullPath);
 					}
 
-					ImGui::ImageButton(path.string().c_str(), m_AssetImages[path]->GetRendererID(), { 64, 64 }, { 0, 1 }, { 1, 0 });
+					ImGui::ImageButton(path.string().c_str(), m_AssetImages[path]->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						ImGui::Text("%s", fileName.c_str());
 						ImGui::EndTooltip();
 					}
+
+					ShowFileContextMenu(path);
 				}
 				else
 				{
-					ImGui::ImageButton(path.string().c_str(), m_FileIcon->GetRendererID(), { 64, 64 }, { 0, 1 }, { 1, 0 });
-					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-					{
-
-					}
+					ImGui::ImageButton(path.string().c_str(), m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+					
+					ShowFileContextMenu(path);
 				}
 
 				/// Open the file on double click
@@ -105,16 +105,13 @@ namespace Kerberos
 						ImGui::Text("Could not open file: %s", fileName.c_str());
 					}
 				}
-				/// Show context menu on left click
-				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-				{
-					ShowFolderContextMenu(path);
-				}
 
 			}
 			ImGui::TextWrapped(fileName.c_str());
 
 			ImGui::NextColumn();
+
+			ImGui::PopID();
 		}
 
 		ImGui::Columns(1);
@@ -122,27 +119,48 @@ namespace Kerberos
 		ImGui::End();
 	}
 
-	void AssetsPanel::ShowFileContextMenu(std::filesystem::path::iterator::reference path) const 
+	void AssetsPanel::ShowFileContextMenu(std::filesystem::path::iterator::reference path) 
 	{
-		if (ImGui::BeginPopup("File Context Menu"))
+		if (ImGui::BeginPopupContextItem("FileContext")) // "FileContext" is the ID for this popup
 		{
-			if (ImGui::MenuItem("Delete"))
+			ImGui::TextDisabled("%s", path.string().c_str());
+			ImGui::Separator();
+			if (ImGui::MenuItem("Open"))
 			{
-				std::filesystem::remove(path);
+				FileOperations::OpenFile(path.string().c_str());
+				ImGui::CloseCurrentPopup();
 			}
+			if (ImGui::MenuItem("Delete File"))
+			{
+				// TODO: Add confirmation!
+				if (m_AssetImages.contains(path))
+				{
+					m_AssetImages.erase(path); // Release texture if it was loaded
+				}
+				std::filesystem::remove(path);
+				ImGui::CloseCurrentPopup();
+			}
+			// Add other file-specific menu items (e.g., Rename, Show in Explorer)
 			ImGui::EndPopup();
 		}
 	}
 
-	void AssetsPanel::ShowFolderContextMenu(std::filesystem::path::iterator::reference path) const 
+	void AssetsPanel::ShowFolderContextMenu(std::filesystem::path::iterator::reference path) 
 	{
-		ImGui::OpenPopup("Folder Context Menu");
-
-		if (ImGui::BeginPopup("Folder Context Menu"))
+		if (ImGui::BeginPopupContextItem("FolderContext")) // "FolderContext" is the ID for this popup
 		{
-			if (ImGui::MenuItem("Delete"))
+			ImGui::TextDisabled("%s", path.string().c_str());
+			ImGui::Separator();
+			if (ImGui::MenuItem("Open"))
 			{
-				std::filesystem::remove(path);
+				m_CurrentDirectory /= path.filename();
+				ImGui::CloseCurrentPopup();
+			}
+			if (ImGui::MenuItem("Delete Folder"))
+			{
+				// TODO: Add confirmation dialog!
+				std::filesystem::remove_all(path); // Use remove_all for directories
+				ImGui::CloseCurrentPopup();
 			}
 			ImGui::EndPopup();
 		}
