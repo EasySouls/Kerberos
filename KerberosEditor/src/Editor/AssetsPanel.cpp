@@ -1,6 +1,7 @@
 #include "AssetsPanel.h"
 
 #include <imgui/imgui.h>
+#include <Kerberos/Utils/PlatformUtils.h>
 
 namespace Kerberos
 {
@@ -54,7 +55,7 @@ namespace Kerberos
 						m_AssetImages[path] = Texture2D::Create(fullPath);
 					}
 
-					ImGui::ImageButton(path.string().c_str(), (ImTextureID)m_AssetImages[path]->GetRendererID(), {64, 64}, {0, 1}, {1, 0});
+					ImGui::ImageButton(path.string().c_str(), m_AssetImages[path]->GetRendererID(), {64, 64}, {0, 1}, {1, 0});
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
@@ -64,6 +65,12 @@ namespace Kerberos
 					/// Open the file on double click
 					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 					{
+						/// Open the file using the default application
+						const bool opened = FileOperations::OpenFile(path.string().c_str());
+						if (!opened)
+						{
+							ImGui::Text("Could not open file: %s", fileName.c_str());
+						}
 					}
 				}
 				else

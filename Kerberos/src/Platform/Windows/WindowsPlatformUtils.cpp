@@ -55,4 +55,22 @@ namespace Kerberos
 
 		return {};
 	}
+
+	bool FileOperations::OpenFile(const char* path)
+	{
+		SHELLEXECUTEINFOA sei = { sizeof(sei) };
+		sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+		sei.hwnd = glfwGetWin32Window(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow()));
+		sei.lpVerb = "open";
+		sei.lpFile = path;
+		sei.nShow = SW_SHOWNORMAL;
+		if (ShellExecuteExA(&sei))
+		{
+			WaitForSingleObject(sei.hProcess, INFINITE);
+			CloseHandle(sei.hProcess);
+			return true;
+		}
+		
+		return false;
+	}
 }
