@@ -3,6 +3,7 @@
 
 //#include "ParticleSystem.h"
 #include "Editor/HierarchyPanel.h"
+#include "Editor/AssetsPanel.h"
 
 
 namespace Kerberos
@@ -22,6 +23,8 @@ namespace Kerberos
 	private:
 		bool OnKeyPressed(const KeyPressedEvent& event);
 		bool OnMouseButtonPressed(const MouseButtonPressedEvent& event);
+
+		void HandleDragAndDrop();
 
 		void SaveScene() const;
 		void SaveSceneAs() const;
@@ -78,6 +81,7 @@ namespace Kerberos
 
 		/// Editor Panels
 		HierarchyPanel m_HierarchyPanel;
+		AssetsPanel m_AssetsPanel;
 	};
 }
 

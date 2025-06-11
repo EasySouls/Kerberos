@@ -20,7 +20,7 @@ namespace Kerberos
 		KBR_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		const WindowProps props{ name, 1280, 720 };
+		const WindowProps props{ name, true, 1280, 720 };
 		m_Window = Window::Create(props);
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 

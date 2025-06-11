@@ -55,4 +55,32 @@ namespace Kerberos
 
 		return {};
 	}
+
+	bool FileOperations::OpenFile(const char* path)
+	{
+		if (!path || path[0] == '\0')
+		{
+			KBR_CORE_WARN("FileOperations::OpenFile called with an empty path.");
+			return false;
+		}
+
+		SHELLEXECUTEINFOA sei = { sizeof(sei) };
+		sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+		sei.hwnd = glfwGetWin32Window(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow()));
+		sei.lpVerb = "open";
+		sei.lpFile = path;
+		sei.nShow = SW_SHOWNORMAL;
+		if (ShellExecuteExA(&sei))
+		{
+			/// This will block until the opened process is closed
+			WaitForSingleObject(sei.hProcess, INFINITE);
+			CloseHandle(sei.hProcess);
+			return true;
+		}
+
+		DWORD error = GetLastError();
+		KBR_CORE_ERROR("Failed to open file: {0}, Error code: {1}", path, error);
+		
+		return false;
+	}
 }
