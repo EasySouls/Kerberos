@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+#include "Kerberos/Log.h"
+
 namespace Kerberos
 {
 	static const std::filesystem::path ASSETS_DIRECTORY = "Assets";
@@ -33,12 +35,15 @@ namespace Kerberos
 		}
 
 		static float padding = 10.0f;
-		static float thumbnailSize = 128.0f;
+		static float thumbnailSize = 96.0f;
 		static float cellSize = thumbnailSize + padding;
 
 		const float panelWidth = ImGui::GetContentRegionAvail().x;
 		int columns = static_cast<int>(panelWidth / cellSize);
 		columns = std::max(columns, 1);
+
+		/// Show default context menu when right-clicking on an empty space in the panel
+		ShowContextMenu(1 | ImGuiPopupFlags_NoOpenOverItems);
 
 		ImGui::Columns(columns, nullptr, false);
 
@@ -50,10 +55,14 @@ namespace Kerberos
 
 			if (entry.is_directory())
 			{
-				ImGui::ImageButton(path.string().c_str(), m_FolderIcon->GetRendererID(), {64, 64}, {0, 1}, {1, 0});
+				ImGui::ImageButton(path.string().c_str(), m_FolderIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 				{
 					m_CurrentDirectory /= path.filename();
+				}
+				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+				{
+					ShowFolderContextMenu(path);
 				}
 			}
 			else
@@ -69,31 +78,37 @@ namespace Kerberos
 						m_AssetImages[path] = Texture2D::Create(fullPath);
 					}
 
-					ImGui::ImageButton(path.string().c_str(), m_AssetImages[path]->GetRendererID(), {64, 64}, {0, 1}, {1, 0});
+					ImGui::ImageButton(path.string().c_str(), m_AssetImages[path]->GetRendererID(), { 64, 64 }, { 0, 1 }, { 1, 0 });
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::BeginTooltip();
 						ImGui::Text("%s", fileName.c_str());
 						ImGui::EndTooltip();
 					}
-					/// Open the file on double click
-					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-					{
-						/// Open the file using the default application
-						const bool opened = FileOperations::OpenFile(path.string().c_str());
-						if (!opened)
-						{
-							ImGui::Text("Could not open file: %s", fileName.c_str());
-						}
-					}
 				}
 				else
 				{
-					ImGui::ImageButton(path.string().c_str(), m_FileIcon->GetRendererID(), {64, 64}, {0, 1}, {1, 0});
+					ImGui::ImageButton(path.string().c_str(), m_FileIcon->GetRendererID(), { 64, 64 }, { 0, 1 }, { 1, 0 });
 					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 					{
-						
+
 					}
+				}
+
+				/// Open the file on double click
+				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+				{
+					/// Open the file using the default application
+					const bool opened = FileOperations::OpenFile(path.string().c_str());
+					if (!opened)
+					{
+						ImGui::Text("Could not open file: %s", fileName.c_str());
+					}
+				}
+				/// Show context menu on left click
+				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+				{
+					ShowFolderContextMenu(path);
 				}
 
 			}
@@ -106,4 +121,61 @@ namespace Kerberos
 
 		ImGui::End();
 	}
+
+	void AssetsPanel::ShowFileContextMenu(std::filesystem::path::iterator::reference path) const 
+	{
+		if (ImGui::BeginPopup("File Context Menu"))
+		{
+			if (ImGui::MenuItem("Delete"))
+			{
+				std::filesystem::remove(path);
+			}
+			ImGui::EndPopup();
+		}
+	}
+
+	void AssetsPanel::ShowFolderContextMenu(std::filesystem::path::iterator::reference path) const 
+	{
+		ImGui::OpenPopup("Folder Context Menu");
+
+		if (ImGui::BeginPopup("Folder Context Menu"))
+		{
+			if (ImGui::MenuItem("Delete"))
+			{
+				std::filesystem::remove(path);
+			}
+			ImGui::EndPopup();
+		}
+	}
+
+	void AssetsPanel::ShowContextMenu(const ImGuiPopupFlags popupFlags) const 
+	{
+		if (ImGui::BeginPopupContextWindow(nullptr, popupFlags))
+		{
+			if (ImGui::MenuItem("New Folder"))
+			{
+				std::filesystem::path newFolderPath = m_CurrentDirectory / "New Folder";
+				int counter = 1;
+				while (std::filesystem::exists(newFolderPath))
+				{
+					newFolderPath = m_CurrentDirectory / ("New Folder " + std::to_string(counter++));
+				}
+				std::filesystem::create_directory(newFolderPath);
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void AssetsPanel::SetCurrentDir(const std::filesystem::path& path) 
+	{
+		if (std::filesystem::exists(path) && std::filesystem::is_directory(path))
+		{
+			m_CurrentDirectory = path;
+			return;
+		}
+
+		KBR_CORE_ERROR("Invalid directory path: {0}", path.string());
+	}
+
 }
