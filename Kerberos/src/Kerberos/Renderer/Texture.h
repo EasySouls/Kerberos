@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Kerberos/Core.h"
+#include <string>
 
 namespace Kerberos
 {

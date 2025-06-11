@@ -43,9 +43,36 @@ namespace Kerberos
 			}
 			else
 			{
-				if (ImGui::Selectable(fileName.c_str()))
+				const auto fileExtension = path.extension();
+				const bool isImageFile = (fileExtension == ".png" || fileExtension == ".jpg" || fileExtension == ".jpeg");
+				if (isImageFile)
 				{
+					if (!m_AssetImages.contains(path))
+					{
+						/// Load the image and store it in the map
+						const std::string fullPath = path.string();
+						m_AssetImages[path] = Texture2D::Create(fullPath);
+					}
+
+					ImGui::ImageButton(path.string().c_str(), (ImTextureID)m_AssetImages[path]->GetRendererID(), {64, 64}, {0, 1}, {1, 0});
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::BeginTooltip();
+						ImGui::Text("%s", fileName.c_str());
+						ImGui::EndTooltip();
+					}
+					/// Open the file on double click
+					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+					{
+					}
 				}
+				else
+				{
+					if (ImGui::Selectable(fileName.c_str()))
+					{
+					}
+				}
+
 			}
 
 		}
