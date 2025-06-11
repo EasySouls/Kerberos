@@ -96,7 +96,8 @@ namespace Kerberos
 
 				if (ImGui::MenuItem("Static Mesh"))
 				{
-					m_SelectedEntity.AddComponent<StaticMeshComponent>(m_CubeMesh, m_WhiteMaterial);
+					//m_SelectedEntity.AddComponent<StaticMeshComponent>(m_CubeMesh, m_WhiteMaterial);
+					m_SelectedEntity.AddComponent<StaticMeshComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 
