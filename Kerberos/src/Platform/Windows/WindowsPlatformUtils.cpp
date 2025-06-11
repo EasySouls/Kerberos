@@ -77,6 +77,9 @@ namespace Kerberos
 			CloseHandle(sei.hProcess);
 			return true;
 		}
+
+		DWORD error = GetLastError();
+		KBR_CORE_ERROR("Failed to open file: {0}, Error code: {1}", path, error);
 		
 		return false;
 	}
