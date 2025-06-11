@@ -3,6 +3,8 @@
 #include <imgui/imgui.h>
 #include <Kerberos/Utils/PlatformUtils.h>
 
+#include <algorithm>
+
 namespace Kerberos
 {
 	static const std::filesystem::path ASSETS_DIRECTORY = "Assets";
@@ -10,7 +12,8 @@ namespace Kerberos
 	AssetsPanel::AssetsPanel()
 		: m_CurrentDirectory(ASSETS_DIRECTORY)
 	{
-
+		m_FolderIcon = Texture2D::Create("Assets/Editor/directory_icon.png");
+		m_FileIcon = Texture2D::Create("Assets/Editor/file_icon.png");
 	}
 
 	void AssetsPanel::OnImGuiRender()
@@ -29,6 +32,16 @@ namespace Kerberos
 			}
 		}
 
+		static float padding = 10.0f;
+		static float thumbnailSize = 128.0f;
+		static float cellSize = thumbnailSize + padding;
+
+		const float panelWidth = ImGui::GetContentRegionAvail().x;
+		int columns = static_cast<int>(panelWidth / cellSize);
+		columns = std::max(columns, 1);
+
+		ImGui::Columns(columns, nullptr, false);
+
 		for (const auto& entry : std::filesystem::directory_iterator(m_CurrentDirectory))
 		{
 			const std::filesystem::path& path = entry.path();
@@ -37,7 +50,8 @@ namespace Kerberos
 
 			if (entry.is_directory())
 			{
-				if (ImGui::Selectable(fileName.c_str()))
+				ImGui::ImageButton(path.string().c_str(), m_FolderIcon->GetRendererID(), {64, 64}, {0, 1}, {1, 0});
+				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 				{
 					m_CurrentDirectory /= path.filename();
 				}
@@ -75,14 +89,20 @@ namespace Kerberos
 				}
 				else
 				{
-					if (ImGui::Selectable(fileName.c_str()))
+					ImGui::ImageButton(path.string().c_str(), m_FileIcon->GetRendererID(), {64, 64}, {0, 1}, {1, 0});
+					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 					{
+						
 					}
 				}
 
 			}
+			ImGui::TextWrapped(fileName.c_str());
 
+			ImGui::NextColumn();
 		}
+
+		ImGui::Columns(1);
 
 		ImGui::End();
 	}

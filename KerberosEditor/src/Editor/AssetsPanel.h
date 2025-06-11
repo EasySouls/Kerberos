@@ -18,6 +18,8 @@ namespace Kerberos
 
 	private:
 		std::filesystem::path m_CurrentDirectory = std::filesystem::current_path();
+		Ref<Texture2D> m_FolderIcon;
+		Ref<Texture2D> m_FileIcon;
 
 		std::map<std::filesystem::path, Ref<Texture2D>> m_AssetImages;
 	};
