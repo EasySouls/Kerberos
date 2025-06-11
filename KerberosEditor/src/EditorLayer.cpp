@@ -350,8 +350,11 @@ namespace Kerberos
 
 		m_ViewportSize = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
 
+		/// Render the viewport into an image
 		const uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		ImGui::Image(textureID, ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		HandleDragAndDrop();
 
 		/// Set the bounds of the viewport
 		const auto windowSize = ImGui::GetWindowSize();
@@ -487,6 +490,28 @@ namespace Kerberos
 			m_HierarchyPanel.SetSelectedEntity(m_HoveredEntity);
 		}
 		return false;
+	}
+
+	void EditorLayer::HandleDragAndDrop() 
+	{
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
+			{
+				const auto& path = static_cast<const char*>(payload->Data);
+				KBR_INFO("Drag and drop payload: {0}", path);
+
+				/*const AssetHandle assetHandle = *static_cast<AssetHandle*>(payload->Data);
+				const AssetType assetType = AssetManager::GetAssetType(assetHandle);
+				if (assetType == AssetType::Texture2D)
+				{
+					const Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(assetHandle);
+					m_SquareColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+					m_Texture = texture;
+				}*/
+			}
+			ImGui::EndDragDropTarget();
+		}
 	}
 
 	void EditorLayer::NewScene()

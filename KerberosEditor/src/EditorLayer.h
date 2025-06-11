@@ -24,6 +24,8 @@ namespace Kerberos
 		bool OnKeyPressed(const KeyPressedEvent& event);
 		bool OnMouseButtonPressed(const MouseButtonPressedEvent& event);
 
+		void HandleDragAndDrop();
+
 		void SaveScene() const;
 		void SaveSceneAs() const;
 		void LoadScene();

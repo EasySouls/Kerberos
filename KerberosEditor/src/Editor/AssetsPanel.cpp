@@ -55,6 +55,8 @@ namespace Kerberos
 
 			ImGui::PushID(path.string().c_str());
 
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.2f, 0.2f, 0.5f));
+
 			if (entry.is_directory())
 			{
 				ImGui::ImageButton(path.string().c_str(), m_FolderIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
@@ -85,14 +87,21 @@ namespace Kerberos
 						ImGui::Text("%s", fileName.c_str());
 						ImGui::EndTooltip();
 					}
-
-					ShowFileContextMenu(path);
 				}
 				else
 				{
 					ImGui::ImageButton(path.string().c_str(), m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
-					
-					ShowFileContextMenu(path);
+				}
+
+				ShowFileContextMenu(path);
+
+				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+				{
+					const auto itemPath = relativePath.string();
+
+					ImGui::SetDragDropPayload("ASSET_BROWSER_ITEM", itemPath.c_str(), itemPath.size() + 1, ImGuiCond_Once);
+					ImGui::Text("%s", fileName.c_str());
+					ImGui::EndDragDropSource();
 				}
 
 				/// Open the file on double click
@@ -110,6 +119,8 @@ namespace Kerberos
 			ImGui::TextWrapped("%s", fileName.c_str());
 
 			ImGui::NextColumn();
+
+			ImGui::PopStyleColor();
 
 			ImGui::PopID();
 		}
