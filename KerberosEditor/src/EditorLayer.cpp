@@ -271,6 +271,7 @@ namespace Kerberos
 		}
 
 		m_HierarchyPanel.OnImGuiRender();
+		m_AssetsPanel.OnImGuiRender();
 
 		ImGui::Begin("Settings");
 		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));

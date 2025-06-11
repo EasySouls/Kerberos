@@ -3,6 +3,7 @@
 
 //#include "ParticleSystem.h"
 #include "Editor/HierarchyPanel.h"
+#include "Editor/AssetsPanel.h"
 
 
 namespace Kerberos
@@ -78,6 +79,7 @@ namespace Kerberos
 
 		/// Editor Panels
 		HierarchyPanel m_HierarchyPanel;
+		AssetsPanel m_AssetsPanel;
 	};
 }
 
