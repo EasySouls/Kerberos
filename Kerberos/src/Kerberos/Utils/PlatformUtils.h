@@ -21,6 +21,6 @@ namespace Kerberos
 		* @return whether the file was successfully opened or not.
 		*/
 		[[nodiscard]]
-		static bool OpenFile(const char* path = nullptr);
+		static bool OpenFile(const char* path);
 	};
 }

@@ -23,7 +23,7 @@ namespace Kerberos
 		ImGui::Begin("Assets");
 
 		const auto& relativeDir = std::filesystem::relative(m_CurrentDirectory, ASSETS_DIRECTORY);
-		const std::string title = relativeDir.string() == "." ? "Assets" : "Assets\\" + relativeDir.string();
+		const std::string title = relativeDir.string() == "." ? "Assets" : "Assets" + std::string(1, std::filesystem::path::preferred_separator) + relativeDir.string();
 		ImGui::Text("Current Directory: %s", title.data());
 
 		if (m_CurrentDirectory != ASSETS_DIRECTORY)
@@ -43,7 +43,7 @@ namespace Kerberos
 		columns = std::max(columns, 1);
 
 		/// Show default context menu when right-clicking on an empty space in the panel
-		ShowContextMenu(1 | ImGuiPopupFlags_NoOpenOverItems);
+		ShowContextMenu(ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems);
 
 		ImGui::Columns(columns, nullptr, false);
 
@@ -107,7 +107,7 @@ namespace Kerberos
 				}
 
 			}
-			ImGui::TextWrapped(fileName.c_str());
+			ImGui::TextWrapped("%s", fileName.c_str());
 
 			ImGui::NextColumn();
 
@@ -127,7 +127,11 @@ namespace Kerberos
 			ImGui::Separator();
 			if (ImGui::MenuItem("Open"))
 			{
-				FileOperations::OpenFile(path.string().c_str());
+				const bool success = FileOperations::OpenFile(path.string().c_str());
+				if (!success)
+				{
+					ImGui::Text("Could not open file: %s", path.filename().string().c_str());
+				}
 				ImGui::CloseCurrentPopup();
 			}
 			if (ImGui::MenuItem("Delete File"))

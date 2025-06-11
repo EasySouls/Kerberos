@@ -58,6 +58,12 @@ namespace Kerberos
 
 	bool FileOperations::OpenFile(const char* path)
 	{
+		if (!path || path[0] == '\0')
+		{
+			KBR_CORE_WARN("FileOperations::OpenFile called with an empty path.");
+			return false;
+		}
+
 		SHELLEXECUTEINFOA sei = { sizeof(sei) };
 		sei.fMask = SEE_MASK_NOCLOSEPROCESS;
 		sei.hwnd = glfwGetWin32Window(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow()));
@@ -66,6 +72,7 @@ namespace Kerberos
 		sei.nShow = SW_SHOWNORMAL;
 		if (ShellExecuteExA(&sei))
 		{
+			/// This will block until the opened process is closed
 			WaitForSingleObject(sei.hProcess, INFINITE);
 			CloseHandle(sei.hProcess);
 			return true;
