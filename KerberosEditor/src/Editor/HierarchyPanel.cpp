@@ -15,11 +15,7 @@ namespace Kerberos
 	HierarchyPanel::HierarchyPanel(const Ref<Scene>& context)
 		: m_Context(context)
 	{
-		m_IceTexture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
-		m_SpriteSheetTexture = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
-		m_CubeMesh = Mesh::CreateCube(1.0f);
-		m_SphereMesh = Mesh::CreateSphere(1.0f, 16, 16);
-		m_WhiteMaterial = CreateRef<Material>();
+		SetContext(context);
 	}
 
 	void HierarchyPanel::SetContext(const Ref<Scene>& context)
@@ -29,6 +25,16 @@ namespace Kerberos
 		/// This is neccessary to avoid having a dangling pointer to the previous context
 		/// when loading a new scene
 		m_SelectedEntity = {};
+
+		m_IceTexture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
+		m_SpriteSheetTexture = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
+		m_CubeMesh = Mesh::CreateCube(1.0f);
+		m_SphereMesh = Mesh::CreateSphere(1.0f, 16, 16);
+		m_WhiteMaterial = CreateRef<Material>();
+
+		m_WhiteTexture = Texture2D::Create(1, 1);
+		uint32_t whiteTextureData = 0xffffffff;
+		m_WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 	}
 
 	void HierarchyPanel::OnImGuiRender()
@@ -96,7 +102,6 @@ namespace Kerberos
 
 				if (ImGui::MenuItem("Static Mesh"))
 				{
-					//m_SelectedEntity.AddComponent<StaticMeshComponent>(m_CubeMesh, m_WhiteMaterial);
 					m_SelectedEntity.AddComponent<StaticMeshComponent>();
 					ImGui::CloseCurrentPopup();
 				}
@@ -113,7 +118,7 @@ namespace Kerberos
 		ImGui::End();
 	}
 
-	void HierarchyPanel::SetSelectedEntity(const Entity entity) 
+	void HierarchyPanel::SetSelectedEntity(const Entity entity)
 	{
 		m_SelectedEntity = entity;
 	}
@@ -573,7 +578,7 @@ namespace Kerberos
 
 				if (ImGui::BeginCombo("Mesh Type", currentMeshTypeString))
 				{
-					for (auto& meshType : meshTypes) 
+					for (auto& meshType : meshTypes)
 					{
 						const std::string meshTypeString = currentMeshTypeString;
 
@@ -610,25 +615,43 @@ namespace Kerberos
 					ImGui::DragFloat("Shininess", &staticMesh.MeshMaterial->Shininess, 0.1f, 0.0f, 10.0f);
 				}
 
+				ImGui::Separator();
+				ImGui::Text("Texture");
+				uint64_t textureID;
 				if (staticMesh.MeshTexture)
 				{
-					ImGui::Separator();
-					ImGui::Text("Texture");
-					const uint64_t textureID = staticMesh.MeshTexture->GetRendererID();
-					ImGui::Image(textureID, ImVec2{ 64, 64 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+					textureID = staticMesh.MeshTexture->GetRendererID();
+				}
+				else
+				{
+					textureID = m_WhiteTexture->GetRendererID();
+				}
+				ImGui::Image(textureID, ImVec2{ 64, 64 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
-					/// Handle drag and drop for textures
-					if (ImGui::BeginDragDropTarget())
+				/// Handle drag and drop for textures
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
 					{
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
-						{
-							/// TODO: Handle the case where the payload is not a texture
-							const auto& pathStr = static_cast<const char*>(payload->Data);
-							const std::filesystem::path path = ASSETS_DIRECTORY / pathStr;
-							staticMesh.MeshTexture = Texture2D::Create(path.string());
-						}
-						ImGui::EndDragDropTarget();
+						/// TODO: Handle the case where the payload is not a texture
+						const auto& pathStr = static_cast<const char*>(payload->Data);
+						const std::filesystem::path path = ASSETS_DIRECTORY / pathStr;
+						staticMesh.MeshTexture = Texture2D::Create(path.string());
 					}
+					ImGui::EndDragDropTarget();
+				}
+
+				/// Clear the texture if needed
+				if (ImGui::BeginPopupContextItem("Texture Options"))
+				{
+					ImGui::TextDisabled("%s", "Texture Options");
+					ImGui::Separator();
+					if (ImGui::MenuItem("Clear Texture"))
+					{
+						staticMesh.MeshTexture = m_WhiteTexture;
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
 				}
 
 				ImGui::TreePop();
