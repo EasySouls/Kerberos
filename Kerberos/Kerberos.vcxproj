@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="src\Kerberos.h" />
     <ClInclude Include="src\Kerberos\Application.h" />
+    <ClInclude Include="src\Kerberos\Assets\Model.h" />
     <ClInclude Include="src\Kerberos\Core.h" />
     <ClInclude Include="src\Kerberos\Core\Input.h" />
     <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
@@ -233,6 +234,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp" />
+    <ClCompile Include="src\Kerberos\Assets\Model.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Kerberos\Layer.cpp" />
