@@ -163,7 +163,7 @@ project "Kerberos"
 		"_CRT_SECURE_NO_WARNINGS",
 		"GLFW_INCLUDE_NONE",
 		"IMGUI_DOCKING_BRANCH",
-		"YAML_CPP_STATIC_DEFINE"
+		"YAML_CPP_STATIC_DEFINE",
 	}
 
 	filter "files:vendor/ImGuizmo/ImGuizmo.cpp"
@@ -273,8 +273,10 @@ project "Sandbox"
 		"Kerberos/src",
 		"Kerberos/vendor",
 		"Kerberos/vendor/spdlog/include",
+
 		IncludeDir.glm,
-		IncludeDir.entt
+		IncludeDir.entt,
+		--IncludeDir.Assimp,
 	}
 	
 	links
@@ -323,8 +325,10 @@ project "KerberosEditor"
 		"Kerberos/src",
 		"Kerberos/vendor",
 		"Kerberos/vendor/spdlog/include",
+
 		IncludeDir.glm,
-		IncludeDir.entt
+		IncludeDir.entt,
+		--IncludeDir.Assimp
 	}
 	
 	links

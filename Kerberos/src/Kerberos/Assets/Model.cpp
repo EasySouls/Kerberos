@@ -1,6 +1,10 @@
 #include "kbrpch.h"
 #include "Model.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 namespace Kerberos
 {
 	Model::Model(const std::filesystem::path& path) 
@@ -40,8 +44,7 @@ namespace Kerberos
 	{
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
-		std::vector<Texture> textures;
-
+		std::vector<Ref<Texture>> textures;
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
@@ -61,7 +64,7 @@ namespace Kerberos
 				vertex.Normal = vector;
 			}
 
-			if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+			if (mesh->mTextureCoords[0])
 			{
 				glm::vec2 vec;
 				vec.x = mesh->mTextureCoords[0][i].x;

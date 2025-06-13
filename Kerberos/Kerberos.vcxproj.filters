@@ -7,6 +7,9 @@
     <Filter Include="src\Kerberos">
       <UniqueIdentifier>{19724353-05D5-D2F7-AE5A-0BAE9A9C9E7A}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Kerberos\Assets">
+      <UniqueIdentifier>{DB420FCF-47A4-ECDC-D011-338F3C72239C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Kerberos\Core">
       <UniqueIdentifier>{11CE04FF-7DE4-0295-C65B-8EB632B1D31C}</UniqueIdentifier>
     </Filter>
@@ -56,6 +59,9 @@
     </ClInclude>
     <ClInclude Include="src\Kerberos\Application.h">
       <Filter>src\Kerberos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Model.h">
+      <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Core.h">
       <Filter>src\Kerberos</Filter>
@@ -291,11 +297,13 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Assets\Model.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
       <Filter>src\Kerberos</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\Model.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp">
       <Filter>src\Kerberos\ImGui</Filter>
@@ -465,6 +473,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Assets\Model.cpp" />
   </ItemGroup>
 </Project>

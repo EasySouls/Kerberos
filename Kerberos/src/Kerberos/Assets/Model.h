@@ -4,11 +4,13 @@
 
 #include <filesystem>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 #include "Kerberos/Renderer/Texture.h"
+
+struct aiNode;
+struct aiMesh;
+struct aiMaterial;
+struct aiScene;
+enum aiTextureType;
 
 namespace Kerberos
 {
