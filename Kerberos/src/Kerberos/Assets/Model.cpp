@@ -5,6 +5,11 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "Kerberos/Core/Timer.h"
+
+#include <ranges>
+#include <algorithm>
+
 namespace Kerberos
 {
 	Model::Model(const std::filesystem::path& path) 
@@ -25,6 +30,11 @@ namespace Kerberos
 		m_Directory = path.string().substr(0, path.string().find_last_of('/'));
 
 		KBR_CORE_TRACE("Loading model from path: {}", path.string());
+
+		Timer timer("Model - compiling", [&](const TimerData& res)
+			{
+				KBR_CORE_TRACE("Model compilation took {0} ms", res.DurationMs);
+			});
 
 		ProcessNode(scene->mRootNode, scene);
 	}
@@ -102,10 +112,12 @@ namespace Kerberos
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 		}
 
+		m_Textures.insert(m_Textures.end(), textures.begin(), textures.end());
+
 		return { vertices, indices };
 	}
 
-	std::vector<Ref<Texture>> Model::LoadMaterialTextures(const aiMaterial* mat, const aiTextureType type, const std::string& typeName) const 
+	std::vector<Ref<Texture>> Model::LoadMaterialTextures(const aiMaterial* mat, const aiTextureType type, const std::string& typeName) 
 	{
 		KBR_CORE_TRACE("Loading material textures of type {} and count {}", typeName, mat->GetTextureCount(type));
 
@@ -117,7 +129,19 @@ namespace Kerberos
 			mat->GetTexture(type, i, &str);
 
 			const std::filesystem::path texturePath = m_Directory + "/" + str.C_Str();
+
+			const bool textureExists = std::ranges::any_of(m_LoadedTexturePaths, [&](const std::string& texPath) {
+				return texPath == texturePath.string();
+				});
+
+			if (textureExists)	
+			{
+				KBR_CORE_TRACE("Texture {} already loaded, skipping", texturePath.string());
+				continue;
+			}
+			
 			auto texture = Texture2D::Create(texturePath.string());
+			m_LoadedTexturePaths.push_back(texturePath.string());
 			textures.push_back(texture);
 		}
 		
