@@ -108,6 +108,8 @@ namespace Kerberos
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
+
+		Model backpackModel = Model("assets/models/backpack/backpack.obj");
 	}
 
 	void EditorLayer::OnDetach()
