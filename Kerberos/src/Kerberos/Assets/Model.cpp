@@ -24,6 +24,8 @@ namespace Kerberos
 		}
 		m_Directory = path.string().substr(0, path.string().find_last_of('/'));
 
+		KBR_CORE_TRACE("Loading model from path: {}", path.string());
+
 		ProcessNode(scene->mRootNode, scene);
 	}
 
@@ -31,11 +33,13 @@ namespace Kerberos
 	{
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
+			KBR_CORE_TRACE("Processing mesh: {}", scene->mMeshes[node->mMeshes[i]]->mName.C_Str());
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 			m_Meshes.push_back(ProcessMesh(mesh, scene));
 		}
 		for (unsigned int i = 0; i < node->mNumChildren; i++)
 		{
+			KBR_CORE_TRACE("Processing child node: {}", node->mChildren[i]->mName.C_Str());
 			ProcessNode(node->mChildren[i], scene);
 		}
 	}
@@ -45,6 +49,8 @@ namespace Kerberos
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
 		std::vector<Ref<Texture>> textures;
+
+		KBR_CORE_TRACE("Processing mesh with {} vertices and {} faces", mesh->mNumVertices, mesh->mNumFaces);
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
@@ -99,9 +105,10 @@ namespace Kerberos
 		return { vertices, indices };
 	}
 
-	std::vector<Ref<Texture>> Model::LoadMaterialTextures(const aiMaterial* mat, const aiTextureType type, const std::string& typeName) 
+	std::vector<Ref<Texture>> Model::LoadMaterialTextures(const aiMaterial* mat, const aiTextureType type, const std::string& typeName) const 
 	{
-	
+		KBR_CORE_TRACE("Loading material textures of type {} and count {}", typeName, mat->GetTextureCount(type));
+
 		std::vector<Ref<Texture>> textures;
 		
 		for (uint32_t i = 0; i < mat->GetTextureCount(type); i++)
@@ -109,7 +116,8 @@ namespace Kerberos
 			aiString str;
 			mat->GetTexture(type, i, &str);
 
-			auto texture = Texture2D::Create(str.C_Str());
+			const std::filesystem::path texturePath = m_Directory + "/" + str.C_Str();
+			auto texture = Texture2D::Create(texturePath.string());
 			textures.push_back(texture);
 		}
 		

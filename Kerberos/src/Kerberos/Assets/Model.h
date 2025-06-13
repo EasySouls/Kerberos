@@ -24,7 +24,7 @@ namespace Kerberos
 		void ProcessNode(const aiNode* node, const aiScene* scene);
 		Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
 		std::vector<Ref<Texture>> LoadMaterialTextures(const aiMaterial* mat, aiTextureType type,
-		                                          const std::string& typeName);
+		                                          const std::string& typeName) const;
 
 	private:
 		std::vector<Mesh> m_Meshes;
