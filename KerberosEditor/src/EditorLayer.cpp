@@ -110,14 +110,16 @@ namespace Kerberos
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
 		Model backpackModel = Model("assets/models/backpack/backpack.obj");
-		Material backpackMaterial = Material();
+		Ref<Material> backpackMaterial = CreateRef<Material>();
 		const Ref<Texture2D> backpackTexture = backpackModel.GetTextures().at(0);
 		int i = 0;
-		for (const auto& mesh : backpackModel.GetMeshes())
+		for (auto& mesh : backpackModel.GetMeshes())
 		{
-			const Ref<Mesh> meshRef = ;
 			Entity backpackEntity = m_ActiveScene->CreateEntity("Backpack-" + std::to_string(i));
-			backpackEntity.AddComponent<StaticMeshComponent>(mesh, backpackTexture, nullptr);
+			auto& stc = backpackEntity.AddComponent<StaticMeshComponent>();
+			stc.StaticMesh = mesh;
+			stc.MeshMaterial = backpackMaterial;
+			stc.MeshTexture = backpackTexture;
 			i++;
 		}
 	}

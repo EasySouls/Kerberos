@@ -58,7 +58,7 @@ namespace Kerberos
 	{
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
-		std::vector<Ref<Texture>> textures;
+		std::vector<Ref<Texture2D>> textures;
 
 		KBR_CORE_TRACE("Processing mesh with {} vertices and {} faces", mesh->mNumVertices, mesh->mNumFaces);
 
