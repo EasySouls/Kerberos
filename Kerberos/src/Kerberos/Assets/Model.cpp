@@ -54,7 +54,7 @@ namespace Kerberos
 		}
 	}
 
-	Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene) 
+	Ref<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene) 
 	{
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
@@ -105,23 +105,23 @@ namespace Kerberos
 		if (mesh->mMaterialIndex >= 0)
 		{
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-			std::vector<Ref<Texture>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+			std::vector<Ref<Texture2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-			std::vector<Ref<Texture>> specularMaps = LoadMaterialTextures(material,
+			std::vector<Ref<Texture2D>> specularMaps = LoadMaterialTextures(material,
 				aiTextureType_SPECULAR, "texture_specular");
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 		}
 
 		m_Textures.insert(m_Textures.end(), textures.begin(), textures.end());
 
-		return { vertices, indices };
+		return CreateRef<Mesh>(vertices, indices);
 	}
 
-	std::vector<Ref<Texture>> Model::LoadMaterialTextures(const aiMaterial* mat, const aiTextureType type, const std::string& typeName) 
+	std::vector<Ref<Texture2D>> Model::LoadMaterialTextures(const aiMaterial* mat, const aiTextureType type, const std::string& typeName) 
 	{
 		KBR_CORE_TRACE("Loading material textures of type {} and count {}", typeName, mat->GetTextureCount(type));
 
-		std::vector<Ref<Texture>> textures;
+		std::vector<Ref<Texture2D>> textures;
 		
 		for (uint32_t i = 0; i < mat->GetTextureCount(type); i++)
 		{

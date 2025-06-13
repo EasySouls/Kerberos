@@ -20,16 +20,19 @@ namespace Kerberos
 	public:
 		explicit Model(const std::filesystem::path& path);
 
+		const std::vector<Ref<Mesh>>& GetMeshes() const { return m_Meshes; }
+		const std::vector<Ref<Texture2D>>& GetTextures() const { return m_Textures; }
+
 	private:
 		void LoadModel(const std::filesystem::path& path);
 		void ProcessNode(const aiNode* node, const aiScene* scene);
-		Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<Ref<Texture>> LoadMaterialTextures(const aiMaterial* mat, aiTextureType type,
+		Ref<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
+		std::vector<Ref<Texture2D>> LoadMaterialTextures(const aiMaterial* mat, aiTextureType type,
 		                                          const std::string& typeName);
 
 	private:
-		std::vector<Mesh> m_Meshes;
-		std::vector<Ref<Texture>> m_Textures;
+		std::vector<Ref<Mesh>> m_Meshes;
+		std::vector<Ref<Texture2D>> m_Textures;
 
 		std::string m_Directory;
 		std::vector<std::string> m_LoadedTexturePaths;
