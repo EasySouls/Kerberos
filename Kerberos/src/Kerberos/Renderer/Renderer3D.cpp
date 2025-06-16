@@ -45,8 +45,8 @@ namespace Kerberos
 
 		struct LightsDataUbo
 		{
-			glm::vec3 GlobalAmbientColor = { 0.5f, 0.5f, 0.5f };
-			alignas(4) float GlobalAmbientIntensity = 1.0f;
+			glm::vec3 GlobalAmbientColor = { 1.0f, 1.0f, 1.0f };
+			alignas(4) float GlobalAmbientIntensity = 2.0f;
 
 			alignas(4) int NrOfPointLights = 0;
 			DirectionalLight SunLight;
@@ -279,6 +279,8 @@ namespace Kerberos
 		/// Reset depth function to default
 		RenderCommand::SetDepthFunc(DepthFunc::Less); 
 
+		s_Stats.Vertices += 36;
+		s_Stats.Faces += 12;
 		s_Stats.DrawCalls++;
 		s_Stats.DrawnMeshes++;
 	}

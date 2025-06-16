@@ -47,6 +47,7 @@ namespace Kerberos
 		void SetIs3D(const bool is3D) { m_Is3D = is3D; }
 
 		Entity GetPrimaryCameraEntity();
+		void CalculateEntityTransforms();
 
 	private:
 		template<typename T>

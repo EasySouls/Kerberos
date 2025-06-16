@@ -26,6 +26,8 @@ namespace Kerberos
 
 		void HandleDragAndDrop();
 
+		void CalculateEntityTransforms() const;
+
 		void SaveScene() const;
 		void SaveSceneAs() const;
 		void LoadScene();

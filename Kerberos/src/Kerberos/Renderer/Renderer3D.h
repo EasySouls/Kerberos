@@ -32,6 +32,8 @@ namespace Kerberos
         {
             uint32_t DrawCalls = 0;
             uint32_t DrawnMeshes = 0;
+            int Vertices = 0;
+			int Faces = 0;
         };
 
 		static Statistics GetStatistics();

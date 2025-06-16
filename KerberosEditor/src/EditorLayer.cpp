@@ -55,6 +55,7 @@ namespace Kerberos
 		Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
 		const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
 		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
+		cubeEntity.GetComponent<TransformComponent>().Translation = { -2.0f, 1.0f, -2.0f };
 
 		Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
 		const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
@@ -74,7 +75,7 @@ namespace Kerberos
 		Entity pointLightEntity = m_ActiveScene->CreateEntity("Point Light");
 		auto& pointLightComponent = pointLightEntity.AddComponent<PointLightComponent>();
 		pointLightComponent.Light.Color = { 0.8f, 0.2f, 0.2f };
-		pointLightComponent.Light.Position = { 0.0f, 3.0f, 0.0f };
+		pointLightComponent.Light.Position = { 0.9f, 4.1f, 3.9f };
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
 		auto& cameraComponent = m_CameraEntity.AddComponent<CameraComponent>();
@@ -139,6 +140,13 @@ namespace Kerberos
 		m_Fps = static_cast<float>(1) / deltaTime;
 
 		Timer timer("EditorLayer::OnUpdate", [&](const ProfileResult profileResult) { m_ProfileResults.push_back(profileResult); });
+
+		{
+			KBR_PROFILE_SCOPE("EditorLayer::OnUpdate - CalculateEntityTransforms");
+
+			/// Calculates the children entities' world transform from their parents' and their own local transform
+			CalculateEntityTransforms();
+		}
 
 		/// Resize the camera if needed
 		if (const FramebufferSpecification spec = m_Framebuffer->GetSpecification();
@@ -293,7 +301,7 @@ namespace Kerberos
 		ImGui::Begin("Settings");
 		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
 
-		const auto [DrawCalls, DrawnMeshes] = Renderer3D::GetStatistics();
+		const auto [DrawCalls, DrawnMeshes, Vertices, Faces] = Renderer3D::GetStatistics();
 		ImGui::Text("Renderer3D Stats");
 		ImGui::Text("Draw Calls: %u", DrawCalls);
 		ImGui::Text("Meshes: %u", DrawnMeshes);
@@ -536,6 +544,11 @@ namespace Kerberos
 			}
 			ImGui::EndDragDropTarget();
 		}
+	}
+
+	void EditorLayer::CalculateEntityTransforms() const 
+	{
+		m_ActiveScene->CalculateEntityTransforms();
 	}
 
 	void EditorLayer::NewScene()

@@ -27,7 +27,7 @@ namespace Kerberos
 			KBR_CORE_ERROR("Assimp error: {}", importer.GetErrorString());
 			return;
 		}
-		m_Directory = path.string().substr(0, path.string().find_last_of('/'));
+		m_Directory = path.parent_path().string();
 
 		KBR_CORE_TRACE("Loading model from path: {}", path.string());
 

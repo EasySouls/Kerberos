@@ -93,6 +93,8 @@ namespace Kerberos
 
 	void Scene::SetParent(const Entity child, const Entity parent, bool keepWorldTransform) 
 	{
+		RemoveParent(child);
+
 		auto& childHierarchy = child.GetComponent<HierarchyComponent>();
 		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
 
@@ -197,7 +199,7 @@ namespace Kerberos
 
 			if (mesh.Visible)
 			{
-				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), mesh.MeshMaterial, mesh.MeshTexture);
+				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.WorldTransform, mesh.MeshMaterial, mesh.MeshTexture);
 			}
 		}
 
@@ -238,7 +240,7 @@ namespace Kerberos
 
 			if (mesh.Visible)
 			{
-				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), mesh.MeshMaterial, mesh.MeshTexture, 1.0f, static_cast<int>(entity));
+				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.WorldTransform, mesh.MeshMaterial, mesh.MeshTexture, 1.0f, static_cast<int>(entity));
 			}
 		}
 
@@ -270,6 +272,21 @@ namespace Kerberos
 		}
 
 		return {};
+	}
+
+	void Scene::CalculateEntityTransforms()
+	{
+		const auto view = m_Registry.view<TransformComponent>();
+		for (const auto id : view)
+		{
+			const Entity entity{ id, this };
+			const Entity parent = entity.GetComponent<HierarchyComponent>().Parent;
+
+			if (!parent)
+			{
+				UpdateChildTransforms(entity, glm::mat4(1.0f));
+			}
+		}
 	}
 
 	template <typename T>
