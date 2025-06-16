@@ -43,7 +43,10 @@ namespace Kerberos
 		for (const auto entityId : m_Context->m_Registry.view<entt::entity>())
 		{
 			Entity e{ entityId, m_Context.get() };
-			DrawEntityNode(e);
+			
+			/// Only draw the root nodes
+			if (!m_Context->GetParent(e))
+				DrawEntityNode(e);
 		}
 
 		/// If an empty space is clicked, deselect the entity
@@ -154,6 +157,11 @@ namespace Kerberos
 			constexpr ImGuiTreeNodeFlags childFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 			if (bool childOpened = ImGui::TreeNodeEx(reinterpret_cast<void*>(9817239), childFlags, tag.c_str()))
 			{
+				for (Entity child : m_Context->GetChildren(entity))
+				{
+					DrawEntityNode(child);
+				}
+
 				ImGui::TreePop();
 			}
 			ImGui::TreePop();
