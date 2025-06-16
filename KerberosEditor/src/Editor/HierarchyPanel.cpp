@@ -154,15 +154,19 @@ namespace Kerberos
 
 		if (opened)
 		{
-			constexpr ImGuiTreeNodeFlags childFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-			if (bool childOpened = ImGui::TreeNodeEx(reinterpret_cast<void*>(9817239), childFlags, tag.c_str()))
+			for (Entity child : m_Context->GetChildren(entity))
 			{
-				for (Entity child : m_Context->GetChildren(entity))
+				const std::string& childTag = child.GetComponent<TagComponent>().Tag;
+				const uint64_t treeNodeId = static_cast<uint32_t>(child);
+				constexpr ImGuiTreeNodeFlags childFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+				if (ImGui::TreeNodeEx(reinterpret_cast<void*>(treeNodeId), childFlags, "%s", childTag.c_str()))
 				{
 					DrawEntityNode(child);
+
+					ImGui::TreePop();
 				}
 
-				ImGui::TreePop();
 			}
 			ImGui::TreePop();
 		}

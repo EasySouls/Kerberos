@@ -432,6 +432,13 @@ namespace Kerberos
 		ImGui::End();
 
 		ImGui::End();
+
+#ifdef KBR_DEBUG
+		if (Input::IsKeyPressed(Key::RightControl))
+		{
+			ImGui::DebugStartItemPicker();
+		}
+#endif
 	}
 
 	void EditorLayer::OnEvent(Event& event)
