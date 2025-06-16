@@ -60,6 +60,9 @@
     <ClInclude Include="src\Kerberos\Application.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\AssetManager.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Assets\Model.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
@@ -301,6 +304,9 @@
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
       <Filter>src\Kerberos</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\AssetManager.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\Model.cpp">
       <Filter>src\Kerberos\Assets</Filter>

@@ -64,8 +64,8 @@ namespace Kerberos
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
-			Vertex vertex;
-			glm::vec3 vector;
+			Vertex vertex{};
+			glm::vec3 vector{};
 
 			vector.x = mesh->mVertices[i].x;
 			vector.y = mesh->mVertices[i].y;

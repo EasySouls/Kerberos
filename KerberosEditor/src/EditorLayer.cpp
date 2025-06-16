@@ -113,13 +113,16 @@ namespace Kerberos
 		Ref<Material> backpackMaterial = CreateRef<Material>();
 		const Ref<Texture2D> backpackTexture = backpackModel.GetTextures().at(0);
 		int i = 0;
+		Entity backpackEntity = m_ActiveScene->CreateEntity("Backpack");
 		for (auto& mesh : backpackModel.GetMeshes())
 		{
-			Entity backpackEntity = m_ActiveScene->CreateEntity("Backpack-" + std::to_string(i));
-			auto& stc = backpackEntity.AddComponent<StaticMeshComponent>();
+			Entity backpackPartEntity = m_ActiveScene->CreateEntity("Backpack-" + std::to_string(i));
+			auto& stc = backpackPartEntity.AddComponent<StaticMeshComponent>();
 			stc.StaticMesh = mesh;
 			stc.MeshMaterial = backpackMaterial;
 			stc.MeshTexture = backpackTexture;
+
+			m_ActiveScene->SetParent(backpackPartEntity, backpackEntity);
 			i++;
 		}
 	}

@@ -13,6 +13,7 @@
 #include "Kerberos/Renderer/Material.h"
 #include "Kerberos/Renderer/TextureCube.h"
 #include "Kerberos/Scene/SceneCamera.h"
+#include "Kerberos/Scene/Entity.h"
 
 namespace Kerberos
 {
@@ -23,6 +24,8 @@ namespace Kerberos
 		glm::vec3 Translation = glm::vec3(0.0f);
 		glm::vec3 Rotation = glm::vec3(0.0f);
 		glm::vec3 Scale = glm::vec3(1.0f);
+
+		glm::mat4 WorldTransform = glm::mat4(1.0f);
 
 		TransformComponent() = default;
 		~TransformComponent() = default;
@@ -201,5 +204,13 @@ namespace Kerberos
 		SkyboxComponent(const Ref<TextureCube>& texture, const Ref<Shader>& shader)
 			: SkyboxTexture(texture), SkyboxShader(shader)
 		{}
+	};
+
+	struct HierarchyComponent
+	{
+		Entity Parent = {};
+		std::vector<Entity> Children;
+
+		HierarchyComponent() = default;
 	};
 }
