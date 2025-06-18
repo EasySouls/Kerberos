@@ -27,6 +27,7 @@ IncludeDir["entt"] = "%{wks.location}/Kerberos/vendor/entt/Include"
 IncludeDir["yaml_cpp"] = "%{wks.location}/Kerberos/vendor/yaml-cpp/include"
 IncludeDir["ImGuizmo"] = "%{wks.location}/Kerberos/vendor/ImGuizmo"
 IncludeDir["Assimp"] = "%{wks.location}/Kerberos/vendor/Assimp/include"
+IncludeDir["JoltPhysics"] = "%{wks.location}/Kerberos/vendor/JoltPhysics"
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
@@ -100,6 +101,7 @@ group "Dependencies"
 	include "Kerberos/vendor/yaml-cpp"
 	include "Kerberos/vendor/ImGuizmo"
 	include "Kerberos/vendor/Assimp"
+	include "Kerberos/vendor/JoltPhysics"
 group ""
 
 project "Kerberos"
@@ -137,7 +139,8 @@ project "Kerberos"
 		IncludeDir.entt,
 		IncludeDir.yaml_cpp,
 		IncludeDir.ImGuizmo,
-		IncludeDir.Assimp
+		IncludeDir.Assimp,
+		IncludeDir.JoltPhysics,
 	}
 
 	libdirs 
