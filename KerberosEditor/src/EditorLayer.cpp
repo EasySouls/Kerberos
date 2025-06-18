@@ -15,7 +15,8 @@ namespace Kerberos
 {
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f)
-	{}
+	{
+	}
 
 	void EditorLayer::OnAttach()
 	{
@@ -166,9 +167,20 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("EditorCamera::OnUpdate");
 
-			/// Only update the camera when the viewport is focused
-			if (m_ViewportFocused)
+			switch (m_SceneState)
+			{
+			case SceneState::Edit:
+			case SceneState::Simulate:
 				m_EditorCamera.OnUpdate(deltaTime);
+				break;
+			case SceneState::Play:
+			{
+				/// Only update the camera when the viewport is focused
+				if (m_ViewportFocused)
+					m_CameraController.OnUpdate(deltaTime);
+				break;
+			}
+			}
 		}
 
 		Renderer3D::ResetStatistics();
@@ -190,9 +202,16 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("Scene::OnUpdate");
 
-			m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera, m_RenderSkybox);
-			//m_ActiveScene->OnUpdateRuntime(deltaTime);
-
+			switch (m_SceneState)
+			{
+			case SceneState::Edit:
+			case SceneState::Simulate:
+				m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera, m_RenderSkybox);
+				break;
+			case SceneState::Play:
+				m_ActiveScene->OnUpdateRuntime(deltaTime);
+				break;
+			}
 		}
 
 		{
@@ -498,7 +517,7 @@ namespace Kerberos
 			}
 			break;
 
-		/// Gizmos
+			/// Gizmos
 		case Key::Q:
 			m_GizmoType = -1;
 			break;
@@ -518,7 +537,7 @@ namespace Kerberos
 		return false;
 	}
 
-	bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event) 
+	bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event)
 	{
 		/// Handle mouse picking
 		/// Only select the entity if we are not using the gizmos or the camera
@@ -529,17 +548,17 @@ namespace Kerberos
 		return false;
 	}
 
-	void EditorLayer::OnScenePlay() 
+	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
 	}
 
-	void EditorLayer::OnSceneStop() 
+	void EditorLayer::OnSceneStop()
 	{
 		m_SceneState = SceneState::Edit;
 	}
 
-	void EditorLayer::HandleDragAndDrop() 
+	void EditorLayer::HandleDragAndDrop()
 	{
 		if (ImGui::BeginDragDropTarget())
 		{
@@ -561,7 +580,7 @@ namespace Kerberos
 		}
 	}
 
-	void EditorLayer::CalculateEntityTransforms() const 
+	void EditorLayer::CalculateEntityTransforms() const
 	{
 		m_ActiveScene->CalculateEntityTransforms();
 	}
@@ -573,7 +592,7 @@ namespace Kerberos
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 
-	void EditorLayer::UIToolbar() 
+	void EditorLayer::UIToolbar()
 	{
 		constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0.0f, 0.0f));
@@ -617,7 +636,7 @@ namespace Kerberos
 		serializer.Serialize("assets/scenes/Example.kerberos");
 	}
 
-	void EditorLayer::SaveSceneAs() const 
+	void EditorLayer::SaveSceneAs() const
 	{
 		const std::string filepath = FileDialog::SaveFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
 		if (filepath.empty())
@@ -627,7 +646,7 @@ namespace Kerberos
 		serializer.Serialize(filepath);
 	}
 
-	void EditorLayer::LoadScene() 
+	void EditorLayer::LoadScene()
 	{
 		const std::string filepath = FileDialog::OpenFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
 
