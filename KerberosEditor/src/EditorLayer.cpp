@@ -126,6 +126,9 @@ namespace Kerberos
 			m_ActiveScene->SetParent(backpackPartEntity, backpackEntity);
 			i++;
 		}
+
+		m_IconPlay = Texture2D::Create("assets/editor/play_button.png");
+		m_IconStop = Texture2D::Create("assets/editor/stop_button.png");
 	}
 
 	void EditorLayer::OnDetach()
@@ -439,6 +442,8 @@ namespace Kerberos
 
 		ImGui::End();
 
+		UIToolbar();
+
 		ImGui::End();
 
 #ifdef KBR_DEBUG
@@ -524,6 +529,16 @@ namespace Kerberos
 		return false;
 	}
 
+	void EditorLayer::OnScenePlay() 
+	{
+		m_SceneState = SceneState::Play;
+	}
+
+	void EditorLayer::OnSceneStop() 
+	{
+		m_SceneState = SceneState::Edit;
+	}
+
 	void EditorLayer::HandleDragAndDrop() 
 	{
 		if (ImGui::BeginDragDropTarget())
@@ -556,6 +571,34 @@ namespace Kerberos
 		m_ActiveScene = CreateRef<Scene>();
 		m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
 		m_HierarchyPanel.SetContext(m_ActiveScene);
+	}
+
+	void EditorLayer::UIToolbar() 
+	{
+		constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+		ImGui::Begin("Toolbar", nullptr, flags);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 4.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 4.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(4.0f, 4.0f));
+
+		const auto icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+
+		if (ImGui::ImageButton("PlayButton", icon->GetRendererID(), ImVec2(50, 50)))
+		{
+			if (m_SceneState == SceneState::Edit)
+			{
+				OnScenePlay();
+			}
+			else if (m_SceneState == SceneState::Play)
+			{
+				OnSceneStop();
+			}
+		}
+
+		ImGui::PopStyleVar(3);
+
+		ImGui::End();
 	}
 
 	void EditorLayer::SaveScene() const

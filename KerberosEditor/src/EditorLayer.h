@@ -24,6 +24,9 @@ namespace Kerberos
 		bool OnKeyPressed(const KeyPressedEvent& event);
 		bool OnMouseButtonPressed(const MouseButtonPressedEvent& event);
 
+		void OnScenePlay();
+		void OnSceneStop();
+
 		void HandleDragAndDrop();
 
 		void CalculateEntityTransforms() const;
@@ -32,6 +35,8 @@ namespace Kerberos
 		void SaveSceneAs() const;
 		void LoadScene();
 		void NewScene();
+
+		void UIToolbar();
 
 	private:
 		OrthographicCameraController m_CameraController;
@@ -84,6 +89,17 @@ namespace Kerberos
 		/// Editor Panels
 		HierarchyPanel m_HierarchyPanel;
 		AssetsPanel m_AssetsPanel;
+
+		enum class SceneState : uint8_t
+		{
+			Edit,
+			Play,
+			Simulate
+		};
+
+		Ref<Texture2D> m_IconPlay;
+		Ref<Texture2D> m_IconStop;
+		SceneState m_SceneState = SceneState::Edit;
 	};
 }
 
