@@ -15,7 +15,8 @@ namespace Kerberos
 {
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f)
-	{}
+	{
+	}
 
 	void EditorLayer::OnAttach()
 	{
@@ -55,6 +56,7 @@ namespace Kerberos
 		Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
 		const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
 		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
+		cubeEntity.GetComponent<TransformComponent>().Translation = { -2.0f, 1.0f, -2.0f };
 
 		Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
 		const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
@@ -74,7 +76,7 @@ namespace Kerberos
 		Entity pointLightEntity = m_ActiveScene->CreateEntity("Point Light");
 		auto& pointLightComponent = pointLightEntity.AddComponent<PointLightComponent>();
 		pointLightComponent.Light.Color = { 0.8f, 0.2f, 0.2f };
-		pointLightComponent.Light.Position = { 0.0f, 3.0f, 0.0f };
+		pointLightComponent.Light.Position = { 0.9f, 4.1f, 3.9f };
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
 		auto& cameraComponent = m_CameraEntity.AddComponent<CameraComponent>();
@@ -108,6 +110,15 @@ namespace Kerberos
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
+
+		Model backpackModel = Model("assets/models/backpack/backpack.obj", "Backpack");
+		backpackModel.InitEntities(m_ActiveScene);
+
+		/*Model deerModel = Model("assets/models/deer_demo/scene.gltf", "Deer");
+		deerModel.InitEntities(m_ActiveScene);*/
+
+		m_IconPlay = Texture2D::Create("assets/editor/play_button.png");
+		m_IconStop = Texture2D::Create("assets/editor/stop_button.png");
 	}
 
 	void EditorLayer::OnDetach()
@@ -122,6 +133,13 @@ namespace Kerberos
 		m_Fps = static_cast<float>(1) / deltaTime;
 
 		Timer timer("EditorLayer::OnUpdate", [&](const ProfileResult profileResult) { m_ProfileResults.push_back(profileResult); });
+
+		{
+			KBR_PROFILE_SCOPE("EditorLayer::OnUpdate - CalculateEntityTransforms");
+
+			/// Calculates the children entities' world transform from their parents' and their own local transform
+			CalculateEntityTransforms();
+		}
 
 		/// Resize the camera if needed
 		if (const FramebufferSpecification spec = m_Framebuffer->GetSpecification();
@@ -138,9 +156,20 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("EditorCamera::OnUpdate");
 
-			/// Only update the camera when the viewport is focused
-			if (m_ViewportFocused)
+			switch (m_SceneState)
+			{
+			case SceneState::Edit:
+			case SceneState::Simulate:
 				m_EditorCamera.OnUpdate(deltaTime);
+				break;
+			case SceneState::Play:
+			{
+				/// Only update the camera when the viewport is focused
+				if (m_ViewportFocused)
+					m_CameraController.OnUpdate(deltaTime);
+				break;
+			}
+			}
 		}
 
 		Renderer3D::ResetStatistics();
@@ -162,9 +191,16 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("Scene::OnUpdate");
 
-			m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera, m_RenderSkybox);
-			//m_ActiveScene->OnUpdateRuntime(deltaTime);
-
+			switch (m_SceneState)
+			{
+			case SceneState::Edit:
+			case SceneState::Simulate:
+				m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera, m_RenderSkybox);
+				break;
+			case SceneState::Play:
+				m_ActiveScene->OnUpdateRuntime(deltaTime);
+				break;
+			}
 		}
 
 		{
@@ -276,10 +312,12 @@ namespace Kerberos
 		ImGui::Begin("Settings");
 		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
 
-		const auto [DrawCalls, DrawnMeshes] = Renderer3D::GetStatistics();
+		const auto [DrawCalls, DrawnMeshes, Vertices, Faces] = Renderer3D::GetStatistics();
 		ImGui::Text("Renderer3D Stats");
 		ImGui::Text("Draw Calls: %u", DrawCalls);
 		ImGui::Text("Meshes: %u", DrawnMeshes);
+		ImGui::Text("Vertices: %u", Vertices);
+		ImGui::Text("Faces: %u", Faces);
 
 		for (const auto& [Name, Time] : m_ProfileResults)
 		{
@@ -414,7 +452,16 @@ namespace Kerberos
 
 		ImGui::End();
 
+		UIToolbar();
+
 		ImGui::End();
+
+#ifdef KBR_DEBUG
+		if (Input::IsKeyPressed(Key::RightControl))
+		{
+			ImGui::DebugStartItemPicker();
+		}
+#endif
 	}
 
 	void EditorLayer::OnEvent(Event& event)
@@ -461,7 +508,7 @@ namespace Kerberos
 			}
 			break;
 
-		/// Gizmos
+			/// Gizmos
 		case Key::Q:
 			m_GizmoType = -1;
 			break;
@@ -481,7 +528,7 @@ namespace Kerberos
 		return false;
 	}
 
-	bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event) 
+	bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event)
 	{
 		/// Handle mouse picking
 		/// Only select the entity if we are not using the gizmos or the camera
@@ -492,7 +539,17 @@ namespace Kerberos
 		return false;
 	}
 
-	void EditorLayer::HandleDragAndDrop() 
+	void EditorLayer::OnScenePlay()
+	{
+		m_SceneState = SceneState::Play;
+	}
+
+	void EditorLayer::OnSceneStop()
+	{
+		m_SceneState = SceneState::Edit;
+	}
+
+	void EditorLayer::HandleDragAndDrop()
 	{
 		if (ImGui::BeginDragDropTarget())
 		{
@@ -514,11 +571,54 @@ namespace Kerberos
 		}
 	}
 
+	void EditorLayer::CalculateEntityTransforms() const
+	{
+		m_ActiveScene->CalculateEntityTransforms();
+	}
+
 	void EditorLayer::NewScene()
 	{
 		m_ActiveScene = CreateRef<Scene>();
 		m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
 		m_HierarchyPanel.SetContext(m_ActiveScene);
+	}
+
+	void EditorLayer::UIToolbar()
+	{
+		constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0.0f, 0.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 2.0f));
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+		const auto& colors = ImGui::GetStyle().Colors;
+		const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+		const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+		ImGui::Begin("Toolbar", nullptr, flags);
+
+		const Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+		const float size = ImGui::GetWindowHeight() - 4.0f;
+
+		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+		if (ImGui::ImageButton("PlayButton", icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
+		{
+			if (m_SceneState == SceneState::Edit)
+			{
+				OnScenePlay();
+			}
+			else if (m_SceneState == SceneState::Play)
+			{
+				OnSceneStop();
+			}
+		}
+
+		ImGui::PopStyleColor(3);
+		ImGui::PopStyleVar(2);
+
+		ImGui::End();
 	}
 
 	void EditorLayer::SaveScene() const
@@ -527,7 +627,7 @@ namespace Kerberos
 		serializer.Serialize("assets/scenes/Example.kerberos");
 	}
 
-	void EditorLayer::SaveSceneAs() const 
+	void EditorLayer::SaveSceneAs() const
 	{
 		const std::string filepath = FileDialog::SaveFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
 		if (filepath.empty())
@@ -537,7 +637,7 @@ namespace Kerberos
 		serializer.Serialize(filepath);
 	}
 
-	void EditorLayer::LoadScene() 
+	void EditorLayer::LoadScene()
 	{
 		const std::string filepath = FileDialog::OpenFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
 

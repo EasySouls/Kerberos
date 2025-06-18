@@ -78,6 +78,7 @@ namespace Kerberos
 	{
 		Entity entity = { m_Registry.create(), this };
 		entity.AddComponent<TransformComponent>();
+		entity.AddComponent<HierarchyComponent>();
 
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
@@ -88,6 +89,48 @@ namespace Kerberos
 	void Scene::DestroyEntity(const Entity entity) 
 	{
 		m_Registry.destroy(static_cast<entt::entity>(entity));
+	}
+
+	void Scene::SetParent(const Entity child, const Entity parent, bool keepWorldTransform) 
+	{
+		RemoveParent(child);
+
+		auto& childHierarchy = child.GetComponent<HierarchyComponent>();
+		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
+
+		childHierarchy.Parent = parent;
+		parentHierarchy.Children.push_back(child);
+	}
+
+	Entity Scene::GetParent(const Entity child) 
+	{
+		const auto& childHierarchy = child.GetComponent<HierarchyComponent>();
+		if (childHierarchy.Parent)
+		{
+			return childHierarchy.Parent;
+		}
+		return {};
+	}
+
+	void Scene::RemoveParent(const Entity child) 
+	{
+		auto& childHierarchy = child.GetComponent<HierarchyComponent>();
+		if (childHierarchy.Parent)
+		{
+			auto& parentHierarchy = childHierarchy.Parent.GetComponent<HierarchyComponent>();
+			const auto it = std::ranges::find(parentHierarchy.Children, child);
+			if (it != parentHierarchy.Children.end())
+			{
+				parentHierarchy.Children.erase(it);
+			}
+			childHierarchy.Parent = Entity{};
+		}
+	}
+
+	const std::vector<Entity>& Scene::GetChildren(const Entity parent) 
+	{
+		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
+		return parentHierarchy.Children;
 	}
 
 	void Scene::OnViewportResize(const uint32_t width, const uint32_t height) 
@@ -156,7 +199,7 @@ namespace Kerberos
 
 			if (mesh.Visible)
 			{
-				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), mesh.MeshMaterial, mesh.MeshTexture);
+				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.WorldTransform, mesh.MeshMaterial, mesh.MeshTexture);
 			}
 		}
 
@@ -197,11 +240,23 @@ namespace Kerberos
 
 			if (mesh.Visible)
 			{
-				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.GetTransform(), mesh.MeshMaterial, mesh.MeshTexture, 1.0f, static_cast<int>(entity));
+				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.WorldTransform, mesh.MeshMaterial, mesh.MeshTexture, 1.0f, static_cast<int>(entity));
 			}
 		}
 
 		Renderer3D::EndScene();
+	}
+
+	void Scene::UpdateChildTransforms(const Entity parent, const glm::mat4& parentTransform) 
+	{
+		auto& tsc = parent.GetComponent<TransformComponent>();
+		const glm::mat4 localTransform = tsc.GetTransform();
+		tsc.WorldTransform = parentTransform * localTransform;
+
+		for (const auto child : GetChildren(parent))
+		{
+			UpdateChildTransforms(child, tsc.WorldTransform);
+		}
 	}
 
 	Entity Scene::GetPrimaryCameraEntity() 
@@ -217,6 +272,21 @@ namespace Kerberos
 		}
 
 		return {};
+	}
+
+	void Scene::CalculateEntityTransforms()
+	{
+		const auto view = m_Registry.view<TransformComponent>();
+		for (const auto id : view)
+		{
+			const Entity entity{ id, this };
+			const Entity parent = entity.GetComponent<HierarchyComponent>().Parent;
+
+			if (!parent)
+			{
+				UpdateChildTransforms(entity, glm::mat4(1.0f));
+			}
+		}
 	}
 
 	template <typename T>
@@ -272,5 +342,9 @@ namespace Kerberos
 
 	template <>
 	void Scene::OnComponentAdded<SkyboxComponent>(Entity entity, SkyboxComponent& component)
+	{}
+
+	template <>
+	void Scene::OnComponentAdded<HierarchyComponent>(Entity entity, HierarchyComponent& component)
 	{}
 }

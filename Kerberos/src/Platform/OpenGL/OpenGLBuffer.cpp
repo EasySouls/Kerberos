@@ -16,6 +16,9 @@ namespace Kerberos
 
 		// TODO: Specify the buffer usage as a parameter
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+
+		/// Assuming each vertex has 3 components (x, y, z)
+		m_Count = size / sizeof(float) / 3;
 	}
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(const uint32_t size) 
@@ -41,6 +44,9 @@ namespace Kerberos
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+
+		/// Assuming each vertex has 3 components (x, y, z)
+		m_Count = size / sizeof(float) / 3;
 	}
 
 	void OpenGLVertexBuffer::Bind() const 

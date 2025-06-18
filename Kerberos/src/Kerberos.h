@@ -53,3 +53,8 @@
 #include "Kerberos/Core/MouseButtonCodes.h"
 #include "Kerberos/OrthographicCameraController.h"
 /// ---------------------------------
+
+/// ---- Assets ---------------------
+#include "Kerberos/Assets/Model.h"
+//#include "Kerberos/Assets/AssetManager.h"
+/// ---------------------------------

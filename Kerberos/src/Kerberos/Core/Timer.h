@@ -2,12 +2,18 @@
 
 namespace Kerberos
 {
+	struct TimerData
+	{
+		const char* Name;
+		float DurationMs;
+	};
+
 	template<typename Fn>
 	class Timer
 	{
 	public:
 		explicit Timer(const char* name, Fn&& callback)
-			: m_Name(name), m_Callback(callback), m_Stopped(false)
+			: m_Name(name), m_Callback(std::move(callback)), m_Stopped(false)
 		{
 			m_StartTimepoint = std::chrono::high_resolution_clock::now();
 		}
@@ -27,7 +33,7 @@ namespace Kerberos
 
 			m_Stopped = true;
 
-			auto duration = end - start;
+			const auto duration = end - start;
 			auto durationMs = duration * 0.001f;
 
 			m_Callback({ m_Name, durationMs });

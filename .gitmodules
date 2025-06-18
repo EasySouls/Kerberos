@@ -14,3 +14,6 @@
 [submodule "Kerberos/vendor/ImGuizmo"]
 	path = Kerberos/vendor/ImGuizmo
 	url = https://github.com/EasySouls/ImGuizmo
+[submodule "Kerberos/vendor/Assimp"]
+	path = Kerberos/vendor/Assimp
+	url = https://github.com/EasySouls/Assimp

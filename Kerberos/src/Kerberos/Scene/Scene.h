@@ -36,22 +36,28 @@ namespace Kerberos
 		 */
 		void DestroyEntity(Entity entity);
 
+		void SetParent(Entity child, Entity parent, bool keepWorldTransform = true);
+		Entity GetParent(Entity child);
+		void RemoveParent(Entity child);
+		const std::vector<Entity>& GetChildren(Entity parent);
+
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 
 		void SetIs3D(const bool is3D) { m_Is3D = is3D; }
 
 		Entity GetPrimaryCameraEntity();
+		void CalculateEntityTransforms();
 
 	private:
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
 
 		void Render2DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
-
 		void Render3DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
-
 		void Render3DEditor(const EditorCamera& camera, bool renderSkybox);
+
+		void UpdateChildTransforms(Entity parent, const glm::mat4& parentTransform);
 
 	private:
 		entt::registry m_Registry;

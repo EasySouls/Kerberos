@@ -6,20 +6,24 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Editor\AssetsPanel.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
     <ClInclude Include="src\Editor\HierarchyPanel.h">
       <Filter>Editor</Filter>
     </ClInclude>
     <ClInclude Include="src\EditorLayer.h" />
     <ClInclude Include="src\ParticleSystem.h" />
-    <ClInclude Include="src\Editor\AssetsPanel.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Editor\AssetsPanel.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
     <ClCompile Include="src\Editor\HierarchyPanel.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
     <ClCompile Include="src\EditorLayer.cpp" />
     <ClCompile Include="src\KerberosEditorApp.cpp" />
     <ClCompile Include="src\ParticleSystem.cpp" />
-    <ClCompile Include="src\Editor\AssetsPanel.cpp" />
   </ItemGroup>
 </Project>
