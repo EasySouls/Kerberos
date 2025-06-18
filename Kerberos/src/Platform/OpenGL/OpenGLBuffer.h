@@ -22,6 +22,7 @@ namespace Kerberos
 	private:
 		uint32_t m_RendererID;
 		BufferLayout m_Layout;
+		uint32_t m_Count;
 	};
 
 	class OpenGLIndexBuffer final : public IndexBuffer

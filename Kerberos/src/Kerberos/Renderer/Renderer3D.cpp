@@ -314,6 +314,7 @@ namespace Kerberos
 
 		s_Stats.DrawCalls++;
 		s_Stats.DrawnMeshes++;
+		s_Stats.Vertices += mesh->GetVertexCount();
 	}
 
 	void Renderer3D::SetGlobalAmbientLight(const glm::vec3& color, const float intensity) 
@@ -347,5 +348,7 @@ namespace Kerberos
 	{
 		s_Stats.DrawCalls = 0;
 		s_Stats.DrawnMeshes = 0;
+		s_Stats.Faces = 0;
+		s_Stats.Vertices = 0;
 	}
 }

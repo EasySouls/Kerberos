@@ -20,6 +20,12 @@ namespace Kerberos
 
 		Ref<VertexArray> GetVertexArray() const { return m_VertexArray; }
 		uint32_t GetIndexCount() const { return m_IndexCount; }
+		uint32_t GetVertexCount() const 
+		{ 
+			if (m_VertexArray && !m_VertexArray->GetVertexBuffers().empty())
+				return m_VertexArray->GetVertexBuffers()[0]-
+			return 0; 
+		}
 
 	private:
 		void SetupMesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
