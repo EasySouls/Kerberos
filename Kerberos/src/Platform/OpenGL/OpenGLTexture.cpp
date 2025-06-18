@@ -51,7 +51,7 @@ namespace Kerberos
 
 		/// Set the texture wrapping/filtering options (on the currently bound texture object)
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		/// Upload the texture data to the GPU
 		glTextureSubImage2D(m_RendererID, 
@@ -85,7 +85,7 @@ namespace Kerberos
 
 		/// Set the texture wrapping/filtering options (on the currently bound texture object)
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D() 

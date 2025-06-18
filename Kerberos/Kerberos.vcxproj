@@ -77,7 +77,7 @@
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;YAML_CPP_STATIC_DEFINE;KBR_PLATFORM_WINDOWS;KBR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.313.2\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;E:\VulkanSDK\1.4.313.1\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -91,8 +91,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.313.2\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;C:\VulkanSDK\1.4.313.2\Lib\shaderc_sharedd.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-cored.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-glsld.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.313.2\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;E:\VulkanSDK\1.4.313.1\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;E:\VulkanSDK\1.4.313.1\Lib\shaderc_sharedd.lib;E:\VulkanSDK\1.4.313.1\Lib\spirv-cross-cored.lib;E:\VulkanSDK\1.4.313.1\Lib\spirv-cross-glsld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>E:\VulkanSDK\1.4.313.1\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -101,7 +101,7 @@
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;YAML_CPP_STATIC_DEFINE;KBR_PLATFORM_WINDOWS;KBR_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.313.2\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;E:\VulkanSDK\1.4.313.1\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -118,8 +118,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.313.2\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;C:\VulkanSDK\1.4.313.2\Lib\shaderc_shared.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.313.2\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;E:\VulkanSDK\1.4.313.1\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;E:\VulkanSDK\1.4.313.1\Lib\shaderc_shared.lib;E:\VulkanSDK\1.4.313.1\Lib\spirv-cross-core.lib;E:\VulkanSDK\1.4.313.1\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>E:\VulkanSDK\1.4.313.1\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
@@ -128,7 +128,7 @@
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;YAML_CPP_STATIC_DEFINE;KBR_PLATFORM_WINDOWS;KBR_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.313.2\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;E:\VulkanSDK\1.4.313.1\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -145,8 +145,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.313.2\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;C:\VulkanSDK\1.4.313.2\Lib\shaderc_shared.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.313.2\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;E:\VulkanSDK\1.4.313.1\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;E:\VulkanSDK\1.4.313.1\Lib\shaderc_shared.lib;E:\VulkanSDK\1.4.313.1\Lib\spirv-cross-core.lib;E:\VulkanSDK\1.4.313.1\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>E:\VulkanSDK\1.4.313.1\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
