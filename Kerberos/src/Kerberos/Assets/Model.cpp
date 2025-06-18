@@ -10,11 +10,34 @@
 #include <ranges>
 #include <algorithm>
 
+#include "Kerberos/Scene/Components.h"
+#include "Kerberos/Scene/Entity.h"
+
 namespace Kerberos
 {
-	Model::Model(const std::filesystem::path& path) 
+	Model::Model(const std::filesystem::path& path, std::string name)
+		:m_Name(std::move(name))
 	{
 		LoadModel(path);
+	}
+
+	void Model::InitEntities(const Ref<Scene>& scene) const
+	{
+		const Ref<Material> material = CreateRef<Material>();
+		const Ref<Texture2D> texture = GetTextures().at(0);
+		int i = 0;
+		const Entity parent = scene->CreateEntity(m_Name);
+		for (auto& mesh : GetMeshes())
+		{
+			Entity partEntity = scene->CreateEntity(m_Name + std::to_string(i));
+			auto& stc = partEntity.AddComponent<StaticMeshComponent>();
+			stc.StaticMesh = mesh;
+			stc.MeshMaterial = material;
+			stc.MeshTexture = texture;
+
+			scene->SetParent(partEntity, parent);
+			i++;
+		}
 	}
 
 	void Model::LoadModel(const std::filesystem::path& path) 

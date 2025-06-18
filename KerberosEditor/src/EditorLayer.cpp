@@ -111,22 +111,11 @@ namespace Kerberos
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
-		Model backpackModel = Model("assets/models/backpack/backpack.obj");
-		Ref<Material> backpackMaterial = CreateRef<Material>();
-		const Ref<Texture2D> backpackTexture = backpackModel.GetTextures().at(0);
-		int i = 0;
-		Entity backpackEntity = m_ActiveScene->CreateEntity("Backpack");
-		for (auto& mesh : backpackModel.GetMeshes())
-		{
-			Entity backpackPartEntity = m_ActiveScene->CreateEntity("Backpack-" + std::to_string(i));
-			auto& stc = backpackPartEntity.AddComponent<StaticMeshComponent>();
-			stc.StaticMesh = mesh;
-			stc.MeshMaterial = backpackMaterial;
-			stc.MeshTexture = backpackTexture;
+		Model backpackModel = Model("assets/models/backpack/backpack.obj", "Backpack");
+		backpackModel.InitEntities(m_ActiveScene);
 
-			m_ActiveScene->SetParent(backpackPartEntity, backpackEntity);
-			i++;
-		}
+		/*Model deerModel = Model("assets/models/deer_demo/scene.gltf", "Deer");
+		deerModel.InitEntities(m_ActiveScene);*/
 
 		m_IconPlay = Texture2D::Create("assets/editor/play_button.png");
 		m_IconStop = Texture2D::Create("assets/editor/stop_button.png");
@@ -327,6 +316,8 @@ namespace Kerberos
 		ImGui::Text("Renderer3D Stats");
 		ImGui::Text("Draw Calls: %u", DrawCalls);
 		ImGui::Text("Meshes: %u", DrawnMeshes);
+		ImGui::Text("Vertices: %u", Vertices);
+		ImGui::Text("Faces: %u", Faces);
 
 		for (const auto& [Name, Time] : m_ProfileResults)
 		{

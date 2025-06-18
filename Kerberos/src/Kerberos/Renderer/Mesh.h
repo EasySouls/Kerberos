@@ -23,7 +23,15 @@ namespace Kerberos
 		uint32_t GetVertexCount() const 
 		{ 
 			if (m_VertexArray && !m_VertexArray->GetVertexBuffers().empty())
-				return m_VertexArray->GetVertexBuffers()[0]-
+			{
+				uint32_t count = 0;
+				for (const auto& vertexBuffer : m_VertexArray->GetVertexBuffers())
+				{
+					count += vertexBuffer->GetCount();
+				}
+				return count;
+			}
+				
 			return 0; 
 		}
 

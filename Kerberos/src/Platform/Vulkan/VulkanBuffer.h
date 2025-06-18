@@ -22,6 +22,7 @@ namespace Kerberos
 		const BufferLayout& GetLayout() const override;
 
 		VkBuffer GetVkBuffer() const { return m_Buffer; }
+		uint32_t GetCount() const override { return 0; }
 
 	private:
 		VkBuffer m_Buffer = VK_NULL_HANDLE;

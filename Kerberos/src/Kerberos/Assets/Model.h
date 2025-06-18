@@ -6,6 +6,7 @@
 
 #include "Kerberos/Renderer/Material.h"
 #include "Kerberos/Renderer/Texture.h"
+#include "Kerberos/Scene/Scene.h"
 
 struct aiNode;
 struct aiMesh;
@@ -18,7 +19,16 @@ namespace Kerberos
 	class Model
 	{
 	public:
-		explicit Model(const std::filesystem::path& path);
+		explicit Model(const std::filesystem::path& path, std::string name);
+
+		/**
+		 * @brief Creates the entities in the scene based on the loaded model.
+		 *
+		 * This has to be reworked, since for now it creates entities for each mesh in the model,
+		 * and we would like one entity with a StaticMeshComponent that has all the meshes in it.
+		 * @param scene The scene to which the entities will be added.
+		 */
+		void InitEntities(const Ref<Scene>& scene) const;
 
 		const std::vector<Ref<Mesh>>& GetMeshes() const { return m_Meshes; }
 		const std::vector<Ref<Texture2D>>& GetTextures() const { return m_Textures; }
@@ -36,5 +46,7 @@ namespace Kerberos
 
 		std::string m_Directory;
 		std::vector<std::string> m_LoadedTexturePaths;
+
+		std::string m_Name;
 	};
 }

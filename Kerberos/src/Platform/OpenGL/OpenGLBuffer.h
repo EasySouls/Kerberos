@@ -18,6 +18,7 @@ namespace Kerberos
 
 		void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
 		const BufferLayout& GetLayout() const override { return m_Layout; }
+		uint32_t GetCount() const override { return m_Count; }
 
 	private:
 		uint32_t m_RendererID;
