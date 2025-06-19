@@ -213,4 +213,42 @@ namespace Kerberos
 
 		HierarchyComponent() = default;
 	};
+
+	struct RigidBody3DComponent {
+
+		enum class BodyType : uint8_t
+		{
+			Static,
+			Dynamic,
+			Kinematic
+		};
+		BodyType Type = BodyType::Static;
+		float Mass = 1.0f;
+		glm::vec3 Velocity = glm::vec3(0.0f);
+		glm::vec3 AngularVelocity = glm::vec3(0.0f);
+		bool UseGravity = true;
+
+		/// Pointer to the physics engine's runtime body
+		void* RuntimeBody = nullptr; 
+
+		RigidBody3DComponent() = default;
+		explicit RigidBody3DComponent(const BodyType type)
+			: Type(type)
+		{}
+	};
+
+	struct BoxCollider3DComponent
+	{
+		glm::vec3 Size = glm::vec3(1.0f);
+		glm::vec3 Offset = glm::vec3(0.0f);
+		bool IsTrigger = false;
+
+		// Pointer to the physics engine's runtime collider
+		void* RuntimeCollider = nullptr; 
+
+		BoxCollider3DComponent() = default;
+		explicit BoxCollider3DComponent(const glm::vec3& size, const glm::vec3& offset = glm::vec3(0.0f), const bool isTrigger = false)
+			: Size(size), Offset(offset), IsTrigger(isTrigger)
+		{}
+	};
 }

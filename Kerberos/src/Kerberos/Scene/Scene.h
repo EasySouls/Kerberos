@@ -7,6 +7,13 @@
 #include "EditorCamera.h"
 #include "Kerberos/Renderer/Camera.h"
 
+namespace JPH
+{
+	class PhysicsSystem;
+	class TempAllocator;
+	class JobSystem;
+
+}
 
 namespace Kerberos
 {
@@ -20,7 +27,7 @@ namespace Kerberos
 		virtual ~Scene();
 
 		void OnRuntimeStart();
-		void OnRuntimeStop();
+		void OnRuntimeStop() const;
 
 		void OnUpdateEditor(Timestep ts, const EditorCamera& camera, bool renderSkybox);
 		void OnUpdateRuntime(Timestep ts);
@@ -69,6 +76,10 @@ namespace Kerberos
 		uint32_t m_ViewportHeight = 0;
 
 		bool m_Is3D = true;
+
+		JPH::PhysicsSystem* m_PhysicsSystem = nullptr;
+		JPH::TempAllocator* m_PhysicsTempAllocator = nullptr;
+		JPH::JobSystem* m_PhysicsJobSystem = nullptr;
 
 		friend class Entity;
 		friend class HierarchyPanel;

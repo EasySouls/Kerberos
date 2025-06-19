@@ -17,6 +17,8 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
+#include "Jolt/Physics/Collision/Shape/BoxShape.h"
+
 namespace Kerberos
 {
 	namespace Physics
@@ -220,12 +222,12 @@ namespace Kerberos
 		// B.t.w. 10 MB is way too much for this example but it is a typical value you can use.
 		// If you don't want to pre-allocate you can also use TempAllocatorMalloc to fall back to
 		// malloc / free.
-		JPH::TempAllocatorImpl temp_allocator(10 * 1024 * 1024);
+		m_PhysicsTempAllocator = new JPH::TempAllocatorImpl(10 * 1024 * 1024);
 
 		// We need a job system that will execute physics jobs on multiple threads. Typically
 		// you would implement the JobSystem interface yourself and let Jolt Physics run on top
 		// of your own job scheduler. JobSystemThreadPool is an example implementation.
-		JPH::JobSystemThreadPool job_system(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1);
+		m_PhysicsJobSystem = new JPH::JobSystemThreadPool(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1);
 
 		// This is the max amount of rigid bodies that you can add to the physics system. If you try to add more you'll get an error.
 	// Note: This value is low because this is a simple test. For a real project use something in the order of 65536.
@@ -260,33 +262,57 @@ namespace Kerberos
 		// Also have a look at ObjectLayerPairFilterTable or ObjectLayerPairFilterMask for a simpler interface.
 		const Physics::ObjectLayerPairFilterImpl objectVsObjectLayerFilter;
 
-		JPH::PhysicsSystem physicsSystem;
-		physicsSystem.Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broadPhaseLayerInterface, objectVsBroadphaseLayerFilter, objectVsObjectLayerFilter);
+		m_PhysicsSystem = new JPH::PhysicsSystem();
+		m_PhysicsSystem->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broadPhaseLayerInterface, objectVsBroadphaseLayerFilter, objectVsObjectLayerFilter);
 
 		// A body activation listener gets notified when bodies activate and go to sleep
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
 		// Registering one is entirely optional.
 		Physics::KBRBodyActivationListener bodyActivationListener;
-		physicsSystem.SetBodyActivationListener(&bodyActivationListener);
+		m_PhysicsSystem->SetBodyActivationListener(&bodyActivationListener);
 
 		// A contact listener gets notified when bodies (are about to) collide, and when they separate again.
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
 		// Registering one is entirely optional.
 		Physics::KBRContactListener contactListener;
-		physicsSystem.SetContactListener(&contactListener);
+		m_PhysicsSystem->SetContactListener(&contactListener);
 
 		// The main way to interact with the bodies in the physics system is through the body interface. There is a locking and a non-locking
 		// variant of this. We're going to use the locking version (even though we're not planning to access bodies from multiple threads)
-		JPH::BodyInterface& bodyInterface = physicsSystem.GetBodyInterface();
+		JPH::BodyInterface& bodyInterface = m_PhysicsSystem->GetBodyInterface();
+
+		{
+			const auto view = m_Registry.view<RigidBody3DComponent, BoxCollider3DComponent>();
+			for (const auto e : view)
+			{
+				Entity entity = { e, this };
+				auto& transform = entity.GetComponent<TransformComponent>();
+				auto [rigidBody, collider] = view.get<RigidBody3DComponent, BoxCollider3DComponent>(e);
+
+				JPH::BoxShapeSettings shapeSettings(JPH::Vec3(collider.Size.x, collider.Size.y, collider.Size.z));
+				shapeSettings.SetEmbedded();
+
+				JPH::ShapeSettings::ShapeResult shapeResult = shapeSettings.Create();
+				JPH::ShapeRefC shape = shapeResult.Get();
+
+				JPH::BodyCreationSettings bodySettings(shape, JPH::RVec3(0.0f, -1.0f, 0.0f), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Physics::Layers::MOVING);
+				const JPH::Body* body = bodyInterface.CreateBody(bodySettings);
+				const auto bodyID = body->GetID();
+
+				bodyInterface.AddBody(body->GetID(), JPH::EActivation::Activate);
+			}
+		}
 	}
 
-	void Scene::OnRuntimeStop() 
+	void Scene::OnRuntimeStop() const 
 	{
 		delete JPH::Factory::sInstance;
 		JPH::Factory::sInstance = nullptr;
 
 		JPH::Trace = nullptr;
-		JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = nullptr;)
+		JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = nullptr;);
+
+		delete m_PhysicsSystem;
 	}
 
 	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera, const bool renderSkybox)
@@ -309,6 +335,12 @@ namespace Kerberos
 
 					script.Instance->OnUpdate(ts);
 				});
+		}
+
+		/// Physics
+		{
+			/*constexpr int collisionSteps = 1;
+			m_PhysicsSystem->Update(ts, collisionSteps, m_PhysicsTempAllocator, m_PhysicsJobSystem);*/
 		}
 
 		/// Render the scene
@@ -615,5 +647,13 @@ namespace Kerberos
 
 	template <>
 	void Scene::OnComponentAdded<HierarchyComponent>(Entity entity, HierarchyComponent& component)
+	{}
+
+	template <>
+	void Scene::OnComponentAdded<RigidBody3DComponent>(Entity entity, RigidBody3DComponent& component)
+	{}
+
+	template <>
+	void Scene::OnComponentAdded<BoxCollider3DComponent>(Entity entity, BoxCollider3DComponent& component)
 	{}
 }

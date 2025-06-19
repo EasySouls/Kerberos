@@ -57,6 +57,8 @@ namespace Kerberos
 		const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
 		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
 		cubeEntity.GetComponent<TransformComponent>().Translation = { -2.0f, 1.0f, -2.0f };
+		cubeEntity.AddComponent<BoxCollider3DComponent>();
+		cubeEntity.AddComponent<RigidBody3DComponent>();
 
 		Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
 		const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
