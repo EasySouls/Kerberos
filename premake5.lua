@@ -156,6 +156,7 @@ project "Kerberos"
 		"yaml-cpp",
 		"ImGuizmo",
 		"Assimp",
+		"JoltPhysics",
 
 		"opengl32.lib",
 		Library.Vulkan,

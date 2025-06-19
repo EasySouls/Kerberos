@@ -19,6 +19,9 @@ namespace Kerberos
 		Scene();
 		virtual ~Scene();
 
+		void OnRuntimeStart();
+		void OnRuntimeStop();
+
 		void OnUpdateEditor(Timestep ts, const EditorCamera& camera, bool renderSkybox);
 		void OnUpdateRuntime(Timestep ts);
 
