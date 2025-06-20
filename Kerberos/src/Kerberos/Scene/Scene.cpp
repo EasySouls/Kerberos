@@ -21,6 +21,22 @@
 
 namespace Kerberos
 {
+	static JPH::EMotionType GetBodyTypeFromComponent(const RigidBody3DComponent::BodyType& type)
+	{
+		switch (type)
+		{
+		case RigidBody3DComponent::BodyType::Static:
+			return JPH::EMotionType::Static;
+		case RigidBody3DComponent::BodyType::Kinematic:
+			return JPH::EMotionType::Kinematic;
+		case RigidBody3DComponent::BodyType::Dynamic:
+			return JPH::EMotionType::Dynamic;
+		default:
+			KBR_CORE_ASSERT(false, "Unknown body type!");
+			return JPH::EMotionType::Static;
+		}
+	}
+
 	namespace Physics
 	{
 		// Layer that objects can be in, determines which other objects it can collide with
@@ -296,11 +312,22 @@ namespace Kerberos
 				JPH::ShapeSettings::ShapeResult shapeResult = shapeSettings.Create();
 				JPH::ShapeRefC shape = shapeResult.Get();
 
-				JPH::BodyCreationSettings bodySettings(shape, JPH::RVec3(0.0f, -1.0f, 0.0f), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Physics::Layers::MOVING);
-				const JPH::Body* body = bodyInterface.CreateBody(bodySettings);
+				const JPH::Vec3 position = JPH::Vec3(transform.WorldTransform[3].x, transform.WorldTransform[3].y, transform.WorldTransform[3].z);
+				const JPH::Vec3 rotationAngles = JPH::Vec3(
+					transform.WorldTransform[0].y, // Pitch
+					transform.WorldTransform[1].x, // Yaw
+					transform.WorldTransform[2].z  // Roll
+				);
+				const JPH::Quat rotation = JPH::Quat::sEulerAngles(rotationAngles);
+
+				JPH::BodyCreationSettings bodySettings(shape, position, rotation, GetBodyTypeFromComponent(rigidBody.Type), Physics::Layers::MOVING);
+				JPH::Body* body = bodyInterface.CreateBody(bodySettings);
+
+				rigidBody.RuntimeBody = body;
+
 				const auto bodyID = body->GetID();
 
-				bodyInterface.AddBody(body->GetID(), JPH::EActivation::Activate);
+				bodyInterface.AddBody(bodyID, JPH::EActivation::Activate);
 			}
 		}
 	}
@@ -342,6 +369,20 @@ namespace Kerberos
 		{
 			constexpr int collisionSteps = 1;
 			m_PhysicsSystem->Update(ts, collisionSteps, m_PhysicsTempAllocator, m_PhysicsJobSystem);
+
+			const auto view = m_Registry.view<RigidBody3DComponent, TransformComponent>();
+			for (const auto e : view)
+			{
+				auto& transform = view.get<TransformComponent>(e);
+				const auto& rigidBody = view.get<RigidBody3DComponent>(e);
+
+				if (rigidBody.RuntimeBody)
+				{
+					const JPH::Body* body = static_cast<JPH::Body*>(rigidBody.RuntimeBody);
+					const JPH::Vec3 position = body->GetPosition();
+					transform.WorldTransform[3] = glm::vec4(position.GetX(), position.GetY(), position.GetZ(), 1.0f);
+				}
+			}
 		}
 
 		/// Render the scene
