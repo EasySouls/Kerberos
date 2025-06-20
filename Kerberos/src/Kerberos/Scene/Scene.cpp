@@ -130,7 +130,7 @@ namespace Kerberos
 			// See: ContactListener
 			virtual JPH::ValidateResult	OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult) override
 			{
-				std::cout << "Contact validate callback" << std::endl;
+				std::cout << "Contact validate callback" << '\n';
 
 				// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
 				return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
@@ -138,17 +138,17 @@ namespace Kerberos
 
 			virtual void OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override
 			{
-				std::cout << "A contact was added" << std::endl;
+				std::cout << "A contact was added" << '\n';
 			}
 
 			virtual void OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override
 			{
-				std::cout << "A contact was persisted" << std::endl;
+				std::cout << "A contact was persisted" << '\n';
 			}
 
 			virtual void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override
 			{
-				std::cout << "A contact was removed" << std::endl;
+				std::cout << "A contact was removed" << '\n';
 			}
 		};
 
@@ -158,12 +158,12 @@ namespace Kerberos
 		public:
 			virtual void OnBodyActivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData) override
 			{
-				std::cout << "A body got activated" << std::endl;
+				std::cout << "A body got activated" << '\n';
 			}
 
 			virtual void OnBodyDeactivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData) override
 			{
-				std::cout << "A body went to sleep" << std::endl;
+				std::cout << "A body went to sleep" << '\n';
 			}
 		};
 	}
@@ -222,12 +222,13 @@ namespace Kerberos
 		// B.t.w. 10 MB is way too much for this example but it is a typical value you can use.
 		// If you don't want to pre-allocate you can also use TempAllocatorMalloc to fall back to
 		// malloc / free.
-		m_PhysicsTempAllocator = new JPH::TempAllocatorImpl(10 * 1024 * 1024);
+		constexpr size_t cTempAllocatorSize = 10 * 1024 * 1024; // 10 MB
+		m_PhysicsTempAllocator = new JPH::TempAllocatorImpl(cTempAllocatorSize);
 
 		// We need a job system that will execute physics jobs on multiple threads. Typically
 		// you would implement the JobSystem interface yourself and let Jolt Physics run on top
 		// of your own job scheduler. JobSystemThreadPool is an example implementation.
-		m_PhysicsJobSystem = new JPH::JobSystemThreadPool(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1);
+		m_PhysicsJobSystem = new JPH::JobSystemThreadPool(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, static_cast<int>(std::thread::hardware_concurrency()) - 1);
 
 		// This is the max amount of rigid bodies that you can add to the physics system. If you try to add more you'll get an error.
 	// Note: This value is low because this is a simple test. For a real project use something in the order of 65536.
@@ -250,20 +251,20 @@ namespace Kerberos
 		// Create mapping table from object layer to broadphase layer
 		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
 		// Also have a look at BroadPhaseLayerInterfaceTable or BroadPhaseLayerInterfaceMask for a simpler interface.
-		const Physics::BPLayerInterfaceImpl broadPhaseLayerInterface;
+		m_BroadPhaseLayerInterface = new Physics::BPLayerInterfaceImpl();
 
 		// Create class that filters object vs broadphase layers
 		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
 		// Also have a look at ObjectVsBroadPhaseLayerFilterTable or ObjectVsBroadPhaseLayerFilterMask for a simpler interface.
-		const Physics::ObjectVsBroadPhaseLayerFilterImpl objectVsBroadphaseLayerFilter;
+		m_ObjectVsBroadPhaseLayerFilter = new Physics::ObjectVsBroadPhaseLayerFilterImpl();
 
 		// Create class that filters object vs object layers
 		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
 		// Also have a look at ObjectLayerPairFilterTable or ObjectLayerPairFilterMask for a simpler interface.
-		const Physics::ObjectLayerPairFilterImpl objectVsObjectLayerFilter;
+		m_ObjectVsObjectLayerFilter = new Physics::ObjectLayerPairFilterImpl();
 
 		m_PhysicsSystem = new JPH::PhysicsSystem();
-		m_PhysicsSystem->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broadPhaseLayerInterface, objectVsBroadphaseLayerFilter, objectVsObjectLayerFilter);
+		m_PhysicsSystem->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, *m_BroadPhaseLayerInterface, *m_ObjectVsBroadPhaseLayerFilter, *m_ObjectVsObjectLayerFilter);
 
 		// A body activation listener gets notified when bodies activate and go to sleep
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
@@ -279,9 +280,9 @@ namespace Kerberos
 
 		// The main way to interact with the bodies in the physics system is through the body interface. There is a locking and a non-locking
 		// variant of this. We're going to use the locking version (even though we're not planning to access bodies from multiple threads)
-		JPH::BodyInterface& bodyInterface = m_PhysicsSystem->GetBodyInterface();
 
 		{
+			JPH::BodyInterface& bodyInterface = m_PhysicsSystem->GetBodyInterface();
 			const auto view = m_Registry.view<RigidBody3DComponent, BoxCollider3DComponent>();
 			for (const auto e : view)
 			{
@@ -339,8 +340,8 @@ namespace Kerberos
 
 		/// Physics
 		{
-			/*constexpr int collisionSteps = 1;
-			m_PhysicsSystem->Update(ts, collisionSteps, m_PhysicsTempAllocator, m_PhysicsJobSystem);*/
+			constexpr int collisionSteps = 1;
+			m_PhysicsSystem->Update(ts, collisionSteps, m_PhysicsTempAllocator, m_PhysicsJobSystem);
 		}
 
 		/// Render the scene

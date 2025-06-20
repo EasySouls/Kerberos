@@ -12,7 +12,9 @@ namespace JPH
 	class PhysicsSystem;
 	class TempAllocator;
 	class JobSystem;
-
+	class ObjectVsBroadPhaseLayerFilter;
+	class BroadPhaseLayerInterface;
+	class ObjectLayerPairFilter;
 }
 
 namespace Kerberos
@@ -77,9 +79,16 @@ namespace Kerberos
 
 		bool m_Is3D = true;
 
+		/// Physics related members
+		/// These are pointers, since i do not want to include Jolt headers in the Scene.h file,
+		/// and non-complete types are not allowed in the class definition
+		
 		JPH::PhysicsSystem* m_PhysicsSystem = nullptr;
 		JPH::TempAllocator* m_PhysicsTempAllocator = nullptr;
 		JPH::JobSystem* m_PhysicsJobSystem = nullptr;
+		JPH::ObjectVsBroadPhaseLayerFilter* m_ObjectVsBroadPhaseLayerFilter = nullptr;
+		JPH::BroadPhaseLayerInterface* m_BroadPhaseLayerInterface = nullptr;
+		JPH::ObjectLayerPairFilter* m_ObjectVsObjectLayerFilter = nullptr;
 
 		friend class Entity;
 		friend class HierarchyPanel;
