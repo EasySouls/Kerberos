@@ -60,8 +60,6 @@ namespace YAML
 
 namespace Kerberos
 {
-	
-
 	static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& vec)
 	{
 		out << YAML::Flow << YAML::BeginSeq << vec.x << vec.y << vec.z << YAML::EndSeq;
@@ -138,11 +136,54 @@ namespace Kerberos
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<HierarchyComponent>())
+		{
+			out << YAML::Key << "HierarchyComponent";
+			out << YAML::BeginMap;
+			const auto& hierarchy = entity.GetComponent<HierarchyComponent>();
+			out << YAML::Key << "Parent" << YAML::Value << static_cast<uint32_t>(hierarchy.Parent);
+			out << YAML::Key << "Children" << YAML::Value << YAML::BeginSeq;
+			for (const auto& child : hierarchy.Children)
+			{
+				out << static_cast<uint32_t>(child);
+			}
+			out << YAML::EndSeq;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<NativeScriptComponent>())
+		{
+			
+		}
+
+		if (entity.HasComponent<RigidBody3DComponent>())
+		{
+			out << YAML::Key << "RigidBody3DComponent";
+			out << YAML::BeginMap;
+			const auto& rigidBody = entity.GetComponent<RigidBody3DComponent>();
+			out << YAML::Key << "Mass" << YAML::Value << rigidBody.Mass;
+			out << YAML::Key << "Type" << YAML::Value << static_cast<int>(rigidBody.Type);
+			out << YAML::Key << "Velocity" << YAML::Value << rigidBody.Velocity;
+			out << YAML::Key << "AngularVelocity" << YAML::Value << rigidBody.AngularVelocity;
+			out << YAML::Key << "UseGravity" << YAML::Value << rigidBody.UseGravity;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<BoxCollider3DComponent>())
+		{
+			out << YAML::Key << "BoxCollider3DComponent";
+			out << YAML::BeginMap;
+			const auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+			out << YAML::Key << "Size" << YAML::Value << boxCollider.Size;
+			out << YAML::Key << "Offset" << YAML::Value << boxCollider.Offset;
+			out << YAML::EndMap;
+		}
+
 		out << YAML::EndMap;
 
 	}
 
-	void SceneSerializer::Serialize(const std::string& filepath)
+	void SceneSerializer::Serialize(const std::string& filepath) const 
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
@@ -186,7 +227,7 @@ namespace Kerberos
 		throw std::logic_error("Not implemented");
 	}
 
-	bool SceneSerializer::Deserialize(const std::string& filepath)
+	bool SceneSerializer::Deserialize(const std::string& filepath) const 
 	{
 		const std::ifstream inFile(filepath);
 		std::stringstream stream;
@@ -243,6 +284,40 @@ namespace Kerberos
 				{
 					auto& spriteRenderer = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					spriteRenderer.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+				}
+
+				if (auto hierarchyComponent = entity["HierarchyComponent"])
+				{
+					auto& hierarchy = deserializedEntity.AddComponent<HierarchyComponent>();
+					const uint32_t parentId = hierarchyComponent["Parent"].as<uint32_t>();
+					hierarchy.Parent = Entity{ static_cast<entt::entity>(parentId), m_Scene };
+					for (const auto& child : hierarchyComponent["Children"])
+					{
+						hierarchy.Children.emplace_back(static_cast<entt::entity>(child.as<uint32_t>()), m_Scene);
+					}
+				}
+
+				if (auto nativeScriptComponent = entity["NativeScriptComponent"])
+				{
+					// Handle NativeScriptComponent deserialization here
+					// This is a placeholder as the actual implementation depends on the scripting system used
+				}
+
+				if (auto rigidBodyComponent = entity["RigidBody3DComponent"])
+				{
+					auto& rigidBody = deserializedEntity.AddComponent<RigidBody3DComponent>();
+					rigidBody.Mass = rigidBodyComponent["Mass"].as<float>();
+					rigidBody.Type = static_cast<RigidBody3DComponent::BodyType>(rigidBodyComponent["Type"].as<int>());
+					rigidBody.Velocity = rigidBodyComponent["Velocity"].as<glm::vec3>();
+					rigidBody.AngularVelocity = rigidBodyComponent["AngularVelocity"].as<glm::vec3>();
+					rigidBody.UseGravity = rigidBodyComponent["UseGravity"].as<bool>();
+				}
+
+				if (auto boxColliderComponent = entity["BoxCollider3DComponent"])
+				{
+					auto& boxCollider = deserializedEntity.AddComponent<BoxCollider3DComponent>();
+					boxCollider.Size = boxColliderComponent["Size"].as<glm::vec3>();
+					boxCollider.Offset = boxColliderComponent["Offset"].as<glm::vec3>();
 				}
 			}
 		}

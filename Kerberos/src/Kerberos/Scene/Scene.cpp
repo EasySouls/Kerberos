@@ -216,6 +216,8 @@ namespace Kerberos
 
 	void Scene::OnRuntimeStart() 
 	{
+		KBR_PROFILE_FUNCTION();
+
 		// Register allocation hook. In this example we'll just let Jolt use malloc / free but you can override these if you want (see Memory.h).
 	// This needs to be done before any other Jolt function is called.
 		JPH::RegisterDefaultAllocator();
@@ -350,8 +352,12 @@ namespace Kerberos
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
+		KBR_PROFILE_FUNCTION();
+
 		/// Update the scripts
 		{
+			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - Scripts update");
+
 			m_Registry.view<NativeScriptComponent>().each([this, ts](auto entity, const NativeScriptComponent& script)
 				{
 					if (!script.Instance)
@@ -367,6 +373,8 @@ namespace Kerberos
 
 		/// Physics
 		{
+			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - Physics update");
+
 			constexpr int collisionSteps = 1;
 			m_PhysicsSystem->Update(ts, collisionSteps, m_PhysicsTempAllocator, m_PhysicsJobSystem);
 
@@ -510,6 +518,8 @@ namespace Kerberos
 
 	void Scene::Render3DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform)
 	{
+		KBR_PROFILE_FUNCTION();
+
 		const DirectionalLight* sun = nullptr;
 		const auto sunView = m_Registry.view<DirectionalLightComponent, TransformComponent>();
 		for (const auto entity : sunView)

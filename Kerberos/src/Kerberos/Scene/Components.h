@@ -222,7 +222,7 @@ namespace Kerberos
 			Dynamic,
 			Kinematic
 		};
-		BodyType Type = BodyType::Static;
+		BodyType Type = BodyType::Dynamic;
 		float Mass = 1.0f;
 		glm::vec3 Velocity = glm::vec3(0.0f);
 		glm::vec3 AngularVelocity = glm::vec3(0.0f);
