@@ -7,7 +7,6 @@
 #include <yaml-cpp/yaml.h>
 
 #include <fstream>
-#include <filesystem>
 
 namespace YAML
 {
@@ -225,7 +224,7 @@ namespace Kerberos
 
 	}
 
-	void SceneSerializer::Serialize(const std::string& filepath) const 
+	void SceneSerializer::Serialize(const std::filesystem::path& filepath) const 
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
@@ -242,10 +241,8 @@ namespace Kerberos
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
 
-		const std::filesystem::path filePathObj(filepath);
-
 		/// Check if there's a parent directory
-		if (const std::filesystem::path parentDir = filePathObj.parent_path(); !parentDir.empty()) {
+		if (const std::filesystem::path parentDir = filepath.parent_path(); !parentDir.empty()) {
 			std::error_code ec;
 			std::filesystem::create_directories(parentDir, ec);
 			if (ec) {
@@ -260,16 +257,16 @@ namespace Kerberos
 		}
 		else
 		{
-			KBR_CORE_ERROR("Could not open file {0} for writing!", filepath);
+			KBR_CORE_ERROR("Could not open file {0} for writing!", filepath.string());
 		}
 	}
 
-	void SceneSerializer::SerializeRuntime(const std::string& filepath)
+	void SceneSerializer::SerializeRuntime(const std::filesystem::path& filepath)
 	{
 		throw std::logic_error("Not implemented");
 	}
 
-	bool SceneSerializer::Deserialize(const std::string& filepath) const 
+	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath) const 
 	{
 		const std::ifstream inFile(filepath);
 		std::stringstream stream;
@@ -278,7 +275,7 @@ namespace Kerberos
 		YAML::Node data = YAML::Load(stream.str());
 		if (!data["Scene"])
 		{
-			KBR_CORE_ERROR("Invalid Scene file {0}", filepath);
+			KBR_CORE_ERROR("Invalid Scene file {0}", filepath.string());
 			return false;
 		}
 
@@ -402,7 +399,7 @@ namespace Kerberos
 		return true;
 	}
 
-	bool SceneSerializer::DeserializeRuntime(const std::string& filepath)
+	bool SceneSerializer::DeserializeRuntime(const std::filesystem::path& filepath) const 
 	{
 		throw std::logic_error("Not implemented");
 	}

@@ -327,7 +327,7 @@ namespace Kerberos
 
 				rigidBody.RuntimeBody = body;
 
-				const auto bodyID = body->GetID();
+				const auto& bodyID = body->GetID();
 
 				bodyInterface.AddBody(bodyID, JPH::EActivation::Activate);
 			}
