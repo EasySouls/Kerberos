@@ -456,6 +456,8 @@ namespace Kerberos
 
 		UIToolbar();
 
+		m_NotificationManager.RenderNotifications();
+
 		ImGui::End();
 
 #ifdef KBR_DEBUG
@@ -564,6 +566,9 @@ namespace Kerberos
 				const auto& path = static_cast<const char*>(payload->Data);
 				KBR_INFO("Drag and drop payload: {0}", path);
 
+				const std::string message = "Drag and drop payload: " + std::string(path);
+				m_NotificationManager.AddNotification(message, Notification::Type::Info);
+
 				/*const AssetHandle assetHandle = *static_cast<AssetHandle*>(payload->Data);
 				const AssetType assetType = AssetManager::GetAssetType(assetHandle);
 				if (assetType == AssetType::Texture2D)
@@ -629,7 +634,7 @@ namespace Kerberos
 
 	void EditorLayer::SaveScene() const
 	{
-		SceneSerializer serializer(m_ActiveScene);
+		const SceneSerializer serializer(m_ActiveScene);
 		serializer.Serialize("assets/scenes/Example.kerberos");
 	}
 
@@ -639,7 +644,7 @@ namespace Kerberos
 		if (filepath.empty())
 			return;
 
-		SceneSerializer serializer(m_ActiveScene);
+		const SceneSerializer serializer(m_ActiveScene);
 		serializer.Serialize(filepath);
 	}
 
@@ -655,8 +660,12 @@ namespace Kerberos
 		m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Deserialize("assets/scenes/Example.kerberos");
+		const SceneSerializer serializer(m_ActiveScene);
+		/// TODO: We need to convert the filepath to a relative path, so that it works on all platforms
+		if (!serializer.Deserialize("assets/scenes/Example.kerberos"))
+		{
+			KBR_ERROR("Failed to load scene from {0}", filepath);
+		}
 	}
 
 }

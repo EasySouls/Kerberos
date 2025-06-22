@@ -17,7 +17,7 @@ namespace Kerberos
 		bool DeserializeRuntime(const std::string& filepath);
 
 	private:
-		Ref<Scene>	m_Scene;
+		Ref<Scene> m_Scene;
 	};
 }
 

@@ -288,7 +288,8 @@ namespace Kerberos
 
 				if (auto hierarchyComponent = entity["HierarchyComponent"])
 				{
-					auto& hierarchy = deserializedEntity.AddComponent<HierarchyComponent>();
+					/// The entity must have a HierarchyComponent already when created
+					auto& hierarchy = deserializedEntity.GetComponent<HierarchyComponent>();
 					const uint32_t parentId = hierarchyComponent["Parent"].as<uint32_t>();
 					hierarchy.Parent = Entity{ static_cast<entt::entity>(parentId), m_Scene };
 					for (const auto& child : hierarchyComponent["Children"])
