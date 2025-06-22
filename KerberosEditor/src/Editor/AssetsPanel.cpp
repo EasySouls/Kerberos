@@ -6,13 +6,14 @@
 #include <algorithm>
 
 #include "Kerberos/Log.h"
+#include "Kerberos/Project/Project.h"
 
 namespace Kerberos
 {
 	static const std::filesystem::path ASSETS_DIRECTORY = "Assets";
 
 	AssetsPanel::AssetsPanel()
-		: m_CurrentDirectory(ASSETS_DIRECTORY)
+		: m_CurrentDirectory(Project::GetAssetDirectory())
 	{
 		m_FolderIcon = Texture2D::Create("Assets/Editor/directory_icon.png");
 		m_FileIcon = Texture2D::Create("Assets/Editor/file_icon.png");

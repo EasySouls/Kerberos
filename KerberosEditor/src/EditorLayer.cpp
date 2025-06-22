@@ -641,6 +641,20 @@ namespace Kerberos
 		ImGui::End();
 	}
 
+	void EditorLayer::NewProject()
+	{
+		Project::New();
+	}
+
+	void EditorLayer::OpenProject(const std::filesystem::path& filepath) 
+	{
+		if (const auto project = Project::Load(filepath))
+		{
+			const auto startScenePath = Project::GetAssetDirectory() / project->GetInfo().StartScenePath;
+			OpenScene(startScenePath);
+		}
+	}
+
 	void EditorLayer::SaveScene()
 	{
 		const std::filesystem::path scenePath = "assets/scenes/Example.kerberos";
@@ -681,4 +695,16 @@ namespace Kerberos
 		}
 	}
 
+	void EditorLayer::OpenScene(const std::filesystem::path& filepath) 
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+		m_HierarchyPanel.SetContext(m_ActiveScene);
+
+		const SceneSerializer serializer(m_ActiveScene);
+		if (!serializer.Deserialize(filepath))
+		{
+			KBR_ERROR("Failed to load scene from {0}", filepath.string());
+		}
+	}
 }

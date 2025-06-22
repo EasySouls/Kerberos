@@ -32,9 +32,13 @@ namespace Kerberos
 
 		void CalculateEntityTransforms() const;
 
+		void NewProject();
+		void OpenProject(const std::filesystem::path& filepath); 
+
 		void SaveScene();
 		void SaveSceneAs() const;
 		void LoadScene();
+		void OpenScene(const std::filesystem::path& filepath);
 		void NewScene();
 
 		void UIToolbar();
