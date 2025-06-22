@@ -128,6 +128,9 @@ namespace Kerberos
 		Layer::OnDetach();
 	}
 
+	static uint64_t s_FrameCount = 0;
+	static constexpr int s_TransformCalculationFramespan = 5;
+
 	void EditorLayer::OnUpdate(const Timestep deltaTime)
 	{
 		KBR_PROFILE_FUNCTION();
@@ -139,8 +142,14 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("EditorLayer::OnUpdate - CalculateEntityTransforms");
 
+			/// TODO: Implement a valid logic from calculating only the dirty transforms
 			/// Calculates the children entities' world transform from their parents' and their own local transform
-			CalculateEntityTransforms();
+			if (s_FrameCount % s_TransformCalculationFramespan == 0)
+			{
+				CalculateEntityTransforms();
+			}
+
+			s_FrameCount++;
 		}
 
 		/// Resize the camera if needed

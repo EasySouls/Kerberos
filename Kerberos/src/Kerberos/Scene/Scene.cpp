@@ -17,9 +17,9 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
-#include <algorithm>
-
 #include "Jolt/Physics/Collision/Shape/BoxShape.h"
+
+#include <algorithm>
 
 #define USE_MAP_FOR_UUID 1
 
