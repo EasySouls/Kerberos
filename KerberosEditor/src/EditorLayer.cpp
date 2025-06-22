@@ -632,10 +632,14 @@ namespace Kerberos
 		ImGui::End();
 	}
 
-	void EditorLayer::SaveScene() const
+	void EditorLayer::SaveScene()
 	{
+		const std::filesystem::path scenePath = "assets/scenes/Example.kerberos";
+
 		const SceneSerializer serializer(m_ActiveScene);
-		serializer.Serialize("assets/scenes/Example.kerberos");
+		serializer.Serialize(scenePath.string());
+
+		m_NotificationManager.AddNotification("Scene saved to " + scenePath.string(), Notification::Type::Info);
 	}
 
 	void EditorLayer::SaveSceneAs() const

@@ -72,7 +72,7 @@ namespace Kerberos
 		return out;
 	}
 
-	static void SerializeEntity(YAML::Emitter& out, Entity entity)
+	static void SerializeEntity(YAML::Emitter& out, const Entity entity)
 	{
 		out << YAML::BeginMap;
 		out << YAML::Key << "Entity" << YAML::Value << static_cast<uint32_t>(entity);
@@ -154,6 +154,48 @@ namespace Kerberos
 		if (entity.HasComponent<NativeScriptComponent>())
 		{
 			
+		}
+
+		if (entity.HasComponent<DirectionalLightComponent>())
+		{
+			out << YAML::Key << "DirectionalLightComponent";
+			out << YAML::BeginMap;
+			const auto& directionalLight = entity.GetComponent<DirectionalLightComponent>();
+			out << YAML::Key << "Color" << YAML::Value << directionalLight.Light.Color;
+			out << YAML::Key << "Direction" << YAML::Value << directionalLight.Light.Direction;
+			out << YAML::Key << "Intensity" << YAML::Value << directionalLight.Light.Intensity;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<PointLightComponent>())
+		{
+			out << YAML::Key << "PointLightComponent";
+			out << YAML::BeginMap;
+			const auto& pointLight = entity.GetComponent<PointLightComponent>();
+			out << YAML::Key << "Color" << YAML::Value << pointLight.Light.Color;
+			out << YAML::Key << "Position" << YAML::Value << pointLight.Light.Position;
+			out << YAML::Key << "Intensity" << YAML::Value << pointLight.Light.Intensity;
+			out << YAML::Key << "Constant" << YAML::Value << pointLight.Light.Constant;
+			out << YAML::Key << "Linear" << YAML::Value << pointLight.Light.Linear;
+			out << YAML::Key << "Quadratic" << YAML::Value << pointLight.Light.Quadratic;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<SpotLightComponent>())
+		{
+			out << YAML::Key << "SpotLightComponent";
+			out << YAML::BeginMap;
+			const auto& spotLight = entity.GetComponent<SpotLightComponent>();
+			out << YAML::Key << "Color" << YAML::Value << spotLight.Light.Color;
+			out << YAML::Key << "Position" << YAML::Value << spotLight.Light.Position;
+			out << YAML::Key << "Direction" << YAML::Value << spotLight.Light.Direction;
+			out << YAML::Key << "Intensity" << YAML::Value << spotLight.Light.Intensity;
+			out << YAML::Key << "Constant" << YAML::Value << spotLight.Light.Constant;
+			out << YAML::Key << "Linear" << YAML::Value << spotLight.Light.Linear;
+			out << YAML::Key << "Quadratic" << YAML::Value << spotLight.Light.Quadratic;
+			out << YAML::Key << "CutOffAngleRadians" << YAML::Value << spotLight.Light.CutOffAngleRadians;
+			out << YAML::Key << "OuterCutOffAngleRadians" << YAML::Value << spotLight.Light.OuterCutOffAngleRadians;
+			out << YAML::EndMap;
 		}
 
 		if (entity.HasComponent<RigidBody3DComponent>())
@@ -303,6 +345,39 @@ namespace Kerberos
 				{
 					// Handle NativeScriptComponent deserialization here
 					// This is a placeholder as the actual implementation depends on the scripting system used
+				}
+
+				if (auto directionalLightComponent = entity["DirectionalLightComponent"])
+				{
+					auto& directionalLight = deserializedEntity.AddComponent<DirectionalLightComponent>();
+					directionalLight.Light.Color = directionalLightComponent["Color"].as<glm::vec3>();
+					directionalLight.Light.Direction = directionalLightComponent["Direction"].as<glm::vec3>();
+					directionalLight.Light.Intensity = directionalLightComponent["Intensity"].as<float>();
+				}
+
+				if (auto pointLightComponent = entity["PointLightComponent"])
+				{
+					auto& pointLight = deserializedEntity.AddComponent<PointLightComponent>();
+					pointLight.Light.Color = pointLightComponent["Color"].as<glm::vec3>();
+					pointLight.Light.Position = pointLightComponent["Position"].as<glm::vec3>();
+					pointLight.Light.Intensity = pointLightComponent["Intensity"].as<float>();
+					pointLight.Light.Constant = pointLightComponent["Constant"].as<float>();
+					pointLight.Light.Linear = pointLightComponent["Linear"].as<float>();
+					pointLight.Light.Quadratic = pointLightComponent["Quadratic"].as<float>();
+				}
+
+				if (auto spotLightComponent = entity["SpotLightComponent"])
+				{
+					auto& spotLight = deserializedEntity.AddComponent<SpotLightComponent>();
+					spotLight.Light.Color = spotLightComponent["Color"].as<glm::vec3>();
+					spotLight.Light.Position = spotLightComponent["Position"].as<glm::vec3>();
+					spotLight.Light.Direction = spotLightComponent["Direction"].as<glm::vec3>();
+					spotLight.Light.Intensity = spotLightComponent["Intensity"].as<float>();
+					spotLight.Light.Constant = spotLightComponent["Constant"].as<float>();
+					spotLight.Light.Linear = spotLightComponent["Linear"].as<float>();
+					spotLight.Light.Quadratic = spotLightComponent["Quadratic"].as<float>();
+					spotLight.Light.CutOffAngleRadians = spotLightComponent["CutOffAngleRadians"].as<float>();
+					spotLight.Light.OuterCutOffAngleRadians = spotLightComponent["OuterCutOffAngleRadians"].as<float>();
 				}
 
 				if (auto rigidBodyComponent = entity["RigidBody3DComponent"])

@@ -32,7 +32,7 @@ namespace Kerberos
 
 		void CalculateEntityTransforms() const;
 
-		void SaveScene() const;
+		void SaveScene();
 		void SaveSceneAs() const;
 		void LoadScene();
 		void NewScene();

@@ -1013,6 +1013,13 @@ Entities:
       Parent: 4294967295
       Children:
         []
+    PointLightComponent:
+      Color: [0.8, 0.2, 0.2]
+      Position: [0.9, 4.1, 3.9]
+      Intensity: 1
+      Constant: 1
+      Linear: 0.09
+      Quadratic: 0.032
   - Entity: 4
     TagComponent:
       Tag: Sun
@@ -1024,6 +1031,10 @@ Entities:
       Parent: 4294967295
       Children:
         []
+    DirectionalLightComponent:
+      Color: [1, 1, 0.8]
+      Direction: [123, 80, 130]
+      Intensity: 1
   - Entity: 3
     TagComponent:
       Tag: Plane
