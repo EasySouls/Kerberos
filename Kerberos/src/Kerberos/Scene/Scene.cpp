@@ -333,13 +333,16 @@ namespace Kerberos
 				JPH::ShapeSettings::ShapeResult shapeResult = shapeSettings.Create();
 				JPH::ShapeRefC shape = shapeResult.Get();
 
-				const JPH::Vec3 position = JPH::Vec3(transform.WorldTransform[3].x, transform.WorldTransform[3].y, transform.WorldTransform[3].z);
-				const JPH::Vec3 rotationAngles = JPH::Vec3(
-					transform.WorldTransform[0].y, // Pitch
-					transform.WorldTransform[1].x, // Yaw
-					transform.WorldTransform[2].z  // Roll
-				);
-				const JPH::Quat rotation = JPH::Quat::sEulerAngles(rotationAngles);
+				const glm::vec4 worldPos = transform.WorldTransform[3];
+				const float posX = worldPos.x; //+ collider.Offset.x;
+				const float posY = worldPos.y; //+ collider.Offset.y;
+				const float posZ = worldPos.z; //+ collider.Offset.z;
+
+				const JPH::Vec3 position = JPH::Vec3(posX, posY, posZ);
+
+				/// Extract rotation quaternion from the transform matrix
+				glm::quat glmRotation = glm::quat_cast(glm::mat3(transform.WorldTransform));
+				const JPH::Quat rotation = JPH::Quat(glmRotation.x, glmRotation.y, glmRotation.z, glmRotation.w);
 
 				JPH::BodyCreationSettings bodySettings(shape, position, rotation, GetBodyTypeFromComponent(rigidBody.Type), GetObjectLayerFromComponent(rigidBody.Type));
 				JPH::Body* body = bodyInterface.CreateBody(bodySettings);
@@ -353,15 +356,44 @@ namespace Kerberos
 		}
 	}
 
-	void Scene::OnRuntimeStop() const
+	void Scene::OnRuntimeStop()
 	{
+		const auto view = m_Registry.view<RigidBody3DComponent>();
+		for (const auto e : view)
+		{
+			auto& rigidbody = view.get<RigidBody3DComponent>(e);
+			rigidbody.RuntimeBody = nullptr;
+		}
+
+		delete m_ContactListener;
+		m_ContactListener = nullptr;
+
+		delete m_BodyActivationListener;
+		m_BodyActivationListener = nullptr;
+		
+		delete m_PhysicsSystem;
+		m_PhysicsSystem = nullptr;
+		
+		delete m_ObjectVsObjectLayerFilter;
+		m_ObjectVsObjectLayerFilter = nullptr;
+		
+		delete m_ObjectVsBroadPhaseLayerFilter;
+		m_ObjectVsBroadPhaseLayerFilter = nullptr;
+		
+		delete m_BroadPhaseLayerInterface;
+		m_BroadPhaseLayerInterface = nullptr;
+		
+		delete m_PhysicsJobSystem;
+		m_PhysicsJobSystem = nullptr;
+		
+		delete m_PhysicsTempAllocator;
+		m_PhysicsTempAllocator = nullptr;
+
 		delete JPH::Factory::sInstance;
 		JPH::Factory::sInstance = nullptr;
 
 		JPH::Trace = nullptr;
 		JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = nullptr;);
-
-		delete m_PhysicsSystem;
 	}
 
 	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera, const bool renderSkybox)
@@ -485,7 +517,7 @@ namespace Kerberos
 		m_Registry.destroy(static_cast<entt::entity>(entity));
 	}
 
-	Entity Scene::GetEntityByUUID(const UUID uuid)
+	Entity Scene::GetEntityByUUID(const UUID uuid) const 
 	{
 		KBR_PROFILE_FUNCTION();
 

@@ -34,7 +34,7 @@ namespace Kerberos
 		virtual ~Scene();
 
 		void OnRuntimeStart();
-		void OnRuntimeStop() const;
+		void OnRuntimeStop();
 
 		void OnUpdateEditor(Timestep ts, const EditorCamera& camera, bool renderSkybox);
 		void OnUpdateRuntime(Timestep ts);
@@ -55,7 +55,7 @@ namespace Kerberos
 		 */
 		void DestroyEntity(Entity entity);
 
-		Entity GetEntityByUUID(UUID uuid);
+		Entity GetEntityByUUID(UUID uuid) const;
 
 		void SetParent(Entity child, Entity parent, bool keepWorldTransform = true);
 		Entity GetParent(Entity child);
