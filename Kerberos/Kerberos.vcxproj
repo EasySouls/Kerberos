@@ -160,6 +160,7 @@
     <ClInclude Include="src\Kerberos\Core\MouseButtonCodes.h" />
     <ClInclude Include="src\Kerberos\Core\Timer.h" />
     <ClInclude Include="src\Kerberos\Core\Timestep.h" />
+    <ClInclude Include="src\Kerberos\Core\UUID.h" />
     <ClInclude Include="src\Kerberos\Debug\Instrumentor.h" />
     <ClInclude Include="src\Kerberos\EntryPoint.h" />
     <ClInclude Include="src\Kerberos\Events\ApplicationEvent.h" />
@@ -237,6 +238,7 @@
     <ClCompile Include="src\Kerberos\Application.cpp" />
     <ClCompile Include="src\Kerberos\Assets\AssetManager.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Model.cpp" />
+    <ClCompile Include="src\Kerberos\Core\UUID.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Kerberos\Layer.cpp" />
