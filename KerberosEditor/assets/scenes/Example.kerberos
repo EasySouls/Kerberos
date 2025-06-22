@@ -1,6 +1,964 @@
 Scene: Unnamed Scene
 Entities:
-  - Entity: 7
+  - Entity: 2730788449493548836
+    TagComponent:
+      Tag: Backpack78
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 521353536526615658
+    TagComponent:
+      Tag: Backpack77
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 15648443754490184469
+    TagComponent:
+      Tag: Backpack76
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 3343271929495123999
+    TagComponent:
+      Tag: Backpack75
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 712050414456410835
+    TagComponent:
+      Tag: Backpack74
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 3697201122944651925
+    TagComponent:
+      Tag: Backpack73
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 4024475249966733292
+    TagComponent:
+      Tag: Backpack72
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 13276334841255033942
+    TagComponent:
+      Tag: Backpack71
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 11210888178536656728
+    TagComponent:
+      Tag: Backpack70
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 14030868507168183704
+    TagComponent:
+      Tag: Backpack69
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 917013738206235217
+    TagComponent:
+      Tag: Backpack68
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 6364796309125321028
+    TagComponent:
+      Tag: Backpack67
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 7465795546434277560
+    TagComponent:
+      Tag: Backpack66
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 175899992709321084
+    TagComponent:
+      Tag: Backpack65
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 5465313085466416446
+    TagComponent:
+      Tag: Backpack64
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 8265821225360153291
+    TagComponent:
+      Tag: Backpack63
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 10202572237624505053
+    TagComponent:
+      Tag: Backpack62
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 17678974904588251664
+    TagComponent:
+      Tag: Backpack61
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 1512535595084166703
+    TagComponent:
+      Tag: Backpack60
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 13724512905954835932
+    TagComponent:
+      Tag: Backpack59
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 6525603642231263713
+    TagComponent:
+      Tag: Backpack58
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 13224978003754419315
+    TagComponent:
+      Tag: Backpack57
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 13298568834586743008
+    TagComponent:
+      Tag: Backpack56
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 3249797195845427028
+    TagComponent:
+      Tag: Backpack55
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 11876812609891805799
+    TagComponent:
+      Tag: Backpack54
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 17399875496392840980
+    TagComponent:
+      Tag: Backpack53
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 5864219709626140329
+    TagComponent:
+      Tag: Backpack52
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 5408735586921131968
+    TagComponent:
+      Tag: Backpack51
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 6007938141274276096
+    TagComponent:
+      Tag: Backpack50
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 9668607037062629545
+    TagComponent:
+      Tag: Backpack49
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 986190034866575347
+    TagComponent:
+      Tag: Backpack48
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 6882770122829262219
+    TagComponent:
+      Tag: Backpack47
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 13075035821827589355
+    TagComponent:
+      Tag: Backpack46
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 3226539710562902731
+    TagComponent:
+      Tag: Backpack45
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 14721120914128601543
+    TagComponent:
+      Tag: Backpack44
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 3888227084783552248
+    TagComponent:
+      Tag: Backpack43
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 15273975506254796363
+    TagComponent:
+      Tag: Backpack42
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 9301685621620092203
+    TagComponent:
+      Tag: Backpack41
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 11001236422685305692
+    TagComponent:
+      Tag: Backpack40
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 8725249337469736129
+    TagComponent:
+      Tag: Backpack39
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 10740433651570892757
+    TagComponent:
+      Tag: Backpack38
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 4021775439996704633
+    TagComponent:
+      Tag: Backpack37
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 14697544372291677811
+    TagComponent:
+      Tag: Backpack36
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 3575840570254379263
+    TagComponent:
+      Tag: Backpack35
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 3504211754759493094
+    TagComponent:
+      Tag: Backpack34
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 9972161272486335435
+    TagComponent:
+      Tag: Backpack33
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 1126822298256454789
+    TagComponent:
+      Tag: Backpack32
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 4154759128759749631
+    TagComponent:
+      Tag: Backpack31
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 3017361102152768461
+    TagComponent:
+      Tag: Backpack30
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 16781510747207873915
+    TagComponent:
+      Tag: Backpack29
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 15000637302097493235
+    TagComponent:
+      Tag: Backpack28
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 2401331576661938444
+    TagComponent:
+      Tag: Backpack27
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 11120811620469080834
+    TagComponent:
+      Tag: Backpack26
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 5456559186291518249
+    TagComponent:
+      Tag: Backpack25
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 14254651656869975631
+    TagComponent:
+      Tag: Backpack24
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 14738733479127446014
+    TagComponent:
+      Tag: Backpack23
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 17978347870969542198
+    TagComponent:
+      Tag: Backpack22
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 1421548492271876522
+    TagComponent:
+      Tag: Backpack21
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 9581201683424127051
+    TagComponent:
+      Tag: Backpack20
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 694885339620096538
+    TagComponent:
+      Tag: Backpack19
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 6885698166303986972
+    TagComponent:
+      Tag: Backpack18
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 11559572043814250730
+    TagComponent:
+      Tag: Backpack17
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 11318552888846171925
+    TagComponent:
+      Tag: Backpack16
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 1135598245424541875
+    TagComponent:
+      Tag: Backpack15
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 6263205102593587993
+    TagComponent:
+      Tag: Backpack14
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 16942843601574299743
+    TagComponent:
+      Tag: Backpack13
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 8323232134504814730
+    TagComponent:
+      Tag: Backpack12
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 5240653740173201083
+    TagComponent:
+      Tag: Backpack11
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 16703259418018650099
+    TagComponent:
+      Tag: Backpack10
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 381453803704804811
+    TagComponent:
+      Tag: Backpack9
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 11893119211771600796
+    TagComponent:
+      Tag: Backpack8
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 13203531000154849429
+    TagComponent:
+      Tag: Backpack7
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 16790743808367948809
+    TagComponent:
+      Tag: Backpack6
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 14744288434354303623
+    TagComponent:
+      Tag: Backpack5
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 8077355689759195902
+    TagComponent:
+      Tag: Backpack4
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 2138413774741794507
+    TagComponent:
+      Tag: Backpack3
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 6094211888629257490
+    TagComponent:
+      Tag: Backpack2
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 7509366707952743827
+    TagComponent:
+      Tag: Backpack1
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 5509411576700679441
+    TagComponent:
+      Tag: Backpack0
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 9227440980591799121
+      Children:
+        []
+  - Entity: 9227440980591799121
+    TagComponent:
+      Tag: Backpack
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        - 5509411576700679441
+        - 7509366707952743827
+        - 6094211888629257490
+        - 2138413774741794507
+        - 8077355689759195902
+        - 14744288434354303623
+        - 16790743808367948809
+        - 13203531000154849429
+        - 11893119211771600796
+        - 381453803704804811
+        - 16703259418018650099
+        - 5240653740173201083
+        - 8323232134504814730
+        - 16942843601574299743
+        - 6263205102593587993
+        - 1135598245424541875
+        - 11318552888846171925
+        - 11559572043814250730
+        - 6885698166303986972
+        - 694885339620096538
+        - 9581201683424127051
+        - 1421548492271876522
+        - 17978347870969542198
+        - 14738733479127446014
+        - 14254651656869975631
+        - 5456559186291518249
+        - 11120811620469080834
+        - 2401331576661938444
+        - 15000637302097493235
+        - 16781510747207873915
+        - 3017361102152768461
+        - 4154759128759749631
+        - 1126822298256454789
+        - 9972161272486335435
+        - 3504211754759493094
+        - 3575840570254379263
+        - 14697544372291677811
+        - 4021775439996704633
+        - 10740433651570892757
+        - 8725249337469736129
+        - 11001236422685305692
+        - 9301685621620092203
+        - 15273975506254796363
+        - 3888227084783552248
+        - 14721120914128601543
+        - 3226539710562902731
+        - 13075035821827589355
+        - 6882770122829262219
+        - 986190034866575347
+        - 9668607037062629545
+        - 6007938141274276096
+        - 5408735586921131968
+        - 5864219709626140329
+        - 17399875496392840980
+        - 11876812609891805799
+        - 3249797195845427028
+        - 13298568834586743008
+        - 13224978003754419315
+        - 6525603642231263713
+        - 13724512905954835932
+        - 1512535595084166703
+        - 17678974904588251664
+        - 10202572237624505053
+        - 8265821225360153291
+        - 5465313085466416446
+        - 175899992709321084
+        - 7465795546434277560
+        - 6364796309125321028
+        - 917013738206235217
+        - 14030868507168183704
+        - 11210888178536656728
+        - 13276334841255033942
+        - 4024475249966733292
+        - 3697201122944651925
+        - 712050414456410835
+        - 3343271929495123999
+        - 15648443754490184469
+        - 521353536526615658
+        - 2730788449493548836
+  - Entity: 6363663000178729486
     TagComponent:
       Tag: Second Camera
     TransformComponent:
@@ -18,7 +976,11 @@ Entities:
         OrthographicFar: 1
       IsPrimary: false
       FixedAspectRatio: false
-  - Entity: 6
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+  - Entity: 334056538404718444
     TagComponent:
       Tag: Camera
     TransformComponent:
@@ -36,42 +998,86 @@ Entities:
         OrthographicFar: 1
       IsPrimary: true
       FixedAspectRatio: false
-  - Entity: 5
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+  - Entity: 7497343579326276019
     TagComponent:
       Tag: Point Light
     TransformComponent:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-  - Entity: 4
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+    PointLightComponent:
+      Color: [0.8, 0.2, 0.2]
+      Position: [0.9, 4.1, 3.9]
+      Intensity: 1
+      Constant: 1
+      Linear: 0.09
+      Quadratic: 0.032
+  - Entity: 14392294392378417062
     TagComponent:
       Tag: Sun
     TransformComponent:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-  - Entity: 3
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+    DirectionalLightComponent:
+      Color: [1, 1, 0.8]
+      Direction: [123, 80, 130]
+      Intensity: 1
+  - Entity: 15845441210239486461
     TagComponent:
       Tag: Plane
     TransformComponent:
       Translation: [0, -1, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-  - Entity: 2
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+  - Entity: 1573222352455355578
     TagComponent:
       Tag: Sphere
     TransformComponent:
       Translation: [2, 1.2, -2]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-  - Entity: 1
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+  - Entity: 4596999360366291698
     TagComponent:
       Tag: Cube
     TransformComponent:
-      Translation: [0, 0, 0]
+      Translation: [-2, 1, -2]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-  - Entity: 0
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+    RigidBody3DComponent:
+      Mass: 1
+      Type: 1
+      Velocity: [0, 0, 0]
+      AngularVelocity: [0, 0, 0]
+      UseGravity: true
+    BoxCollider3DComponent:
+      Size: [1, 1, 1]
+      Offset: [0, 0, 0]
+  - Entity: 936678741513761348
     TagComponent:
       Tag: Square
     TransformComponent:
@@ -80,3 +1086,7 @@ Entities:
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Color: [0.2, 0.3, 0.8, 1]
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []

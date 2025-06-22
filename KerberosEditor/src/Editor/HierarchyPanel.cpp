@@ -109,11 +109,17 @@ namespace Kerberos
 					ImGui::CloseCurrentPopup();
 				}
 
-				/*if (ImGui::MenuItem("Box Collider"))
+				if (ImGui::MenuItem("Rigidbody3D"))
 				{
-					m_SelectedEntity.AddComponent<BoxCollider2DComponent>();
+					m_SelectedEntity.AddComponent<RigidBody3DComponent>();
 					ImGui::CloseCurrentPopup();
-				}*/
+				}
+
+				if (ImGui::MenuItem("Box Collider 3D"))
+				{
+					m_SelectedEntity.AddComponent<BoxCollider3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
 
 				ImGui::EndPopup();
 			}
@@ -134,7 +140,7 @@ namespace Kerberos
 			| (entity == m_SelectedEntity ? ImGuiTreeNodeFlags_Selected : 0);
 
 		/// The entity's identifier serves as the unique ID for the ImGui tree node
-		const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, "%s", tag.c_str());
+		const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint64_t>(entity.GetUUID())), flags, "%s", tag.c_str());
 
 		if (ImGui::IsItemClicked())
 		{
@@ -154,7 +160,7 @@ namespace Kerberos
 
 		if (opened)
 		{
-			for (Entity child : m_Context->GetChildren(entity))
+			for (const Entity& child : m_Context->GetChildren(entity))
 			{
 				DrawEntityNode(child);
 			}
@@ -175,7 +181,7 @@ namespace Kerberos
 	static void DrawVec3Control(const std::string& label, glm::vec3& values, const float resetValue = 0.0f, const float columnWidth = 80.0f)
 	{
 		const ImGuiIO& io = ImGui::GetIO();
-		auto boldFont = io.Fonts->Fonts[1];
+		const auto boldFont = io.Fonts->Fonts[1];
 
 		ImGui::PushID(label.c_str());
 
@@ -663,6 +669,105 @@ namespace Kerberos
 			if (componentDeleted)
 			{
 				entity.RemoveComponent<StaticMeshComponent>();
+			}
+		}
+		if (entity.HasComponent<RigidBody3DComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(RigidBody3DComponent).hash_code()), treeNodeFlags, "RigidBody3D");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("RigidBody3D Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			if (opened)
+			{
+				auto& rb = entity.GetComponent<RigidBody3DComponent>();
+
+				const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
+				const char* currentBodyTypeString = bodyTypeStrings[static_cast<int>(rb.Type)];
+				if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						const bool isSelected = (currentBodyTypeString == bodyTypeStrings[i]);
+						if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
+						{
+							rb.Type = static_cast<RigidBody3DComponent::BodyType>(i);
+						}
+						if (isSelected)
+						{
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+					ImGui::EndCombo();
+				}
+
+				ImGui::DragFloat3("Velocity", glm::value_ptr(rb.Velocity), 0.1f);
+				ImGui::DragFloat3("Angular Velocity", glm::value_ptr(rb.AngularVelocity));
+				ImGui::Checkbox("Use Gravity", &rb.UseGravity);
+				ImGui::DragFloat("Mass", &rb.Mass, 0.1f, 0.01f, 100.0f);
+
+				ImGui::TreePop();
+			}
+
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<RigidBody3DComponent>();
+			}
+		}
+		if (entity.HasComponent<BoxCollider3DComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(BoxCollider3DComponent).hash_code()), treeNodeFlags, "BoxCollider3D");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("BoxCollider3D Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			if (opened)
+			{
+				auto& collider = entity.GetComponent<BoxCollider3DComponent>();
+				ImGui::DragFloat3("Size", glm::value_ptr(collider.Size), 0.1f);
+				ImGui::DragFloat3("Offset", glm::value_ptr(collider.Offset), 0.1f);
+				ImGui::Checkbox("Is Trigger", &collider.IsTrigger);
+
+				ImGui::TreePop();
+			}
+
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<BoxCollider3DComponent>();
 			}
 		}
 	}

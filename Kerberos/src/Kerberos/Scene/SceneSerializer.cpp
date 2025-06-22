@@ -7,7 +7,6 @@
 #include <yaml-cpp/yaml.h>
 
 #include <fstream>
-#include <filesystem>
 
 namespace YAML
 {
@@ -60,8 +59,6 @@ namespace YAML
 
 namespace Kerberos
 {
-	
-
 	static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& vec)
 	{
 		out << YAML::Flow << YAML::BeginSeq << vec.x << vec.y << vec.z << YAML::EndSeq;
@@ -74,10 +71,11 @@ namespace Kerberos
 		return out;
 	}
 
-	static void SerializeEntity(YAML::Emitter& out, Entity entity)
+	static void SerializeEntity(YAML::Emitter& out, const Entity entity)
 	{
 		out << YAML::BeginMap;
-		out << YAML::Key << "Entity" << YAML::Value << static_cast<uint32_t>(entity);
+
+		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
 
 		if (entity.HasComponent<TagComponent>())
 		{
@@ -138,11 +136,96 @@ namespace Kerberos
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<HierarchyComponent>())
+		{
+			out << YAML::Key << "HierarchyComponent";
+			out << YAML::BeginMap;
+			const auto& hierarchy = entity.GetComponent<HierarchyComponent>();
+			out << YAML::Key << "Parent" << YAML::Value << hierarchy.Parent;
+			out << YAML::Key << "Children" << YAML::Value << YAML::BeginSeq;
+			for (const auto& child : hierarchy.Children)
+			{
+				out << child;
+			}
+			out << YAML::EndSeq;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<NativeScriptComponent>())
+		{
+			
+		}
+
+		if (entity.HasComponent<DirectionalLightComponent>())
+		{
+			out << YAML::Key << "DirectionalLightComponent";
+			out << YAML::BeginMap;
+			const auto& directionalLight = entity.GetComponent<DirectionalLightComponent>();
+			out << YAML::Key << "Color" << YAML::Value << directionalLight.Light.Color;
+			out << YAML::Key << "Direction" << YAML::Value << directionalLight.Light.Direction;
+			out << YAML::Key << "Intensity" << YAML::Value << directionalLight.Light.Intensity;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<PointLightComponent>())
+		{
+			out << YAML::Key << "PointLightComponent";
+			out << YAML::BeginMap;
+			const auto& pointLight = entity.GetComponent<PointLightComponent>();
+			out << YAML::Key << "Color" << YAML::Value << pointLight.Light.Color;
+			out << YAML::Key << "Position" << YAML::Value << pointLight.Light.Position;
+			out << YAML::Key << "Intensity" << YAML::Value << pointLight.Light.Intensity;
+			out << YAML::Key << "Constant" << YAML::Value << pointLight.Light.Constant;
+			out << YAML::Key << "Linear" << YAML::Value << pointLight.Light.Linear;
+			out << YAML::Key << "Quadratic" << YAML::Value << pointLight.Light.Quadratic;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<SpotLightComponent>())
+		{
+			out << YAML::Key << "SpotLightComponent";
+			out << YAML::BeginMap;
+			const auto& spotLight = entity.GetComponent<SpotLightComponent>();
+			out << YAML::Key << "Color" << YAML::Value << spotLight.Light.Color;
+			out << YAML::Key << "Position" << YAML::Value << spotLight.Light.Position;
+			out << YAML::Key << "Direction" << YAML::Value << spotLight.Light.Direction;
+			out << YAML::Key << "Intensity" << YAML::Value << spotLight.Light.Intensity;
+			out << YAML::Key << "Constant" << YAML::Value << spotLight.Light.Constant;
+			out << YAML::Key << "Linear" << YAML::Value << spotLight.Light.Linear;
+			out << YAML::Key << "Quadratic" << YAML::Value << spotLight.Light.Quadratic;
+			out << YAML::Key << "CutOffAngleRadians" << YAML::Value << spotLight.Light.CutOffAngleRadians;
+			out << YAML::Key << "OuterCutOffAngleRadians" << YAML::Value << spotLight.Light.OuterCutOffAngleRadians;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<RigidBody3DComponent>())
+		{
+			out << YAML::Key << "RigidBody3DComponent";
+			out << YAML::BeginMap;
+			const auto& rigidBody = entity.GetComponent<RigidBody3DComponent>();
+			out << YAML::Key << "Mass" << YAML::Value << rigidBody.Mass;
+			out << YAML::Key << "Type" << YAML::Value << static_cast<int>(rigidBody.Type);
+			out << YAML::Key << "Velocity" << YAML::Value << rigidBody.Velocity;
+			out << YAML::Key << "AngularVelocity" << YAML::Value << rigidBody.AngularVelocity;
+			out << YAML::Key << "UseGravity" << YAML::Value << rigidBody.UseGravity;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<BoxCollider3DComponent>())
+		{
+			out << YAML::Key << "BoxCollider3DComponent";
+			out << YAML::BeginMap;
+			const auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+			out << YAML::Key << "Size" << YAML::Value << boxCollider.Size;
+			out << YAML::Key << "Offset" << YAML::Value << boxCollider.Offset;
+			out << YAML::EndMap;
+		}
+
 		out << YAML::EndMap;
 
 	}
 
-	void SceneSerializer::Serialize(const std::string& filepath)
+	void SceneSerializer::Serialize(const std::filesystem::path& filepath) const 
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
@@ -159,10 +242,8 @@ namespace Kerberos
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
 
-		const std::filesystem::path filePathObj(filepath);
-
 		/// Check if there's a parent directory
-		if (const std::filesystem::path parentDir = filePathObj.parent_path(); !parentDir.empty()) {
+		if (const std::filesystem::path parentDir = filepath.parent_path(); !parentDir.empty()) {
 			std::error_code ec;
 			std::filesystem::create_directories(parentDir, ec);
 			if (ec) {
@@ -177,16 +258,16 @@ namespace Kerberos
 		}
 		else
 		{
-			KBR_CORE_ERROR("Could not open file {0} for writing!", filepath);
+			KBR_CORE_ERROR("Could not open file {0} for writing!", filepath.string());
 		}
 	}
 
-	void SceneSerializer::SerializeRuntime(const std::string& filepath)
+	void SceneSerializer::SerializeRuntime(const std::filesystem::path& filepath)
 	{
 		throw std::logic_error("Not implemented");
 	}
 
-	bool SceneSerializer::Deserialize(const std::string& filepath)
+	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath) const 
 	{
 		const std::ifstream inFile(filepath);
 		std::stringstream stream;
@@ -195,7 +276,7 @@ namespace Kerberos
 		YAML::Node data = YAML::Load(stream.str());
 		if (!data["Scene"])
 		{
-			KBR_CORE_ERROR("Invalid Scene file {0}", filepath);
+			KBR_CORE_ERROR("Invalid Scene file {0}", filepath.string());
 			return false;
 		}
 
@@ -205,12 +286,13 @@ namespace Kerberos
 		{
 			for (const auto& entity : entities)
 			{
-				uint32_t id = entity["Entity"].as<uint32_t>();
+				uint64_t uuid = entity["Entity"].as<uint64_t>();
 				std::string tag;
 				if (entity["TagComponent"])
 					tag = entity["TagComponent"]["Tag"].as<std::string>();
 
-				Entity deserializedEntity = m_Scene->CreateEntity(tag);
+				/// Create the entity with the given tag and id
+				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(tag, uuid);
 
 				if (auto transformComponent = entity["TransformComponent"])
 				{
@@ -244,13 +326,82 @@ namespace Kerberos
 					auto& spriteRenderer = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					spriteRenderer.Color = spriteRendererComponent["Color"].as<glm::vec4>();
 				}
+
+				if (auto hierarchyComponent = entity["HierarchyComponent"])
+				{
+					/// The entity must have a HierarchyComponent already when created
+					auto& hierarchy = deserializedEntity.GetComponent<HierarchyComponent>();
+					const uint64_t parentId = hierarchyComponent["Parent"].as<uint64_t>();
+					hierarchy.Parent = UUID(parentId);
+					for (const auto& child : hierarchyComponent["Children"])
+					{
+						const uint64_t childUUID = child.as<uint64_t>();
+						hierarchy.Children.emplace_back(childUUID);
+					}
+				}
+
+				if (auto nativeScriptComponent = entity["NativeScriptComponent"])
+				{
+					// Handle NativeScriptComponent deserialization here
+					// This is a placeholder as the actual implementation depends on the scripting system used
+				}
+
+				if (auto directionalLightComponent = entity["DirectionalLightComponent"])
+				{
+					auto& directionalLight = deserializedEntity.AddComponent<DirectionalLightComponent>();
+					directionalLight.Light.Color = directionalLightComponent["Color"].as<glm::vec3>();
+					directionalLight.Light.Direction = directionalLightComponent["Direction"].as<glm::vec3>();
+					directionalLight.Light.Intensity = directionalLightComponent["Intensity"].as<float>();
+				}
+
+				if (auto pointLightComponent = entity["PointLightComponent"])
+				{
+					auto& pointLight = deserializedEntity.AddComponent<PointLightComponent>();
+					pointLight.Light.Color = pointLightComponent["Color"].as<glm::vec3>();
+					pointLight.Light.Position = pointLightComponent["Position"].as<glm::vec3>();
+					pointLight.Light.Intensity = pointLightComponent["Intensity"].as<float>();
+					pointLight.Light.Constant = pointLightComponent["Constant"].as<float>();
+					pointLight.Light.Linear = pointLightComponent["Linear"].as<float>();
+					pointLight.Light.Quadratic = pointLightComponent["Quadratic"].as<float>();
+				}
+
+				if (auto spotLightComponent = entity["SpotLightComponent"])
+				{
+					auto& spotLight = deserializedEntity.AddComponent<SpotLightComponent>();
+					spotLight.Light.Color = spotLightComponent["Color"].as<glm::vec3>();
+					spotLight.Light.Position = spotLightComponent["Position"].as<glm::vec3>();
+					spotLight.Light.Direction = spotLightComponent["Direction"].as<glm::vec3>();
+					spotLight.Light.Intensity = spotLightComponent["Intensity"].as<float>();
+					spotLight.Light.Constant = spotLightComponent["Constant"].as<float>();
+					spotLight.Light.Linear = spotLightComponent["Linear"].as<float>();
+					spotLight.Light.Quadratic = spotLightComponent["Quadratic"].as<float>();
+					spotLight.Light.CutOffAngleRadians = spotLightComponent["CutOffAngleRadians"].as<float>();
+					spotLight.Light.OuterCutOffAngleRadians = spotLightComponent["OuterCutOffAngleRadians"].as<float>();
+				}
+
+				if (auto rigidBodyComponent = entity["RigidBody3DComponent"])
+				{
+					auto& rigidBody = deserializedEntity.AddComponent<RigidBody3DComponent>();
+					rigidBody.Mass = rigidBodyComponent["Mass"].as<float>();
+					rigidBody.Type = static_cast<RigidBody3DComponent::BodyType>(rigidBodyComponent["Type"].as<int>());
+					rigidBody.Velocity = rigidBodyComponent["Velocity"].as<glm::vec3>();
+					rigidBody.AngularVelocity = rigidBodyComponent["AngularVelocity"].as<glm::vec3>();
+					rigidBody.UseGravity = rigidBodyComponent["UseGravity"].as<bool>();
+				}
+
+				if (auto boxColliderComponent = entity["BoxCollider3DComponent"])
+				{
+					auto& boxCollider = deserializedEntity.AddComponent<BoxCollider3DComponent>();
+					boxCollider.Size = boxColliderComponent["Size"].as<glm::vec3>();
+					boxCollider.Offset = boxColliderComponent["Offset"].as<glm::vec3>();
+				}
 			}
 		}
 
 		return true;
 	}
 
-	bool SceneSerializer::DeserializeRuntime(const std::string& filepath)
+	bool SceneSerializer::DeserializeRuntime(const std::filesystem::path& filepath) const 
 	{
 		throw std::logic_error("Not implemented");
 	}

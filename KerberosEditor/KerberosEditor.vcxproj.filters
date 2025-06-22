@@ -14,6 +14,8 @@
     </ClInclude>
     <ClInclude Include="src\EditorLayer.h" />
     <ClInclude Include="src\ParticleSystem.h" />
+    <ClInclude Include="src\Notification\NotificationManager.h" />
+    <ClInclude Include="src\Notification\Notification.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Editor\AssetsPanel.cpp">
@@ -25,5 +27,6 @@
     <ClCompile Include="src\EditorLayer.cpp" />
     <ClCompile Include="src\KerberosEditorApp.cpp" />
     <ClCompile Include="src\ParticleSystem.cpp" />
+    <ClCompile Include="src\Notification\NotificationManager.cpp" />
   </ItemGroup>
 </Project>

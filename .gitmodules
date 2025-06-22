@@ -17,3 +17,6 @@
 [submodule "Kerberos/vendor/Assimp"]
 	path = Kerberos/vendor/Assimp
 	url = https://github.com/EasySouls/Assimp
+[submodule "Kerberos/vendor/JoltPhysics"]
+	path = Kerberos/vendor/JoltPhysics
+	url = https://github.com/EasySouls/JoltPhysics

@@ -4,6 +4,7 @@
 //#include "ParticleSystem.h"
 #include "Editor/HierarchyPanel.h"
 #include "Editor/AssetsPanel.h"
+#include "Notification/NotificationManager.h"
 
 
 namespace Kerberos
@@ -31,7 +32,7 @@ namespace Kerberos
 
 		void CalculateEntityTransforms() const;
 
-		void SaveScene() const;
+		void SaveScene();
 		void SaveSceneAs() const;
 		void LoadScene();
 		void NewScene();
@@ -71,6 +72,8 @@ namespace Kerberos
 		bool m_RenderOceanSkybox = true;
 
 		bool m_ShowWireframe = false;
+
+		NotificationManager m_NotificationManager;
 
 		Ref<Texture2D> m_Texture;
 		Ref<Texture2D> m_SpriteSheet;

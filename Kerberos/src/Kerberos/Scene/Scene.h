@@ -6,7 +6,21 @@
 
 #include "EditorCamera.h"
 #include "Kerberos/Renderer/Camera.h"
+#include "Kerberos/Core/UUID.h"
 
+namespace JPH
+{
+	class PhysicsSystem;
+	class TempAllocator;
+	class JobSystem;
+	class ObjectVsBroadPhaseLayerFilter;
+	class BroadPhaseLayerInterface;
+	class ObjectLayerPairFilter;
+
+	/// Optional listeners for physics events
+	class ContactListener;
+	class BodyActivationListener;
+}
 
 namespace Kerberos
 {
@@ -19,6 +33,9 @@ namespace Kerberos
 		Scene();
 		virtual ~Scene();
 
+		void OnRuntimeStart();
+		void OnRuntimeStop();
+
 		void OnUpdateEditor(Timestep ts, const EditorCamera& camera, bool renderSkybox);
 		void OnUpdateRuntime(Timestep ts);
 
@@ -29,6 +46,8 @@ namespace Kerberos
 		 */
 		Entity CreateEntity(const std::string& name = std::string());
 
+		Entity CreateEntityWithUUID(const std::string& name, uint64_t uuid);
+
 		/**
 		 * @brief Destroy an entity in the scene
 		 *
@@ -36,11 +55,12 @@ namespace Kerberos
 		 */
 		void DestroyEntity(Entity entity);
 
+		Entity GetEntityByUUID(UUID uuid) const;
+
 		void SetParent(Entity child, Entity parent, bool keepWorldTransform = true);
 		Entity GetParent(Entity child);
 		void RemoveParent(Entity child);
-		const std::vector<Entity>& GetChildren(Entity parent);
-
+		std::vector<Entity> GetChildren(Entity parent);
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 
@@ -66,6 +86,21 @@ namespace Kerberos
 		uint32_t m_ViewportHeight = 0;
 
 		bool m_Is3D = true;
+
+		std::unordered_map<UUID, Entity> m_UUIDToEntityMap;
+
+		/// Physics related members
+		/// These are pointers, since i do not want to include Jolt headers in the Scene.h file,
+		/// and non-complete types are not allowed in the class definition
+		
+		JPH::PhysicsSystem* m_PhysicsSystem = nullptr;
+		JPH::TempAllocator* m_PhysicsTempAllocator = nullptr;
+		JPH::JobSystem* m_PhysicsJobSystem = nullptr;
+		JPH::ObjectVsBroadPhaseLayerFilter* m_ObjectVsBroadPhaseLayerFilter = nullptr;
+		JPH::BroadPhaseLayerInterface* m_BroadPhaseLayerInterface = nullptr;
+		JPH::ObjectLayerPairFilter* m_ObjectVsObjectLayerFilter = nullptr;
+		JPH::ContactListener* m_ContactListener = nullptr;
+		JPH::BodyActivationListener* m_BodyActivationListener = nullptr;
 
 		friend class Entity;
 		friend class HierarchyPanel;

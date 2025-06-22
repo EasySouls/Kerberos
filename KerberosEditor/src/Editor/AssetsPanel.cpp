@@ -107,6 +107,8 @@ namespace Kerberos
 				/// Open the file on double click
 				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 				{
+					/// TODO: If the file is a kerberos scene, open it in the scene editor
+
 					/// Open the file using the default application
 					const bool opened = FileOperations::OpenFile(path.string().c_str());
 					if (!opened)

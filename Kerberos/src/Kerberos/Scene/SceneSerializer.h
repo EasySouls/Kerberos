@@ -2,6 +2,8 @@
 
 #include "Scene.h"
 
+#include <filesystem>
+
 namespace Kerberos
 {
 	class SceneSerializer
@@ -10,14 +12,14 @@ namespace Kerberos
 		explicit SceneSerializer(const Ref<Scene>& scene)
 			: m_Scene(scene) {}
 
-		void Serialize(const std::string& filepath);
-		void SerializeRuntime(const std::string& filepath);
+		void Serialize(const std::filesystem::path& filepath) const;
+		void SerializeRuntime(const std::filesystem::path& filepath);
 
-		bool Deserialize(const std::string& filepath);
-		bool DeserializeRuntime(const std::string& filepath);
+		bool Deserialize(const std::filesystem::path& filepath) const;
+		bool DeserializeRuntime(const std::filesystem::path& filepath) const;
 
 	private:
-		Ref<Scene>	m_Scene;
+		Ref<Scene> m_Scene;
 	};
 }
 

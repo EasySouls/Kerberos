@@ -57,6 +57,8 @@ namespace Kerberos
 		const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
 		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
 		cubeEntity.GetComponent<TransformComponent>().Translation = { -2.0f, 1.0f, -2.0f };
+		cubeEntity.AddComponent<BoxCollider3DComponent>();
+		cubeEntity.AddComponent<RigidBody3DComponent>();
 
 		Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
 		const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
@@ -126,6 +128,9 @@ namespace Kerberos
 		Layer::OnDetach();
 	}
 
+	static uint64_t s_FrameCount = 0;
+	static constexpr int s_TransformCalculationFramespan = 3;
+
 	void EditorLayer::OnUpdate(const Timestep deltaTime)
 	{
 		KBR_PROFILE_FUNCTION();
@@ -137,8 +142,14 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("EditorLayer::OnUpdate - CalculateEntityTransforms");
 
+			/// TODO: Implement a valid logic from calculating only the dirty transforms
 			/// Calculates the children entities' world transform from their parents' and their own local transform
-			CalculateEntityTransforms();
+			if (s_FrameCount % s_TransformCalculationFramespan == 0)
+			{
+				CalculateEntityTransforms();
+			}
+
+			s_FrameCount++;
 		}
 
 		/// Resize the camera if needed
@@ -454,6 +465,8 @@ namespace Kerberos
 
 		UIToolbar();
 
+		m_NotificationManager.RenderNotifications();
+
 		ImGui::End();
 
 #ifdef KBR_DEBUG
@@ -542,11 +555,15 @@ namespace Kerberos
 	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
+
+		m_ActiveScene->OnRuntimeStart();
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
 		m_SceneState = SceneState::Edit;
+
+		m_ActiveScene->OnRuntimeStop();
 	}
 
 	void EditorLayer::HandleDragAndDrop()
@@ -557,6 +574,9 @@ namespace Kerberos
 			{
 				const auto& path = static_cast<const char*>(payload->Data);
 				KBR_INFO("Drag and drop payload: {0}", path);
+
+				const std::string message = "Drag and drop payload: " + std::string(path);
+				m_NotificationManager.AddNotification(message, Notification::Type::Info);
 
 				/*const AssetHandle assetHandle = *static_cast<AssetHandle*>(payload->Data);
 				const AssetType assetType = AssetManager::GetAssetType(assetHandle);
@@ -621,10 +641,14 @@ namespace Kerberos
 		ImGui::End();
 	}
 
-	void EditorLayer::SaveScene() const
+	void EditorLayer::SaveScene()
 	{
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Serialize("assets/scenes/Example.kerberos");
+		const std::filesystem::path scenePath = "assets/scenes/Example.kerberos";
+
+		const SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize(scenePath.string());
+
+		m_NotificationManager.AddNotification("Scene saved to " + scenePath.string(), Notification::Type::Info);
 	}
 
 	void EditorLayer::SaveSceneAs() const
@@ -633,7 +657,7 @@ namespace Kerberos
 		if (filepath.empty())
 			return;
 
-		SceneSerializer serializer(m_ActiveScene);
+		const SceneSerializer serializer(m_ActiveScene);
 		serializer.Serialize(filepath);
 	}
 
@@ -649,8 +673,12 @@ namespace Kerberos
 		m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Deserialize("assets/scenes/Example.kerberos");
+		const SceneSerializer serializer(m_ActiveScene);
+		/// TODO: We need to convert the filepath to a relative path, so that it works on all platforms
+		if (!serializer.Deserialize("assets/scenes/Example.kerberos"))
+		{
+			KBR_ERROR("Failed to load scene from {0}", filepath);
+		}
 	}
 
 }
