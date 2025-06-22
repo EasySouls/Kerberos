@@ -21,6 +21,8 @@
 
 #include "Jolt/Physics/Collision/Shape/BoxShape.h"
 
+#define USE_MAP_FOR_UUID 1
+
 namespace Kerberos
 {
 	static JPH::EMotionType GetBodyTypeFromComponent(const RigidBody3DComponent::BodyType& type)
@@ -447,10 +449,14 @@ namespace Kerberos
 		Entity entity = { m_Registry.create(), this };
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<HierarchyComponent>();
-		entity.AddComponent<IDComponent>();
 
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
+
+		const auto& idComp = entity.AddComponent<IDComponent>();
+#if USE_MAP_FOR_UUID
+		m_UUIDToEntityMap[idComp.ID] = entity;
+#endif
 
 		return entity;
 	}
@@ -467,6 +473,10 @@ namespace Kerberos
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
 
+#if USE_MAP_FOR_UUID
+		m_UUIDToEntityMap[idComp.ID] = entity;
+#endif
+
 		return entity;
 	}
 
@@ -479,6 +489,10 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
+#if USE_MAP_FOR_UUID
+
+		return m_UUIDToEntityMap.at(uuid);
+#else
 		const auto view = m_Registry.view<IDComponent>();
 		for (auto entity : view)
 		{
@@ -490,6 +504,7 @@ namespace Kerberos
 		}
 
 		return {};
+#endif
 	}
 
 	void Scene::SetParent(const Entity child, const Entity parent, bool keepWorldTransform)

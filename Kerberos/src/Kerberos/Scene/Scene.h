@@ -87,6 +87,8 @@ namespace Kerberos
 
 		bool m_Is3D = true;
 
+		std::unordered_map<UUID, Entity> m_UUIDToEntityMap;
+
 		/// Physics related members
 		/// These are pointers, since i do not want to include Jolt headers in the Scene.h file,
 		/// and non-complete types are not allowed in the class definition
