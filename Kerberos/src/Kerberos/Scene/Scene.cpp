@@ -287,14 +287,14 @@ namespace Kerberos
 		// A body activation listener gets notified when bodies activate and go to sleep
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
 		// Registering one is entirely optional.
-		Physics::KBRBodyActivationListener bodyActivationListener;
-		m_PhysicsSystem->SetBodyActivationListener(&bodyActivationListener);
+		m_BodyActivationListener = new Physics::KBRBodyActivationListener();
+		m_PhysicsSystem->SetBodyActivationListener(m_BodyActivationListener);
 
 		// A contact listener gets notified when bodies (are about to) collide, and when they separate again.
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
 		// Registering one is entirely optional.
-		Physics::KBRContactListener contactListener;
-		m_PhysicsSystem->SetContactListener(&contactListener);
+		m_ContactListener = new Physics::KBRContactListener();
+		m_PhysicsSystem->SetContactListener(m_ContactListener);
 
 		// The main way to interact with the bodies in the physics system is through the body interface. There is a locking and a non-locking
 		// variant of this. We're going to use the locking version (even though we're not planning to access bodies from multiple threads)

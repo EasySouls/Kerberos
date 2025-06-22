@@ -15,6 +15,10 @@ namespace JPH
 	class ObjectVsBroadPhaseLayerFilter;
 	class BroadPhaseLayerInterface;
 	class ObjectLayerPairFilter;
+
+	/// Optional listeners for physics events
+	class ContactListener;
+	class BodyActivationListener;
 }
 
 namespace Kerberos
@@ -91,6 +95,8 @@ namespace Kerberos
 		JPH::ObjectVsBroadPhaseLayerFilter* m_ObjectVsBroadPhaseLayerFilter = nullptr;
 		JPH::BroadPhaseLayerInterface* m_BroadPhaseLayerInterface = nullptr;
 		JPH::ObjectLayerPairFilter* m_ObjectVsObjectLayerFilter = nullptr;
+		JPH::ContactListener* m_ContactListener = nullptr;
+		JPH::BodyActivationListener* m_BodyActivationListener = nullptr;
 
 		friend class Entity;
 		friend class HierarchyPanel;
