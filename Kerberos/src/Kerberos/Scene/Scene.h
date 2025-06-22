@@ -6,6 +6,7 @@
 
 #include "EditorCamera.h"
 #include "Kerberos/Renderer/Camera.h"
+#include "Kerberos/Core/UUID.h"
 
 namespace JPH
 {
@@ -45,7 +46,7 @@ namespace Kerberos
 		 */
 		Entity CreateEntity(const std::string& name = std::string());
 
-		Entity CreateEntity(const std::string& name, uint32_t id);
+		Entity CreateEntityWithUUID(const std::string& name, uint64_t uuid);
 
 		/**
 		 * @brief Destroy an entity in the scene
@@ -54,11 +55,12 @@ namespace Kerberos
 		 */
 		void DestroyEntity(Entity entity);
 
+		Entity GetEntityByUUID(UUID uuid);
+
 		void SetParent(Entity child, Entity parent, bool keepWorldTransform = true);
 		Entity GetParent(Entity child);
 		void RemoveParent(Entity child);
-		const std::vector<Entity>& GetChildren(Entity parent);
-
+		std::vector<Entity> GetChildren(Entity parent);
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 

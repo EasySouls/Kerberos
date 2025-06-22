@@ -1,7 +1,9 @@
 #pragma once 
 
 #include "Scene.h"
+#include "Components.h"
 #include "Kerberos/Log.h"
+#include "Kerberos/Core/UUID.h"
 
 namespace Kerberos
 {
@@ -50,9 +52,9 @@ namespace Kerberos
 			return m_Scene->m_Registry.any_of<T>(m_EntityHandle);
 		}
 
-		explicit operator bool() const { return m_EntityHandle != entt::null; }
+		UUID GetUUID() const { return GetComponent<IDComponent>().ID; }
 
-		explicit operator uint32_t () const { return static_cast<uint32_t>(m_EntityHandle); }
+		explicit operator bool() const { return m_EntityHandle != entt::null; }
 
 		explicit operator entt::entity() const { return m_EntityHandle; }
 

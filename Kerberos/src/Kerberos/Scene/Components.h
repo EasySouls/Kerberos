@@ -13,11 +13,23 @@
 #include "Kerberos/Renderer/Material.h"
 #include "Kerberos/Renderer/TextureCube.h"
 #include "Kerberos/Scene/SceneCamera.h"
-#include "Kerberos/Scene/Entity.h"
+#include "Kerberos/Core/UUID.h"
 
 namespace Kerberos
 {
 	class ScriptableEntity;
+
+	struct IDComponent
+	{
+		UUID ID;
+
+		IDComponent() = default;
+		~IDComponent() = default;
+		IDComponent(const IDComponent&) = default;
+		IDComponent(IDComponent&&) = default;
+		IDComponent& operator=(const IDComponent&) = default;
+		IDComponent& operator=(IDComponent&&) = default;
+	};
 
 	struct TransformComponent
 	{
@@ -208,8 +220,8 @@ namespace Kerberos
 
 	struct HierarchyComponent
 	{
-		Entity Parent = {};
-		std::vector<Entity> Children;
+		UUID Parent = UUID::Invalid();
+		std::vector<UUID> Children;
 
 		HierarchyComponent() = default;
 	};

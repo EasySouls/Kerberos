@@ -17,6 +17,8 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
+#include <algorithm>
+
 #include "Jolt/Physics/Collision/Shape/BoxShape.h"
 
 namespace Kerberos
@@ -31,10 +33,10 @@ namespace Kerberos
 			return JPH::EMotionType::Kinematic;
 		case RigidBody3DComponent::BodyType::Dynamic:
 			return JPH::EMotionType::Dynamic;
-		default:
-			KBR_CORE_ASSERT(false, "Unknown body type!");
-			return JPH::EMotionType::Static;
 		}
+
+		KBR_CORE_ASSERT(false, "Unknown body type!");
+		return JPH::EMotionType::Static;
 	}
 
 	namespace Physics
@@ -187,16 +189,16 @@ namespace Kerberos
 	static JPH::ObjectLayer GetObjectLayerFromComponent(const RigidBody3DComponent::BodyType& type)
 	{
 		switch (type)
-		{		
+		{
 		case RigidBody3DComponent::BodyType::Static:
 			return Physics::Layers::NON_MOVING;
 		case RigidBody3DComponent::BodyType::Kinematic:
 		case RigidBody3DComponent::BodyType::Dynamic:
 			return Physics::Layers::MOVING;
-		default:
-			KBR_CORE_ASSERT(false, "Unknown body type!");
-			return Physics::Layers::NON_MOVING;
 		}
+
+		KBR_CORE_ASSERT(false, "Unknown body type!");
+		return Physics::Layers::NON_MOVING;
 	}
 
 	Scene::Scene()
@@ -204,7 +206,7 @@ namespace Kerberos
 		m_Registry = entt::basic_registry();
 	}
 
-	Scene::~Scene() 
+	Scene::~Scene()
 	{
 		/// Destroy all entities in the scene
 		m_Registry.clear<entt::entity>();
@@ -225,11 +227,11 @@ namespace Kerberos
 	static bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, uint32_t inLine)
 	{
 		KBR_CORE_ERROR("{}:{}: ({}) {}", inFile, inLine, inExpression, inMessage != nullptr ? inMessage : "");
-		
+
 		return true;
 	};
 
-	void Scene::OnRuntimeStart() 
+	void Scene::OnRuntimeStart()
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -241,9 +243,9 @@ namespace Kerberos
 		JPH::Trace = TraceImpl;
 		JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = AssertFailedImpl;)
 
-		// Create a factory, this class is responsible for creating instances of classes based on their name or hash and is mainly used for deserialization of saved data.
-		// It is not directly used in this example but still required.
-		JPH::Factory::sInstance = new JPH::Factory();
+			// Create a factory, this class is responsible for creating instances of classes based on their name or hash and is mainly used for deserialization of saved data.
+			// It is not directly used in this example but still required.
+			JPH::Factory::sInstance = new JPH::Factory();
 
 		// Register all physics types with the factory and install their collision handlers with the CollisionDispatch class.
 		// If you have your own custom shape types you probably need to register their handlers with the CollisionDispatch before calling this function.
@@ -349,7 +351,7 @@ namespace Kerberos
 		}
 	}
 
-	void Scene::OnRuntimeStop() const 
+	void Scene::OnRuntimeStop() const
 	{
 		delete JPH::Factory::sInstance;
 		JPH::Factory::sInstance = nullptr;
@@ -445,6 +447,7 @@ namespace Kerberos
 		Entity entity = { m_Registry.create(), this };
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<HierarchyComponent>();
+		entity.AddComponent<IDComponent>();
 
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
@@ -452,66 +455,99 @@ namespace Kerberos
 		return entity;
 	}
 
-	Entity Scene::CreateEntity(const std::string& name, uint32_t id)
+	Entity Scene::CreateEntityWithUUID(const std::string& name, const uint64_t uuid)
 	{
-		Entity entity = { m_Registry.create(static_cast<entt::entity>(id)), this };
+		Entity entity = { m_Registry.create(), this };
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<HierarchyComponent>();
 
+		auto& idComp = entity.AddComponent<IDComponent>();
+		idComp.ID = UUID(uuid);
+
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
 
 		return entity;
 	}
 
-	void Scene::DestroyEntity(const Entity entity) 
+	void Scene::DestroyEntity(const Entity entity)
 	{
 		m_Registry.destroy(static_cast<entt::entity>(entity));
 	}
 
-	void Scene::SetParent(const Entity child, const Entity parent, bool keepWorldTransform) 
+	Entity Scene::GetEntityByUUID(const UUID uuid)
+	{
+		KBR_PROFILE_FUNCTION();
+
+		const auto view = m_Registry.view<IDComponent>();
+		for (auto entity : view)
+		{
+			auto id = view.get<IDComponent>(entity).ID;
+			if (id == uuid)
+			{
+				return { entity, this };
+			}
+		}
+
+		return {};
+	}
+
+	void Scene::SetParent(const Entity child, const Entity parent, bool keepWorldTransform)
 	{
 		RemoveParent(child);
 
 		auto& childHierarchy = child.GetComponent<HierarchyComponent>();
 		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
 
-		childHierarchy.Parent = parent;
-		parentHierarchy.Children.push_back(child);
+		childHierarchy.Parent = parent.GetUUID();
+		parentHierarchy.Children.emplace_back(child.GetUUID());
 	}
 
-	Entity Scene::GetParent(const Entity child) 
+	Entity Scene::GetParent(const Entity child)
 	{
+		KBR_PROFILE_FUNCTION();
+
 		const auto& childHierarchy = child.GetComponent<HierarchyComponent>();
-		if (childHierarchy.Parent)
+		if (childHierarchy.Parent.IsValid())
 		{
-			return childHierarchy.Parent;
+			return GetEntityByUUID(childHierarchy.Parent);
 		}
 		return {};
 	}
 
-	void Scene::RemoveParent(const Entity child) 
+	void Scene::RemoveParent(const Entity child)
 	{
+		KBR_PROFILE_FUNCTION();
+
 		auto& childHierarchy = child.GetComponent<HierarchyComponent>();
-		if (childHierarchy.Parent)
+		if (childHierarchy.Parent.IsValid())
 		{
-			auto& parentHierarchy = childHierarchy.Parent.GetComponent<HierarchyComponent>();
-			const auto it = std::ranges::find(parentHierarchy.Children, child);
+			auto& parentHierarchy = GetEntityByUUID(childHierarchy.Parent).GetComponent<HierarchyComponent>();
+			const auto it = std::ranges::find(parentHierarchy.Children, child.GetUUID());
 			if (it != parentHierarchy.Children.end())
 			{
 				parentHierarchy.Children.erase(it);
 			}
-			childHierarchy.Parent = Entity{};
+			childHierarchy.Parent = UUID::Invalid();
 		}
 	}
 
-	const std::vector<Entity>& Scene::GetChildren(const Entity parent) 
+	std::vector<Entity> Scene::GetChildren(const Entity parent)
 	{
-		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
-		return parentHierarchy.Children;
+		KBR_PROFILE_FUNCTION();
+
+		const auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
+
+		std::vector<Entity> children;
+		for (const auto& child : parentHierarchy.Children)
+		{
+			Entity entity = GetEntityByUUID(child);
+			children.push_back(entity);
+		}
+		return children;
 	}
 
-	void Scene::OnViewportResize(const uint32_t width, const uint32_t height) 
+	void Scene::OnViewportResize(const uint32_t width, const uint32_t height)
 	{
 		m_ViewportHeight = height;
 		m_ViewportWidth = width;
@@ -528,7 +564,7 @@ namespace Kerberos
 		}
 	}
 
-	void Scene::Render2DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform) 
+	void Scene::Render2DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform)
 	{
 		Renderer2D::BeginScene(*mainCamera, mainCameraTransform);
 
@@ -586,7 +622,7 @@ namespace Kerberos
 		Renderer3D::EndScene();
 	}
 
-	void Scene::Render3DEditor(const EditorCamera& camera, const bool renderSkybox) 
+	void Scene::Render3DEditor(const EditorCamera& camera, const bool renderSkybox)
 	{
 		const DirectionalLight* sun = nullptr;
 		const auto sunView = m_Registry.view<DirectionalLightComponent, TransformComponent>();
@@ -627,7 +663,7 @@ namespace Kerberos
 		Renderer3D::EndScene();
 	}
 
-	void Scene::UpdateChildTransforms(const Entity parent, const glm::mat4& parentTransform) 
+	void Scene::UpdateChildTransforms(const Entity parent, const glm::mat4& parentTransform)
 	{
 		auto& tsc = parent.GetComponent<TransformComponent>();
 		const glm::mat4 localTransform = tsc.GetTransform();
@@ -639,7 +675,7 @@ namespace Kerberos
 		}
 	}
 
-	Entity Scene::GetPrimaryCameraEntity() 
+	Entity Scene::GetPrimaryCameraEntity()
 	{
 		const auto view = m_Registry.view<CameraComponent>();
 		for (const auto entity : view)
@@ -656,13 +692,17 @@ namespace Kerberos
 
 	void Scene::CalculateEntityTransforms()
 	{
+		KBR_PROFILE_FUNCTION();
+
 		const auto view = m_Registry.view<TransformComponent>();
 		for (const auto id : view)
 		{
 			const Entity entity{ id, this };
-			const Entity parent = entity.GetComponent<HierarchyComponent>().Parent;
+			const UUID parentUUID = entity.GetComponent<HierarchyComponent>().Parent;
 
-			if (!parent)
+			/// Only calculate the transforms of root entities, since the UpdateChildTransforms
+			/// function will handle all the children
+			if (!parentUUID.IsValid())
 			{
 				UpdateChildTransforms(entity, glm::mat4(1.0f));
 			}
@@ -682,24 +722,24 @@ namespace Kerberos
 	}
 
 	template <>
+	void Scene::OnComponentAdded<IDComponent>(Entity entity, IDComponent& component)
+	{}
+
+	template <>
 	void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
-	{	
-	}
+	{}
 
 	template <>
 	void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component)
-	{
-	}
+	{}
 
 	template <>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
-	{
-	}
+	{}
 
 	template <>
 	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
-	{
-	}
+	{}
 
 	template <>
 	void Scene::OnComponentAdded<StaticMeshComponent>(Entity entity, StaticMeshComponent& component)
@@ -707,18 +747,15 @@ namespace Kerberos
 
 	template <>
 	void Scene::OnComponentAdded<DirectionalLightComponent>(Entity entity, DirectionalLightComponent& component)
-	{
-	}
+	{}
 
 	template <>
 	void Scene::OnComponentAdded<PointLightComponent>(Entity entity, PointLightComponent& component)
-	{
-	}
+	{}
 
 	template <>
 	void Scene::OnComponentAdded<SpotLightComponent>(Entity entity, SpotLightComponent& component)
-	{
-	}
+	{}
 
 	template <>
 	void Scene::OnComponentAdded<SkyboxComponent>(Entity entity, SkyboxComponent& component)

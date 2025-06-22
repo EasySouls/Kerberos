@@ -74,7 +74,8 @@ namespace Kerberos
 	static void SerializeEntity(YAML::Emitter& out, const Entity entity)
 	{
 		out << YAML::BeginMap;
-		out << YAML::Key << "Entity" << YAML::Value << static_cast<uint32_t>(entity);
+
+		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
 
 		if (entity.HasComponent<TagComponent>())
 		{
@@ -140,11 +141,11 @@ namespace Kerberos
 			out << YAML::Key << "HierarchyComponent";
 			out << YAML::BeginMap;
 			const auto& hierarchy = entity.GetComponent<HierarchyComponent>();
-			out << YAML::Key << "Parent" << YAML::Value << static_cast<uint32_t>(hierarchy.Parent);
+			out << YAML::Key << "Parent" << YAML::Value << hierarchy.Parent;
 			out << YAML::Key << "Children" << YAML::Value << YAML::BeginSeq;
 			for (const auto& child : hierarchy.Children)
 			{
-				out << static_cast<uint32_t>(child);
+				out << child;
 			}
 			out << YAML::EndSeq;
 			out << YAML::EndMap;
@@ -285,13 +286,13 @@ namespace Kerberos
 		{
 			for (const auto& entity : entities)
 			{
-				uint32_t id = entity["Entity"].as<uint32_t>();
+				uint64_t uuid = entity["Entity"].as<uint64_t>();
 				std::string tag;
 				if (entity["TagComponent"])
 					tag = entity["TagComponent"]["Tag"].as<std::string>();
 
 				/// Create the entity with the given tag and id
-				Entity deserializedEntity = m_Scene->CreateEntity(tag, id);
+				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(tag, uuid);
 
 				if (auto transformComponent = entity["TransformComponent"])
 				{
@@ -330,11 +331,12 @@ namespace Kerberos
 				{
 					/// The entity must have a HierarchyComponent already when created
 					auto& hierarchy = deserializedEntity.GetComponent<HierarchyComponent>();
-					const uint32_t parentId = hierarchyComponent["Parent"].as<uint32_t>();
-					hierarchy.Parent = Entity{ static_cast<entt::entity>(parentId), m_Scene };
+					const uint64_t parentId = hierarchyComponent["Parent"].as<uint64_t>();
+					hierarchy.Parent = UUID(parentId);
 					for (const auto& child : hierarchyComponent["Children"])
 					{
-						hierarchy.Children.emplace_back(static_cast<entt::entity>(child.as<uint32_t>()), m_Scene);
+						const uint64_t childUUID = child.as<uint64_t>();
+						hierarchy.Children.emplace_back(childUUID);
 					}
 				}
 

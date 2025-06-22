@@ -6,6 +6,7 @@
 #include "Kerberos/Core.h"
 #include "Kerberos/Log.h"
 #include "Kerberos/Layer.h"
+#include "Kerberos/Core/UUID.h"
 
 #include "Kerberos/Core/Timestep.h"
 #include "Kerberos/Core/Timer.h"

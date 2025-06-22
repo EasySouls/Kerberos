@@ -20,6 +20,26 @@ namespace Kerberos
 
 		operator uint64_t() const { return m_UUID; }
 
+		bool operator==(const UUID& other) const
+		{
+			return m_UUID == other.m_UUID;
+		}
+
+		bool operator!=(const UUID& other) const
+		{
+			return !(*this == other);
+		}
+
+		static UUID Invalid()
+		{
+			return UUID(0);
+		}
+
+		inline bool IsValid() const 
+		{
+			return m_UUID != 0;
+		}
+
 	private:
 		uint64_t m_UUID;
 	};

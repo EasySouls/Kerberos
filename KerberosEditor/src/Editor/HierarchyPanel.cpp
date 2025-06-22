@@ -140,7 +140,7 @@ namespace Kerberos
 			| (entity == m_SelectedEntity ? ImGuiTreeNodeFlags_Selected : 0);
 
 		/// The entity's identifier serves as the unique ID for the ImGui tree node
-		const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, "%s", tag.c_str());
+		const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint64_t>(entity.GetUUID())), flags, "%s", tag.c_str());
 
 		if (ImGui::IsItemClicked())
 		{
@@ -160,7 +160,7 @@ namespace Kerberos
 
 		if (opened)
 		{
-			for (Entity child : m_Context->GetChildren(entity))
+			for (const Entity& child : m_Context->GetChildren(entity))
 			{
 				DrawEntityNode(child);
 			}
@@ -181,7 +181,7 @@ namespace Kerberos
 	static void DrawVec3Control(const std::string& label, glm::vec3& values, const float resetValue = 0.0f, const float columnWidth = 80.0f)
 	{
 		const ImGuiIO& io = ImGui::GetIO();
-		auto boldFont = io.Fonts->Fonts[1];
+		const auto boldFont = io.Fonts->Fonts[1];
 
 		ImGui::PushID(label.c_str());
 
