@@ -129,7 +129,7 @@ namespace Kerberos
 	}
 
 	static uint64_t s_FrameCount = 0;
-	static constexpr int s_TransformCalculationFramespan = 5;
+	static constexpr int s_TransformCalculationFramespan = 3;
 
 	void EditorLayer::OnUpdate(const Timestep deltaTime)
 	{
