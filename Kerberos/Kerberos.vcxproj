@@ -172,6 +172,8 @@
     <ClInclude Include="src\Kerberos\LayerStack.h" />
     <ClInclude Include="src\Kerberos\Log.h" />
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
+    <ClInclude Include="src\Kerberos\Project\Project.h" />
+    <ClInclude Include="src\Kerberos\Project\ProjectSerializer.h" />
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h" />
     <ClInclude Include="src\Kerberos\Renderer\Camera.h" />
     <ClInclude Include="src\Kerberos\Renderer\Framebuffer.h" />
@@ -245,6 +247,8 @@
     <ClCompile Include="src\Kerberos\LayerStack.cpp" />
     <ClCompile Include="src\Kerberos\Log.cpp" />
     <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp" />
+    <ClCompile Include="src\Kerberos\Project\Project.cpp" />
+    <ClCompile Include="src\Kerberos\Project\ProjectSerializer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Mesh.cpp" />
