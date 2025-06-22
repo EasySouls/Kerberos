@@ -184,6 +184,21 @@ namespace Kerberos
 		};
 	}
 
+	static JPH::ObjectLayer GetObjectLayerFromComponent(const RigidBody3DComponent::BodyType& type)
+	{
+		switch (type)
+		{		
+		case RigidBody3DComponent::BodyType::Static:
+			return Physics::Layers::NON_MOVING;
+		case RigidBody3DComponent::BodyType::Kinematic:
+		case RigidBody3DComponent::BodyType::Dynamic:
+			return Physics::Layers::MOVING;
+		default:
+			KBR_CORE_ASSERT(false, "Unknown body type!");
+			return Physics::Layers::NON_MOVING;
+		}
+	}
+
 	Scene::Scene()
 	{
 		m_Registry = entt::basic_registry();
@@ -322,7 +337,7 @@ namespace Kerberos
 				);
 				const JPH::Quat rotation = JPH::Quat::sEulerAngles(rotationAngles);
 
-				JPH::BodyCreationSettings bodySettings(shape, position, rotation, GetBodyTypeFromComponent(rigidBody.Type), Physics::Layers::MOVING);
+				JPH::BodyCreationSettings bodySettings(shape, position, rotation, GetBodyTypeFromComponent(rigidBody.Type), GetObjectLayerFromComponent(rigidBody.Type));
 				JPH::Body* body = bodyInterface.CreateBody(bodySettings);
 
 				rigidBody.RuntimeBody = body;
