@@ -150,7 +150,7 @@ namespace Kerberos
 			// See: ContactListener
 			virtual JPH::ValidateResult	OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult) override
 			{
-				std::cout << "Contact validate callback" << '\n';
+				KBR_CORE_TRACE("Contact validate callback: {} - {}", inBody1.GetID().GetIndex(), inBody2.GetID().GetIndex());
 
 				// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
 				return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
@@ -158,17 +158,17 @@ namespace Kerberos
 
 			virtual void OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override
 			{
-				std::cout << "A contact was added" << '\n';
+				KBR_CORE_TRACE("A contact was added: {} - {}", inBody1.GetID().GetIndex(), inBody2.GetID().GetIndex());
 			}
 
 			virtual void OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override
 			{
-				std::cout << "A contact was persisted" << '\n';
+				KBR_CORE_TRACE("A contact was persisted: {} - {}", inBody1.GetID().GetIndex(), inBody2.GetID().GetIndex());
 			}
 
 			virtual void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override
 			{
-				std::cout << "A contact was removed" << '\n';
+				KBR_CORE_TRACE("A contact was removed: {} - {}", inSubShapePair.GetBody1ID().GetIndex(), inSubShapePair.GetBody2ID().GetIndex());
 			}
 		};
 
@@ -178,12 +178,13 @@ namespace Kerberos
 		public:
 			virtual void OnBodyActivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData) override
 			{
-				std::cout << "A body got activated" << '\n';
+				KBR_CORE_TRACE("A body got activated: {}", inBodyID.GetIndex());
 			}
 
 			virtual void OnBodyDeactivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData) override
 			{
-				std::cout << "A body went to sleep" << '\n';
+				KBR_CORE_TRACE("A body went to sleep: {}", inBodyID.GetIndex());
+
 			}
 		};
 	}
@@ -238,16 +239,16 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		// Register allocation hook. In this example we'll just let Jolt use malloc / free but you can override these if you want (see Memory.h).
-	// This needs to be done before any other Jolt function is called.
+		// This needs to be done before any other Jolt function is called.
 		JPH::RegisterDefaultAllocator();
 
 		// Install trace and assert callbacks
 		JPH::Trace = TraceImpl;
 		JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = AssertFailedImpl;)
 
-			// Create a factory, this class is responsible for creating instances of classes based on their name or hash and is mainly used for deserialization of saved data.
-			// It is not directly used in this example but still required.
-			JPH::Factory::sInstance = new JPH::Factory();
+		// Create a factory, this class is responsible for creating instances of classes based on their name or hash and is mainly used for deserialization of saved data.
+		// It is not directly used in this example but still required.
+		JPH::Factory::sInstance = new JPH::Factory();
 
 		// Register all physics types with the factory and install their collision handlers with the CollisionDispatch class.
 		// If you have your own custom shape types you probably need to register their handlers with the CollisionDispatch before calling this function.
@@ -268,7 +269,7 @@ namespace Kerberos
 		m_PhysicsJobSystem = new JPH::JobSystemThreadPool(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, static_cast<int>(std::thread::hardware_concurrency()) - 1);
 
 		// This is the max amount of rigid bodies that you can add to the physics system. If you try to add more you'll get an error.
-	// Note: This value is low because this is a simple test. For a real project use something in the order of 65536.
+		// Note: This value is low because this is a simple test. For a real project use something in the order of 65536.
 		constexpr uint32_t cMaxBodies = 1024;
 
 		// This determines how many mutexes to allocate to protect rigid bodies from concurrent access. Set it to 0 for the default settings.
