@@ -251,7 +251,8 @@ namespace Kerberos
 				if (entity["TagComponent"])
 					tag = entity["TagComponent"]["Tag"].as<std::string>();
 
-				Entity deserializedEntity = m_Scene->CreateEntity(tag);
+				/// Create the entity with the given tag and id
+				Entity deserializedEntity = m_Scene->CreateEntity(tag, id);
 
 				if (auto transformComponent = entity["TransformComponent"])
 				{

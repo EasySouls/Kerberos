@@ -437,6 +437,18 @@ namespace Kerberos
 		return entity;
 	}
 
+	Entity Scene::CreateEntity(const std::string& name, uint32_t id)
+	{
+		Entity entity = { m_Registry.create(static_cast<entt::entity>(id)), this };
+		entity.AddComponent<TransformComponent>();
+		entity.AddComponent<HierarchyComponent>();
+
+		auto& tag = entity.AddComponent<TagComponent>();
+		tag.Tag = name.empty() ? "Entity" : name;
+
+		return entity;
+	}
+
 	void Scene::DestroyEntity(const Entity entity) 
 	{
 		m_Registry.destroy(static_cast<entt::entity>(entity));

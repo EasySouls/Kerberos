@@ -41,6 +41,8 @@ namespace Kerberos
 		 */
 		Entity CreateEntity(const std::string& name = std::string());
 
+		Entity CreateEntity(const std::string& name, uint32_t id);
+
 		/**
 		 * @brief Destroy an entity in the scene
 		 *
