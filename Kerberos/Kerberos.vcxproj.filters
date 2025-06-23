@@ -84,6 +84,9 @@
     <ClInclude Include="src\Kerberos\Core\Timestep.h">
       <Filter>src\Kerberos\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Core\UUID.h">
+      <Filter>src\Kerberos\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Debug\Instrumentor.h">
       <Filter>src\Kerberos\Debug</Filter>
     </ClInclude>
@@ -300,7 +303,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Core\UUID.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -311,6 +313,9 @@
     </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\Model.cpp">
       <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Core\UUID.cpp">
+      <Filter>src\Kerberos\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp">
       <Filter>src\Kerberos\ImGui</Filter>
@@ -480,6 +485,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Core\UUID.cpp" />
   </ItemGroup>
 </Project>

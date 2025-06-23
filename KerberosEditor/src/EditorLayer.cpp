@@ -15,8 +15,7 @@ namespace Kerberos
 {
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f)
-	{
-	}
+	{}
 
 	void EditorLayer::OnAttach()
 	{
@@ -53,22 +52,32 @@ namespace Kerberos
 
 		const auto skymapTexture = Texture2D::Create("assets/textures/starmap_cubemap_1.png");
 
-		Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
-		const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
-		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
-		cubeEntity.GetComponent<TransformComponent>().Translation = { -2.0f, 1.0f, -2.0f };
-		cubeEntity.AddComponent<BoxCollider3DComponent>();
-		cubeEntity.AddComponent<RigidBody3DComponent>();
+		{
+			Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
+			const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
+			cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
+			auto& transform = cubeEntity.GetComponent<TransformComponent>();
+			transform.Translation = { -2.0f, 2.0f, -2.0f };
+			transform.Rotation = { 20, 10, 86 };
+			cubeEntity.AddComponent<BoxCollider3DComponent>();
+			cubeEntity.AddComponent<RigidBody3DComponent>();
+		}
 
-		Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
-		const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
-		sphereEntity.AddComponent<StaticMeshComponent>(sphereMesh, whiteMaterial, m_Texture);
-		sphereEntity.GetComponent<TransformComponent>().Translation = { 2.0f, 1.2f, -2.0f };
+		{
+			Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
+			const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
+			sphereEntity.AddComponent<StaticMeshComponent>(sphereMesh, whiteMaterial, m_Texture);
+			sphereEntity.GetComponent<TransformComponent>().Translation = { 2.0f, 1.2f, -2.0f };
+		}
 
-		Entity planeEntity = m_ActiveScene->CreateEntity("Plane");
-		const Ref<Mesh> planeMesh = Mesh::CreatePlane(10.0f, 10.0f);
-		planeEntity.AddComponent<StaticMeshComponent>(planeMesh, whiteMaterial, nullptr);
-		planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, -1.0f, 0.0f };
+		{
+			Entity planeEntity = m_ActiveScene->CreateEntity("Plane");
+			const Ref<Mesh> planeMesh = Mesh::CreatePlane(10.0f, 10.0f);
+			planeEntity.AddComponent<StaticMeshComponent>(planeMesh, whiteMaterial, nullptr);
+			planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, -1.0f, 0.0f };
+			planeEntity.AddComponent<RigidBody3DComponent>().Type = RigidBody3DComponent::BodyType::Static;
+			planeEntity.AddComponent<BoxCollider3DComponent>().Size = { 10.f, 0.01f, 10.f };
+		}
 
 		m_SunlightEntity = m_ActiveScene->CreateEntity("Sun");
 		auto& sunlightComponent = m_SunlightEntity.AddComponent<DirectionalLightComponent>();
@@ -641,6 +650,20 @@ namespace Kerberos
 		ImGui::End();
 	}
 
+	void EditorLayer::NewProject()
+	{
+		Project::New();
+	}
+
+	void EditorLayer::OpenProject(const std::filesystem::path& filepath)
+	{
+		if (const auto project = Project::Load(filepath))
+		{
+			const auto startScenePath = Project::GetAssetDirectory() / project->GetInfo().StartScenePath;
+			OpenScene(startScenePath);
+		}
+	}
+
 	void EditorLayer::SaveScene()
 	{
 		const std::filesystem::path scenePath = "assets/scenes/Example.kerberos";
@@ -663,9 +686,9 @@ namespace Kerberos
 
 	void EditorLayer::LoadScene()
 	{
-		const std::string filepath = FileDialog::OpenFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
+		const std::string filepathString = FileDialog::OpenFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
 
-		if (filepath.empty())
+		if (filepathString.empty())
 			return;
 
 		/// Create a new scene, since otherwise the deserialized entities would be added to the current scene
@@ -674,11 +697,22 @@ namespace Kerberos
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
 		const SceneSerializer serializer(m_ActiveScene);
-		/// TODO: We need to convert the filepath to a relative path, so that it works on all platforms
-		if (!serializer.Deserialize("assets/scenes/Example.kerberos"))
+		if (!serializer.Deserialize(filepathString))
 		{
-			KBR_ERROR("Failed to load scene from {0}", filepath);
+			KBR_ERROR("Failed to load scene from {0}", filepathString);
 		}
 	}
 
+	void EditorLayer::OpenScene(const std::filesystem::path& filepath)
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+		m_HierarchyPanel.SetContext(m_ActiveScene);
+
+		const SceneSerializer serializer(m_ActiveScene);
+		if (!serializer.Deserialize(filepath))
+		{
+			KBR_ERROR("Failed to load scene from {0}", filepath.string());
+		}
+	}
 }

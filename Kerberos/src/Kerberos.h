@@ -59,3 +59,7 @@
 #include "Kerberos/Assets/Model.h"
 //#include "Kerberos/Assets/AssetManager.h"
 /// ---------------------------------
+
+/// ---- Project --------------------
+#include "Kerberos/Project/Project.h"
+/// ---------------------------------

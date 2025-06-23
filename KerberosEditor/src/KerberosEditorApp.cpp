@@ -19,6 +19,9 @@ namespace Kerberos
 
 	Application* CreateApplication()
 	{
+		Project::New();
+		Project::SaveActive("World3D.kbrproj");
+
 		return new KerberosEditorApp();
 	}
 }
