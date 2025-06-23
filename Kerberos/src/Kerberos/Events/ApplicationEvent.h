@@ -2,34 +2,36 @@
 
 #include "Event.h"
 
+#include <filesystem>
+
 namespace Kerberos
 {
 
-	class WindowResizeEvent : public Event
+	class WindowResizeEvent final : public Event
 	{
 	public:
-		WindowResizeEvent(unsigned int width, unsigned int height)
-			: _width(width), _height(height)
+		WindowResizeEvent(const unsigned int width, const unsigned int height)
+			: m_Width(width), m_Height(height)
 		{
 		}
 
-		unsigned int GetWidth() const { return _width; }
-		unsigned int GetHeight() const { return _height; }
+		unsigned int GetWidth() const { return m_Width; }
+		unsigned int GetHeight() const { return m_Height; }
 
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "WindowResizeEvent: " << _width << ", " << _height;
+			ss << "WindowResizeEvent: " << m_Width << ", " << m_Height;
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(WindowResize)
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	private:
-		unsigned int _width, _height;
+		unsigned int m_Width, m_Height;
 	};
 
-	class WindowCloseEvent : public Event
+	class WindowCloseEvent final : public Event
 	{
 	public:
 		WindowCloseEvent() = default;
@@ -38,7 +40,38 @@ namespace Kerberos
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class AppTickEvent : public Event
+	class WindowDropEvent final : public Event
+	{
+	public:
+		explicit WindowDropEvent(const std::vector<std::filesystem::path>& paths)
+			: m_Paths(paths)
+		{}
+
+		explicit WindowDropEvent(std::vector<std::filesystem::path>&& paths)
+			: m_Paths(std::move(paths))
+		{}
+
+		const std::vector<std::filesystem::path>& GetPaths() { return m_Paths; }
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "WindowDropEvent: ";
+			for (auto& path : m_Paths)
+			{
+				ss << " " << path.string();
+			}
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(WindowDrop)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+	private:
+		std::vector<std::filesystem::path> m_Paths;
+	};
+
+	class AppTickEvent final : public Event
 	{
 	public:
 		AppTickEvent() = default;
@@ -47,7 +80,7 @@ namespace Kerberos
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class AppUpdateEvent : public Event
+	class AppUpdateEvent final : public Event
 	{
 	public:
 		AppUpdateEvent() = default;
@@ -56,7 +89,7 @@ namespace Kerberos
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class AppRenderEvent : public Event
+	class AppRenderEvent final : public Event
 	{
 	public:
 		AppRenderEvent() = default;

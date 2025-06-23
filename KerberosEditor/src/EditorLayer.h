@@ -24,6 +24,7 @@ namespace Kerberos
 	private:
 		bool OnKeyPressed(const KeyPressedEvent& event);
 		bool OnMouseButtonPressed(const MouseButtonPressedEvent& event);
+		bool OnWindowDrop(const WindowDropEvent& event);
 
 		void OnScenePlay();
 		void OnSceneStop();

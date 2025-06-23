@@ -22,6 +22,9 @@
     <Filter Include="src\Kerberos\ImGui">
       <UniqueIdentifier>{035609E0-EF39-CA35-589A-C488449DB4B7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Kerberos\Project">
+      <UniqueIdentifier>{5F1F0631-4BAE-8FFA-F4CC-A3F5E03AA0A0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Kerberos\Renderer">
       <UniqueIdentifier>{DF21D73E-4B8E-9239-1482-2A9780ADB4A1}</UniqueIdentifier>
     </Filter>
@@ -119,6 +122,12 @@
     </ClInclude>
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h">
       <Filter>src\Kerberos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Project\Project.h">
+      <Filter>src\Kerberos\Project</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Project\ProjectSerializer.h">
+      <Filter>src\Kerberos\Project</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h">
       <Filter>src\Kerberos\Renderer</Filter>
@@ -334,6 +343,12 @@
     </ClCompile>
     <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp">
       <Filter>src\Kerberos</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Project\Project.cpp">
+      <Filter>src\Kerberos\Project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Project\ProjectSerializer.cpp">
+      <Filter>src\Kerberos\Project</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Buffer.cpp">
       <Filter>src\Kerberos\Renderer</Filter>

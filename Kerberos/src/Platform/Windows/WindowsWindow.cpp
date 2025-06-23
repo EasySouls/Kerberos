@@ -198,6 +198,20 @@ namespace Kerberos
 				MouseMovedEvent event(static_cast<float>(xPos), static_cast<float>(yPos));
 				data.EventCallback(event);
 			});
+
+		glfwSetDropCallback(m_Window, [](GLFWwindow* window, const int pathCount, const char* paths[])
+			{
+				const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+
+				std::vector<std::filesystem::path> filepaths(pathCount);
+				for (int i = 0; i < pathCount; ++i)
+				{
+					filepaths[i] = paths[i];
+				}
+
+				WindowDropEvent event(std::move(filepaths));
+				data.EventCallback(event);
+			});
 	}
 
 	void WindowsWindow::Shutdown() 

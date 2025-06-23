@@ -494,6 +494,7 @@ namespace Kerberos
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(KBR_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(KBR_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+		dispatcher.Dispatch<WindowDropEvent>(KBR_BIND_EVENT_FN(EditorLayer::OnWindowDrop));
 	}
 
 	bool EditorLayer::OnKeyPressed(const KeyPressedEvent& event)
@@ -558,6 +559,12 @@ namespace Kerberos
 		{
 			m_HierarchyPanel.SetSelectedEntity(m_HoveredEntity);
 		}
+		return false;
+	}
+
+	bool EditorLayer::OnWindowDrop(const WindowDropEvent& event) 
+	{
+		/// TODO: Implement when asset manager is done
 		return false;
 	}
 
