@@ -152,6 +152,8 @@
   <ItemGroup>
     <ClInclude Include="src\Kerberos\Assets\Asset.h" />
     <ClInclude Include="src\Kerberos\Assets\AssetManager.h" />
+    <ClInclude Include="src\Kerberos\Assets\AssetMetadata.h" />
+    <ClInclude Include="src\Kerberos\Assets\AssetRegistry.h" />
     <ClInclude Include="src\Kerberos\Assets\EditorAssetManager.h" />
     <ClInclude Include="src\Kerberos\Assets\RuntimeAssetManager.h" />
     <ClInclude Include="src\Kerberos.h" />
@@ -242,6 +244,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Assets\AssetManager.cpp" />
+    <ClCompile Include="src\Kerberos\Assets\AssetRegistry.cpp" />
     <ClCompile Include="src\Kerberos\Assets\EditorAssetManager.cpp" />
     <ClCompile Include="src\Kerberos\Assets\RuntimeAssetManager.cpp" />
     <ClCompile Include="src\Kerberos\Application.cpp" />

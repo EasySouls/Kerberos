@@ -2,6 +2,8 @@
 
 #include "Kerberos/Core.h"
 #include "Kerberos/Assets/AssetManagerBase.h"
+#include "Kerberos/Assets/EditorAssetManager.h"
+#include "Kerberos/Assets/RuntimeAssetManager.h"
 
 #include <filesystem>
 
@@ -47,10 +49,12 @@ namespace Kerberos
 		}
 
 		ProjectInfo& GetInfo() { return m_Info; }
-
+		
 		static Ref<Project> GetActive() { return s_ActiveProject; }
 
-		Ref<AssetManagerBase> GetAssetManager() { return m_AssetManager; }
+		Ref<AssetManagerBase> GetAssetManager() const { return m_AssetManager; }
+		Ref<EditorAssetManager> GetEditorAssetManager() const { return std::static_pointer_cast<EditorAssetManager>(m_AssetManager); }
+		Ref<RuntimeAssetManager> GetRuntimeAssetManager() const { return std::static_pointer_cast<RuntimeAssetManager>(m_AssetManager); }
 
 	private:
 		ProjectInfo m_Info;

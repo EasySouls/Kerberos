@@ -239,6 +239,10 @@ namespace Kerberos
 		glm::vec3 Velocity = glm::vec3(0.0f);
 		glm::vec3 AngularVelocity = glm::vec3(0.0f);
 		bool UseGravity = true;
+		/// Between 0 and 1
+		float Friction = 0.5f;
+		/// Between 0 and 1
+		float Restitution = 0.5f;
 
 		/// Pointer to the physics engine's runtime body
 		void* RuntimeBody = nullptr; 

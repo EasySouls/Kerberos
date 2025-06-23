@@ -718,6 +718,8 @@ namespace Kerberos
 					ImGui::EndCombo();
 				}
 
+				ImGui::DragFloat("Friction", &rb.Friction, 0.02f, 0.0f, 1.0f);
+				ImGui::DragFloat("Restitution", &rb.Restitution, 0.02f, 0.0f, 1.0f);
 				ImGui::DragFloat3("Velocity", glm::value_ptr(rb.Velocity), 0.1f);
 				ImGui::DragFloat3("Angular Velocity", glm::value_ptr(rb.AngularVelocity));
 				ImGui::Checkbox("Use Gravity", &rb.UseGravity);

@@ -412,6 +412,9 @@ namespace Kerberos
 				JPH::BodyCreationSettings bodySettings(shape, position, rotation, GetBodyTypeFromComponent(rigidBody.Type), GetObjectLayerFromComponent(rigidBody.Type));
 				JPH::Body* body = bodyInterface.CreateBody(bodySettings);
 
+				body->SetRestitution(rigidBody.Restitution);
+				body->SetFriction(rigidBody.Friction);
+
 				rigidBody.RuntimeBody = body;
 
 				const auto& bodyID = body->GetID();
