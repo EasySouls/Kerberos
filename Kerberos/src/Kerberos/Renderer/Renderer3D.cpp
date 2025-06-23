@@ -195,9 +195,8 @@ namespace Kerberos
 		
 		if (!sun)
 		{
-			KBR_CORE_WARN("No sun light provided! Defaulting to a white directional light.");
-			s_RendererData.LightsData.SunLight = DirectionalLight{.IsEnabled = true, .Direction = {1.0f, 1.0f, 1.0f },
-				.Color = { 1.0f, 1.0f, 1.0f } };
+
+			s_RendererData.LightsData.SunLight = DirectionalLight{.IsEnabled = false};
 		}
 		else
 		{
