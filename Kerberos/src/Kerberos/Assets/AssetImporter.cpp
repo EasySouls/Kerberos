@@ -1,0 +1,28 @@
+#include "kbrpch.h"
+#include "AssetImporter.h"
+
+#include "TextureImporter.h"
+#include "Kerberos/Renderer/Texture.h"
+
+namespace Kerberos
+{
+	Ref<Asset> AssetImporter::ImportAsset(const AssetHandle handle, const AssetMetadata& metadata) 
+	{
+		switch (metadata.Type)
+		{
+		case AssetType::Texture2D:
+			return TextureImporter::ImportTexture(handle, metadata);
+		case AssetType::TextureCube:
+			break;
+		case AssetType::Material:
+			break;
+		case AssetType::Mesh:
+			break;
+		case AssetType::Scene:
+			break;
+		}
+
+		KBR_CORE_ASSERT(false, "Unsupported asset type by AssetImporter!");
+		return nullptr;
+	}
+}

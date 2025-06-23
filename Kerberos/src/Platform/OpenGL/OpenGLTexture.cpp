@@ -22,8 +22,8 @@ namespace Kerberos
 	
 		KBR_ASSERT(data, "Failed to load image!")
 
-		m_Width = static_cast<unsigned int>(width);
-		m_Height = static_cast<unsigned int>(height);
+		m_Spec.Width = static_cast<unsigned int>(width);
+		m_Spec.Height = static_cast<unsigned int>(height);
 
 		/// Internal format is how OpenGl will store the texture data internally (in the GPU)
 		GLenum internalFormat = 0;
@@ -47,7 +47,7 @@ namespace Kerberos
 		m_DataFormat = dataFormat;
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-		glTextureStorage2D(m_RendererID, 1, internalFormat, static_cast<int>(m_Width), static_cast<int>(m_Height));
+		glTextureStorage2D(m_RendererID, 1, internalFormat, static_cast<int>(m_Spec.Width), static_cast<int>(m_Spec.Height));
 
 		/// Set the texture wrapping/filtering options (on the currently bound texture object)
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -58,8 +58,8 @@ namespace Kerberos
 			0, 
 			0, 
 			0, 
-			static_cast<int>(m_Width), 
-			static_cast<int>(m_Height), 
+			static_cast<int>(m_Spec.Width), 
+			static_cast<int>(m_Spec.Height), 
 			dataFormat, 
 			GL_UNSIGNED_BYTE, 
 			data);
@@ -67,8 +67,8 @@ namespace Kerberos
 		stbi_image_free(data);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(const uint32_t width, const uint32_t height)
-		: m_Width(width), m_Height(height)
+	OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec)
+		: m_Spec(spec)
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -78,7 +78,7 @@ namespace Kerberos
 		constexpr GLenum dataFormat = GL_RGBA;
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-		glTextureStorage2D(m_RendererID, 1, internalFormat, static_cast<int>(m_Width), static_cast<int>(m_Height));
+		glTextureStorage2D(m_RendererID, 1, internalFormat, static_cast<int>(m_Spec.Width), static_cast<int>(m_Spec.Height));
 
 		m_InternalFormat = internalFormat;
 		m_DataFormat = dataFormat;
@@ -107,8 +107,8 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		const uint32_t bytesPerPixel = m_DataFormat == GL_RGBA ? 4 : 3;
-		KBR_CORE_ASSERT(size == m_Width * m_Height * bytesPerPixel, "Data must be the entire texture!");
+		KBR_CORE_ASSERT(size == m_Spec.Width * m_Spec.Height * bytesPerPixel, "Data must be the entire texture!");
 
-		glTextureSubImage2D(m_RendererID, 0, 0, 0, static_cast<int>(m_Width), static_cast<int>(m_Height), m_DataFormat, GL_UNSIGNED_BYTE, data);
+		glTextureSubImage2D(m_RendererID, 0, 0, 0, static_cast<int>(m_Spec.Width), static_cast<int>(m_Spec.Height), m_DataFormat, GL_UNSIGNED_BYTE, data);
 	}
 }

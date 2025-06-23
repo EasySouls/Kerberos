@@ -62,8 +62,8 @@ namespace Kerberos
 
 		KBR_ASSERT(imageData, "Failed to load image!")
 
-		m_Width = static_cast<uint32_t>(width);
-		m_Height = static_cast<uint32_t>(height);
+		m_Spec.Width = static_cast<uint32_t>(width);
+		m_Spec.Height = static_cast<uint32_t>(height);
 
 		m_Format = DXGI_FORMAT_UNKNOWN;
 		if (channels == 4) /// RGBA
@@ -78,8 +78,8 @@ namespace Kerberos
 
 		D3D11_TEXTURE2D_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.Width = m_Width;
-		desc.Height = m_Height;
+		desc.Width = m_Spec.Width;
+		desc.Height = m_Spec.Height;
 		desc.MipLevels = 1;
 		desc.ArraySize = 1;
 		desc.Format = m_Format;
@@ -90,7 +90,7 @@ namespace Kerberos
 
 		D3D11_SUBRESOURCE_DATA resData;
 		resData.pSysMem = imageData;
-		resData.SysMemPitch = m_Width * (channels == 4 ? 4 : 3);
+		resData.SysMemPitch = m_Spec.Width * (channels == 4 ? 4 : 3);
 		resData.SysMemSlicePitch = 0;
 
 		const auto device = D3D11Context::Get().GetDevice();
@@ -122,8 +122,8 @@ namespace Kerberos
 		stbi_image_free(imageData);
 	}
 
-	D3D11Texture2D::D3D11Texture2D(const uint32_t width, const uint32_t height)
-		: m_Width(width), m_Height(height)
+	D3D11Texture2D::D3D11Texture2D(const TextureSpecification& spec)
+		: m_Spec(spec)
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -132,8 +132,8 @@ namespace Kerberos
 
 		D3D11_TEXTURE2D_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.Width = m_Width;
-		desc.Height = m_Height;
+		desc.Width = m_Spec.Width;
+		desc.Height = m_Spec.Height;
 		desc.MipLevels = 1;
 		desc.ArraySize = 1;
 		desc.Format = m_Format;
@@ -150,7 +150,7 @@ namespace Kerberos
 		HRESULT hr = device->CreateTexture2D(&desc, nullptr, m_Texture.GetAddressOf());
 		if (FAILED(hr))
 		{
-			KBR_ERROR("Failed to create texture with dimensions {0}x{1}", m_Width, m_Height);
+			KBR_ERROR("Failed to create texture with dimensions {0}x{1}", m_Spec.Width, m_Spec.Height);
 			return;
 		}
 
@@ -190,8 +190,8 @@ namespace Kerberos
 			m_SamplerState.Reset();
 		}
 		m_RendererID = 0;
-		m_Width = 0;
-		m_Height = 0;
+		m_Spec.Width = 0;
+		m_Spec.Height = 0;
 	}
 
 	void D3D11Texture2D::Bind(const uint32_t slot) const
@@ -222,10 +222,10 @@ namespace Kerberos
 
 		const uint32_t bytesPerPixel = Utils::GetBytesPerPixel(m_Format);
 
-		KBR_CORE_ASSERT(size == m_Width * m_Height * bytesPerPixel, "Data size does not match texture size.");
+		KBR_CORE_ASSERT(size == m_Spec.Width * m_Spec.Height * bytesPerPixel, "Data size does not match texture size.");
 
 		const auto context = D3D11Context::Get().GetImmediateContext();
-		const uint32_t rowPitch = m_Width * bytesPerPixel;
+		const uint32_t rowPitch = m_Spec.Width * bytesPerPixel;
 		context->UpdateSubresource(m_Texture.Get(), 0, nullptr, data, rowPitch, 0);
 	}
 }

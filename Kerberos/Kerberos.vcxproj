@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Kerberos\Assets\Asset.h" />
+    <ClInclude Include="src\Kerberos\Assets\AssetImporter.h" />
     <ClInclude Include="src\Kerberos\Assets\AssetManager.h" />
     <ClInclude Include="src\Kerberos\Assets\AssetMetadata.h" />
     <ClInclude Include="src\Kerberos\Assets\AssetRegistry.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="src\Kerberos\Application.h" />
     <ClInclude Include="src\Kerberos\Assets\AssetManagerBase.h" />
     <ClInclude Include="src\Kerberos\Assets\Model.h" />
+    <ClInclude Include="src\Kerberos\Assets\TextureImporter.h" />
     <ClInclude Include="src\Kerberos\Core.h" />
     <ClInclude Include="src\Kerberos\Core\Input.h" />
     <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
@@ -243,6 +245,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Kerberos\Assets\AssetImporter.cpp" />
     <ClCompile Include="src\Kerberos\Assets\AssetManager.cpp" />
     <ClCompile Include="src\Kerberos\Assets\AssetRegistry.cpp" />
     <ClCompile Include="src\Kerberos\Assets\EditorAssetManager.cpp" />
@@ -250,6 +253,7 @@
     <ClCompile Include="src\Kerberos\Application.cpp" />
     <ClCompile Include="src\Kerberos\Assets\AssetManagerBase.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Model.cpp" />
+    <ClCompile Include="src\Kerberos\Assets\TextureImporter.cpp" />
     <ClCompile Include="src\Kerberos\Core\UUID.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp" />

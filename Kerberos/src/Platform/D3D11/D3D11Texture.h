@@ -16,11 +16,12 @@ namespace Kerberos
 
 	public:
 		explicit D3D11Texture2D(const std::string& path);
-		explicit D3D11Texture2D(uint32_t width, uint32_t height);
+		explicit D3D11Texture2D(const TextureSpecification& spec);
 		~D3D11Texture2D() override;
 
-		uint32_t GetWidth() const override { return m_Width; }
-		uint32_t GetHeight() const override { return m_Height; }
+		uint32_t GetWidth() const override { return m_Spec.Width; }
+		uint32_t GetHeight() const override { return m_Spec.Height; }
+		const TextureSpecification& GetSpecification() const override { return m_Spec; }
 
 		RendererID GetRendererID() const override { return m_RendererID; }
 
@@ -33,10 +34,9 @@ namespace Kerberos
 			return m_RendererID == dynamic_cast<const D3D11Texture2D&>(other).m_RendererID;
 		}
 
-	private:
+private:
 		std::string m_Path;
-		uint32_t m_Width;
-		uint32_t m_Height;
+		TextureSpecification m_Spec;
 		RendererID m_RendererID;
 
 		//! D3D11 specific members

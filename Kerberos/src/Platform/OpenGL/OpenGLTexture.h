@@ -9,11 +9,12 @@ namespace Kerberos
 	{
 	public:
 		explicit OpenGLTexture2D(const std::string& path);
-		explicit OpenGLTexture2D(uint32_t width, uint32_t height);
+		explicit OpenGLTexture2D(const TextureSpecification& spec);
 		~OpenGLTexture2D() override;
 
-		uint32_t GetWidth() const override { return m_Width; }
-		uint32_t GetHeight() const override { return m_Height; }
+		uint32_t GetWidth() const override { return m_Spec.Width; }
+		uint32_t GetHeight() const override { return m_Spec.Height; }
+		const TextureSpecification& GetSpecification() const override { return m_Spec; }
 
 		uint64_t GetRendererID() const override { return m_RendererID; }
 		
@@ -28,10 +29,10 @@ namespace Kerberos
 
 	private:
 		std::string m_Path;
-		uint32_t m_Width;
-		uint32_t m_Height;
+		TextureSpecification m_Spec;
+		uint32_t m_RendererID;
+
 		GLenum m_InternalFormat;
 		GLenum m_DataFormat;
-		uint32_t m_RendererID;
 	};
 }

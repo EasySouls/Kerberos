@@ -1,6 +1,8 @@
 #include "kbrpch.h"
 #include "EditorAssetManager.h"
 
+#include "AssetImporter.h"
+
 namespace Kerberos
 {
 	Ref<Asset> EditorAssetManager::GetAsset(const AssetHandle handle) 
@@ -20,7 +22,11 @@ namespace Kerberos
 			if (!asset)
 			{
 				KBR_CORE_ERROR("Asset import failed!");
+				return nullptr;
 			}
+
+			/// Save the loaded asset
+			m_LoadedAssets[handle] = asset;
 		}
 
 		return asset;
