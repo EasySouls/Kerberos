@@ -688,7 +688,6 @@ namespace Kerberos
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
 		const SceneSerializer serializer(m_ActiveScene);
-		/// TODO: We need to convert the filepathString to a relative path, so that it works on all platforms
 		if (!serializer.Deserialize(filepathString))
 		{
 			KBR_ERROR("Failed to load scene from {0}", filepathString);
