@@ -194,14 +194,9 @@ namespace Kerberos
 		s_RendererData.pSunLight = sun;
 		
 		if (!sun)
-		{
-
 			s_RendererData.LightsData.SunLight = DirectionalLight{.IsEnabled = false};
-		}
 		else
-		{
 			s_RendererData.LightsData.SunLight = *sun;
-		}
 
 		s_RendererData.LightsData.NrOfPointLights = static_cast<int>(pointLights.size());
 		
@@ -235,7 +230,11 @@ namespace Kerberos
 
 		s_RendererData.pSunLight = sun;
 		
-		s_RendererData.LightsData.SunLight = *sun;
+		if (!sun)
+			s_RendererData.LightsData.SunLight = DirectionalLight{ .IsEnabled = false };
+		else
+			s_RendererData.LightsData.SunLight = *sun;
+
 		s_RendererData.LightsData.NrOfPointLights = static_cast<int>(pointLights.size());
 
 		for (size_t i = 0; i < pointLights.size(); ++i)

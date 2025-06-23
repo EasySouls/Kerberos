@@ -30,6 +30,12 @@ namespace Kerberos
 		std::ofstream fout(filepath);
 		fout << out.c_str();
 
+		if (fout.fail())
+		{
+			KBR_CORE_ERROR("Failed to write project file to '{}'", filepath.string());
+			return false;
+		}
+
 		return true;
 	}
 

@@ -13,13 +13,13 @@ namespace Kerberos
 
 	Ref<Project> Project::Load(const std::filesystem::path& filepath) 
 	{
-		const Ref<Project> loadedProject = CreateRef<Project>();
+		const Ref<Project> projectToLoad = CreateRef<Project>();
 
-		const ProjectSerializer deserializer(s_ActiveProject);
+		const ProjectSerializer deserializer(projectToLoad);
 		if (deserializer.Deserialize(filepath))
 		{
-			loadedProject->m_ProjectDirectory = filepath.parent_path();
-			s_ActiveProject = loadedProject;
+			projectToLoad->m_ProjectDirectory = filepath.parent_path();
+			s_ActiveProject = projectToLoad;
 			KBR_CORE_INFO("Project is loaded from {}", std::filesystem::absolute(filepath).string());
 			return s_ActiveProject;
 		}
