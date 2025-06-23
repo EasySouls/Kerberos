@@ -16,8 +16,9 @@
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
-
 #include "Jolt/Physics/Collision/Shape/BoxShape.h"
+
+#include <glm/gtx/matrix_decompose.hpp>
 
 #include <algorithm>
 
@@ -234,6 +235,45 @@ namespace Kerberos
 		return true;
 	};
 
+	inline glm::vec3 ToGlmVec3(const JPH::RVec3& v)
+	{
+		return glm::vec3(static_cast<float>(v.GetX()),
+			static_cast<float>(v.GetY()),
+			static_cast<float>(v.GetZ()));
+	}
+
+	inline glm::quat ToGlmQuat(const JPH::Quat& q)
+	{
+		return glm::quat(static_cast<float>(q.GetW()),
+			static_cast<float>(q.GetX()),
+			static_cast<float>(q.GetY()),
+			static_cast<float>(q.GetZ()));
+	}
+
+	static void ApplyJoltTransformToEntity(glm::mat4& worldTransform, const JPH::Body& body)
+	{
+		const JPH::RVec3 joltPosition = body.GetPosition();
+		const JPH::Quat joltRotation = body.GetRotation();
+
+		glm::vec3 position = ToGlmVec3(joltPosition);
+		glm::quat rotation = ToGlmQuat(joltRotation);
+
+		// Decompose the current transform to get the scale
+		glm::vec3 scale, skew;
+		glm::vec4 perspective;
+		glm::quat oldRotation;
+		glm::vec3 oldPosition;
+
+		glm::decompose(worldTransform, scale, oldRotation, oldPosition, skew, perspective);
+
+		// Rebuild world transform using physics position & rotation but keep original scale
+		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), position);
+		glm::mat4 rotationMatrix = glm::toMat4(rotation);
+		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scale);
+
+		worldTransform = translationMatrix * rotationMatrix * scaleMatrix;
+	}
+
 	void Scene::OnRuntimeStart()
 	{
 		KBR_PROFILE_FUNCTION();
@@ -321,18 +361,33 @@ namespace Kerberos
 
 		{
 			JPH::BodyInterface& bodyInterface = m_PhysicsSystem->GetBodyInterface();
-			const auto view = m_Registry.view<RigidBody3DComponent, BoxCollider3DComponent>();
+			const auto view = m_Registry.view<RigidBody3DComponent>();
 			for (const auto e : view)
 			{
 				Entity entity = { e, this };
 				auto& transform = entity.GetComponent<TransformComponent>();
-				auto [rigidBody, collider] = view.get<RigidBody3DComponent, BoxCollider3DComponent>(e);
+				auto& rigidBody = view.get<RigidBody3DComponent>(e);
 
-				JPH::BoxShapeSettings shapeSettings(JPH::Vec3(collider.Size.x, collider.Size.y, collider.Size.z));
-				shapeSettings.SetEmbedded();
+				JPH::ShapeRefC shape = nullptr;
 
-				JPH::ShapeSettings::ShapeResult shapeResult = shapeSettings.Create();
-				JPH::ShapeRefC shape = shapeResult.Get();
+				if (entity.HasComponent<BoxCollider3DComponent>())
+				{
+					auto& collider = entity.GetComponent<BoxCollider3DComponent>();
+					if (collider.Size.x > 0.0f && collider.Size.y > 0.0f && collider.Size.z > 0.0f)
+					{
+						JPH::BoxShapeSettings shapeSettings(JPH::Vec3(collider.Size.x, collider.Size.y, collider.Size.z));
+						shapeSettings.SetEmbedded();
+
+						JPH::ShapeSettings::ShapeResult shapeResult = shapeSettings.Create();
+						shape = shapeResult.Get();
+					}
+				}
+
+				if (!shape)
+				{
+					KBR_CORE_ERROR("RigidBody3DComponent on entity {} does not have a valid shape!", entity.GetComponent<TagComponent>().Tag);
+					continue;
+				}
 
 				const glm::vec4 worldPos = transform.WorldTransform[3];
 				const float posX = worldPos.x; //+ collider.Offset.x;
@@ -439,8 +494,8 @@ namespace Kerberos
 				if (rigidBody.RuntimeBody)
 				{
 					const JPH::Body* body = static_cast<JPH::Body*>(rigidBody.RuntimeBody);
-					const JPH::Vec3 position = body->GetPosition();
-					transform.WorldTransform[3] = glm::vec4(position.GetX(), position.GetY(), position.GetZ(), 1.0f);
+
+					ApplyJoltTransformToEntity(transform.WorldTransform, *body);
 				}
 			}
 		}
