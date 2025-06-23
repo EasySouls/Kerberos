@@ -15,8 +15,7 @@ namespace Kerberos
 {
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f)
-	{
-	}
+	{}
 
 	void EditorLayer::OnAttach()
 	{
@@ -53,22 +52,32 @@ namespace Kerberos
 
 		const auto skymapTexture = Texture2D::Create("assets/textures/starmap_cubemap_1.png");
 
-		Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
-		const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
-		cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
-		cubeEntity.GetComponent<TransformComponent>().Translation = { -2.0f, 1.0f, -2.0f };
-		cubeEntity.AddComponent<BoxCollider3DComponent>();
-		cubeEntity.AddComponent<RigidBody3DComponent>();
+		{
+			Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
+			const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
+			cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
+			auto& transform = cubeEntity.GetComponent<TransformComponent>();
+			transform.Translation = { -2.0f, 2.0f, -2.0f };
+			transform.Rotation = { 20, 10, 86 };
+			cubeEntity.AddComponent<BoxCollider3DComponent>();
+			cubeEntity.AddComponent<RigidBody3DComponent>();
+		}
 
-		Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
-		const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
-		sphereEntity.AddComponent<StaticMeshComponent>(sphereMesh, whiteMaterial, m_Texture);
-		sphereEntity.GetComponent<TransformComponent>().Translation = { 2.0f, 1.2f, -2.0f };
+		{
+			Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
+			const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
+			sphereEntity.AddComponent<StaticMeshComponent>(sphereMesh, whiteMaterial, m_Texture);
+			sphereEntity.GetComponent<TransformComponent>().Translation = { 2.0f, 1.2f, -2.0f };
+		}
 
-		Entity planeEntity = m_ActiveScene->CreateEntity("Plane");
-		const Ref<Mesh> planeMesh = Mesh::CreatePlane(10.0f, 10.0f);
-		planeEntity.AddComponent<StaticMeshComponent>(planeMesh, whiteMaterial, nullptr);
-		planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, -1.0f, 0.0f };
+		{
+			Entity planeEntity = m_ActiveScene->CreateEntity("Plane");
+			const Ref<Mesh> planeMesh = Mesh::CreatePlane(10.0f, 10.0f);
+			planeEntity.AddComponent<StaticMeshComponent>(planeMesh, whiteMaterial, nullptr);
+			planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, -1.0f, 0.0f };
+			planeEntity.AddComponent<RigidBody3DComponent>().Type = RigidBody3DComponent::BodyType::Static;
+			planeEntity.AddComponent<BoxCollider3DComponent>().Size = { 10.f, 0.01f, 10.f };
+		}
 
 		m_SunlightEntity = m_ActiveScene->CreateEntity("Sun");
 		auto& sunlightComponent = m_SunlightEntity.AddComponent<DirectionalLightComponent>();
@@ -646,7 +655,7 @@ namespace Kerberos
 		Project::New();
 	}
 
-	void EditorLayer::OpenProject(const std::filesystem::path& filepath) 
+	void EditorLayer::OpenProject(const std::filesystem::path& filepath)
 	{
 		if (const auto project = Project::Load(filepath))
 		{
@@ -694,7 +703,7 @@ namespace Kerberos
 		}
 	}
 
-	void EditorLayer::OpenScene(const std::filesystem::path& filepath) 
+	void EditorLayer::OpenScene(const std::filesystem::path& filepath)
 	{
 		m_ActiveScene = CreateRef<Scene>();
 		m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));

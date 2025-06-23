@@ -235,19 +235,23 @@ namespace Kerberos
 		return true;
 	};
 
-	inline glm::vec3 ToGlmVec3(const JPH::RVec3& v)
+	static inline glm::vec3 ToGlmVec3(const JPH::RVec3& v)
 	{
-		return glm::vec3(static_cast<float>(v.GetX()),
-			static_cast<float>(v.GetY()),
-			static_cast<float>(v.GetZ()));
+		return {
+			(v.GetX()),
+			(v.GetY()),
+			(v.GetZ())
+		};
 	}
 
-	inline glm::quat ToGlmQuat(const JPH::Quat& q)
+	static inline glm::quat ToGlmQuat(const JPH::Quat& q)
 	{
-		return glm::quat(static_cast<float>(q.GetW()),
-			static_cast<float>(q.GetX()),
-			static_cast<float>(q.GetY()),
-			static_cast<float>(q.GetZ()));
+		return {
+			(q.GetW()),
+			(q.GetX()),
+			(q.GetY()),
+			(q.GetZ())
+		};
 	}
 
 	static void ApplyJoltTransformToEntity(glm::mat4& worldTransform, const JPH::Body& body)
@@ -379,6 +383,11 @@ namespace Kerberos
 						shapeSettings.SetEmbedded();
 
 						JPH::ShapeSettings::ShapeResult shapeResult = shapeSettings.Create();
+						if (shapeResult.HasError())
+						{
+							KBR_CORE_ERROR("Jolt: shape error on entity {}: {}", entity.GetComponent<TagComponent>().Tag, shapeResult.GetError().c_str());
+							continue;
+						}
 						shape = shapeResult.Get();
 					}
 				}
