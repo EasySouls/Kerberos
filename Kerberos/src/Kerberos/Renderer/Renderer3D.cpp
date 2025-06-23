@@ -193,7 +193,17 @@ namespace Kerberos
 
 		s_RendererData.pSunLight = sun;
 		
-		s_RendererData.LightsData.SunLight = *sun;
+		if (!sun)
+		{
+			KBR_CORE_WARN("No sun light provided! Defaulting to a white directional light.");
+			s_RendererData.LightsData.SunLight = DirectionalLight{.IsEnabled = true, .Direction = {1.0f, 1.0f, 1.0f },
+				.Color = { 1.0f, 1.0f, 1.0f } };
+		}
+		else
+		{
+			s_RendererData.LightsData.SunLight = *sun;
+		}
+
 		s_RendererData.LightsData.NrOfPointLights = static_cast<int>(pointLights.size());
 		
 		for (size_t i = 0; i < pointLights.size(); ++i)

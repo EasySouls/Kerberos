@@ -677,9 +677,9 @@ namespace Kerberos
 
 	void EditorLayer::LoadScene()
 	{
-		const std::string filepath = FileDialog::OpenFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
+		const std::string filepathString = FileDialog::OpenFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
 
-		if (filepath.empty())
+		if (filepathString.empty())
 			return;
 
 		/// Create a new scene, since otherwise the deserialized entities would be added to the current scene
@@ -688,10 +688,10 @@ namespace Kerberos
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
 		const SceneSerializer serializer(m_ActiveScene);
-		/// TODO: We need to convert the filepath to a relative path, so that it works on all platforms
-		if (!serializer.Deserialize("assets/scenes/Example.kerberos"))
+		/// TODO: We need to convert the filepathString to a relative path, so that it works on all platforms
+		if (!serializer.Deserialize(filepathString))
 		{
-			KBR_ERROR("Failed to load scene from {0}", filepath);
+			KBR_ERROR("Failed to load scene from {0}", filepathString);
 		}
 	}
 
