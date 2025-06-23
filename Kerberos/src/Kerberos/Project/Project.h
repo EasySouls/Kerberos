@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Kerberos/Core.h"
+#include "Kerberos/Assets/AssetManagerBase.h"
 
 #include <filesystem>
 
@@ -49,9 +50,13 @@ namespace Kerberos
 
 		static Ref<Project> GetActive() { return s_ActiveProject; }
 
+		Ref<AssetManagerBase> GetAssetManager() { return m_AssetManager; }
+
 	private:
 		ProjectInfo m_Info;
 		std::filesystem::path m_ProjectDirectory;
+
+		Ref<AssetManagerBase> m_AssetManager;
 
 		inline static Ref<Project> s_ActiveProject;
 	};

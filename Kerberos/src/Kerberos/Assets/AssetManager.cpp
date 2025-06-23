@@ -1,9 +1,9 @@
 #include "kbrpch.h"
 #include "AssetManager.h"
 
-namespace Kerberos {
-
-	Ref<Texture2D> AssetManager::GetDefaultTexture2D() 
+namespace Kerberos
+{
+	Ref<Texture2D> AssetManager::GetDefaultTexture2D()
 	{
 		const Ref<Texture2D> defaultTexture = Texture2D::Create(1, 1);
 		uint32_t data = 0xFFFFFFFF;
@@ -11,7 +11,7 @@ namespace Kerberos {
 		return defaultTexture;
 	}
 
-	Ref<Mesh> AssetManager::GetDefaultCubeMesh() 
+	Ref<Mesh> AssetManager::GetDefaultCubeMesh()
 	{
 		return Mesh::CreateCube(1.0f);
 	}

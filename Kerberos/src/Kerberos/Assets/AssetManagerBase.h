@@ -1,15 +1,15 @@
 #pragma once
-
 #include "Kerberos/Renderer/Mesh.h"
 #include "Kerberos/Renderer/Texture.h"
 #include "Kerberos/Assets/Asset.h"
 
 namespace Kerberos
 {
-	class AssetManager
+	class AssetManagerBase
 	{
 	public:
-		static Ref<Texture2D> GetDefaultTexture2D();
-		static Ref<Mesh> GetDefaultCubeMesh();
+		virtual ~AssetManagerBase() = default;
+
+		virtual Ref<Asset> GetAsset(AssetHandle handle) = 0;
 	};
 }

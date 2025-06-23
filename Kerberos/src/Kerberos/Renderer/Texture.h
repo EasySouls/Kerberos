@@ -3,12 +3,14 @@
 #include "Kerberos/Core.h"
 #include <string>
 
+#include "Kerberos/Assets/Asset.h"
+
 namespace Kerberos
 {
-	class Texture
+	class Texture : public Asset
 	{
 	public:
-		virtual ~Texture() = default;
+		~Texture() override = default;
 
 		virtual uint32_t GetWidth() const = 0;
 		virtual uint32_t GetHeight() const = 0;
@@ -33,5 +35,7 @@ namespace Kerberos
 	public:
 		static Ref<Texture2D> Create(const std::string& path);
 		static Ref<Texture2D> Create(uint32_t width, uint32_t height);
+
+		AssetType GetType() override { return AssetType::Texture2D; }
 	};
 }
