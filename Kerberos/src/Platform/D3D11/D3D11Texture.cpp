@@ -122,7 +122,7 @@ namespace Kerberos
 		stbi_image_free(imageData);
 	}
 
-	D3D11Texture2D::D3D11Texture2D(const TextureSpecification& spec)
+	D3D11Texture2D::D3D11Texture2D(const TextureSpecification& spec, Buffer data)
 		: m_Spec(spec)
 	{
 		KBR_PROFILE_FUNCTION();

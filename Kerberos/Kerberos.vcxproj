@@ -163,6 +163,7 @@
     <ClInclude Include="src\Kerberos\Assets\Model.h" />
     <ClInclude Include="src\Kerberos\Assets\TextureImporter.h" />
     <ClInclude Include="src\Kerberos\Core.h" />
+    <ClInclude Include="src\Kerberos\Core\Buffer.h" />
     <ClInclude Include="src\Kerberos\Core\Input.h" />
     <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
     <ClInclude Include="src\Kerberos\Core\MouseButtonCodes.h" />
@@ -251,7 +252,6 @@
     <ClCompile Include="src\Kerberos\Assets\EditorAssetManager.cpp" />
     <ClCompile Include="src\Kerberos\Assets\RuntimeAssetManager.cpp" />
     <ClCompile Include="src\Kerberos\Application.cpp" />
-    <ClCompile Include="src\Kerberos\Assets\AssetManagerBase.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Model.cpp" />
     <ClCompile Include="src\Kerberos\Assets\TextureImporter.cpp" />
     <ClCompile Include="src\Kerberos\Core\UUID.cpp" />

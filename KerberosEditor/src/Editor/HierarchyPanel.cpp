@@ -8,6 +8,8 @@
 #include "imgui/imgui_internal.h"
 #include <filesystem>
 
+#include "Kerberos/Assets/AssetManager.h"
+
 namespace Kerberos
 {
 	static const std::filesystem::path ASSETS_DIRECTORY = "Assets";
@@ -32,9 +34,7 @@ namespace Kerberos
 		m_SphereMesh = Mesh::CreateSphere(1.0f, 16, 16);
 		m_WhiteMaterial = CreateRef<Material>();
 
-		m_WhiteTexture = Texture2D::Create(1, 1);
-		uint32_t whiteTextureData = 0xffffffff;
-		m_WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+		m_WhiteTexture = AssetManager::GetDefaultTexture2D();
 	}
 
 	void HierarchyPanel::OnImGuiRender()

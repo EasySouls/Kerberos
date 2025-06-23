@@ -4,8 +4,14 @@
 
 namespace Kerberos
 {
-	class RuntimeAssetManager : public AssetManagerBase
-	{};
+	class RuntimeAssetManager final : public AssetManagerBase
+	{
+	public:
+		Ref<Asset> GetAsset(AssetHandle handle) override;
+
+		bool IsAssetHandleValid(AssetHandle handle) override;
+		bool IsAssetLoaded(AssetHandle handle) override;
+	};
 }
 
 

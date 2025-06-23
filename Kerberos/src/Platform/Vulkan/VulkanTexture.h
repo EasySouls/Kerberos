@@ -10,7 +10,7 @@ namespace Kerberos
 	{
 	public:
 		explicit VulkanTexture2D(const std::string& path);
-		explicit VulkanTexture2D(const TextureSpecification& spec);
+		explicit VulkanTexture2D(const TextureSpecification& spec, Buffer data);
 		~VulkanTexture2D() override;
 
 		uint32_t GetWidth() const override { return m_Spec.Width; }

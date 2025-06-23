@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Kerberos/Core/UUID.h"
+#include "Kerberos/Core.h"
+#include "Kerberos/Log.h"
+
+#include <string>
 
 namespace Kerberos
 {

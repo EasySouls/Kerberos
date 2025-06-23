@@ -9,7 +9,7 @@ namespace Kerberos
 	{
 	public:
 		explicit OpenGLTexture2D(const std::string& path);
-		explicit OpenGLTexture2D(const TextureSpecification& spec);
+		explicit OpenGLTexture2D(const TextureSpecification& spec, Buffer data);
 		~OpenGLTexture2D() override;
 
 		uint32_t GetWidth() const override { return m_Spec.Width; }

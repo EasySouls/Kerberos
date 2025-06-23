@@ -9,9 +9,7 @@ namespace Kerberos
 	{
 	}
 
-	D3D11TextureCube::~D3D11TextureCube()
-	{
-	}
+	D3D11TextureCube::~D3D11TextureCube() = default;
 
 	void D3D11TextureCube::Bind(uint32_t slot) const
 	{

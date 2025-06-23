@@ -16,7 +16,7 @@ namespace Kerberos
 
 	public:
 		explicit D3D11Texture2D(const std::string& path);
-		explicit D3D11Texture2D(const TextureSpecification& spec);
+		explicit D3D11Texture2D(const TextureSpecification& spec, Buffer data);
 		~D3D11Texture2D() override;
 
 		uint32_t GetWidth() const override { return m_Spec.Width; }

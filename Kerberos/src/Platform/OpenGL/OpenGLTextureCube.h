@@ -18,6 +18,7 @@ namespace Kerberos
 		const std::string& GetName() const override { return m_Name; }
 		uint32_t GetWidth() const override;
 		uint32_t GetHeight() const override;
+		const TextureSpecification& GetSpecification() const override { return m_Spec; }
 
 		void SetData(void* data, uint32_t size) override;
 
@@ -30,5 +31,6 @@ namespace Kerberos
 		std::string m_Name;
 		bool m_GenerateMipmaps;
 		bool m_SRGB;
+		TextureSpecification m_Spec;
 	};
 }

@@ -308,7 +308,7 @@ namespace Kerberos
 		context.SubmitCommandBuffer(commandBuffer);
 	}
 
-	VulkanTexture2D::VulkanTexture2D(const TextureSpecification& spec)
+	VulkanTexture2D::VulkanTexture2D(const TextureSpecification& spec, Buffer data)
 		: m_Spec(spec)
 	{
         KBR_PROFILE_FUNCTION();

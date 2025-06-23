@@ -18,7 +18,7 @@ namespace Kerberos
 		else
 		{
 			const AssetMetadata& metadata = GetMetadata(handle);
-			asset = AssetImporter::ImportAsset(metadata);
+			asset = AssetImporter::ImportAsset(handle, metadata);
 			if (!asset)
 			{
 				KBR_CORE_ERROR("Asset import failed!");

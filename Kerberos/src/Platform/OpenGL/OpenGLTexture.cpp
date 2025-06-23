@@ -5,6 +5,42 @@
 
 namespace Kerberos
 {
+	namespace Utils
+	{
+		static constexpr GLenum KBRImageFormatToGLDataFormat(const ImageFormat format)
+		{
+			switch (format)
+			{
+			case ImageFormat::RGB8: return GL_RGB;
+			case ImageFormat::RGBA8: return GL_RGBA;
+			case ImageFormat::None:
+			case ImageFormat::R8:
+			case ImageFormat::RGBA32F:
+				break;
+			}
+
+			KBR_CORE_ASSERT(false, "KBRImageFormatToGLDataFormat - unsupported format");
+			return 0;
+		}
+
+		static constexpr GLenum KBRImageFormatToGLInternalFormat(const ImageFormat format)
+		{
+			switch (format)
+			{
+			case ImageFormat::RGB8: return GL_RGB8;
+			case ImageFormat::RGBA8: return GL_RGBA8;
+			case ImageFormat::None:
+			case ImageFormat::R8:
+			case ImageFormat::RGBA32F:
+				break;
+			}
+
+			KBR_CORE_ASSERT(false, "KBRImageFormatToGLInternalFormat - unsupported format");
+			return 0;
+		}
+	
+	}
+
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 		: m_Path(path)
 	{
@@ -67,15 +103,17 @@ namespace Kerberos
 		stbi_image_free(data);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec)
+	OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec, const Buffer data)
 		: m_Spec(spec)
 	{
 		KBR_PROFILE_FUNCTION();
 
+		/// TODO: Choose formats based on spec.Format
+
 		/// Internal format is how OpenGl will store the texture data internally (in the GPU)
-		constexpr GLenum internalFormat = GL_RGBA8;
+		const GLenum internalFormat = Utils::KBRImageFormatToGLInternalFormat(spec.Format);
 		/// Data format is the format of the texture data we provide to OpenGL
-		constexpr GLenum dataFormat = GL_RGBA;
+		const GLenum dataFormat = Utils::KBRImageFormatToGLDataFormat(spec.Format);
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, internalFormat, static_cast<int>(m_Spec.Width), static_cast<int>(m_Spec.Height));
@@ -86,6 +124,12 @@ namespace Kerberos
 		/// Set the texture wrapping/filtering options (on the currently bound texture object)
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		if (data)
+		{
+			/// Upload the texture data to the GPU
+			OpenGLTexture2D::SetData(data.Data, data.Size);
+		}
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D() 

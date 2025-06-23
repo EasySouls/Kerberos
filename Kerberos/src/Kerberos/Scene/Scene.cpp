@@ -373,10 +373,13 @@ namespace Kerberos
 				auto& rigidBody = view.get<RigidBody3DComponent>(e);
 
 				JPH::ShapeRefC shape = nullptr;
+				bool isTrigger = false;
 
 				if (entity.HasComponent<BoxCollider3DComponent>())
 				{
 					auto& collider = entity.GetComponent<BoxCollider3DComponent>();
+					isTrigger = collider.IsTrigger;
+
 					if (collider.Size.x > 0.0f && collider.Size.y > 0.0f && collider.Size.z > 0.0f)
 					{
 						JPH::BoxShapeSettings shapeSettings(JPH::Vec3(collider.Size.x, collider.Size.y, collider.Size.z));
@@ -410,6 +413,8 @@ namespace Kerberos
 				const JPH::Quat rotation = JPH::Quat(glmRotation.x, glmRotation.y, glmRotation.z, glmRotation.w);
 
 				JPH::BodyCreationSettings bodySettings(shape, position, rotation, GetBodyTypeFromComponent(rigidBody.Type), GetObjectLayerFromComponent(rigidBody.Type));
+				bodySettings.mIsSensor = isTrigger;
+
 				JPH::Body* body = bodyInterface.CreateBody(bodySettings);
 
 				body->SetRestitution(rigidBody.Restitution);

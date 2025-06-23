@@ -76,7 +76,7 @@ namespace Kerberos
 			planeEntity.AddComponent<StaticMeshComponent>(planeMesh, whiteMaterial, nullptr);
 			planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, -1.0f, 0.0f };
 			planeEntity.AddComponent<RigidBody3DComponent>().Type = RigidBody3DComponent::BodyType::Static;
-			planeEntity.AddComponent<BoxCollider3DComponent>().Size = { 10.f, 0.01f, 10.f };
+			planeEntity.AddComponent<BoxCollider3DComponent>().Size = { 10.f, 0.1f, 10.f };
 		}
 
 		m_SunlightEntity = m_ActiveScene->CreateEntity("Sun");

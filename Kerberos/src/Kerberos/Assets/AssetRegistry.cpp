@@ -12,7 +12,7 @@ namespace Kerberos
 
 	AssetMetadata& AssetRegistry::Get(const AssetHandle handle) 
 	{
-		KBR_CORE_ASSERT(m_Registry.contains(handle));
+		KBR_CORE_ASSERT(m_Registry.contains(handle), "AssetRegistry::Get - registry doesn't contain AssetHandle {}", static_cast<uint64_t>(handle));
 
 		return m_Registry.at(handle);
 	}

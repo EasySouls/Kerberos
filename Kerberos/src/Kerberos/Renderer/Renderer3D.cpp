@@ -3,6 +3,7 @@
 #include "RenderCommand.h"
 #include "TextureCube.h"
 #include "UniformBuffer.h"
+#include "Kerberos/Assets/AssetManager.h"
 
 static constexpr int MAX_POINT_LIGHTS = 10;
 
@@ -86,9 +87,7 @@ namespace Kerberos
 		/// Set the default shader to the base shader
 		s_RendererData.ActiveShader = s_RendererData.BaseShader;
 
-		s_RendererData.WhiteTexture = Texture2D::Create(1, 1);
-		uint32_t whiteTextureData = 0xffffffff;
-		s_RendererData.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+		s_RendererData.WhiteTexture = AssetManager::GetDefaultTexture2D();
 
 		s_RendererData.SkyboxShader = Shader::Create("assets/shaders/skybox.glsl");
 		const std::vector<std::string> skymapTextures = {

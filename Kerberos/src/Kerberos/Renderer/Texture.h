@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Kerberos/Core.h"
-#include <string>
-
+#include "Kerberos/Core/Buffer.h"
 #include "Kerberos/Assets/Asset.h"
+#include <string>
 
 namespace Kerberos
 {
@@ -52,7 +52,7 @@ namespace Kerberos
 	{
 	public:
 		static Ref<Texture2D> Create(const std::string& path);
-		static Ref<Texture2D> Create(const TextureSpecification& spec);
+		static Ref<Texture2D> Create(const TextureSpecification& spec, Buffer data = Buffer());
 
 		AssetType GetType() override { return AssetType::Texture2D; }
 	};
