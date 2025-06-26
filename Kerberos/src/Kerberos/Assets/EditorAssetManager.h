@@ -16,6 +16,9 @@ namespace Kerberos
 
 		const AssetMetadata& GetMetadata(AssetHandle handle) const;
 
+		void SerializeAssetRegistry();
+		bool DeserializeAssetRegistry();
+
 	private:
 		AssetMap m_LoadedAssets;
 		AssetRegistry m_AssetRegistry;

@@ -63,14 +63,41 @@
     <ClInclude Include="src\Kerberos\Application.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Asset.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\AssetImporter.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Assets\AssetManager.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\AssetManagerBase.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\AssetMetadata.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\AssetRegistry.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\EditorAssetManager.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Assets\Model.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\RuntimeAssetManager.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\TextureImporter.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Core.h">
       <Filter>src\Kerberos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Core\Buffer.h">
+      <Filter>src\Kerberos\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Core\Input.h">
       <Filter>src\Kerberos\Core</Filter>
@@ -317,10 +344,25 @@
     <ClCompile Include="src\Kerberos\Application.cpp">
       <Filter>src\Kerberos</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\AssetImporter.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\AssetManager.cpp">
       <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\AssetRegistry.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\EditorAssetManager.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\Model.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\RuntimeAssetManager.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\TextureImporter.cpp">
       <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Core\UUID.cpp">

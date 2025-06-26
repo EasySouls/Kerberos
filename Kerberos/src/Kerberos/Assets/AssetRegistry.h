@@ -19,6 +19,8 @@ namespace Kerberos
 		size_t Remove(AssetHandle handle);
 		void Clear();
 
+		void Add(AssetHandle handle, const AssetMetadata& metadata);
+
 		auto begin() { return m_Registry.begin(); }
 		auto end() { return m_Registry.end(); }
 		auto begin() const { return m_Registry.cbegin(); }

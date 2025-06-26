@@ -21,6 +21,11 @@ namespace Kerberos
 			projectToLoad->m_ProjectDirectory = filepath.parent_path();
 			s_ActiveProject = projectToLoad;
 			KBR_CORE_INFO("Project is loaded from {}", std::filesystem::absolute(filepath).string());
+
+			/// Initialize the asset manager for the project
+			/// TODO: Load Editor or Runtime Asset Manager based on the project type
+			s_ActiveProject->m_AssetManager = CreateRef<EditorAssetManager>();
+
 			return s_ActiveProject;
 		}
 

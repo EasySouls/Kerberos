@@ -13,9 +13,8 @@ namespace Kerberos
 		template<typename T>
 		static Ref<T> GetAsset(const AssetHandle handle)
 		{
-			Ref<Asset> asset = Project::GetActive()->GetAssetManager()->GetAsset(handle);
-			//return std::static_pointer_cast<T>(asset);
-			return asset;
+			const Ref<Asset> asset = Project::GetActive()->GetAssetManager()->GetAsset(handle);
+			return std::static_pointer_cast<T>(asset);
 		}
 
 		static Ref<Texture2D> GetDefaultTexture2D();

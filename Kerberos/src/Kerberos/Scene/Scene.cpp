@@ -256,6 +256,8 @@ namespace Kerberos
 
 	static void ApplyJoltTransformToEntity(glm::mat4& worldTransform, const JPH::Body& body)
 	{
+		KBR_PROFILE_FUNCTION();
+
 		const JPH::RVec3 joltPosition = body.GetPosition();
 		const JPH::Quat joltRotation = body.GetRotation();
 

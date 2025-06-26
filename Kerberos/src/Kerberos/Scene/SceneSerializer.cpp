@@ -8,6 +8,8 @@
 
 #include <fstream>
 
+#include "Kerberos/Assets/AssetManager.h"
+
 namespace YAML
 {
 	template<>
@@ -153,7 +155,7 @@ namespace Kerberos
 
 		if (entity.HasComponent<NativeScriptComponent>())
 		{
-			
+
 		}
 
 		if (entity.HasComponent<DirectionalLightComponent>())
@@ -221,11 +223,22 @@ namespace Kerberos
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<StaticMeshComponent>())
+		{
+			out << YAML::Key << "StaticMeshComponent";
+			out << YAML::BeginMap;
+			const auto& staticMesh = entity.GetComponent<StaticMeshComponent>();
+			out << YAML::Key << "Mesh" << YAML::Value << 0; /// Placeholder for mesh index, to be replaced with actual mesh index
+			out << YAML::Key << "Material" << YAML::Value << staticMesh.MeshMaterial->GetHandle();
+			out << YAML::Key << "Texture" << YAML::Value << staticMesh.MeshTexture->GetHandle();
+			out << YAML::EndMap;
+		}
+
 		out << YAML::EndMap;
 
 	}
 
-	void SceneSerializer::Serialize(const std::filesystem::path& filepath) const 
+	void SceneSerializer::Serialize(const std::filesystem::path& filepath) const
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
@@ -267,7 +280,7 @@ namespace Kerberos
 		throw std::logic_error("Not implemented");
 	}
 
-	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath) const 
+	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath) const
 	{
 		const std::ifstream inFile(filepath);
 		std::stringstream stream;
@@ -395,13 +408,26 @@ namespace Kerberos
 					boxCollider.Size = boxColliderComponent["Size"].as<glm::vec3>();
 					boxCollider.Offset = boxColliderComponent["Offset"].as<glm::vec3>();
 				}
+
+				if (auto staticMeshComponent = entity["StaticMeshComponent"])
+				{
+					auto& staticMesh = deserializedEntity.AddComponent<StaticMeshComponent>();
+					staticMesh.MeshMaterial = AssetManager::GetAsset<Material>(UUID(staticMeshComponent["Material"].as<uint64_t>()));
+					staticMesh.MeshTexture = AssetManager::GetAsset<Texture2D>(UUID(staticMeshComponent["Texture"].as<uint64_t>()));
+
+					const auto mesh = staticMeshComponent["Mesh"].as<uint64_t>();
+					if (mesh == 0)
+					{
+						staticMesh.StaticMesh = AssetManager::GetDefaultCubeMesh();
+					}
+				}
 			}
 		}
 
 		return true;
 	}
 
-	bool SceneSerializer::DeserializeRuntime(const std::filesystem::path& filepath) const 
+	bool SceneSerializer::DeserializeRuntime(const std::filesystem::path& filepath) const
 	{
 		throw std::logic_error("Not implemented");
 	}

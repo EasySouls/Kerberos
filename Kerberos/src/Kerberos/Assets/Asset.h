@@ -35,7 +35,7 @@ namespace Kerberos
 		AssetHandle m_Handle;
 	};
 
-	static std::string AssetTypeToString(const AssetType type)
+	static std::string_view AssetTypeToString(const AssetType type)
 	{
 		switch (type)
 		{
@@ -55,7 +55,7 @@ namespace Kerberos
 		return "";
 	}
 
-	static AssetType AssetTypeFromString(const std::string& str)
+	static AssetType AssetTypeFromString(const std::string_view str)
 	{
 		if (str == "Texture2D")
 			return AssetType::Texture2D;

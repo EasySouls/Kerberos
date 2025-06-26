@@ -36,4 +36,9 @@ namespace Kerberos
 	{
 		m_Registry.clear();
 	}
+
+	void AssetRegistry::Add(const AssetHandle handle, const AssetMetadata& metadata)
+	{
+		m_Registry[handle] = metadata;
+	}
 }
