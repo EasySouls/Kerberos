@@ -9,6 +9,19 @@
 
 namespace Kerberos
 {
+	static AssetType AssetTypeFromFileExtension(const std::filesystem::path& filepath)
+	{
+		const std::string extension = filepath.extension().string();
+		if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
+			return AssetType::Texture2D;
+		else if (extension == ".fbx" || extension == ".obj")
+			return AssetType::Mesh;
+		else if (extension == ".kerberos")
+			return AssetType::Scene;
+		KBR_CORE_WARN("Unknown asset type for file: {0}", filepath.string());
+		return AssetType::Texture2D;
+	}
+
 	Ref<Asset> EditorAssetManager::GetAsset(const AssetHandle handle) 
 	{
 		if (!IsAssetHandleValid(handle))
@@ -47,6 +60,24 @@ namespace Kerberos
 	bool EditorAssetManager::IsAssetLoaded(const AssetHandle handle) 
 	{
 		return m_LoadedAssets.contains(handle);
+	}
+
+	void EditorAssetManager::ImportAsset(const std::filesystem::path& filepath)
+	{
+		AssetHandle handle;
+		AssetMetadata metadata;
+		metadata.Filepath = filepath;
+		metadata.Type = AssetTypeFromFileExtension(filepath);
+
+		Ref<Asset> asset = AssetImporter::ImportAsset(handle, metadata);
+		if (!asset)
+		{
+			KBR_CORE_ERROR("Failed to import asset: {0}", filepath.string());
+			return;
+		}
+
+		asset->GetHandle() = handle;
+		m_LoadedAssets[handle] = asset;
 	}
 
 	const AssetMetadata& EditorAssetManager::GetMetadata(const AssetHandle handle) const

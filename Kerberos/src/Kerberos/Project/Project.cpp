@@ -4,14 +4,14 @@
 
 namespace Kerberos
 {
-	Ref<Project> Project::New() 
+	Ref<Project> Project::New()
 	{
 		s_ActiveProject = CreateRef<Project>();
 
 		return s_ActiveProject;
 	}
 
-	Ref<Project> Project::Load(const std::filesystem::path& filepath) 
+	Ref<Project> Project::Load(const std::filesystem::path& filepath)
 	{
 		const Ref<Project> projectToLoad = CreateRef<Project>();
 
@@ -24,7 +24,9 @@ namespace Kerberos
 
 			/// Initialize the asset manager for the project
 			/// TODO: Load Editor or Runtime Asset Manager based on the project type
-			s_ActiveProject->m_AssetManager = CreateRef<EditorAssetManager>();
+			const Ref<EditorAssetManager> editorAssetManager = CreateRef<EditorAssetManager>();
+			s_ActiveProject->m_AssetManager = editorAssetManager;
+			editorAssetManager->DeserializeAssetRegistry();
 
 			return s_ActiveProject;
 		}
@@ -32,7 +34,7 @@ namespace Kerberos
 		return nullptr;
 	}
 
-	bool Project::SaveActive(const std::filesystem::path& filepath) 
+	bool Project::SaveActive(const std::filesystem::path& filepath)
 	{
 		const ProjectSerializer serializer(s_ActiveProject);
 		if (serializer.Serialize(filepath))
