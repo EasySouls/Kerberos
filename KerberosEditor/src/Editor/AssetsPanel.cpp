@@ -10,10 +10,8 @@
 
 namespace Kerberos
 {
-	static const std::filesystem::path ASSETS_DIRECTORY = "Assets";
-
 	AssetsPanel::AssetsPanel()
-		: m_CurrentDirectory(Project::GetAssetDirectory())
+		: m_AssetsDirectory(Project::GetAssetDirectory()), m_CurrentDirectory(m_AssetsDirectory)
 	{
 		m_FolderIcon = Texture2D::Create("Assets/Editor/directory_icon.png");
 		m_FileIcon = Texture2D::Create("Assets/Editor/file_icon.png");
@@ -23,11 +21,11 @@ namespace Kerberos
 	{
 		ImGui::Begin("Assets");
 
-		const auto& relativeDir = std::filesystem::relative(m_CurrentDirectory, ASSETS_DIRECTORY);
+		const auto& relativeDir = std::filesystem::relative(m_CurrentDirectory, m_AssetsDirectory);
 		const std::string title = relativeDir.string() == "." ? "Assets" : "Assets" + std::string(1, std::filesystem::path::preferred_separator) + relativeDir.string();
 		ImGui::Text("Current Directory: %s", title.data());
 
-		if (m_CurrentDirectory != ASSETS_DIRECTORY)
+		if (m_CurrentDirectory != m_AssetsDirectory)
 		{
 			if (ImGui::Button("Back"))
 			{
@@ -51,7 +49,7 @@ namespace Kerberos
 		for (const auto& entry : std::filesystem::directory_iterator(m_CurrentDirectory))
 		{
 			const std::filesystem::path& path = entry.path();
-			const auto& relativePath = std::filesystem::relative(path, ASSETS_DIRECTORY);
+			const auto& relativePath = std::filesystem::relative(path, m_AssetsDirectory);
 			const std::string fileName = relativePath.filename().string();
 
 			ImGui::PushID(path.string().c_str());

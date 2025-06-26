@@ -28,11 +28,11 @@ namespace Kerberos
 
 		UUID GetHandle() const { return m_Handle; }
 
-	private:
+	protected:
 		/**
 		* Automatically generated UUID
 		*/
-		AssetHandle m_Handle;
+		AssetHandle m_Handle{};
 	};
 
 	static std::string_view AssetTypeToString(const AssetType type)

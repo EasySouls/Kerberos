@@ -7,6 +7,11 @@ namespace Kerberos
 {
 	Ref<Texture2D> TextureImporter::ImportTexture(AssetHandle handle, const AssetMetadata& metadata) 
 	{
+		return ImportTexture(metadata.Filepath);
+	}
+
+	Ref<Texture2D> TextureImporter::ImportTexture(const std::filesystem::path& filepath)
+	{
 		KBR_PROFILE_FUNCTION();
 
 		int width, height, channels;
@@ -15,12 +20,12 @@ namespace Kerberos
 
 		{
 			KBR_PROFILE_SCOPE("TextureImporter::ImportTexture - stbi_load");
-			data.Data = stbi_load(metadata.Filepath.string().c_str(), &width, &height, &channels, 0);
+			data.Data = stbi_load(filepath.string().c_str(), &width, &height, &channels, 0);
 		}
 
 		if (data.Data == nullptr)
 		{
-			KBR_CORE_ERROR("TextureImporter::ImportTexture - failed to load texture from filepath: {}", metadata.Filepath.string());
+			KBR_CORE_ERROR("TextureImporter::ImportTexture - failed to load texture from filepath: {}", filepath.string());
 			return nullptr;
 		}
 
@@ -41,7 +46,7 @@ namespace Kerberos
 			KBR_CORE_ASSERT(false, "TextureImporter::ImportTexture - unsupported number of image channels: {}", channels);
 			break;
 		}
-		
+
 		auto texture = Texture2D::Create(spec, data);
 
 		stbi_image_free(data.Data);

@@ -47,4 +47,12 @@ namespace Kerberos
 			return false;
 		}
 	}
+
+	void Project::SetInfo(const ProjectInfo& info)
+	{
+		m_Info = info;
+
+		/// The project info has changed, so we might need to update the assets
+		s_ActiveProject->m_AssetManager = CreateRef<EditorAssetManager>();
+	}
 }

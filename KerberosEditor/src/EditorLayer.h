@@ -34,7 +34,8 @@ namespace Kerberos
 		void CalculateEntityTransforms() const;
 
 		void NewProject();
-		void OpenProject(const std::filesystem::path& filepath); 
+		void OpenProject(const std::filesystem::path& filepath);
+		[[nodiscard]] bool OpenProject();
 
 		void SaveScene();
 		void SaveSceneAs() const;
@@ -96,7 +97,7 @@ namespace Kerberos
 
 		/// Editor Panels
 		HierarchyPanel m_HierarchyPanel;
-		AssetsPanel m_AssetsPanel;
+		Scope<AssetsPanel> m_AssetsPanel;
 
 		enum class SceneState : uint8_t
 		{

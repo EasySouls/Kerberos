@@ -229,8 +229,14 @@ namespace Kerberos
 			out << YAML::BeginMap;
 			const auto& staticMesh = entity.GetComponent<StaticMeshComponent>();
 			out << YAML::Key << "Mesh" << YAML::Value << 0; /// Placeholder for mesh index, to be replaced with actual mesh index
-			out << YAML::Key << "Material" << YAML::Value << staticMesh.MeshMaterial->GetHandle();
-			out << YAML::Key << "Texture" << YAML::Value << staticMesh.MeshTexture->GetHandle();
+			if (staticMesh.MeshMaterial)
+				out << YAML::Key << "Material" << YAML::Value << staticMesh.MeshMaterial->GetHandle();
+			else
+				out << YAML::Key << "Material" << YAML::Value << UUID::Invalid();
+			if (staticMesh.MeshTexture)
+				out << YAML::Key << "Texture" << YAML::Value << staticMesh.MeshTexture->GetHandle();
+			else
+				out << YAML::Key << "Texture" << YAML::Value << UUID::Invalid();
 			out << YAML::EndMap;
 		}
 
@@ -412,8 +418,18 @@ namespace Kerberos
 				if (auto staticMeshComponent = entity["StaticMeshComponent"])
 				{
 					auto& staticMesh = deserializedEntity.AddComponent<StaticMeshComponent>();
-					staticMesh.MeshMaterial = AssetManager::GetAsset<Material>(UUID(staticMeshComponent["Material"].as<uint64_t>()));
-					staticMesh.MeshTexture = AssetManager::GetAsset<Texture2D>(UUID(staticMeshComponent["Texture"].as<uint64_t>()));
+
+					/// Get the material and texture handles
+					/// If they are valid, load the assets, else use default ones
+
+					const auto matNode = staticMeshComponent["Material"].as<std::uint64_t>();
+					const AssetHandle materialHandle = UUID(matNode);
+					if (materialHandle.IsValid())
+						staticMesh.MeshMaterial = AssetManager::GetAsset<Material>(materialHandle);
+
+					const AssetHandle textureHandle = UUID(staticMeshComponent["Texture"].as<uint64_t>());
+					if (textureHandle.IsValid())
+						staticMesh.MeshTexture = AssetManager::GetAsset<Texture2D>(UUID(staticMeshComponent["Texture"].as<uint64_t>()));
 
 					const auto mesh = staticMeshComponent["Mesh"].as<uint64_t>();
 					if (mesh == 0)

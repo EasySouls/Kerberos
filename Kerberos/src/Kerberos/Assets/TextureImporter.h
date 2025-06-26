@@ -8,5 +8,6 @@ namespace Kerberos
 	{
 	public:
 		static Ref<Texture2D> ImportTexture(AssetHandle handle, const AssetMetadata& metadata);
+		static Ref<Texture2D> ImportTexture(const std::filesystem::path& filepath);
 	};
 }

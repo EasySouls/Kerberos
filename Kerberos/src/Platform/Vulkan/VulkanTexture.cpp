@@ -76,7 +76,7 @@ namespace Kerberos
     }
 
 	VulkanTexture2D::VulkanTexture2D(const std::string& path)
-		: m_Path(path)
+		: Texture2D(), m_Path(path)
 	{
 		KBR_PROFILE_FUNCTION();
 

@@ -9,6 +9,8 @@
 #include "imgui/imgui.h"
 #include <ImGuizmo/ImGuizmo.h>
 
+#include "Kerberos/Assets/TextureImporter.h"
+
 #define PROFILE_SCOPE(name) Timer timer##__LINE__(name, 
 
 namespace Kerberos
@@ -29,11 +31,18 @@ namespace Kerberos
 
 		m_ActiveScene = CreateRef<Scene>();
 
+		/// TODO: Open the project passed as command line argument, if there is one
+
+		if (!OpenProject())
+		{
+			NewProject();
+		}
+
 		m_EditorCamera = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 		m_ViewportSize = { 1280.0f, 720.0f };
 
-		m_Texture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
+		m_Texture = TextureImporter::ImportTexture("assets/textures/y2k_ice_texture.png");
 
 		m_SpriteSheet = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
 
@@ -128,8 +137,8 @@ namespace Kerberos
 		/*Model deerModel = Model("assets/models/deer_demo/scene.gltf", "Deer");
 		deerModel.InitEntities(m_ActiveScene);*/
 
-		m_IconPlay = Texture2D::Create("assets/editor/play_button.png");
-		m_IconStop = Texture2D::Create("assets/editor/stop_button.png");
+		m_IconPlay = TextureImporter::ImportTexture("assets/editor/play_button.png");
+		m_IconStop = TextureImporter::ImportTexture("assets/editor/stop_button.png");
 	}
 
 	void EditorLayer::OnDetach()
@@ -327,7 +336,7 @@ namespace Kerberos
 		}
 
 		m_HierarchyPanel.OnImGuiRender();
-		m_AssetsPanel.OnImGuiRender();
+		m_AssetsPanel->OnImGuiRender();
 
 		ImGui::Begin("Settings");
 		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
@@ -659,7 +668,24 @@ namespace Kerberos
 
 	void EditorLayer::NewProject()
 	{
-		Project::New();
+		const auto newProject = Project::New();
+
+		NewScene();
+		const std::string newSceneName = "Unnamed Scene.kerberos";
+		const std::filesystem::path scenePath = Project::GetAssetDirectory() / "scenes" / newSceneName;
+
+		const SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize(scenePath.string());
+
+		m_NotificationManager.AddNotification("Scene saved to " + scenePath.string(), Notification::Type::Info);
+
+		ProjectInfo projInfo;
+		projInfo.Name = newProject->GetInfo().Name;
+		projInfo.StartScenePath = "scenes/" + newSceneName;
+		projInfo.AssetDirectory = Project::GetAssetDirectory();
+		newProject->SetInfo(projInfo);
+
+		m_AssetsPanel = CreateScope<AssetsPanel>();
 	}
 
 	void EditorLayer::OpenProject(const std::filesystem::path& filepath)
@@ -668,7 +694,20 @@ namespace Kerberos
 		{
 			const auto startScenePath = Project::GetAssetDirectory() / project->GetInfo().StartScenePath;
 			OpenScene(startScenePath);
+
+			m_AssetsPanel = CreateScope<AssetsPanel>();
 		}
+	}
+
+	bool EditorLayer::OpenProject()
+	{
+		const std::string filepathString = FileDialog::OpenFile("Kerberos Project (*.kbrproj)\0*.kbrproj\0");
+
+		if (filepathString.empty())
+			return false;
+
+		OpenProject(filepathString);
+		return true;
 	}
 
 	void EditorLayer::SaveScene()

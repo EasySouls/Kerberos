@@ -48,6 +48,8 @@ namespace Kerberos
 			return GetProjectDirectory() / GetAssetDirectory() / assetPath;
 		}
 
+		void SetInfo(const ProjectInfo& info);
+
 		ProjectInfo& GetInfo() { return m_Info; }
 		
 		static Ref<Project> GetActive() { return s_ActiveProject; }

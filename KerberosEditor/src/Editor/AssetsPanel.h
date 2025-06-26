@@ -2,6 +2,8 @@
 
 #include "Kerberos/Core.h"
 #include "Kerberos/Renderer/Texture.h"
+#include "Kerberos/Project/Project.h"
+
 #include <filesystem>
 #include <map>
 
@@ -40,6 +42,7 @@ namespace Kerberos
 		void ShowContextMenu(ImGuiPopupFlags popupFlags) const;
 
 	private:
+		std::filesystem::path m_AssetsDirectory = "Assets";
 		std::filesystem::path m_CurrentDirectory = std::filesystem::current_path();
 		Ref<Texture2D> m_FolderIcon;
 		Ref<Texture2D> m_FileIcon;
