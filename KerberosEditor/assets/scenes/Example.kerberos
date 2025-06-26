@@ -1,6 +1,6 @@
 Scene: Unnamed Scene
 Entities:
-  - Entity: 461328377198734011
+  - Entity: 10996255002546189675
     TagComponent:
       Tag: Backpack78
     TransformComponent:
@@ -8,14 +8,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 1892647438039836512
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 5945615673089773277
     TagComponent:
       Tag: Backpack77
     TransformComponent:
@@ -23,14 +27,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 2385493563781739356
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 9906215376187087968
     TagComponent:
       Tag: Backpack76
     TransformComponent:
@@ -38,14 +46,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 16749739673557458269
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 7566374699432785254
     TagComponent:
       Tag: Backpack75
     TransformComponent:
@@ -53,14 +65,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 10674845262553256115
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 10090355269267413840
     TagComponent:
       Tag: Backpack74
     TransformComponent:
@@ -68,14 +84,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 1369577197379361303
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 2781901656996272030
     TagComponent:
       Tag: Backpack73
     TransformComponent:
@@ -83,14 +103,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 13395128881402281585
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 11400384649850865182
     TagComponent:
       Tag: Backpack72
     TransformComponent:
@@ -98,14 +122,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 17633714284513944952
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 16828413198585874045
     TagComponent:
       Tag: Backpack71
     TransformComponent:
@@ -113,14 +141,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 8185509546082958752
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 5756255265668596777
     TagComponent:
       Tag: Backpack70
     TransformComponent:
@@ -128,14 +160,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 15161270076339249625
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 15607109391886531577
     TagComponent:
       Tag: Backpack69
     TransformComponent:
@@ -143,14 +179,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 5194391429220321850
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 15410602189173589283
     TagComponent:
       Tag: Backpack68
     TransformComponent:
@@ -158,14 +198,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 16749911097070929263
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 13770751471732480850
     TagComponent:
       Tag: Backpack67
     TransformComponent:
@@ -173,14 +217,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 2364083297904108936
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 12847247444884415257
     TagComponent:
       Tag: Backpack66
     TransformComponent:
@@ -188,14 +236,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 4076029822786528244
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 5863954651656252351
     TagComponent:
       Tag: Backpack65
     TransformComponent:
@@ -203,14 +255,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 2253992651657314833
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 8921116280706214481
     TagComponent:
       Tag: Backpack64
     TransformComponent:
@@ -218,14 +274,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 11524455099906323063
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 2099652884641259013
     TagComponent:
       Tag: Backpack63
     TransformComponent:
@@ -233,14 +293,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 12751964214395734154
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 1591407555390497662
     TagComponent:
       Tag: Backpack62
     TransformComponent:
@@ -248,14 +312,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 4176425251547737166
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 6733405430137427396
     TagComponent:
       Tag: Backpack61
     TransformComponent:
@@ -263,14 +331,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 11914913169022851858
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 7843693248416040503
     TagComponent:
       Tag: Backpack60
     TransformComponent:
@@ -278,14 +350,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 10466455699634584655
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 1618688376657582247
     TagComponent:
       Tag: Backpack59
     TransformComponent:
@@ -293,14 +369,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 7021410849535495565
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 11920156430773992826
     TagComponent:
       Tag: Backpack58
     TransformComponent:
@@ -308,14 +388,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 4961114841530907573
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 10837473969331725033
     TagComponent:
       Tag: Backpack57
     TransformComponent:
@@ -323,14 +407,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 11231067524268272036
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 1133085981809117682
     TagComponent:
       Tag: Backpack56
     TransformComponent:
@@ -338,14 +426,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 17813884097204900258
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 9545840908974845504
     TagComponent:
       Tag: Backpack55
     TransformComponent:
@@ -353,14 +445,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 11907669617060783619
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 3635149329960319766
     TagComponent:
       Tag: Backpack54
     TransformComponent:
@@ -368,14 +464,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 14342169585923457885
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 15152672164710008375
     TagComponent:
       Tag: Backpack53
     TransformComponent:
@@ -383,14 +483,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 6528235957125341618
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 9048924272165738812
     TagComponent:
       Tag: Backpack52
     TransformComponent:
@@ -398,14 +502,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 6543150510483749204
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 11424265305561531877
     TagComponent:
       Tag: Backpack51
     TransformComponent:
@@ -413,14 +521,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 10811101589177276367
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 4288062994342136004
     TagComponent:
       Tag: Backpack50
     TransformComponent:
@@ -428,14 +540,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 5668465219844839642
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 3297645857190907562
     TagComponent:
       Tag: Backpack49
     TransformComponent:
@@ -443,14 +559,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 5479140569590820663
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 10386868637260336916
     TagComponent:
       Tag: Backpack48
     TransformComponent:
@@ -458,14 +578,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 17992170400841374301
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 11443024457875216418
     TagComponent:
       Tag: Backpack47
     TransformComponent:
@@ -473,14 +597,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 6234188180164107383
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 7315983350899304882
     TagComponent:
       Tag: Backpack46
     TransformComponent:
@@ -488,14 +616,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 9347838430836973220
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 2189109837395782319
     TagComponent:
       Tag: Backpack45
     TransformComponent:
@@ -503,14 +635,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 1566917499925051815
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 9428009613437153318
     TagComponent:
       Tag: Backpack44
     TransformComponent:
@@ -518,14 +654,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 6238808311720854659
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 9729688872449720965
     TagComponent:
       Tag: Backpack43
     TransformComponent:
@@ -533,14 +673,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 2779658624891278353
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 6137875601984754690
     TagComponent:
       Tag: Backpack42
     TransformComponent:
@@ -548,14 +692,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 4310752594258725647
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 17563512156908189502
     TagComponent:
       Tag: Backpack41
     TransformComponent:
@@ -563,14 +711,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 17779345259332752534
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 8584092866023645358
     TagComponent:
       Tag: Backpack40
     TransformComponent:
@@ -578,14 +730,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 5129125362989058418
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 15464085760501278531
     TagComponent:
       Tag: Backpack39
     TransformComponent:
@@ -593,14 +749,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 18320693901798651295
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 12171584021882336978
     TagComponent:
       Tag: Backpack38
     TransformComponent:
@@ -608,14 +768,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 13433099707024951244
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 7962311063360224957
     TagComponent:
       Tag: Backpack37
     TransformComponent:
@@ -623,14 +787,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 3639092333208805022
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 6891559811155574717
     TagComponent:
       Tag: Backpack36
     TransformComponent:
@@ -638,14 +806,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 7998500829663968293
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 514124610021668830
     TagComponent:
       Tag: Backpack35
     TransformComponent:
@@ -653,14 +825,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 16643376781106423819
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 17480915921463894891
     TagComponent:
       Tag: Backpack34
     TransformComponent:
@@ -668,14 +844,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 15125450903230715394
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 13442293812584831814
     TagComponent:
       Tag: Backpack33
     TransformComponent:
@@ -683,14 +863,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 14051511901913213193
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 9618386385797098491
     TagComponent:
       Tag: Backpack32
     TransformComponent:
@@ -698,14 +882,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 9046712890613932298
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 9393638869013411790
     TagComponent:
       Tag: Backpack31
     TransformComponent:
@@ -713,14 +901,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 12401408120372344411
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 2467174085667429684
     TagComponent:
       Tag: Backpack30
     TransformComponent:
@@ -728,14 +920,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 1070260965813167697
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 897895713490116169
     TagComponent:
       Tag: Backpack29
     TransformComponent:
@@ -743,14 +939,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 14660113470078598702
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 2436789694260843779
     TagComponent:
       Tag: Backpack28
     TransformComponent:
@@ -758,14 +958,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 12562508598731636382
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 10859289638560352134
     TagComponent:
       Tag: Backpack27
     TransformComponent:
@@ -773,14 +977,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 9511531967337577067
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 15338847725420042004
     TagComponent:
       Tag: Backpack26
     TransformComponent:
@@ -788,14 +996,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 2410896030687012197
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 7749347749673749822
     TagComponent:
       Tag: Backpack25
     TransformComponent:
@@ -803,14 +1015,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 14959470198032957843
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 4161979998876940874
     TagComponent:
       Tag: Backpack24
     TransformComponent:
@@ -818,14 +1034,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 12323494079916542066
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 12510378400638154842
     TagComponent:
       Tag: Backpack23
     TransformComponent:
@@ -833,14 +1053,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 5410902103461034229
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 13609998914075268514
     TagComponent:
       Tag: Backpack22
     TransformComponent:
@@ -848,14 +1072,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 15131010788353465854
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 4503335047923920763
     TagComponent:
       Tag: Backpack21
     TransformComponent:
@@ -863,14 +1091,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 3937453115054576945
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 16928413609308468052
     TagComponent:
       Tag: Backpack20
     TransformComponent:
@@ -878,14 +1110,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 4054312158197439635
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 15239855794965942776
     TagComponent:
       Tag: Backpack19
     TransformComponent:
@@ -893,14 +1129,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 17075466859259254170
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 17094990830268713509
     TagComponent:
       Tag: Backpack18
     TransformComponent:
@@ -908,14 +1148,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 15721682764945909787
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 11701395044544795171
     TagComponent:
       Tag: Backpack17
     TransformComponent:
@@ -923,14 +1167,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 5565611135341127059
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 13207749884553117711
     TagComponent:
       Tag: Backpack16
     TransformComponent:
@@ -938,14 +1186,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 17829009585825204806
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 15879080613629470612
     TagComponent:
       Tag: Backpack15
     TransformComponent:
@@ -953,14 +1205,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 12728611571557972261
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 4435408610673920158
     TagComponent:
       Tag: Backpack14
     TransformComponent:
@@ -968,14 +1224,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 13804022227005049767
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 14278059183704471704
     TagComponent:
       Tag: Backpack13
     TransformComponent:
@@ -983,14 +1243,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 13329571793515406255
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 831948211421818183
     TagComponent:
       Tag: Backpack12
     TransformComponent:
@@ -998,14 +1262,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 5962291096815442257
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 3182282892823983006
     TagComponent:
       Tag: Backpack11
     TransformComponent:
@@ -1013,14 +1281,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 17875573676249894191
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 3292312581883116071
     TagComponent:
       Tag: Backpack10
     TransformComponent:
@@ -1028,14 +1300,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 8944144703790946899
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 7850648307996022171
     TagComponent:
       Tag: Backpack9
     TransformComponent:
@@ -1043,14 +1319,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 10169895051723915805
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 7130383194715653444
     TagComponent:
       Tag: Backpack8
     TransformComponent:
@@ -1058,14 +1338,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 2459575703295343737
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 7642400887128246952
     TagComponent:
       Tag: Backpack7
     TransformComponent:
@@ -1073,14 +1357,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 13342980067938084895
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 8229402838009504124
     TagComponent:
       Tag: Backpack6
     TransformComponent:
@@ -1088,14 +1376,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 6021727965193535759
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 15485595436021195150
     TagComponent:
       Tag: Backpack5
     TransformComponent:
@@ -1103,14 +1395,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 6269722776310541475
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 14411629203535481856
     TagComponent:
       Tag: Backpack4
     TransformComponent:
@@ -1118,14 +1414,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 12024977745535976725
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 2576495422878171871
     TagComponent:
       Tag: Backpack3
     TransformComponent:
@@ -1133,14 +1433,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 18290338418203516310
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 15600727096869736250
     TagComponent:
       Tag: Backpack2
     TransformComponent:
@@ -1148,14 +1452,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 3817379014678900769
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 8412297217375552235
     TagComponent:
       Tag: Backpack1
     TransformComponent:
@@ -1163,14 +1471,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 6357519899531424474
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 15407286700024276582
     TagComponent:
       Tag: Backpack0
     TransformComponent:
@@ -1178,14 +1490,18 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
-      Parent: 10359479181568414110
+      Parent: 15649753853755131991
       Children:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 5878793882408610567
-      Texture: 4936050196408093495
-  - Entity: 10359479181568414110
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 9296570185188545871
+  - Entity: 15649753853755131991
     TagComponent:
       Tag: Backpack
     TransformComponent:
@@ -1195,86 +1511,86 @@ Entities:
     HierarchyComponent:
       Parent: 0
       Children:
-        - 6357519899531424474
-        - 3817379014678900769
-        - 18290338418203516310
-        - 12024977745535976725
-        - 6269722776310541475
-        - 6021727965193535759
-        - 13342980067938084895
-        - 2459575703295343737
-        - 10169895051723915805
-        - 8944144703790946899
-        - 17875573676249894191
-        - 5962291096815442257
-        - 13329571793515406255
-        - 13804022227005049767
-        - 12728611571557972261
-        - 17829009585825204806
-        - 5565611135341127059
-        - 15721682764945909787
-        - 17075466859259254170
-        - 4054312158197439635
-        - 3937453115054576945
-        - 15131010788353465854
-        - 5410902103461034229
-        - 12323494079916542066
-        - 14959470198032957843
-        - 2410896030687012197
-        - 9511531967337577067
-        - 12562508598731636382
-        - 14660113470078598702
-        - 1070260965813167697
-        - 12401408120372344411
-        - 9046712890613932298
-        - 14051511901913213193
-        - 15125450903230715394
-        - 16643376781106423819
-        - 7998500829663968293
-        - 3639092333208805022
-        - 13433099707024951244
-        - 18320693901798651295
-        - 5129125362989058418
-        - 17779345259332752534
-        - 4310752594258725647
-        - 2779658624891278353
-        - 6238808311720854659
-        - 1566917499925051815
-        - 9347838430836973220
-        - 6234188180164107383
-        - 17992170400841374301
-        - 5479140569590820663
-        - 5668465219844839642
-        - 10811101589177276367
-        - 6543150510483749204
-        - 6528235957125341618
-        - 14342169585923457885
-        - 11907669617060783619
-        - 17813884097204900258
-        - 11231067524268272036
-        - 4961114841530907573
-        - 7021410849535495565
-        - 10466455699634584655
-        - 11914913169022851858
-        - 4176425251547737166
-        - 12751964214395734154
-        - 11524455099906323063
-        - 2253992651657314833
-        - 4076029822786528244
-        - 2364083297904108936
-        - 16749911097070929263
-        - 5194391429220321850
-        - 15161270076339249625
-        - 8185509546082958752
-        - 17633714284513944952
-        - 13395128881402281585
-        - 1369577197379361303
-        - 10674845262553256115
-        - 16749739673557458269
-        - 2385493563781739356
-        - 1892647438039836512
-        - 461328377198734011
-  - Entity: 17305616662679891524
+        - 15407286700024276582
+        - 8412297217375552235
+        - 15600727096869736250
+        - 2576495422878171871
+        - 14411629203535481856
+        - 15485595436021195150
+        - 8229402838009504124
+        - 7642400887128246952
+        - 7130383194715653444
+        - 7850648307996022171
+        - 3292312581883116071
+        - 3182282892823983006
+        - 831948211421818183
+        - 14278059183704471704
+        - 4435408610673920158
+        - 15879080613629470612
+        - 13207749884553117711
+        - 11701395044544795171
+        - 17094990830268713509
+        - 15239855794965942776
+        - 16928413609308468052
+        - 4503335047923920763
+        - 13609998914075268514
+        - 12510378400638154842
+        - 4161979998876940874
+        - 7749347749673749822
+        - 15338847725420042004
+        - 10859289638560352134
+        - 2436789694260843779
+        - 897895713490116169
+        - 2467174085667429684
+        - 9393638869013411790
+        - 9618386385797098491
+        - 13442293812584831814
+        - 17480915921463894891
+        - 514124610021668830
+        - 6891559811155574717
+        - 7962311063360224957
+        - 12171584021882336978
+        - 15464085760501278531
+        - 8584092866023645358
+        - 17563512156908189502
+        - 6137875601984754690
+        - 9729688872449720965
+        - 9428009613437153318
+        - 2189109837395782319
+        - 7315983350899304882
+        - 11443024457875216418
+        - 10386868637260336916
+        - 3297645857190907562
+        - 4288062994342136004
+        - 11424265305561531877
+        - 9048924272165738812
+        - 15152672164710008375
+        - 3635149329960319766
+        - 9545840908974845504
+        - 1133085981809117682
+        - 10837473969331725033
+        - 11920156430773992826
+        - 1618688376657582247
+        - 7843693248416040503
+        - 6733405430137427396
+        - 1591407555390497662
+        - 2099652884641259013
+        - 8921116280706214481
+        - 5863954651656252351
+        - 12847247444884415257
+        - 13770751471732480850
+        - 15410602189173589283
+        - 15607109391886531577
+        - 5756255265668596777
+        - 16828413198585874045
+        - 11400384649850865182
+        - 2781901656996272030
+        - 10090355269267413840
+        - 7566374699432785254
+        - 9906215376187087968
+        - 5945615673089773277
+        - 10996255002546189675
+  - Entity: 5584070761154590205
     TagComponent:
       Tag: Second Camera
     TransformComponent:
@@ -1296,7 +1612,7 @@ Entities:
       Parent: 0
       Children:
         []
-  - Entity: 4786241275168900970
+  - Entity: 6122194317251047431
     TagComponent:
       Tag: Camera
     TransformComponent:
@@ -1318,7 +1634,7 @@ Entities:
       Parent: 0
       Children:
         []
-  - Entity: 11621970598608272938
+  - Entity: 9413681401248284604
     TagComponent:
       Tag: Point Light
     TransformComponent:
@@ -1336,7 +1652,7 @@ Entities:
       Constant: 1
       Linear: 0.09
       Quadratic: 0.032
-  - Entity: 17458563621664179216
+  - Entity: 10191381718302882493
     TagComponent:
       Tag: Sun
     TransformComponent:
@@ -1351,7 +1667,7 @@ Entities:
       Color: [1, 1, 0.8]
       Direction: [123, 80, 130]
       Intensity: 1
-  - Entity: 15919020093589045531
+  - Entity: 10857844820241685050
     TagComponent:
       Tag: Plane
     TransformComponent:
@@ -1373,9 +1689,13 @@ Entities:
       Offset: [0, 0, 0]
     StaticMeshComponent:
       Mesh: 0
-      Material: 17563287390633400858
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
       Texture: 0
-  - Entity: 16033554937498919250
+  - Entity: 8826754712867086872
     TagComponent:
       Tag: Sphere
     TransformComponent:
@@ -1388,9 +1708,13 @@ Entities:
         []
     StaticMeshComponent:
       Mesh: 0
-      Material: 17563287390633400858
-      Texture: 8462869209185045758
-  - Entity: 3162189240987957368
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 3657620625299015503
+  - Entity: 1716211377017698833
     TagComponent:
       Tag: Cube
     TransformComponent:
@@ -1412,9 +1736,13 @@ Entities:
       Offset: [0, 0, 0]
     StaticMeshComponent:
       Mesh: 0
-      Material: 17563287390633400858
-      Texture: 8462869209185045758
-  - Entity: 86326792092009163
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 3657620625299015503
+  - Entity: 13770505567964607670
     TagComponent:
       Tag: Square
     TransformComponent:

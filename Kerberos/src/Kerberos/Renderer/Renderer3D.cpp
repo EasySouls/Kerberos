@@ -300,7 +300,8 @@ namespace Kerberos
 			return;
 		}
 
-		const Ref<Shader> shaderToUse = material->MaterialShader ? material->MaterialShader : s_RendererData.ActiveShader;
+		//const Ref<Shader> shaderToUse = material->MaterialShader ? material->MaterialShader : s_RendererData.ActiveShader;
+		const Ref<Shader> shaderToUse = s_RendererData.ActiveShader;
 		shaderToUse->Bind();
 
 		s_RendererData.PerObjectData.ModelMatrix = transform;
