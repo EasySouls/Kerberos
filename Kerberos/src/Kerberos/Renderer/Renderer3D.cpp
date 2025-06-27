@@ -4,6 +4,7 @@
 #include "TextureCube.h"
 #include "UniformBuffer.h"
 #include "Kerberos/Assets/AssetManager.h"
+#include "Kerberos/Assets/Importers/CubemapImporter.h"
 
 static constexpr int MAX_POINT_LIGHTS = 10;
 
@@ -99,6 +100,7 @@ namespace Kerberos
 			"assets/textures/starmap_cubemap_5.png",
 
 		};
+		//s_RendererData.StarmapSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/starmap.kbrcubemap");
 		s_RendererData.StarmapSkyboxTexture = TextureCube::Create("Starmap Skybox", skymapTextures, false);
 		const std::vector<std::string> oceanCubeTextures = {
 			"assets/textures/skybox/right.jpg",
@@ -108,7 +110,8 @@ namespace Kerberos
 			"assets/textures/skybox/front.jpg",
 			"assets/textures/skybox/back.jpg"
 		};
-		s_RendererData.OceanSkyboxTexture = TextureCube::Create("Ocean Skybox", oceanCubeTextures, false);
+		//s_RendererData.OceanSkyboxTexture = TextureCube::Create("Ocean Skybox", oceanCubeTextures, false);
+		s_RendererData.OceanSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/ocean.kbrcubemap");
 		const std::vector<float> skyboxVertices = {
 			-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,

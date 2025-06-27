@@ -13,6 +13,7 @@ namespace Kerberos
 
 		D3D11TextureCube(std::string name, const std::vector<std::string>& faces,
 			bool generateMipmaps, bool srgb);
+		explicit D3D11TextureCube(const CubemapData& data);
 		~D3D11TextureCube() override;
 
 		void Bind(uint32_t slot = 0) const override;

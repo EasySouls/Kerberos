@@ -9,7 +9,7 @@
 #include "imgui/imgui.h"
 #include <ImGuizmo/ImGuizmo.h>
 
-#include "Kerberos/Assets/TextureImporter.h"
+#include "Kerberos/Assets/Importers/TextureImporter.h"
 
 #define PROFILE_SCOPE(name) Timer timer##__LINE__(name, 
 

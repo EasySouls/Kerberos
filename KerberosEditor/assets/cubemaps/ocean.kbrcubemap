@@ -1,0 +1,9 @@
+Cubemap
+	- Name: Ocean Skybox
+	- RightFace: assets/textures/skybox/right.jpg
+	- LeftFace: assets/textures/skybox/left.jpg
+	- TopFace: assets/textures/skybox/top.jpg
+	- BottomFace: assets/textures/skybox/bottom.jpg
+	- FrontFace: assets/textures/skybox/front.jpg
+	- BackFace: assets/textures/skybox/back.jpg
+	- IsSRGB: true

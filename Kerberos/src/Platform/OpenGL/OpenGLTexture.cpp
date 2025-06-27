@@ -2,45 +2,10 @@
 #include "OpenGLTexture.h"
 
 #include "stb_image.h"
+#include "TextureUtils.h"
 
 namespace Kerberos
 {
-	namespace Utils
-	{
-		static constexpr GLenum KBRImageFormatToGLDataFormat(const ImageFormat format)
-		{
-			switch (format)
-			{
-			case ImageFormat::RGB8: return GL_RGB;
-			case ImageFormat::RGBA8: return GL_RGBA;
-			case ImageFormat::None:
-			case ImageFormat::R8:
-			case ImageFormat::RGBA32F:
-				break;
-			}
-
-			KBR_CORE_ASSERT(false, "KBRImageFormatToGLDataFormat - unsupported format");
-			return 0;
-		}
-
-		static constexpr GLenum KBRImageFormatToGLInternalFormat(const ImageFormat format)
-		{
-			switch (format)
-			{
-			case ImageFormat::RGB8: return GL_RGB8;
-			case ImageFormat::RGBA8: return GL_RGBA8;
-			case ImageFormat::None:
-			case ImageFormat::R8:
-			case ImageFormat::RGBA32F:
-				break;
-			}
-
-			KBR_CORE_ASSERT(false, "KBRImageFormatToGLInternalFormat - unsupported format");
-			return 0;
-		}
-	
-	}
-
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 		: m_Path(path)
 	{
@@ -108,12 +73,10 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		/// TODO: Choose formats based on spec.Format
-
 		/// Internal format is how OpenGl will store the texture data internally (in the GPU)
-		const GLenum internalFormat = Utils::KBRImageFormatToGLInternalFormat(spec.Format);
+		const GLenum internalFormat = TextureUtils::KBRImageFormatToGLInternalFormat(spec.Format);
 		/// Data format is the format of the texture data we provide to OpenGL
-		const GLenum dataFormat = Utils::KBRImageFormatToGLDataFormat(spec.Format);
+		const GLenum dataFormat = TextureUtils::KBRImageFormatToGLDataFormat(spec.Format);
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, internalFormat, static_cast<int>(m_Spec.Width), static_cast<int>(m_Spec.Height));

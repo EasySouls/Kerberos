@@ -66,7 +66,7 @@
     <ClInclude Include="src\Kerberos\Assets\Asset.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Assets\AssetImporter.h">
+    <ClInclude Include="src\Kerberos\Assets\Importers\AssetImporter.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Assets\AssetManager.h">
@@ -90,7 +90,7 @@
     <ClInclude Include="src\Kerberos\Assets\RuntimeAssetManager.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Assets\TextureImporter.h">
+    <ClInclude Include="src\Kerberos\Assets\Importers\TextureImporter.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Core.h">
@@ -339,12 +339,14 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Importers\CubemapImporter.h" />
+    <ClInclude Include="src\Platform\OpenGL\TextureUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
       <Filter>src\Kerberos</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Assets\AssetImporter.cpp">
+    <ClCompile Include="src\Kerberos\Assets\Importers\AssetImporter.cpp">
       <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\AssetManager.cpp">
@@ -362,7 +364,7 @@
     <ClCompile Include="src\Kerberos\Assets\RuntimeAssetManager.cpp">
       <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Assets\TextureImporter.cpp">
+    <ClCompile Include="src\Kerberos\Assets\Importers\TextureImporter.cpp">
       <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Core\UUID.cpp">
@@ -542,5 +544,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\Importers\CubemapImporter.cpp" />
   </ItemGroup>
 </Project>

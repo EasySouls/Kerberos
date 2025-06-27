@@ -34,4 +34,31 @@ namespace Kerberos
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
+
+	Ref<TextureCube> TextureCube::Create(const CubemapData& data) 
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLTextureCube>(data);
+
+		case RendererAPI::API::D3D11:
+			return CreateRef<D3D11TextureCube>(data);
+
+		case RendererAPI::API::D3D12:
+			KBR_CORE_ASSERT(false, "D3D12 is currently not supported!");
+			return nullptr;
+
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanTextureCube>(data);
+		}
+
+		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
 }

@@ -14,6 +14,17 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
+		const auto [spec, data] = LoadTextureData(filepath);
+
+		auto texture = Texture2D::Create(spec, data);
+
+		stbi_image_free(data.Data);
+
+		return texture;
+	}
+
+	std::pair<TextureSpecification, Buffer> TextureImporter::LoadTextureData(const std::filesystem::path& filepath) 
+	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
 		Buffer data;
@@ -26,7 +37,7 @@ namespace Kerberos
 		if (data.Data == nullptr)
 		{
 			KBR_CORE_ERROR("TextureImporter::ImportTexture - failed to load texture from filepath: {}", filepath.string());
-			return nullptr;
+			return std::make_pair(TextureSpecification{}, Buffer{});
 		}
 
 		data.Size = static_cast<uint64_t>(width) * height * channels;
@@ -47,10 +58,6 @@ namespace Kerberos
 			break;
 		}
 
-		auto texture = Texture2D::Create(spec, data);
-
-		stbi_image_free(data.Data);
-
-		return texture;
+		return std::make_pair(spec, data);
 	}
 }

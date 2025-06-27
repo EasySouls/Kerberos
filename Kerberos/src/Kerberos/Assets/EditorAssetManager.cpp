@@ -1,7 +1,7 @@
 #include "kbrpch.h"
 #include "EditorAssetManager.h"
 
-#include "AssetImporter.h"
+#include "Kerberos/Assets/Importers/AssetImporter.h"
 #include "Kerberos/Project/Project.h"
 
 #include <yaml-cpp/yaml.h>
@@ -69,15 +69,16 @@ namespace Kerberos
 		metadata.Filepath = filepath;
 		metadata.Type = AssetTypeFromFileExtension(filepath);
 
-		Ref<Asset> asset = AssetImporter::ImportAsset(handle, metadata);
+		const Ref<Asset> asset = AssetImporter::ImportAsset(handle, metadata);
 		if (!asset)
 		{
 			KBR_CORE_ERROR("Failed to import asset: {0}", filepath.string());
 			return;
 		}
 
-		asset->GetHandle() = handle;
-		m_LoadedAssets[handle] = asset;
+		handle = asset->GetHandle();
+		m_AssetRegistry[handle] = metadata;
+		//m_LoadedAssets[handle] = asset;
 	}
 
 	const AssetMetadata& EditorAssetManager::GetMetadata(const AssetHandle handle) const
@@ -93,7 +94,7 @@ namespace Kerberos
 		YAML::Emitter out;
 		{
 			out << YAML::BeginMap;
-			out << YAML::Key << "AssetRegistry";
+			out << YAML::Key << "AssetRegistry" << YAML::Value;
 
 			for (const auto& [handle, metadata] : m_AssetRegistry)
 			{
@@ -132,7 +133,17 @@ namespace Kerberos
 			return false;
 		}
 
-		const auto registryNode = data["AssetRegistry"];
+		YAML::Node registryNode;
+		try
+		{
+			registryNode = data["AssetRegistry"];
+		} 
+		catch (const YAML::BadSubscript& e)
+		{
+			KBR_CORE_WARN("Registry was empty: {0}", e.what());
+			return false;
+		}
+
 		if (!registryNode)
 		{
 			KBR_CORE_ERROR("Invalid asset registry file: {0}", assetRegistryPath.string());
@@ -160,6 +171,8 @@ namespace Kerberos
 				KBR_CORE_WARN("Unsupported asset type: {0}", typeStr);
 			}
 		}
+
+		KBR_CORE_INFO("Asset registry loaded from {0}", assetRegistryPath.string());
 
 		return true;
 	}

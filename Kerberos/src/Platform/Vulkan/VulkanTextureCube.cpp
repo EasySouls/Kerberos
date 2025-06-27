@@ -10,6 +10,11 @@ namespace Kerberos
 
 	}
 
+	VulkanTextureCube::VulkanTextureCube(const CubemapData& data) 
+	{
+		throw std::runtime_error("VulkanTextureCube::VulkanTextureCube(const CubemapData& data) is not yet implemented.");
+	}
+
 	VulkanTextureCube::~VulkanTextureCube()
 	{
 

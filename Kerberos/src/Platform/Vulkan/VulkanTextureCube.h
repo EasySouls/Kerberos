@@ -13,6 +13,7 @@ namespace Kerberos
 
 		VulkanTextureCube(std::string name, const std::vector<std::string>& faces,
 			bool generateMipmaps, bool srgb);
+		explicit VulkanTextureCube(const CubemapData& data);
 		~VulkanTextureCube() override;
 
 		void Bind(uint32_t slot = 0) const override;

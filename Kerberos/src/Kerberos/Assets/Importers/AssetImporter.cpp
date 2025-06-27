@@ -1,6 +1,7 @@
 #include "kbrpch.h"
 #include "AssetImporter.h"
 
+#include "CubemapImporter.h"
 #include "TextureImporter.h"
 #include "Kerberos/Renderer/Texture.h"
 
@@ -13,6 +14,7 @@ namespace Kerberos
 		case AssetType::Texture2D:
 			return TextureImporter::ImportTexture(handle, metadata);
 		case AssetType::TextureCube:
+			return CubemapImporter::ImportCubemap(handle, metadata);
 			break;
 		case AssetType::Material:
 			break;

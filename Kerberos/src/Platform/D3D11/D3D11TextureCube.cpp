@@ -9,6 +9,11 @@ namespace Kerberos
 	{
 	}
 
+	D3D11TextureCube::D3D11TextureCube(const CubemapData& data) 
+	{
+		throw std::runtime_error("D3D11TextureCube::D3D11TextureCube(const CubemapData&) is not yet implemented.");
+	}
+
 	D3D11TextureCube::~D3D11TextureCube() = default;
 
 	void D3D11TextureCube::Bind(uint32_t slot) const
