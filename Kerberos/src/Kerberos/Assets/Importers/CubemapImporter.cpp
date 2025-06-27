@@ -20,7 +20,18 @@ namespace Kerberos
 
 		CubemapDescriptor descriptor;
 
-		YAML::Node node = YAML::LoadFile(filepath.string());
+		const auto& absolutePath = std::filesystem::absolute(filepath);
+
+		YAML::Node node;
+		try
+		{
+		node = YAML::LoadFile(absolutePath.string());
+		} 
+		catch (const YAML::Exception& e)
+		{
+			KBR_CORE_ERROR("CubemapImporter::ImportCubemap - Failed to load yaml file: {}", e.what());
+			return nullptr;
+		}
 
 		if (auto cubemapNode = node["Cubemap"])
 		{
