@@ -22,7 +22,7 @@ namespace Kerberos
 	public:
 		static Ref<Project> New();
 		static Ref<Project> Load(const std::filesystem::path& filepath);
-		static bool SaveActive(const std::filesystem::path& filepath);
+		static bool SaveActive();
 
 		/**
 		* Returns the path to the active project's asset directory.

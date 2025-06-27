@@ -84,7 +84,7 @@ namespace Kerberos
 			Filesystem = 1
 		};
 
-		Mode m_Mode = Mode::Asset;
+		Mode m_Mode = Mode::Filesystem;
 	};
 
 }

@@ -38,7 +38,7 @@ namespace Kerberos
 		[[nodiscard]] bool OpenProject();
 
 		void SaveScene();
-		void SaveSceneAs() const;
+		void SaveSceneAs();
 		void LoadScene();
 		void OpenScene(const std::filesystem::path& filepath);
 		void NewScene();

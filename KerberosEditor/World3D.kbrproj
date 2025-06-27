@@ -1,4 +1,4 @@
 Project:
   Name: World3D
   AssetDirectory: Assets
-  StartScenePath: "scenes/Example.kerberos"
+  StartScenePath: scenes/Example.kerberos

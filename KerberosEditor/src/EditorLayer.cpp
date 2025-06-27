@@ -718,9 +718,11 @@ namespace Kerberos
 		serializer.Serialize(scenePath.string());
 
 		m_NotificationManager.AddNotification("Scene saved to " + scenePath.string(), Notification::Type::Info);
+
+		Project::SaveActive();
 	}
 
-	void EditorLayer::SaveSceneAs() const
+	void EditorLayer::SaveSceneAs()
 	{
 		const std::string filepath = FileDialog::SaveFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
 		if (filepath.empty())
@@ -728,6 +730,10 @@ namespace Kerberos
 
 		const SceneSerializer serializer(m_ActiveScene);
 		serializer.Serialize(filepath);
+
+		m_NotificationManager.AddNotification("Scene saved to " + filepath, Notification::Type::Info);
+
+		Project::SaveActive();
 	}
 
 	void EditorLayer::LoadScene()

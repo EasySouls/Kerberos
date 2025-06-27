@@ -66,13 +66,13 @@ namespace Kerberos
 	{
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
-			KBR_CORE_TRACE("Processing mesh: {}", scene->mMeshes[node->mMeshes[i]]->mName.C_Str());
+			//KBR_CORE_TRACE("Processing mesh: {}", scene->mMeshes[node->mMeshes[i]]->mName.C_Str());
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 			m_Meshes.push_back(ProcessMesh(mesh, scene));
 		}
 		for (unsigned int i = 0; i < node->mNumChildren; i++)
 		{
-			KBR_CORE_TRACE("Processing child node: {}", node->mChildren[i]->mName.C_Str());
+			//KBR_CORE_TRACE("Processing child node: {}", node->mChildren[i]->mName.C_Str());
 			ProcessNode(node->mChildren[i], scene);
 		}
 	}
@@ -83,7 +83,7 @@ namespace Kerberos
 		std::vector<uint32_t> indices;
 		std::vector<Ref<Texture2D>> textures;
 
-		KBR_CORE_TRACE("Processing mesh with {} vertices and {} faces", mesh->mNumVertices, mesh->mNumFaces);
+		//KBR_CORE_TRACE("Processing mesh with {} vertices and {} faces", mesh->mNumVertices, mesh->mNumFaces);
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
@@ -142,7 +142,7 @@ namespace Kerberos
 
 	std::vector<Ref<Texture2D>> Model::LoadMaterialTextures(const aiMaterial* mat, const aiTextureType type, const std::string& typeName) 
 	{
-		KBR_CORE_TRACE("Loading material textures of type {} and count {}", typeName, mat->GetTextureCount(type));
+		//KBR_CORE_TRACE("Loading material textures of type {} and count {}", typeName, mat->GetTextureCount(type));
 
 		std::vector<Ref<Texture2D>> textures;
 		
@@ -159,7 +159,7 @@ namespace Kerberos
 
 			if (textureExists)	
 			{
-				KBR_CORE_TRACE("Texture {} already loaded, skipping", texturePath.string());
+				//KBR_CORE_TRACE("Texture {} already loaded, skipping", texturePath.string());
 				continue;
 			}
 			

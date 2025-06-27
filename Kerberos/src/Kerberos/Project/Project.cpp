@@ -34,18 +34,26 @@ namespace Kerberos
 		return nullptr;
 	}
 
-	bool Project::SaveActive(const std::filesystem::path& filepath)
+	bool Project::SaveActive()
 	{
+		const auto savePath = GetActive()->m_ProjectDirectory / (GetActive()->m_Info.Name + ".kbrproj");
+
 		const ProjectSerializer serializer(s_ActiveProject);
-		if (serializer.Serialize(filepath))
+		if (serializer.Serialize(savePath))
 		{
-			s_ActiveProject->m_ProjectDirectory = filepath.parent_path();
-			KBR_CORE_INFO("Project is saved to {}", std::filesystem::absolute(filepath).string());
+			s_ActiveProject->m_ProjectDirectory = savePath.parent_path();
+			KBR_CORE_INFO("Project is saved to {}", std::filesystem::absolute(savePath).string());
+
+			if (const auto editorAssetManager = std::dynamic_pointer_cast<EditorAssetManager>(s_ActiveProject->m_AssetManager))
+			{
+				editorAssetManager->SerializeAssetRegistry();
+			}
+
 			return true;
 		}
 		else
 		{
-			KBR_CORE_WARN("Could not save project to {}", std::filesystem::absolute(filepath).string());
+			KBR_CORE_WARN("Could not save project to {}", std::filesystem::absolute(savePath).string());
 			return false;
 		}
 	}
