@@ -168,6 +168,13 @@ namespace Kerberos
 				std::filesystem::remove(path);
 				ImGui::CloseCurrentPopup();
 			}
+			if (ImGui::MenuItem("Import as asset"))
+			{
+				const Ref<EditorAssetManager> assetManager = Project::GetActive()->GetEditorAssetManager();
+				assetManager->ImportAsset(path);
+
+				ImGui::CloseCurrentPopup();
+			}
 			// Add other file-specific menu items (e.g., Rename, Show in Explorer)
 			ImGui::EndPopup();
 		}

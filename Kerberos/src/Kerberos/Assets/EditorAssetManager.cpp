@@ -14,9 +14,11 @@ namespace Kerberos
 		const std::string extension = filepath.extension().string();
 		if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
 			return AssetType::Texture2D;
-		else if (extension == ".fbx" || extension == ".obj")
+		if (extension == ".kbrcubemap")
+			return AssetType::TextureCube;
+		if (extension == ".fbx" || extension == ".obj")
 			return AssetType::Mesh;
-		else if (extension == ".kerberos")
+		if (extension == ".kerberos")
 			return AssetType::Scene;
 		KBR_CORE_WARN("Unknown asset type for file: {0}", filepath.string());
 		return AssetType::Texture2D;
@@ -64,6 +66,7 @@ namespace Kerberos
 
 	AssetHandle EditorAssetManager::ImportAsset(const std::filesystem::path& filepath)
 	{
+		/// Generate new handle
 		AssetHandle handle;
 		AssetMetadata metadata;
 		metadata.Filepath = filepath;
@@ -76,8 +79,10 @@ namespace Kerberos
 			return AssetHandle::Invalid();
 		}
 
-		handle = asset->GetHandle();
+		/// Assign generated handle to asset
+		asset->GetHandle() = handle;
 		m_AssetRegistry[handle] = metadata;
+
 		SerializeAssetRegistry();
 		//m_LoadedAssets[handle] = asset;
 		return handle;
@@ -96,7 +101,7 @@ namespace Kerberos
 		YAML::Emitter out;
 		{
 			out << YAML::BeginMap;
-			out << YAML::Key << "AssetRegistry" << YAML::Value;
+			out << YAML::Key << "AssetRegistry" << YAML::Value << YAML::BeginSeq;
 
 			for (const auto& [handle, metadata] : m_AssetRegistry)
 			{
@@ -107,6 +112,7 @@ namespace Kerberos
 				out << YAML::EndMap;
 			}
 
+			out << YAML::EndSeq;
 			out << YAML::EndMap;
 		}
 
@@ -157,6 +163,7 @@ namespace Kerberos
 			if (!assetNode["Handle"] || !assetNode["Type"] || !assetNode["Path"])
 			{
 				KBR_CORE_ERROR("Invalid asset entry in registry: {0}", assetRegistryPath.string());
+				KBR_CORE_ASSERT(false, "Invalid asset entry in registry");
 				continue;
 			}
 			const AssetHandle handle = AssetHandle(assetNode["Handle"].as<uint64_t>());
@@ -164,13 +171,14 @@ namespace Kerberos
 			const std::filesystem::path filepath = assetNode["Path"].as<std::string>();
 
 			const AssetType type = AssetTypeFromString(typeStr);
-			if (type == AssetType::Texture2D)
+			if (type == AssetType::Texture2D || type == AssetType::TextureCube)
 			{
 				m_AssetRegistry.Add(handle, { .Type = type, .Filepath = filepath });
 			}
 			else
 			{
 				KBR_CORE_WARN("Unsupported asset type: {0}", typeStr);
+				KBR_CORE_ASSERT(false, "Unsupported asset type");
 			}
 		}
 

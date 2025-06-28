@@ -1,1 +1,7 @@
-AssetRegistry
+AssetRegistry:
+  - Handle: 1482023877409938326
+    Type: TextureCube
+    Path: Assets\cubemaps\ocean.kbrcubemap
+  - Handle: 15700455669564021845
+    Type: TextureCube
+    Path: Assets\cubemaps\starmap.kbrcubemap
