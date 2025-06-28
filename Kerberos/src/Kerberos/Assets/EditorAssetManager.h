@@ -14,7 +14,7 @@ namespace Kerberos
 		bool IsAssetHandleValid(AssetHandle handle) override;
 		bool IsAssetLoaded(AssetHandle handle) override;
 
-		void ImportAsset(const std::filesystem::path& filepath);
+		AssetHandle ImportAsset(const std::filesystem::path& filepath);
 
 		const AssetMetadata& GetMetadata(AssetHandle handle) const;
 

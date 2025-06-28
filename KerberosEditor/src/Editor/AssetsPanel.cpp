@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include "Kerberos/Log.h"
-#include "Kerberos/Assets/TextureImporter.h"
+#include "Kerberos/Assets/Importers/TextureImporter.h"
 #include "Kerberos/Project/Project.h"
 
 namespace Kerberos

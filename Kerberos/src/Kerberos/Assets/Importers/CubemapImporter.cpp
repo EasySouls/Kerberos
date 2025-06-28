@@ -25,7 +25,7 @@ namespace Kerberos
 		YAML::Node node;
 		try
 		{
-		node = YAML::LoadFile(absolutePath.string());
+			node = YAML::LoadFile(absolutePath.string());
 		} 
 		catch (const YAML::Exception& e)
 		{

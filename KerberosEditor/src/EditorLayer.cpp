@@ -59,8 +59,6 @@ namespace Kerberos
 
 		const Ref<Material> whiteMaterial = CreateRef<Material>();
 
-		const auto skymapTexture = Texture2D::Create("assets/textures/starmap_cubemap_1.png");
-
 		{
 			Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
 			const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);

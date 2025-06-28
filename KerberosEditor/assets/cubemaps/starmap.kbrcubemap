@@ -1,0 +1,9 @@
+Cubemap:
+  Name: Ocean Skybox
+  RightFace: assets/textures/starmap_cubemap_0.png
+  LeftFace: assets/textures/starmap_cubemap_1.png
+  TopFace: assets/textures/starmap_cubemap_2.png
+  BottomFace: assets/textures/starmap_cubemap_3.png
+  FrontFace: assets/textures/starmap_cubemap_4.png
+  BackFace: assets/textures/starmap_cubemap_5.png
+  IsSRGB: true

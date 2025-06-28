@@ -100,8 +100,8 @@ namespace Kerberos
 			"assets/textures/starmap_cubemap_5.png",
 
 		};
-		//s_RendererData.StarmapSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/starmap.kbrcubemap");
-		s_RendererData.StarmapSkyboxTexture = TextureCube::Create("Starmap Skybox", skymapTextures, false);
+		s_RendererData.StarmapSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/starmap.kbrcubemap");
+		//s_RendererData.StarmapSkyboxTexture = TextureCube::Create("Starmap Skybox", skymapTextures, false);
 		const std::vector<std::string> oceanCubeTextures = {
 			"assets/textures/skybox/right.jpg",
 			"assets/textures/skybox/left.jpg",

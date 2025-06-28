@@ -210,6 +210,8 @@ namespace Kerberos
 			out << YAML::Key << "Velocity" << YAML::Value << rigidBody.Velocity;
 			out << YAML::Key << "AngularVelocity" << YAML::Value << rigidBody.AngularVelocity;
 			out << YAML::Key << "UseGravity" << YAML::Value << rigidBody.UseGravity;
+			out << YAML::Key << "Friction" << YAML::Value << rigidBody.Friction;
+			out << YAML::Key << "Restitution" << YAML::Value << rigidBody.Restitution;
 			out << YAML::EndMap;
 		}
 
@@ -420,6 +422,8 @@ namespace Kerberos
 					rigidBody.Velocity = rigidBodyComponent["Velocity"].as<glm::vec3>();
 					rigidBody.AngularVelocity = rigidBodyComponent["AngularVelocity"].as<glm::vec3>();
 					rigidBody.UseGravity = rigidBodyComponent["UseGravity"].as<bool>();
+					rigidBody.Friction = rigidBodyComponent["Friction"].as<float>();
+					rigidBody.Restitution = rigidBodyComponent["Restitution"].as<float>();
 				}
 
 				if (auto boxColliderComponent = entity["BoxCollider3DComponent"])

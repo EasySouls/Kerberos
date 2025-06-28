@@ -62,7 +62,7 @@ namespace Kerberos
 		return m_LoadedAssets.contains(handle);
 	}
 
-	void EditorAssetManager::ImportAsset(const std::filesystem::path& filepath)
+	AssetHandle EditorAssetManager::ImportAsset(const std::filesystem::path& filepath)
 	{
 		AssetHandle handle;
 		AssetMetadata metadata;
@@ -73,12 +73,14 @@ namespace Kerberos
 		if (!asset)
 		{
 			KBR_CORE_ERROR("Failed to import asset: {0}", filepath.string());
-			return;
+			return AssetHandle::Invalid();
 		}
 
 		handle = asset->GetHandle();
 		m_AssetRegistry[handle] = metadata;
+		SerializeAssetRegistry();
 		//m_LoadedAssets[handle] = asset;
+		return handle;
 	}
 
 	const AssetMetadata& EditorAssetManager::GetMetadata(const AssetHandle handle) const
