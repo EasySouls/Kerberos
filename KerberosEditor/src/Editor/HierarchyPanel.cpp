@@ -1,10 +1,10 @@
 #include "HierarchyPanel.h"
+#include "Kerberos/Scene/Components.h"
+#include "Kerberos/Assets/AssetManager.h"
+#include "Kerberos/Assets/Importers/TextureImporter.h"
 
 #include <glm/gtc/type_ptr.hpp>
-
-#include "Kerberos/Scene/Components.h"
 #include <imgui/imgui.h>
-
 #include "imgui/imgui_internal.h"
 #include <filesystem>
 
@@ -26,28 +26,33 @@ namespace Kerberos
 		/// when loading a new scene
 		m_SelectedEntity = {};
 
-		m_IceTexture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
-		m_SpriteSheetTexture = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
+		m_IceTexture = TextureImporter::ImportTexture("assets/textures/y2k_ice_texture.png");
+		m_SpriteSheetTexture = TextureImporter::ImportTexture("assets/game/textures/RPGpack_sheet_2X.png");
 		m_CubeMesh = Mesh::CreateCube(1.0f);
 		m_SphereMesh = Mesh::CreateSphere(1.0f, 16, 16);
 		m_WhiteMaterial = CreateRef<Material>();
 
-		m_WhiteTexture = Texture2D::Create(1, 1);
-		uint32_t whiteTextureData = 0xffffffff;
-		m_WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+		m_WhiteTexture = AssetManager::GetDefaultTexture2D();
 	}
 
 	void HierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Hierarchy");
-		for (const auto entityId : m_Context->m_Registry.view<entt::entity>())
+
+		/// Only draw the root nodes
+		for (const entt::entity& entityId : m_Context->GetRootEntities())
 		{
-			Entity e{ entityId, m_Context.get() };
-			
-			/// Only draw the root nodes
-			if (!m_Context->GetParent(e))
-				DrawEntityNode(e);
+			Entity rootEntity{ entityId, m_Context.get() };
+			DrawEntityNode(rootEntity);
 		}
+
+		//for (const auto entityId : m_Context->m_Registry.view<entt::entity>())
+		//{
+		//	Entity e{ entityId, m_Context.get() };
+
+		//	if (!m_Context->GetParent(e))
+		//		DrawEntityNode(e);
+		//}
 
 		/// If an empty space is clicked, deselect the entity
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
@@ -121,10 +126,18 @@ namespace Kerberos
 					ImGui::CloseCurrentPopup();
 				}
 
+				if (ImGui::MenuItem("Environment"))
+				{
+					m_SelectedEntity.AddComponent<EnvironmentComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
 				ImGui::EndPopup();
 			}
 		}
 		ImGui::End();
+
+		m_NotificationManager.RenderNotifications();
 	}
 
 	void HierarchyPanel::SetSelectedEntity(const Entity entity)
@@ -178,7 +191,7 @@ namespace Kerberos
 		}
 	}
 
-	static void DrawVec3Control(const std::string& label, glm::vec3& values, const float resetValue = 0.0f, const float columnWidth = 80.0f)
+	static void DrawVec3Control(const std::string& label, glm::vec3& values, const float resetValue = 0.0f, const float columnWidth = 80.0f, const std::function<void()>& onValueChanged = nullptr)
 	{
 		const ImGuiIO& io = ImGui::GetIO();
 		const auto boldFont = io.Fonts->Fonts[1];
@@ -204,6 +217,8 @@ namespace Kerberos
 		if (ImGui::Button("X", buttonSize))
 		{
 			values.x = resetValue;
+			if (onValueChanged)
+				onValueChanged();
 		}
 		ImGui::PopFont();
 
@@ -211,7 +226,12 @@ namespace Kerberos
 
 		ImGui::SameLine();
 		/// ##X is used to hide the label of the input field
-		ImGui::DragFloat("##X", &values.x, 0.1f);
+		if (ImGui::DragFloat("##X", &values.x, 0.1f))
+		{
+			if (onValueChanged)
+				onValueChanged();
+		}
+
 		ImGui::PopItemWidth();
 		ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
 
@@ -223,6 +243,8 @@ namespace Kerberos
 		if (ImGui::Button("Y", buttonSize))
 		{
 			values.y = resetValue;
+			if (onValueChanged)
+				onValueChanged();
 		}
 		ImGui::PopFont();
 
@@ -230,7 +252,12 @@ namespace Kerberos
 
 		ImGui::SameLine();
 		/// ##Y is used to hide the label of the input field
-		ImGui::DragFloat("##Y", &values.y, 0.1f);
+		if (ImGui::DragFloat("##Y", &values.y, 0.1f))
+		{
+			if (onValueChanged)
+				onValueChanged();
+		}
+
 		ImGui::PopItemWidth();
 		ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
 
@@ -242,6 +269,8 @@ namespace Kerberos
 		if (ImGui::Button("Z", buttonSize))
 		{
 			values.z = resetValue;
+			if (onValueChanged)
+				onValueChanged();
 		}
 		ImGui::PopFont();
 
@@ -249,7 +278,11 @@ namespace Kerberos
 
 		ImGui::SameLine();
 		/// ##Z is used to hide the label of the input field
-		ImGui::DragFloat("##Z", &values.z, 0.1f);
+		if (ImGui::DragFloat("##Z", &values.z, 0.1f))
+		{
+			if (onValueChanged)
+				onValueChanged();
+		}
 		ImGui::PopItemWidth();
 
 		ImGui::PopStyleVar();
@@ -260,7 +293,7 @@ namespace Kerberos
 		ImGui::PopID();
 	}
 
-	void HierarchyPanel::DrawComponents(const Entity entity) const
+	void HierarchyPanel::DrawComponents(const Entity entity)
 	{
 		if (entity.HasComponent<TagComponent>())
 		{
@@ -284,9 +317,14 @@ namespace Kerberos
 			if (ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
-				DrawVec3Control("Position", transform.Translation);
-				DrawVec3Control("Rotation", transform.Rotation);
-				DrawVec3Control("Scale", transform.Scale, 1.0f);
+				const auto onValueChanged = [&entity, this]()
+				{
+					m_Context->CalculateEntityTransform(entity);
+				};
+
+				DrawVec3Control("Position", transform.Translation, 0.0f, 80.0f, onValueChanged);
+				DrawVec3Control("Rotation", transform.Rotation, 0.0f, 80.0f, onValueChanged);
+				DrawVec3Control("Scale", transform.Scale, 1.0f, 80.f, onValueChanged);
 
 				ImGui::TreePop();
 			}
@@ -640,12 +678,17 @@ namespace Kerberos
 				/// Handle drag and drop for textures
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_TEXTURE"))
 					{
-						/// TODO: Handle the case where the payload is not a texture
-						const auto& pathStr = static_cast<const char*>(payload->Data);
-						const std::filesystem::path path = ASSETS_DIRECTORY / pathStr;
-						staticMesh.MeshTexture = Texture2D::Create(path.string());
+						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
+						if (AssetManager::GetAssetType(handle) != AssetType::Texture2D)
+						{
+							KBR_ERROR("Asset is not a texture: {0}", handle);
+							m_NotificationManager.AddNotification("Asset is not a texture", Notification::Type::Error);
+							return;
+						}
+						const Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
+						staticMesh.MeshTexture = texture;
 					}
 					ImGui::EndDragDropTarget();
 				}
@@ -718,6 +761,8 @@ namespace Kerberos
 					ImGui::EndCombo();
 				}
 
+				ImGui::DragFloat("Friction", &rb.Friction, 0.02f, 0.0f, 1.0f);
+				ImGui::DragFloat("Restitution", &rb.Restitution, 0.02f, 0.0f, 1.0f);
 				ImGui::DragFloat3("Velocity", glm::value_ptr(rb.Velocity), 0.1f);
 				ImGui::DragFloat3("Angular Velocity", glm::value_ptr(rb.AngularVelocity));
 				ImGui::Checkbox("Use Gravity", &rb.UseGravity);
@@ -768,6 +813,58 @@ namespace Kerberos
 			if (componentDeleted)
 			{
 				entity.RemoveComponent<BoxCollider3DComponent>();
+			}
+		}
+		if (entity.HasComponent<EnvironmentComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(EnvironmentComponent).hash_code()), treeNodeFlags, "Environment");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Environment Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (opened)
+			{
+				auto& environment = entity.GetComponent<EnvironmentComponent>();
+				ImGui::Checkbox("Skybox Enabled", &environment.IsSkyboxEnabled);
+
+				/// Handle drag and drop for textures
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_TEXTURE_CUBE"))
+					{
+						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
+						if (AssetManager::GetAssetType(handle) != AssetType::TextureCube)
+						{
+							KBR_ERROR("Asset is not a texture: {0}", handle);
+							/// TODO: Show a notification instead of an error log
+							m_NotificationManager.AddNotification("Asset is not a cubemap", Notification::Type::Error);
+							return;
+						}
+						environment.SkyboxTexture = handle;
+					}
+					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::TreePop();
+			}
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<EnvironmentComponent>();
 			}
 		}
 	}

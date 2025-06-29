@@ -6,6 +6,7 @@
 #include "Kerberos/Renderer/Texture.h"
 #include "Kerberos/Renderer/Material.h"
 #include "Kerberos/Renderer/Mesh.h"
+#include "../Notification/NotificationManager.h"
 
 namespace Kerberos
 {
@@ -19,7 +20,7 @@ namespace Kerberos
 		void SetContext(const Ref<Scene>& context);
 
 		void OnImGuiRender();
-		void DrawComponents(Entity entity) const;
+		void DrawComponents(Entity entity);
 
 		Entity GetSelectedEntity() const { return m_SelectedEntity; }
 		void SetSelectedEntity(Entity entity);
@@ -41,5 +42,7 @@ namespace Kerberos
 		Ref<Mesh> m_SphereMesh;
 		
 		Ref<Material> m_WhiteMaterial;
+
+		NotificationManager m_NotificationManager;
 	};
 }

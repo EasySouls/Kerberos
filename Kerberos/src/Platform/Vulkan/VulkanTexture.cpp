@@ -76,7 +76,7 @@ namespace Kerberos
     }
 
 	VulkanTexture2D::VulkanTexture2D(const std::string& path)
-		: m_Path(path)
+		: Texture2D(), m_Path(path)
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -93,10 +93,10 @@ namespace Kerberos
 
 		KBR_ASSERT(imageData, "Failed to load image!");
 
-		m_Width = static_cast<unsigned int>(width);
-		m_Height = static_cast<unsigned int>(height);
+		m_Spec.Width = static_cast<unsigned int>(width);
+		m_Spec.Height = static_cast<unsigned int>(height);
 
-		uint32_t imageSize = m_Width * m_Height * 4;
+		uint32_t imageSize = m_Spec.Width * m_Spec.Height * 4;
 
 		const VulkanContext& context = VulkanContext::Get();
 		const VkDevice device = context.GetDevice();
@@ -110,8 +110,8 @@ namespace Kerberos
             imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
             imageInfo.imageType = VK_IMAGE_TYPE_2D;
             imageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-            imageInfo.extent.width = m_Width;
-            imageInfo.extent.height = m_Height;
+            imageInfo.extent.width = m_Spec.Width;
+            imageInfo.extent.height = m_Spec.Height;
             imageInfo.extent.depth = 1;
             imageInfo.mipLevels = 1;
             imageInfo.arrayLayers = 1;
@@ -283,8 +283,8 @@ namespace Kerberos
             VkBufferImageCopy region = {};
             region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             region.imageSubresource.layerCount = 1;
-            region.imageExtent.width = m_Width;
-            region.imageExtent.height = m_Height;
+            region.imageExtent.width = m_Spec.Width;
+            region.imageExtent.height = m_Spec.Height;
             region.imageExtent.depth = 1;
             vkCmdCopyBufferToImage(commandBuffer, m_UploadBuffer, m_Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
@@ -308,14 +308,14 @@ namespace Kerberos
 		context.SubmitCommandBuffer(commandBuffer);
 	}
 
-	VulkanTexture2D::VulkanTexture2D(const uint32_t width, const uint32_t height)
-		: m_Width(width), m_Height(height)
+	VulkanTexture2D::VulkanTexture2D(const TextureSpecification& spec, Buffer data)
+		: m_Spec(spec)
 	{
         KBR_PROFILE_FUNCTION();
 
-        KBR_ASSERT(width > 0 && height > 0, "Texture dimensions must be greater than 0");
+        KBR_ASSERT(spec.Width > 0 && spec.Height > 0, "Texture dimensions must be greater than 0");
 
-        uint32_t imageSize = m_Width * m_Height * 4; // 4 bytes per pixel (RGBA)
+        uint32_t imageSize = spec.Width * spec.Height * 4; // 4 bytes per pixel (RGBA)
 
         const VulkanContext& context = VulkanContext::Get();
         const VkDevice device = context.GetDevice();
@@ -328,8 +328,8 @@ namespace Kerberos
             imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
             imageInfo.imageType = VK_IMAGE_TYPE_2D;
             imageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-            imageInfo.extent.width = m_Width;
-            imageInfo.extent.height = m_Height;
+            imageInfo.extent.width = spec.Width;
+            imageInfo.extent.height = spec.Height;
             imageInfo.extent.depth = 1;
             imageInfo.mipLevels = 1;
             imageInfo.arrayLayers = 1;
@@ -494,7 +494,7 @@ namespace Kerberos
 
         KBR_CORE_ASSERT(data, "Data cannot be null when uploading to texture");
 
-        uint32_t expectedSize = m_Width * m_Height * 4; // Assuming RGBA8
+        uint32_t expectedSize = m_Spec.Width * m_Spec.Height * 4; // Assuming RGBA8
         KBR_ASSERT(size == expectedSize, "Data size mismatch! Expected {} bytes, got {} bytes.", expectedSize, size);
         if (size != expectedSize || !data)
         {
@@ -540,7 +540,7 @@ namespace Kerberos
         region.imageSubresource.baseArrayLayer = 0;
         region.imageSubresource.layerCount = 1;
         region.imageOffset = { .x = 0, .y = 0, .z = 0 };
-        region.imageExtent = { .width = m_Width, .height = m_Height, .depth = 1 };
+        region.imageExtent = { .width = m_Spec.Width, .height = m_Spec.Height, .depth = 1 };
         vkCmdCopyBufferToImage(commandBuffer, m_UploadBuffer, m_Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
         /// Transition image from TRANSFER_DST to SHADER_READ_ONLY for sampling

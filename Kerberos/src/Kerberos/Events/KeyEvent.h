@@ -8,44 +8,44 @@ namespace Kerberos
 	class KeyEvent : public Event
 	{
 	public:
-		int GetKeyCode() const { return _keyCode; }
+		int GetKeyCode() const { return m_KeyCode; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
 		explicit KeyEvent(const int keycode)
-			: _keyCode(keycode)
+			: m_KeyCode(keycode)
 		{
 		}
 
-		int _keyCode;
+		int m_KeyCode;
 	};
 
 	class KeyPressedEvent final : public KeyEvent
 	{
 	public:
 		KeyPressedEvent(const int keycode, const int repeatCount)
-			: KeyEvent(keycode), _repeatCount(repeatCount)
+			: KeyEvent(keycode), m_RepeatCount(repeatCount)
 		{
 		}
 
-		int GetRepeatCount() const { return _repeatCount; }
+		int GetRepeatCount() const { return m_RepeatCount; }
 
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyPressedEvent: " << _keyCode << " (" << _repeatCount << " repeats)";
+			ss << "KeyPressedEvent: " << m_KeyCode << " (" << m_RepeatCount << " repeats)";
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(KeyPressed)
 	private:
-		int _repeatCount;
+		int m_RepeatCount;
 	};
 
 	class KeyReleasedEvent final : public KeyEvent
 	{
 	public:
-		explicit KeyReleasedEvent(int keycode)
+		explicit KeyReleasedEvent(const int keycode)
 			: KeyEvent(keycode)
 		{
 		}
@@ -53,7 +53,7 @@ namespace Kerberos
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyReleasedEvent: " << _keyCode;
+			ss << "KeyReleasedEvent: " << m_KeyCode;
 			return ss.str();
 		}
 
@@ -71,7 +71,7 @@ namespace Kerberos
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyTypedEvent: " << _keyCode;
+			ss << "KeyTypedEvent: " << m_KeyCode;
 			return ss.str();
 		}
 

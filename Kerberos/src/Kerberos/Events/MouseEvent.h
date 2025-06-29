@@ -5,73 +5,73 @@
 namespace Kerberos
 {
 
-	class MouseMovedEvent : public Event
+	class MouseMovedEvent final : public Event
 	{
 	public:
-		MouseMovedEvent(float x, float y)
-			: _mouseX(x), _mouseY(y)
+		MouseMovedEvent(const float x, const float y)
+			: m_MouseX(x), m_MouseY(y)
 		{
 		}
 
-		float GetX() const { return _mouseX; }
-		float GetY() const { return _mouseY; }
+		float GetX() const { return m_MouseX; }
+		float GetY() const { return m_MouseY; }
 
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseMovedEvent: " << _mouseX << ", " << _mouseY;
+			ss << "MouseMovedEvent: " << m_MouseX << ", " << m_MouseY;
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(MouseMoved);
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 	private:
-		float _mouseX, _mouseY;
+		float m_MouseX, m_MouseY;
 	};
 
-	class MouseScrolledEvent : public Event
+	class MouseScrolledEvent final : public Event
 	{
 	public:
-		MouseScrolledEvent(float x, float y)
-			: _offsetX(x), _offsetY(y)
+		MouseScrolledEvent(const float x, const float y)
+			: m_OffsetX(x), m_OffsetY(y)
 		{
 		}
 
-		float GetXOffset() const { return _offsetX; }
-		float GetYOffset() const { return _offsetY; }
+		float GetXOffset() const { return m_OffsetX; }
+		float GetYOffset() const { return m_OffsetY; }
 
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseScrolledEvent: " << _offsetX << ", " << _offsetY;
+			ss << "MouseScrolledEvent: " << m_OffsetX << ", " << m_OffsetY;
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(MouseScrolled);
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 	private:
-		float _offsetX, _offsetY;
+		float m_OffsetX, m_OffsetY;
 	};
 
 	class MouseButtonEvent : public Event
 	{
 	public:
-		int GetMouseButton() const { return _button; }
+		int GetMouseButton() const { return m_Button; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 	protected:
-		MouseButtonEvent(int button)
-			: _button(button)
+		explicit MouseButtonEvent(const int button)
+			: m_Button(button)
 		{
 		}
 
-		int _button;
+		int m_Button;
 	};
 
-	class MouseButtonPressedEvent : public MouseButtonEvent
+	class MouseButtonPressedEvent final : public MouseButtonEvent
 	{
 	public:
-		MouseButtonPressedEvent(int button)
+		explicit MouseButtonPressedEvent(const int button)
 			: MouseButtonEvent(button)
 		{
 		}
@@ -79,17 +79,17 @@ namespace Kerberos
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseButtonPressedEvent: " << _button;
+			ss << "MouseButtonPressedEvent: " << m_Button;
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class MouseButtonReleasedEvent : public MouseButtonEvent
+	class MouseButtonReleasedEvent final : public MouseButtonEvent
 	{
 	public:
-		MouseButtonReleasedEvent(int button)
+		explicit MouseButtonReleasedEvent(const int button)
 			: MouseButtonEvent(button)
 		{
 		}
@@ -97,7 +97,7 @@ namespace Kerberos
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseButtonReleasedEvent: " << _button;
+			ss << "MouseButtonReleasedEvent: " << m_Button;
 			return ss.str();
 		}
 

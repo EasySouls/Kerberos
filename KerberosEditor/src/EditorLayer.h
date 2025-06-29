@@ -24,19 +24,21 @@ namespace Kerberos
 	private:
 		bool OnKeyPressed(const KeyPressedEvent& event);
 		bool OnMouseButtonPressed(const MouseButtonPressedEvent& event);
+		bool OnWindowDrop(const WindowDropEvent& event);
 
 		void OnScenePlay();
 		void OnSceneStop();
 
 		void HandleDragAndDrop();
 
-		void CalculateEntityTransforms() const;
+		void CalculateEntityTransform(const Entity& entity) const;
 
 		void NewProject();
-		void OpenProject(const std::filesystem::path& filepath); 
+		void OpenProject(const std::filesystem::path& filepath);
+		[[nodiscard]] bool OpenProject();
 
 		void SaveScene();
-		void SaveSceneAs() const;
+		void SaveSceneAs();
 		void LoadScene();
 		void OpenScene(const std::filesystem::path& filepath);
 		void NewScene();
@@ -67,13 +69,7 @@ namespace Kerberos
 		/// Used when toggling the cameras
 		bool m_IsPrimaryCamera = true;
 
-		bool m_IsScene3D = true;
-
 		int m_GizmoType = -1;
-
-		/// Later this should be handled by the ECS system
-		bool m_RenderSkybox = false;
-		bool m_RenderOceanSkybox = true;
 
 		bool m_ShowWireframe = false;
 
@@ -95,7 +91,7 @@ namespace Kerberos
 
 		/// Editor Panels
 		HierarchyPanel m_HierarchyPanel;
-		AssetsPanel m_AssetsPanel;
+		Scope<AssetsPanel> m_AssetsPanel;
 
 		enum class SceneState : uint8_t
 		{

@@ -7,6 +7,7 @@
 #include "Texture.h"
 #include "Light.h"
 #include "Material.h"
+#include "TextureCube.h"
 #include "Kerberos/Scene/EditorCamera.h"
 
 namespace Kerberos
@@ -18,14 +19,13 @@ namespace Kerberos
 		static void Shutdown();
 
 		static void BeginScene(const OrthographicCamera& camera) = delete;
-		static void BeginScene(const EditorCamera& camera, const DirectionalLight* sun, const std::vector<PointLight>& pointLights, bool renderSkybox = false);
-        static void BeginScene(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights);
+		static void BeginScene(const EditorCamera& camera, const DirectionalLight* sun, const std::vector<PointLight>& pointLights, const Ref<TextureCube>& skyboxTexture);
+        static void BeginScene(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights, const Ref<TextureCube>& skyboxTexture);
         static void EndScene();
 
 		static void SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture = nullptr, float tilingFactor = 1.0f, int entityID = -1);
 
 		static void SetGlobalAmbientLight(const glm::vec3& color, float intensity);
-		static void ToggleSkyboxTexture();
 		static void SetShowWireframe(bool showWireframe);
 
         struct Statistics

@@ -20,6 +20,9 @@
 	#define KBR_CORE_ASSERT(x, ...)
 #endif
 
+#define KBR_VERIFY(x, ...) { if(!(x)) { KBR_ERROR("Verification Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#define KBR_CORE_VERIFY(x, ...) { if(!(x)) { KBR_CORE_ERROR("Verification Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+
 #define KBR_BIND_EVENT_FN(fn) [this](auto&&... args) { return fn(std::forward<decltype(args)>(args)...); }
 #define KBR_BIND_FN(fn) [this]<typename T>(T&& PH1) { return fn(std::forward<T>(PH1)); }
 

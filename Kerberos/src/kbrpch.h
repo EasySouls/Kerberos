@@ -17,5 +17,7 @@
 #include <unordered_set>
 #include <set>
 
+#include "Kerberos/Core/Buffer.h"
+#include "Kerberos/Core.h"
 #include "Kerberos/Log.h"
 #include "Kerberos/Debug/Instrumentor.h"
