@@ -117,7 +117,7 @@ namespace Kerberos
 				if (!isDirectory)
 				{
 					AssetHandle handle = m_AssetTreeNodes[treeNodeIndex].Handle;
-					HandleAssetDragAndDrop(handle, item.extension());
+					HandleAssetDragAndDrop(handle, item.filename());
 				}
 
 
@@ -366,11 +366,12 @@ namespace Kerberos
 		}
 	}
 
-	void AssetsPanel::HandleAssetDragAndDrop(const AssetHandle handle, const std::filesystem::path& extension) 
+	void AssetsPanel::HandleAssetDragAndDrop(const AssetHandle handle, const std::filesystem::path& filename)
 	{
-		if (extension == ".jpg" || extension == ".png" || extension == ".svg")
+		if (ImGui::BeginDragDropSource())
 		{
-			if (ImGui::BeginDragDropSource())
+			const std::filesystem::path extension = filename.extension();
+			if (extension == ".jpg" || extension == ".png" || extension == ".svg")
 			{
 				ImGui::SetDragDropPayload("ASSET_BROWSER_TEXTURE", &handle, sizeof(AssetHandle), ImGuiCond_Once);
 				if (const Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle))
@@ -381,17 +382,14 @@ namespace Kerberos
 				{
 					ImGui::Text("Invalid Texture");
 				}
-				ImGui::EndDragDropSource();
 			}
-		}
-		else if (extension == ".kbrcubemap")
-		{
-			if (ImGui::BeginDragDropSource())
+			else if (extension == ".kbrcubemap")
 			{
 				ImGui::SetDragDropPayload("ASSET_BROWSER_TEXTURE_CUBE", &handle, sizeof(AssetHandle), ImGuiCond_Once);
-				ImGui::Text("Cubemap Texture");
-				ImGui::EndDragDropSource();
+				ImGui::Text("%s", filename.string().c_str());
 			}
+
+			ImGui::EndDragDropSource();
 		}
 	}
 
