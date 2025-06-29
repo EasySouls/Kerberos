@@ -595,7 +595,13 @@ namespace Kerberos
 
 	void Scene::DestroyEntity(const Entity entity)
 	{
-		m_Registry.destroy(static_cast<entt::entity>(entity));
+		const entt::entity enttId = static_cast<entt::entity>(entity);
+		if (m_RootEntities.contains(enttId))
+		{
+			m_RootEntities.erase(enttId);
+		}
+
+		m_Registry.destroy(enttId);
 	}
 
 	Entity Scene::GetEntityByUUID(const UUID uuid) const 

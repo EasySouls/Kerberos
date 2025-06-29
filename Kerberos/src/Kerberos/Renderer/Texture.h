@@ -51,7 +51,6 @@ namespace Kerberos
 	class Texture2D : public Texture
 	{
 	public:
-		static Ref<Texture2D> Create(const std::string& path);
 		static Ref<Texture2D> Create(const TextureSpecification& spec, Buffer data = Buffer());
 
 		AssetType GetType() override { return AssetType::Texture2D; }

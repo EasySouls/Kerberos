@@ -1,14 +1,12 @@
 #include "HierarchyPanel.h"
+#include "Kerberos/Scene/Components.h"
+#include "Kerberos/Assets/AssetManager.h"
+#include "Kerberos/Assets/Importers/TextureImporter.h"
 
 #include <glm/gtc/type_ptr.hpp>
-
-#include "Kerberos/Scene/Components.h"
 #include <imgui/imgui.h>
-
 #include "imgui/imgui_internal.h"
 #include <filesystem>
-
-#include "Kerberos/Assets/AssetManager.h"
 
 namespace Kerberos
 {
@@ -28,8 +26,8 @@ namespace Kerberos
 		/// when loading a new scene
 		m_SelectedEntity = {};
 
-		m_IceTexture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
-		m_SpriteSheetTexture = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
+		m_IceTexture = TextureImporter::ImportTexture("assets/textures/y2k_ice_texture.png");
+		m_SpriteSheetTexture = TextureImporter::ImportTexture("assets/game/textures/RPGpack_sheet_2X.png");
 		m_CubeMesh = Mesh::CreateCube(1.0f);
 		m_SphereMesh = Mesh::CreateSphere(1.0f, 16, 16);
 		m_WhiteMaterial = CreateRef<Material>();
@@ -675,9 +673,9 @@ namespace Kerberos
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
 					{
 						/// TODO: Handle the case where the payload is not a texture
-						const auto& pathStr = static_cast<const char*>(payload->Data);
-						const std::filesystem::path path = ASSETS_DIRECTORY / pathStr;
-						staticMesh.MeshTexture = Texture2D::Create(path.string());
+						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
+						const Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
+						staticMesh.MeshTexture = texture;
 					}
 					ImGui::EndDragDropTarget();
 				}

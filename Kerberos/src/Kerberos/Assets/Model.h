@@ -44,8 +44,8 @@ namespace Kerberos
 		std::vector<Ref<Mesh>> m_Meshes;
 		std::vector<Ref<Texture2D>> m_Textures;
 
-		std::string m_Directory;
-		std::vector<std::string> m_LoadedTexturePaths;
+		std::filesystem::path m_Directory;
+		std::vector<std::filesystem::path> m_LoadedTexturePaths;
 
 		std::string m_Name;
 	};

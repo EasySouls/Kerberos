@@ -26,7 +26,6 @@ namespace Kerberos
 
 		AssetType GetType() override { return AssetType::TextureCube; }
 
-		static Ref<TextureCube> Create(const std::string& name, const std::vector<std::string>& faces, bool generateMipmaps = true, bool srgb = false);
 		static Ref<TextureCube> Create(const CubemapData& data);
 	};
 }

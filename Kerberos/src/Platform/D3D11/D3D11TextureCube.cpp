@@ -3,12 +3,6 @@
 
 namespace Kerberos
 {
-	D3D11TextureCube::D3D11TextureCube(std::string name, const std::vector<std::string>& faces, const bool generateMipmaps,
-		const bool srgb)
-		: m_RendererID(69), m_Name(std::move(name)), m_GenerateMipmaps(generateMipmaps), m_SRGB(srgb)
-	{
-	}
-
 	D3D11TextureCube::D3D11TextureCube(const CubemapData& data) 
 	{
 		throw std::runtime_error("D3D11TextureCube::D3D11TextureCube(const CubemapData&) is not yet implemented.");

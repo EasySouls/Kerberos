@@ -3,13 +3,6 @@
 
 namespace Kerberos
 {
-	VulkanTextureCube::VulkanTextureCube(std::string name, const std::vector<std::string>& faces, bool generateMipmaps,
-		bool srgb)
-			: m_Name(std::move(name))
-	{
-
-	}
-
 	VulkanTextureCube::VulkanTextureCube(const CubemapData& data) 
 	{
 		throw std::runtime_error("VulkanTextureCube::VulkanTextureCube(const CubemapData& data) is not yet implemented.");

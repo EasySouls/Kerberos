@@ -11,8 +11,6 @@ namespace Kerberos
 	public:
 		using RendererID = uint64_t;
 
-		VulkanTextureCube(std::string name, const std::vector<std::string>& faces,
-			bool generateMipmaps, bool srgb);
 		explicit VulkanTextureCube(const CubemapData& data);
 		~VulkanTextureCube() override;
 

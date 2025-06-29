@@ -169,7 +169,7 @@ namespace Kerberos
 						{
 							/// Load the image and store it in the map
 							const std::string fullPath = path.string();
-							m_AssetImages[path] = Texture2D::Create(fullPath);
+							m_AssetImages[path] = TextureImporter::ImportTexture(fullPath);
 						}
 
 						ImGui::ImageButton(path.string().c_str(), m_AssetImages[path]->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });

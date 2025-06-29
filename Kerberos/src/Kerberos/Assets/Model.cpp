@@ -10,6 +10,7 @@
 #include <ranges>
 #include <algorithm>
 
+#include "Importers/TextureImporter.h"
 #include "Kerberos/Scene/Components.h"
 #include "Kerberos/Scene/Entity.h"
 
@@ -50,7 +51,7 @@ namespace Kerberos
 			KBR_CORE_ERROR("Assimp error: {}", importer.GetErrorString());
 			return;
 		}
-		m_Directory = path.parent_path().string();
+		m_Directory = path.parent_path();
 
 		KBR_CORE_TRACE("Loading model from path: {}", path.string());
 
@@ -151,10 +152,10 @@ namespace Kerberos
 			aiString str;
 			mat->GetTexture(type, i, &str);
 
-			const std::filesystem::path texturePath = m_Directory + "/" + str.C_Str();
+			const std::filesystem::path texturePath = m_Directory / str.C_Str();
 
-			const bool textureExists = std::ranges::any_of(m_LoadedTexturePaths, [&](const std::string& texPath) {
-				return texPath == texturePath.string();
+			const bool textureExists = std::ranges::any_of(m_LoadedTexturePaths, [&](const std::filesystem::path& texPath) {
+				return texPath == texturePath;
 				});
 
 			if (textureExists)	
@@ -163,8 +164,8 @@ namespace Kerberos
 				continue;
 			}
 			
-			auto texture = Texture2D::Create(texturePath.string());
-			m_LoadedTexturePaths.push_back(texturePath.string());
+			auto texture = TextureImporter::ImportTexture(texturePath);
+			m_LoadedTexturePaths.push_back(texturePath);
 			textures.push_back(texture);
 		}
 		

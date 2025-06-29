@@ -366,8 +366,15 @@ namespace Kerberos
 				{
 					/// The entity must have a HierarchyComponent already when created
 					auto& hierarchy = deserializedEntity.GetComponent<HierarchyComponent>();
-					const uint64_t parentId = hierarchyComponent["Parent"].as<uint64_t>();
-					hierarchy.Parent = UUID(parentId);
+					const UUID parentId = static_cast<UUID>(hierarchyComponent["Parent"].as<uint64_t>());
+					
+					hierarchy.Parent = parentId;
+					if (parentId.IsValid())
+					{
+						/// If the entity has a parent, it should not be a root entity
+						m_Scene->m_RootEntities.erase(static_cast<entt::entity>(deserializedEntity));
+					}
+
 					for (const auto& child : hierarchyComponent["Children"])
 					{
 						const uint64_t childUUID = child.as<uint64_t>();

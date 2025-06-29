@@ -11,8 +11,6 @@ namespace Kerberos
 	public:
 		using RendererID = uint64_t;
 
-		D3D11TextureCube(std::string name, const std::vector<std::string>& faces,
-			bool generateMipmaps, bool srgb);
 		explicit D3D11TextureCube(const CubemapData& data);
 		~D3D11TextureCube() override;
 

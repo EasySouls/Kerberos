@@ -44,7 +44,7 @@ namespace Kerberos
 
 		m_Texture = TextureImporter::ImportTexture("assets/textures/y2k_ice_texture.png");
 
-		m_SpriteSheet = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
+		m_SpriteSheet = TextureImporter::ImportTexture("assets/game/textures/RPGpack_sheet_2X.png");
 
 		m_TextureStairs = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 7, 6 }, { 128, 128 }, { 1, 1 });
 		m_TextureBarrel = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 8, 3 }, { 128, 128 }, { 1, 1 });
