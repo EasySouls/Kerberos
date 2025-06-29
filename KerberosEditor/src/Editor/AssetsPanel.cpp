@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include "Kerberos/Log.h"
+#include "Kerberos/Assets/AssetManager.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"
 #include "Kerberos/Debug/Instrumentor.h"
 #include "Kerberos/Project/Project.h"
@@ -113,11 +114,10 @@ namespace Kerberos
 					ImGui::EndPopup();
 				}
 
-				if (ImGui::BeginDragDropSource())
+				if (!isDirectory)
 				{
 					AssetHandle handle = m_AssetTreeNodes[treeNodeIndex].Handle;
-					ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", &handle, sizeof(AssetHandle));
-					ImGui::EndDragDropSource();
+					HandleAssetDragAndDrop(handle, item.extension());
 				}
 
 
@@ -362,6 +362,26 @@ namespace Kerberos
 				{
 					KBR_CORE_ERROR("File does not exist: {0}", assetPath.string());
 				}
+			}
+		}
+	}
+
+	void AssetsPanel::HandleAssetDragAndDrop(const AssetHandle handle, const std::filesystem::path& extension) 
+	{
+		if (extension == ".jpg" || extension == ".png" || extension == ".svg")
+		{
+			if (ImGui::BeginDragDropSource())
+			{
+				ImGui::SetDragDropPayload("ASSET_BROWSER_TEXTURE", &handle, sizeof(AssetHandle), ImGuiCond_Once);
+				if (const Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle))
+				{
+					ImGui::Image(texture->GetRendererID(), ImVec2(64, 64), ImVec2(0, 1), ImVec2(1, 0));
+				}
+				else
+				{
+					ImGui::Text("Invalid Texture");
+				}
+				ImGui::EndDragDropSource();
 			}
 		}
 	}

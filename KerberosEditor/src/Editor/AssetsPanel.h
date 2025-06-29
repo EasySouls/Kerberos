@@ -46,6 +46,8 @@ namespace Kerberos
 
 		void ImportAssetDialog();
 
+		void HandleAssetDragAndDrop(AssetHandle handle, const std::filesystem::path& extension);
+
 	private:
 		std::filesystem::path m_AssetsDirectory = "Assets";
 		std::filesystem::path m_CurrentDirectory = std::filesystem::current_path();

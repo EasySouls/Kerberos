@@ -1,5 +1,5 @@
 Cubemap:
-  Name: Ocean Skybox
+  Name: Starmap Skybox
   RightFace: assets/textures/starmap_cubemap_0.png
   LeftFace: assets/textures/starmap_cubemap_1.png
   TopFace: assets/textures/starmap_cubemap_2.png

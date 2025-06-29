@@ -670,7 +670,7 @@ namespace Kerberos
 				/// Handle drag and drop for textures
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_TEXTURE"))
 					{
 						/// TODO: Handle the case where the payload is not a texture
 						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);

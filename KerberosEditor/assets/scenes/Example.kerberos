@@ -18,7 +18,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 17209965197869868199
     TagComponent:
       Tag: Backpack77
@@ -37,7 +37,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 9938345828488908582
     TagComponent:
       Tag: Backpack76
@@ -56,7 +56,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 1591814680753409505
     TagComponent:
       Tag: Backpack75
@@ -75,7 +75,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 4853324808756595059
     TagComponent:
       Tag: Backpack74
@@ -94,7 +94,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 4672464183414078147
     TagComponent:
       Tag: Backpack73
@@ -113,7 +113,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 8184176124119140495
     TagComponent:
       Tag: Backpack72
@@ -132,7 +132,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 5185251666740737501
     TagComponent:
       Tag: Backpack71
@@ -151,7 +151,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 15227028263631563301
     TagComponent:
       Tag: Backpack70
@@ -170,7 +170,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 9613965266704707123
     TagComponent:
       Tag: Backpack69
@@ -189,7 +189,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 10709030618322725322
     TagComponent:
       Tag: Backpack68
@@ -208,7 +208,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 5325327389357671684
     TagComponent:
       Tag: Backpack67
@@ -227,7 +227,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 9925175323593109281
     TagComponent:
       Tag: Backpack66
@@ -246,7 +246,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 11700604359826212904
     TagComponent:
       Tag: Backpack65
@@ -265,7 +265,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 6171351570607518603
     TagComponent:
       Tag: Backpack64
@@ -284,7 +284,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 17114460093331580219
     TagComponent:
       Tag: Backpack63
@@ -303,7 +303,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 15528574311115391207
     TagComponent:
       Tag: Backpack62
@@ -322,7 +322,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 8006937975923397758
     TagComponent:
       Tag: Backpack61
@@ -341,7 +341,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 381695290675035621
     TagComponent:
       Tag: Backpack60
@@ -360,7 +360,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 8238436429764473950
     TagComponent:
       Tag: Backpack59
@@ -379,7 +379,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 4378313768268321860
     TagComponent:
       Tag: Backpack58
@@ -398,7 +398,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 266278896570240872
     TagComponent:
       Tag: Backpack57
@@ -417,7 +417,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 10908228891155225610
     TagComponent:
       Tag: Backpack56
@@ -436,7 +436,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 10324718580759089345
     TagComponent:
       Tag: Backpack55
@@ -455,7 +455,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 17475631488234213007
     TagComponent:
       Tag: Backpack54
@@ -474,7 +474,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 17322691923066413830
     TagComponent:
       Tag: Backpack53
@@ -493,7 +493,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 12701703306917179685
     TagComponent:
       Tag: Backpack52
@@ -512,7 +512,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 9154963299090357249
     TagComponent:
       Tag: Backpack51
@@ -531,7 +531,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 3280153270104593981
     TagComponent:
       Tag: Backpack50
@@ -550,7 +550,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 13285239717824436756
     TagComponent:
       Tag: Backpack49
@@ -569,7 +569,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 9239437060302613426
     TagComponent:
       Tag: Backpack48
@@ -588,7 +588,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 11184516399255604851
     TagComponent:
       Tag: Backpack47
@@ -607,7 +607,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 9374439216134250006
     TagComponent:
       Tag: Backpack46
@@ -626,7 +626,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 10680814694017428884
     TagComponent:
       Tag: Backpack45
@@ -645,7 +645,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 13347680520434570087
     TagComponent:
       Tag: Backpack44
@@ -664,7 +664,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 16513723682445184917
     TagComponent:
       Tag: Backpack43
@@ -683,7 +683,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 5881807827008028459
     TagComponent:
       Tag: Backpack42
@@ -702,7 +702,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 6318090581626696733
     TagComponent:
       Tag: Backpack41
@@ -721,7 +721,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 11186564720472330355
     TagComponent:
       Tag: Backpack40
@@ -740,7 +740,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 8340205828337231930
     TagComponent:
       Tag: Backpack39
@@ -759,7 +759,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 1169582928457888683
     TagComponent:
       Tag: Backpack38
@@ -778,7 +778,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 16802917077446071486
     TagComponent:
       Tag: Backpack37
@@ -797,7 +797,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 14287509443979843415
     TagComponent:
       Tag: Backpack36
@@ -816,7 +816,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 16912456339715970776
     TagComponent:
       Tag: Backpack35
@@ -835,7 +835,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 6991260722753068744
     TagComponent:
       Tag: Backpack34
@@ -854,7 +854,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 17076506580588798667
     TagComponent:
       Tag: Backpack33
@@ -873,7 +873,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 12143876397098935050
     TagComponent:
       Tag: Backpack32
@@ -892,7 +892,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 6778338852679211125
     TagComponent:
       Tag: Backpack31
@@ -911,7 +911,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 16448138588065480109
     TagComponent:
       Tag: Backpack30
@@ -930,7 +930,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 2664144856767191627
     TagComponent:
       Tag: Backpack29
@@ -949,7 +949,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 9262513256712144602
     TagComponent:
       Tag: Backpack28
@@ -968,7 +968,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 15188917011672247669
     TagComponent:
       Tag: Backpack27
@@ -987,7 +987,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 1308265673871612457
     TagComponent:
       Tag: Backpack26
@@ -1006,7 +1006,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 2993141415718987390
     TagComponent:
       Tag: Backpack25
@@ -1025,7 +1025,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 16380134572316635967
     TagComponent:
       Tag: Backpack24
@@ -1044,7 +1044,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 1874082895680929957
     TagComponent:
       Tag: Backpack23
@@ -1063,7 +1063,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 15321646698231089889
     TagComponent:
       Tag: Backpack22
@@ -1082,7 +1082,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 8052679201968573710
     TagComponent:
       Tag: Backpack21
@@ -1101,7 +1101,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 11041070900442126949
     TagComponent:
       Tag: Backpack20
@@ -1120,7 +1120,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 14221565202618625432
     TagComponent:
       Tag: Backpack19
@@ -1139,7 +1139,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 6693663426811628137
     TagComponent:
       Tag: Backpack18
@@ -1158,7 +1158,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 13188340392547791702
     TagComponent:
       Tag: Backpack17
@@ -1177,7 +1177,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 7615271970795063628
     TagComponent:
       Tag: Backpack16
@@ -1196,7 +1196,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 5121772672804481647
     TagComponent:
       Tag: Backpack15
@@ -1215,7 +1215,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 4851560635837649286
     TagComponent:
       Tag: Backpack14
@@ -1234,7 +1234,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 13968213003504220991
     TagComponent:
       Tag: Backpack13
@@ -1253,7 +1253,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 2971709003636702525
     TagComponent:
       Tag: Backpack12
@@ -1272,7 +1272,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 11428526197828245688
     TagComponent:
       Tag: Backpack11
@@ -1291,7 +1291,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 10153015076136968163
     TagComponent:
       Tag: Backpack10
@@ -1310,7 +1310,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 17440418823981043456
     TagComponent:
       Tag: Backpack9
@@ -1329,7 +1329,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 11945111998287321212
     TagComponent:
       Tag: Backpack8
@@ -1348,7 +1348,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 17948929877006993186
     TagComponent:
       Tag: Backpack7
@@ -1367,7 +1367,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 8208037788739900840
     TagComponent:
       Tag: Backpack6
@@ -1386,7 +1386,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 8607052357737411915
     TagComponent:
       Tag: Backpack5
@@ -1405,7 +1405,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 3506916239084282271
     TagComponent:
       Tag: Backpack4
@@ -1424,7 +1424,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 11638519590199311613
     TagComponent:
       Tag: Backpack3
@@ -1443,7 +1443,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 2526794729260745287
     TagComponent:
       Tag: Backpack2
@@ -1462,7 +1462,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 15453936381849306838
     TagComponent:
       Tag: Backpack1
@@ -1481,7 +1481,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 12545771401994085663
     TagComponent:
       Tag: Backpack0
@@ -1500,7 +1500,7 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 4270527116761531425
+      Texture: 8187673179035048105
   - Entity: 67115248746274393
     TagComponent:
       Tag: Backpack
