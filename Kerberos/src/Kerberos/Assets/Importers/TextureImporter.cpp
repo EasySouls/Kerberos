@@ -47,6 +47,9 @@ namespace Kerberos
 		spec.Height = height;
 		switch (channels)
 		{
+		case 1:
+			spec.Format = ImageFormat::R8;
+			break;
 		case 3:
 			spec.Format = ImageFormat::RGB8;
 			break;

@@ -113,7 +113,7 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		const uint32_t bytesPerPixel = m_DataFormat == GL_RGBA ? 4 : 3;
+		const uint32_t bytesPerPixel = TextureUtils::BytesPerPixel(m_Spec.Format);
 		KBR_CORE_ASSERT(size == m_Spec.Width * m_Spec.Height * bytesPerPixel, "Data must be the entire texture!");
 
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, static_cast<int>(m_Spec.Width), static_cast<int>(m_Spec.Height), m_DataFormat, GL_UNSIGNED_BYTE, data);
