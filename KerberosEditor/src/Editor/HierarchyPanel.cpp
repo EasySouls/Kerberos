@@ -40,14 +40,21 @@ namespace Kerberos
 	void HierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Hierarchy");
-		for (const auto entityId : m_Context->m_Registry.view<entt::entity>())
-		{
-			Entity e{ entityId, m_Context.get() };
 
-			/// Only draw the root nodes
-			if (!m_Context->GetParent(e))
-				DrawEntityNode(e);
+		/// Only draw the root nodes
+		for (const entt::entity& entityId : m_Context->GetRootEntities())
+		{
+			Entity rootEntity{ entityId, m_Context.get() };
+			DrawEntityNode(rootEntity);
 		}
+
+		//for (const auto entityId : m_Context->m_Registry.view<entt::entity>())
+		//{
+		//	Entity e{ entityId, m_Context.get() };
+
+		//	if (!m_Context->GetParent(e))
+		//		DrawEntityNode(e);
+		//}
 
 		/// If an empty space is clicked, deselect the entity
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())

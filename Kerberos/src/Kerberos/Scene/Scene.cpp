@@ -553,7 +553,10 @@ namespace Kerberos
 
 	Entity Scene::CreateEntity(const std::string& name)
 	{
-		Entity entity = { m_Registry.create(), this };
+		const auto enttId = m_Registry.create();
+		Entity entity = { enttId, this };
+		m_RootEntities.insert(enttId);
+
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<HierarchyComponent>();
 
@@ -570,7 +573,10 @@ namespace Kerberos
 
 	Entity Scene::CreateEntityWithUUID(const std::string& name, const uint64_t uuid)
 	{
-		Entity entity = { m_Registry.create(), this };
+		const auto enttId = m_Registry.create();
+		Entity entity = { enttId, this };
+		m_RootEntities.insert(enttId);
+
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<HierarchyComponent>();
 
@@ -618,6 +624,8 @@ namespace Kerberos
 	{
 		RemoveParent(child);
 
+		m_RootEntities.erase(static_cast<entt::entity>(child));
+
 		auto& childHierarchy = child.GetComponent<HierarchyComponent>();
 		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
 
@@ -637,7 +645,7 @@ namespace Kerberos
 		return {};
 	}
 
-	void Scene::RemoveParent(const Entity child) const 
+	void Scene::RemoveParent(const Entity child) 
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -650,7 +658,10 @@ namespace Kerberos
 			{
 				parentHierarchy.Children.erase(it);
 			}
+
 			childHierarchy.Parent = UUID::Invalid();
+			/// The child is a root entity now
+			m_RootEntities.insert(static_cast<entt::entity>(child));
 		}
 	}
 
