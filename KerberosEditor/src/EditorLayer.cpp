@@ -683,7 +683,7 @@ namespace Kerberos
 		projInfo.AssetDirectory = Project::GetAssetDirectory();
 		newProject->SetInfo(projInfo);
 
-		m_AssetsPanel = CreateScope<AssetsPanel>();
+		m_AssetsPanel = CreateScope<AssetsPanel>(m_NotificationManager);
 	}
 
 	void EditorLayer::OpenProject(const std::filesystem::path& filepath)
@@ -693,7 +693,7 @@ namespace Kerberos
 			const auto startScenePath = Project::GetAssetDirectory() / project->GetInfo().StartScenePath;
 			OpenScene(startScenePath);
 
-			m_AssetsPanel = CreateScope<AssetsPanel>();
+			m_AssetsPanel = CreateScope<AssetsPanel>(m_NotificationManager);
 		}
 	}
 

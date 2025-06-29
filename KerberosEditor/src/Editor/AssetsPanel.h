@@ -3,7 +3,7 @@
 #include "Kerberos/Core.h"
 #include "Kerberos/Renderer/Texture.h"
 #include "Kerberos/Project/Project.h"
-
+#include "../Notification/NotificationManager.h"
 #include <filesystem>
 #include <map>
 #include <set>
@@ -16,7 +16,7 @@ namespace Kerberos
 	class AssetsPanel
 	{
 	public:
-		AssetsPanel();
+		AssetsPanel(NotificationManager notificationManager);
 		~AssetsPanel() = default;
 
 		/**
@@ -42,11 +42,9 @@ namespace Kerberos
 		*/
 		void ShowContextMenu(ImGuiPopupFlags popupFlags) const;
 
-	private:
-		/**
-		 * 
-		 */
 		void RefreshAssetTree();
+
+		void ImportAssetDialog();
 
 	private:
 		std::filesystem::path m_AssetsDirectory = "Assets";
@@ -59,24 +57,18 @@ namespace Kerberos
 		struct TreeNode
 		{
 			std::filesystem::path Path;
+			AssetHandle Handle = AssetHandle::Invalid();
 
-			TreeNode* Parent = nullptr;
-			std::set<TreeNode*> Children;
+			uint32_t Parent = static_cast<uint32_t>(-1);
+			std::map<std::filesystem::path, uint32_t> Children;
 
-			TreeNode(std::filesystem::path path, TreeNode* parent = nullptr)
-				: Path(std::move(path)), Parent(parent)
+			explicit TreeNode(std::filesystem::path path, const AssetHandle handle)
+				: Path(std::move(path)), Handle(handle)
 			{
 			}
 		};
 
-
-		/**
-		 * The root node of the asset tree.
-		 * Relative to the asset directory.
-		 */
-		TreeNode m_RootNode;
-
-		std::map<std::filesystem::path, std::vector<std::filesystem::path>> m_AssetTree;
+		std::vector<TreeNode> m_AssetTreeNodes;
 
 		enum class Mode : uint8_t
 		{
@@ -85,6 +77,8 @@ namespace Kerberos
 		};
 
 		Mode m_Mode = Mode::Filesystem;
+
+		NotificationManager m_NotificationManager;
 	};
 
 }

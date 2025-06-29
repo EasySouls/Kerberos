@@ -7,18 +7,23 @@
 
 #include "Kerberos/Log.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"
+#include "Kerberos/Debug/Instrumentor.h"
 #include "Kerberos/Project/Project.h"
 
 namespace Kerberos
 {
-	AssetsPanel::AssetsPanel()
-		: m_AssetsDirectory(Project::GetAssetDirectory()), m_CurrentDirectory(m_AssetsDirectory), m_RootNode("/")
+	AssetsPanel::AssetsPanel(NotificationManager notificationManager)
+		: m_AssetsDirectory(Project::GetAssetDirectory()), m_CurrentDirectory(m_AssetsDirectory), m_NotificationManager(
+			std::move(notificationManager))
 	{
 		m_FolderIcon = TextureImporter::ImportTexture("Assets/Editor/directory_icon.png");
 		m_FileIcon = TextureImporter::ImportTexture("Assets/Editor/file_icon.png");
 
+		m_AssetTreeNodes.emplace_back("/", AssetHandle::Invalid());
+
 		RefreshAssetTree();
 	}
+
 
 	void AssetsPanel::OnImGuiRender()
 	{
@@ -30,10 +35,30 @@ namespace Kerberos
 
 		if (m_CurrentDirectory != m_AssetsDirectory)
 		{
+			ImGui::SameLine();
 			if (ImGui::Button("Back"))
 			{
 				m_CurrentDirectory = m_CurrentDirectory.parent_path();
 			}
+		}
+
+		if (m_Mode == Mode::Asset)
+		{
+			ImGui::SameLine();
+			if (ImGui::Button("Refresh"))
+			{
+				RefreshAssetTree();
+			}
+
+			ImGui::SameLine();
+			ImportAssetDialog();
+		}
+
+		const std::string modeLabel = m_Mode == Mode::Asset ? "Assets" : "Folders";
+		if (ImGui::Button(modeLabel.c_str()))
+		{
+			m_Mode = (m_Mode == Mode::Asset) ? Mode::Filesystem : Mode::Asset;
+			RefreshAssetTree();
 		}
 
 		static float padding = 10.0f;
@@ -51,10 +76,68 @@ namespace Kerberos
 
 		if (m_Mode == Mode::Asset)
 		{
+			KBR_PROFILE_SCOPE("AssetsPanel::OnImGuiRender - Asset Mode");
 
+			TreeNode* node = m_AssetTreeNodes.data();
+
+			//auto currentDir = std::filesystem::relative(m_CurrentDirectory, Project::GetAssetDirectory());
+			for (const auto& p : m_CurrentDirectory)
+			{
+				if (node->Path == m_CurrentDirectory)
+					break;
+
+				if (node->Children.contains(p))
+				{
+					node = &m_AssetTreeNodes[node->Children[p]];
+				}
+
+			}
+
+			for (const auto& [item, treeNodeIndex] : node->Children)
+			{
+				bool isDirectory = std::filesystem::is_directory(Project::GetAssetDirectory() / item);
+
+				std::string itemStr = item.generic_string();
+
+				ImGui::PushID(itemStr.c_str());
+				Ref<Texture2D> icon = isDirectory ? m_FolderIcon : m_FileIcon;
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+				ImGui::ImageButton(item.string().c_str(), icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+
+				if (ImGui::BeginPopupContextItem())
+				{
+					if (ImGui::MenuItem("Delete"))
+					{
+						KBR_CORE_ASSERT(false, "Not implemented");
+					}
+					ImGui::EndPopup();
+				}
+
+				if (ImGui::BeginDragDropSource())
+				{
+					AssetHandle handle = m_AssetTreeNodes[treeNodeIndex].Handle;
+					ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", &handle, sizeof(AssetHandle));
+					ImGui::EndDragDropSource();
+				}
+
+
+				ImGui::PopStyleColor();
+				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+				{
+					if (isDirectory)
+						m_CurrentDirectory /= item.filename();
+				}
+
+				ImGui::TextWrapped("%s", itemStr.c_str());
+
+				ImGui::NextColumn();
+
+				ImGui::PopID();
+			}
 		}
 		else
 		{
+			KBR_PROFILE_SCOPE("AssetsPanel::OnImGuiRender - Filesystem Mode");
 
 			for (const auto& entry : std::filesystem::directory_iterator(m_CurrentDirectory))
 			{
@@ -145,7 +228,7 @@ namespace Kerberos
 
 	void AssetsPanel::ShowFileContextMenu(std::filesystem::path::iterator::reference path)
 	{
-		if (ImGui::BeginPopupContextItem("FileContext")) // "FileContext" is the ID for this popup
+		if (ImGui::BeginPopupContextItem("FileContextMenu"))
 		{
 			ImGui::TextDisabled("%s", path.string().c_str());
 			ImGui::Separator();
@@ -182,7 +265,7 @@ namespace Kerberos
 
 	void AssetsPanel::ShowFolderContextMenu(std::filesystem::path::iterator::reference path)
 	{
-		if (ImGui::BeginPopupContextItem("FolderContext")) // "FolderContext" is the ID for this popup
+		if (ImGui::BeginPopupContextItem("FolderContextMenu"))
 		{
 			ImGui::TextDisabled("%s", path.string().c_str());
 			ImGui::Separator();
@@ -222,10 +305,64 @@ namespace Kerberos
 
 	void AssetsPanel::RefreshAssetTree()
 	{
+		KBR_PROFILE_FUNCTION();
+
 		const AssetRegistry& assetRegistry = Project::GetActive()->GetEditorAssetManager()->GetAssetRegistry();
 		for (const auto& [handle, metadata] : assetRegistry)
 		{
-			
+			uint32_t currentNodeIndex = 0;
+
+			for (const auto& p : metadata.Filepath)
+			{
+				auto it = m_AssetTreeNodes[currentNodeIndex].Children.find(p.generic_string());
+				if (it != m_AssetTreeNodes[currentNodeIndex].Children.end())
+				{
+					currentNodeIndex = it->second;
+				}
+				else
+				{
+					TreeNode newNode(p, handle);
+					newNode.Parent = currentNodeIndex;
+					m_AssetTreeNodes.push_back(newNode);
+
+					m_AssetTreeNodes[currentNodeIndex].Children[p] = static_cast<uint32_t>(m_AssetTreeNodes.size()) - 1;
+					currentNodeIndex = static_cast<uint32_t>(m_AssetTreeNodes.size()) - 1;
+				}
+
+			}
+		}
+	}
+
+	void AssetsPanel::ImportAssetDialog()
+	{
+		if (ImGui::Button("Import Asset"))
+		{
+			const std::string filePath = FileDialog::OpenFile("All Files (*.*)\0*.*\0");
+			if (!filePath.empty())
+			{
+				const std::filesystem::path assetPath = std::filesystem::path(filePath);
+				const bool isInsideAssets = assetPath.is_absolute() && assetPath.string().find(m_AssetsDirectory.string()) != std::string::npos;
+				if (std::filesystem::exists(assetPath))
+				{
+					if (isInsideAssets)
+					{
+						Project::GetActive()->GetEditorAssetManager()->ImportAsset(assetPath);
+						RefreshAssetTree();
+					}
+					else
+					{
+						KBR_CORE_ERROR("Asset must be located inside the Assets directory: {0}", assetPath.string());
+						m_NotificationManager.AddNotification(
+							"Asset must be located inside the Assets directory: " + assetPath.string(),
+							Notification::Type::Error
+						);
+					}
+				}
+				else
+				{
+					KBR_CORE_ERROR("File does not exist: {0}", assetPath.string());
+				}
+			}
 		}
 	}
 

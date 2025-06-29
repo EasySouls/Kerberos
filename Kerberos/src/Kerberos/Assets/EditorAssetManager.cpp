@@ -67,7 +67,7 @@ namespace Kerberos
 	AssetHandle EditorAssetManager::ImportAsset(const std::filesystem::path& filepath)
 	{
 		/// Generate new handle
-		AssetHandle handle;
+		const AssetHandle handle;
 		AssetMetadata metadata;
 		metadata.Filepath = filepath;
 		metadata.Type = AssetTypeFromFileExtension(filepath);
@@ -82,9 +82,10 @@ namespace Kerberos
 		/// Assign generated handle to asset
 		asset->GetHandle() = handle;
 		m_AssetRegistry[handle] = metadata;
+		m_LoadedAssets[handle] = asset;
 
 		SerializeAssetRegistry();
-		//m_LoadedAssets[handle] = asset;
+
 		return handle;
 	}
 
