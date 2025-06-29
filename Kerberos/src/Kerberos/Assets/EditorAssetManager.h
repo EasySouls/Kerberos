@@ -11,8 +11,10 @@ namespace Kerberos
 	public:
 		Ref<Asset> GetAsset(AssetHandle handle) override;
 
-		bool IsAssetHandleValid(AssetHandle handle) override;
-		bool IsAssetLoaded(AssetHandle handle) override;
+		bool IsAssetHandleValid(AssetHandle handle) const override;
+		bool IsAssetLoaded(AssetHandle handle) const override;
+
+		AssetType GetAssetType(AssetHandle handle) const override;
 
 		AssetHandle ImportAsset(const std::filesystem::path& filepath);
 

@@ -9,6 +9,8 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+#include "Core/UUID.h"
+
 namespace Kerberos
 {
 	class Log
@@ -63,5 +65,14 @@ struct fmt::formatter<glm::vec4> : fmt::formatter<std::string>
 	auto format(glm::vec4 vec, const format_context& ctx) const -> decltype(ctx.out())
 	{
 		return fmt::format_to(ctx.out(), "({}, {}, {}, {})", vec.x, vec.y, vec.z, vec.w);
+	}
+};
+
+template<>
+struct fmt::formatter<Kerberos::UUID> : fmt::formatter<std::string>
+{
+	auto format(const Kerberos::UUID uuid, const format_context& ctx) const -> decltype(ctx.out())
+	{
+		return fmt::format_to(ctx.out(), "{}", static_cast<uint64_t>(uuid));
 	}
 };

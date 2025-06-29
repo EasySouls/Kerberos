@@ -136,6 +136,8 @@ namespace Kerberos
 			}
 		}
 		ImGui::End();
+
+		m_NotificationManager.RenderNotifications();
 	}
 
 	void HierarchyPanel::SetSelectedEntity(const Entity entity)
@@ -291,7 +293,7 @@ namespace Kerberos
 		ImGui::PopID();
 	}
 
-	void HierarchyPanel::DrawComponents(const Entity entity) const
+	void HierarchyPanel::DrawComponents(const Entity entity)
 	{
 		if (entity.HasComponent<TagComponent>())
 		{
@@ -678,8 +680,13 @@ namespace Kerberos
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_TEXTURE"))
 					{
-						/// TODO: Handle the case where the payload is not a texture
 						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
+						if (AssetManager::GetAssetType(handle) != AssetType::Texture2D)
+						{
+							KBR_ERROR("Asset is not a texture: {0}", handle);
+							m_NotificationManager.AddNotification("Asset is not a texture", Notification::Type::Error);
+							return;
+						}
 						const Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
 						staticMesh.MeshTexture = texture;
 					}
@@ -840,8 +847,14 @@ namespace Kerberos
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_TEXTURE_CUBE"))
 					{
-						/// TODO: Handle the case where the payload is not a texture
 						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
+						if (AssetManager::GetAssetType(handle) != AssetType::TextureCube)
+						{
+							KBR_ERROR("Asset is not a texture: {0}", handle);
+							/// TODO: Show a notification instead of an error log
+							m_NotificationManager.AddNotification("Asset is not a cubemap", Notification::Type::Error);
+							return;
+						}
 						environment.SkyboxTexture = handle;
 					}
 					ImGui::EndDragDropTarget();

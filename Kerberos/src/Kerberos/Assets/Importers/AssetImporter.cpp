@@ -17,9 +17,7 @@ namespace Kerberos
 			return CubemapImporter::ImportCubemap(handle, metadata);
 			break;
 		case AssetType::Material:
-			break;
 		case AssetType::Mesh:
-			break;
 		case AssetType::Scene:
 			break;
 		}

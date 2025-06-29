@@ -51,7 +51,7 @@ namespace Kerberos
 		return asset;
 	}
 
-	bool EditorAssetManager::IsAssetHandleValid(const AssetHandle handle) 
+	bool EditorAssetManager::IsAssetHandleValid(const AssetHandle handle) const
 	{
 		if (!handle.IsValid())
 			return false;
@@ -59,9 +59,20 @@ namespace Kerberos
 		return m_AssetRegistry.Contains(handle);
 	}
 
-	bool EditorAssetManager::IsAssetLoaded(const AssetHandle handle) 
+	bool EditorAssetManager::IsAssetLoaded(const AssetHandle handle) const
 	{
 		return m_LoadedAssets.contains(handle);
+	}
+
+	AssetType EditorAssetManager::GetAssetType(AssetHandle handle) const 
+	{
+		if (!IsAssetHandleValid(handle))
+		{
+			KBR_CORE_ERROR("Invalid asset handle: {0}", handle);
+			throw std::runtime_error("Invalid asset handle when getting asset type!");
+		}
+		const auto& [Type, Filepath] = GetMetadata(handle);
+		return Type;
 	}
 
 	AssetHandle EditorAssetManager::ImportAsset(const std::filesystem::path& filepath)

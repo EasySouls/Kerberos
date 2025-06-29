@@ -17,6 +17,11 @@ namespace Kerberos
 			return std::static_pointer_cast<T>(asset);
 		}
 
+		static AssetType GetAssetType(const AssetHandle handle)
+		{
+			return Project::GetActive()->GetAssetManager()->GetAssetType(handle);
+		}
+
 		static Ref<Texture2D> GetDefaultTexture2D();
 		static Ref<Mesh> GetDefaultCubeMesh();
 	};
