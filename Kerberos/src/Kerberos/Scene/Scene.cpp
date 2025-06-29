@@ -625,7 +625,7 @@ namespace Kerberos
 		parentHierarchy.Children.emplace_back(child.GetUUID());
 	}
 
-	Entity Scene::GetParent(const Entity child)
+	Entity Scene::GetParent(const Entity child) const 
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -637,7 +637,7 @@ namespace Kerberos
 		return {};
 	}
 
-	void Scene::RemoveParent(const Entity child)
+	void Scene::RemoveParent(const Entity child) const 
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -654,7 +654,7 @@ namespace Kerberos
 		}
 	}
 
-	std::vector<Entity> Scene::GetChildren(const Entity parent)
+	std::vector<Entity> Scene::GetChildren(const Entity parent) const 
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -695,7 +695,7 @@ namespace Kerberos
 		{
 			auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
 
-			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+			Renderer2D::DrawQuad(transform.WorldTransform, sprite.Color);
 		}
 
 		Renderer2D::EndScene();
@@ -829,6 +829,11 @@ namespace Kerberos
 				UpdateChildTransforms(entity, glm::mat4(1.0f));
 			}
 		}
+	}
+
+	void Scene::CalculateEntityTransform(const Entity& entity) 
+	{
+		UpdateChildTransforms(entity, glm::mat4(1.0f));
 	}
 
 	template <typename T>

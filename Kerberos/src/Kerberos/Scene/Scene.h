@@ -58,9 +58,9 @@ namespace Kerberos
 		Entity GetEntityByUUID(UUID uuid) const;
 
 		void SetParent(Entity child, Entity parent, bool keepWorldTransform = true);
-		Entity GetParent(Entity child);
-		void RemoveParent(Entity child);
-		std::vector<Entity> GetChildren(Entity parent);
+		Entity GetParent(Entity child) const;
+		void RemoveParent(Entity child) const;
+		std::vector<Entity> GetChildren(Entity parent) const;
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 
@@ -68,6 +68,7 @@ namespace Kerberos
 
 		Entity GetPrimaryCameraEntity();
 		void CalculateEntityTransforms();
+		void CalculateEntityTransform(const Entity& entity);
 
 	private:
 		template<typename T>

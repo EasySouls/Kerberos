@@ -137,15 +137,15 @@ namespace Kerberos
 
 		m_IconPlay = TextureImporter::ImportTexture("assets/editor/play_button.png");
 		m_IconStop = TextureImporter::ImportTexture("assets/editor/stop_button.png");
+
+		/// Calculate the world transforms of the entities initially
+		m_ActiveScene->CalculateEntityTransforms();
 	}
 
 	void EditorLayer::OnDetach()
 	{
 		Layer::OnDetach();
 	}
-
-	static uint64_t s_FrameCount = 0;
-	static constexpr int s_TransformCalculationFramespan = 3;
 
 	void EditorLayer::OnUpdate(const Timestep deltaTime)
 	{
@@ -154,19 +154,6 @@ namespace Kerberos
 		m_Fps = static_cast<float>(1) / deltaTime;
 
 		Timer timer("EditorLayer::OnUpdate", [&](const ProfileResult profileResult) { m_ProfileResults.push_back(profileResult); });
-
-		{
-			KBR_PROFILE_SCOPE("EditorLayer::OnUpdate - CalculateEntityTransforms");
-
-			/// TODO: Implement a valid logic from calculating only the dirty transforms
-			/// Calculates the children entities' world transform from their parents' and their own local transform
-			if (s_FrameCount % s_TransformCalculationFramespan == 0)
-			{
-				CalculateEntityTransforms();
-			}
-
-			s_FrameCount++;
-		}
 
 		/// Resize the camera if needed
 		if (const FramebufferSpecification spec = m_Framebuffer->GetSpecification();
@@ -432,7 +419,8 @@ namespace Kerberos
 		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
 		/// Gizmos
-		if (const Entity selectedEntity = m_HierarchyPanel.GetSelectedEntity(); selectedEntity && m_GizmoType != -1)
+		const bool gizmosEnabled = m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate;
+		if (const Entity selectedEntity = m_HierarchyPanel.GetSelectedEntity(); selectedEntity && m_GizmoType != -1 && gizmosEnabled)
 		{
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
@@ -474,6 +462,8 @@ namespace Kerberos
 				tc.Translation = translation;
 				tc.Rotation = glm::radians(rotationDegrees);
 				tc.Scale = scale;
+
+				CalculateEntityTransform(selectedEntity);
 			}
 		}
 
@@ -614,9 +604,9 @@ namespace Kerberos
 		}
 	}
 
-	void EditorLayer::CalculateEntityTransforms() const
+	void EditorLayer::CalculateEntityTransform(const Entity& entity) const
 	{
-		m_ActiveScene->CalculateEntityTransforms();
+		m_ActiveScene->CalculateEntityTransform(entity);
 	}
 
 	void EditorLayer::NewScene()

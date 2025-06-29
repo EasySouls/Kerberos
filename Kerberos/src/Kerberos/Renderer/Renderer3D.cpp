@@ -65,6 +65,10 @@ namespace Kerberos
 		} PerObjectData;
 
 		Ref<UniformBuffer> PerObjectUniformBuffer = nullptr;
+
+		/// The currently active texture, used for binding textures
+		/// This is used to avoid binding the same texture multiple times
+		Ref<Texture2D> ActiveTexture = nullptr;
 	};
 
 	static Renderer3DData s_RendererData;
@@ -89,6 +93,7 @@ namespace Kerberos
 		s_RendererData.ActiveShader = s_RendererData.BaseShader;
 
 		s_RendererData.WhiteTexture = AssetManager::GetDefaultTexture2D();
+		s_RendererData.ActiveTexture = s_RendererData.WhiteTexture;
 
 		s_RendererData.SkyboxShader = Shader::Create("assets/shaders/skybox.glsl");
 		const std::vector<std::string> skymapTextures = {
@@ -316,7 +321,11 @@ namespace Kerberos
 
 		const Ref<Texture2D> textureToUse = texture ? texture : s_RendererData.WhiteTexture;
 		constexpr int textureSlot = 0;
-		textureToUse->Bind(textureSlot);
+		if (s_RendererData.ActiveTexture != textureToUse)
+		{
+			s_RendererData.ActiveTexture = textureToUse;
+			textureToUse->Bind(textureSlot);
+		}
 		shaderToUse->SetInt("u_Texture", textureSlot);
 
 		mesh->GetVertexArray()->Bind();

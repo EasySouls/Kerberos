@@ -43,7 +43,7 @@ namespace Kerberos
 		for (const auto entityId : m_Context->m_Registry.view<entt::entity>())
 		{
 			Entity e{ entityId, m_Context.get() };
-			
+
 			/// Only draw the root nodes
 			if (!m_Context->GetParent(e))
 				DrawEntityNode(e);
@@ -178,7 +178,7 @@ namespace Kerberos
 		}
 	}
 
-	static void DrawVec3Control(const std::string& label, glm::vec3& values, const float resetValue = 0.0f, const float columnWidth = 80.0f)
+	static void DrawVec3Control(const std::string& label, glm::vec3& values, const float resetValue = 0.0f, const float columnWidth = 80.0f, const std::function<void()>& onValueChanged = nullptr)
 	{
 		const ImGuiIO& io = ImGui::GetIO();
 		const auto boldFont = io.Fonts->Fonts[1];
@@ -204,6 +204,8 @@ namespace Kerberos
 		if (ImGui::Button("X", buttonSize))
 		{
 			values.x = resetValue;
+			if (onValueChanged)
+				onValueChanged();
 		}
 		ImGui::PopFont();
 
@@ -211,7 +213,12 @@ namespace Kerberos
 
 		ImGui::SameLine();
 		/// ##X is used to hide the label of the input field
-		ImGui::DragFloat("##X", &values.x, 0.1f);
+		if (ImGui::DragFloat("##X", &values.x, 0.1f))
+		{
+			if (onValueChanged)
+				onValueChanged();
+		}
+
 		ImGui::PopItemWidth();
 		ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
 
@@ -223,6 +230,8 @@ namespace Kerberos
 		if (ImGui::Button("Y", buttonSize))
 		{
 			values.y = resetValue;
+			if (onValueChanged)
+				onValueChanged();
 		}
 		ImGui::PopFont();
 
@@ -230,7 +239,12 @@ namespace Kerberos
 
 		ImGui::SameLine();
 		/// ##Y is used to hide the label of the input field
-		ImGui::DragFloat("##Y", &values.y, 0.1f);
+		if (ImGui::DragFloat("##Y", &values.y, 0.1f))
+		{
+			if (onValueChanged)
+				onValueChanged();
+		}
+
 		ImGui::PopItemWidth();
 		ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
 
@@ -242,6 +256,8 @@ namespace Kerberos
 		if (ImGui::Button("Z", buttonSize))
 		{
 			values.z = resetValue;
+			if (onValueChanged)
+				onValueChanged();
 		}
 		ImGui::PopFont();
 
@@ -249,7 +265,11 @@ namespace Kerberos
 
 		ImGui::SameLine();
 		/// ##Z is used to hide the label of the input field
-		ImGui::DragFloat("##Z", &values.z, 0.1f);
+		if (ImGui::DragFloat("##Z", &values.z, 0.1f))
+		{
+			if (onValueChanged)
+				onValueChanged();
+		}
 		ImGui::PopItemWidth();
 
 		ImGui::PopStyleVar();
@@ -284,9 +304,14 @@ namespace Kerberos
 			if (ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
-				DrawVec3Control("Position", transform.Translation);
-				DrawVec3Control("Rotation", transform.Rotation);
-				DrawVec3Control("Scale", transform.Scale, 1.0f);
+				const auto onValueChanged = [&entity, this]()
+				{
+					m_Context->CalculateEntityTransform(entity);
+				};
+
+				DrawVec3Control("Position", transform.Translation, 0.0f, 80.0f, onValueChanged);
+				DrawVec3Control("Rotation", transform.Rotation, 0.0f, 80.0f, onValueChanged);
+				DrawVec3Control("Scale", transform.Scale, 1.0f, 80.f, onValueChanged);
 
 				ImGui::TreePop();
 			}

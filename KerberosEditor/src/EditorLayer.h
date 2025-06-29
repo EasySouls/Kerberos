@@ -31,7 +31,7 @@ namespace Kerberos
 
 		void HandleDragAndDrop();
 
-		void CalculateEntityTransforms() const;
+		void CalculateEntityTransform(const Entity& entity) const;
 
 		void NewProject();
 		void OpenProject(const std::filesystem::path& filepath);
