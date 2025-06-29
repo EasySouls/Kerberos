@@ -126,6 +126,12 @@ namespace Kerberos
 					ImGui::CloseCurrentPopup();
 				}
 
+				if (ImGui::MenuItem("Environment"))
+				{
+					m_SelectedEntity.AddComponent<EnvironmentComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
 				ImGui::EndPopup();
 			}
 		}
@@ -800,6 +806,52 @@ namespace Kerberos
 			if (componentDeleted)
 			{
 				entity.RemoveComponent<BoxCollider3DComponent>();
+			}
+		}
+		if (entity.HasComponent<EnvironmentComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(EnvironmentComponent).hash_code()), treeNodeFlags, "Environment");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Environment Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (opened)
+			{
+				auto& environment = entity.GetComponent<EnvironmentComponent>();
+				ImGui::Checkbox("Skybox Enabled", &environment.IsSkyboxEnabled);
+
+				/// Handle drag and drop for textures
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_TEXTURE_CUBE"))
+					{
+						/// TODO: Handle the case where the payload is not a texture
+						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
+						environment.SkyboxTexture = handle;
+					}
+					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::TreePop();
+			}
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<EnvironmentComponent>();
 			}
 		}
 	}

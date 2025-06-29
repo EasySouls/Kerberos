@@ -384,6 +384,15 @@ namespace Kerberos
 				ImGui::EndDragDropSource();
 			}
 		}
+		else if (extension == ".kbrcubemap")
+		{
+			if (ImGui::BeginDragDropSource())
+			{
+				ImGui::SetDragDropPayload("ASSET_BROWSER_TEXTURE_CUBE", &handle, sizeof(AssetHandle), ImGuiCond_Once);
+				ImGui::Text("Cubemap Texture");
+				ImGui::EndDragDropSource();
+			}
+		}
 	}
 
 	void AssetsPanel::SetCurrentDir(const std::filesystem::path& path)

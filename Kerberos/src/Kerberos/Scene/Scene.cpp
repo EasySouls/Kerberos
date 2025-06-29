@@ -22,6 +22,8 @@
 
 #include <algorithm>
 
+#include "Kerberos/Assets/AssetManager.h"
+
 #define USE_MAP_FOR_UUID 1
 
 namespace Kerberos
@@ -471,9 +473,9 @@ namespace Kerberos
 		JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = nullptr;);
 	}
 
-	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera, const bool renderSkybox)
+	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera)
 	{
-		Render3DEditor(camera, renderSkybox);
+		Render3DEditor(camera);
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts)
@@ -745,7 +747,19 @@ namespace Kerberos
 			}
 		}
 
-		Renderer3D::BeginScene(*mainCamera, mainCameraTransform, sun, pointLights);
+		Ref<TextureCube> skyboxTexture = nullptr;
+		const auto skyboxView = m_Registry.view<EnvironmentComponent>();
+		for (const auto entity : skyboxView)
+		{
+			const auto& skybox = skyboxView.get<EnvironmentComponent>(entity);
+			if (skybox.IsSkyboxEnabled && skybox.SkyboxTexture)
+			{
+				skyboxTexture = AssetManager::GetAsset<TextureCube>(skybox.SkyboxTexture);
+				break;
+			}
+		}
+
+		Renderer3D::BeginScene(*mainCamera, mainCameraTransform, sun, pointLights, skyboxTexture);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
 		for (const auto entity : view)
@@ -761,7 +775,7 @@ namespace Kerberos
 		Renderer3D::EndScene();
 	}
 
-	void Scene::Render3DEditor(const EditorCamera& camera, const bool renderSkybox)
+	void Scene::Render3DEditor(const EditorCamera& camera)
 	{
 		const DirectionalLight* sun = nullptr;
 		const auto sunView = m_Registry.view<DirectionalLightComponent, TransformComponent>();
@@ -786,7 +800,19 @@ namespace Kerberos
 			}
 		}
 
-		Renderer3D::BeginScene(camera, sun, pointLights, renderSkybox);
+		Ref<TextureCube> skyboxTexture = nullptr;
+		const auto skyboxView = m_Registry.view<EnvironmentComponent>();
+		for (const auto entity : skyboxView)
+		{
+			const auto& skybox = skyboxView.get<EnvironmentComponent>(entity);
+			if (skybox.IsSkyboxEnabled && skybox.SkyboxTexture)
+			{
+				skyboxTexture = AssetManager::GetAsset<TextureCube>(skybox.SkyboxTexture);
+				break;
+			}
+		}
+
+		Renderer3D::BeginScene(camera, sun, pointLights, skyboxTexture);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
 		for (const auto entity : view)
@@ -902,10 +928,6 @@ namespace Kerberos
 	{}
 
 	template <>
-	void Scene::OnComponentAdded<SkyboxComponent>(Entity entity, SkyboxComponent& component)
-	{}
-
-	template <>
 	void Scene::OnComponentAdded<HierarchyComponent>(Entity entity, HierarchyComponent& component)
 	{}
 
@@ -915,5 +937,9 @@ namespace Kerberos
 
 	template <>
 	void Scene::OnComponentAdded<BoxCollider3DComponent>(Entity entity, BoxCollider3DComponent& component)
+	{}
+
+	template <>
+	void Scene::OnComponentAdded<EnvironmentComponent>(Entity entity, EnvironmentComponent& component)
 	{}
 }

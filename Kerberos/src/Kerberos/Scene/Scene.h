@@ -36,7 +36,7 @@ namespace Kerberos
 		void OnRuntimeStart();
 		void OnRuntimeStop();
 
-		void OnUpdateEditor(Timestep ts, const EditorCamera& camera, bool renderSkybox);
+		void OnUpdateEditor(Timestep ts, const EditorCamera& camera);
 		void OnUpdateRuntime(Timestep ts);
 
 		/**
@@ -78,7 +78,7 @@ namespace Kerberos
 
 		void Render2DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
 		void Render3DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
-		void Render3DEditor(const EditorCamera& camera, bool renderSkybox);
+		void Render3DEditor(const EditorCamera& camera);
 
 		void UpdateChildTransforms(Entity parent, const glm::mat4& parentTransform);
 

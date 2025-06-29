@@ -86,6 +86,11 @@ namespace Kerberos
 			planeEntity.AddComponent<BoxCollider3DComponent>().Size = { 10.f, 0.1f, 10.f };
 		}
 
+		{
+			Entity environmentEntity = m_ActiveScene->CreateEntity("Environment");
+			environmentEntity.AddComponent<EnvironmentComponent>();
+		}
+
 		m_SunlightEntity = m_ActiveScene->CreateEntity("Sun");
 		auto& sunlightComponent = m_SunlightEntity.AddComponent<DirectionalLightComponent>();
 		sunlightComponent.Light.Color = { 1.0f, 1.0f, 0.8f };
@@ -209,7 +214,7 @@ namespace Kerberos
 			{
 			case SceneState::Edit:
 			case SceneState::Simulate:
-				m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera, m_RenderSkybox);
+				m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera);
 				break;
 			case SceneState::Play:
 				m_ActiveScene->OnUpdateRuntime(deltaTime);
@@ -346,18 +351,6 @@ namespace Kerberos
 		{
 			m_CameraEntity.GetComponent<CameraComponent>().IsPrimary = m_IsPrimaryCamera;
 			m_SecondCamera.GetComponent<CameraComponent>().IsPrimary = !m_IsPrimaryCamera;
-		}
-
-		if (ImGui::Checkbox("Toggle 3D", &m_IsScene3D))
-		{
-			m_ActiveScene->SetIs3D(m_IsScene3D);
-		}
-
-		ImGui::Checkbox("Render Skybox", &m_RenderSkybox);
-
-		if (ImGui::Checkbox("Toggle Skybox Texture", &m_RenderOceanSkybox))
-		{
-			Renderer3D::ToggleSkyboxTexture();
 		}
 
 		if (ImGui::Checkbox("Show Wireframe", &m_ShowWireframe))

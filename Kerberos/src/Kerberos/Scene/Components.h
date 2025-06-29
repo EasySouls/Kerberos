@@ -205,20 +205,6 @@ namespace Kerberos
 		{}
 	};
 
-	struct SkyboxComponent
-	{
-		Ref<TextureCube> SkyboxTexture = nullptr;
-		Ref<Shader> SkyboxShader = nullptr;
-
-		SkyboxComponent() = default;
-		explicit SkyboxComponent(const Ref<TextureCube>& texture)
-			: SkyboxTexture(texture)
-		{}
-		SkyboxComponent(const Ref<TextureCube>& texture, const Ref<Shader>& shader)
-			: SkyboxTexture(texture), SkyboxShader(shader)
-		{}
-	};
-
 	struct HierarchyComponent
 	{
 		UUID Parent = UUID::Invalid();
@@ -266,6 +252,17 @@ namespace Kerberos
 		BoxCollider3DComponent() = default;
 		explicit BoxCollider3DComponent(const glm::vec3& size, const glm::vec3& offset = glm::vec3(0.0f), const bool isTrigger = false)
 			: Size(size), Offset(offset), IsTrigger(isTrigger)
+		{}
+	};
+
+	struct EnvironmentComponent
+	{
+		AssetHandle SkyboxTexture = AssetHandle::Invalid();
+		bool IsSkyboxEnabled = true;
+
+		EnvironmentComponent() = default;
+		explicit EnvironmentComponent(const AssetHandle& skyboxTexture, const bool isSkyboxEnabled = true)
+			: SkyboxTexture(skyboxTexture), IsSkyboxEnabled(isSkyboxEnabled)
 		{}
 	};
 }

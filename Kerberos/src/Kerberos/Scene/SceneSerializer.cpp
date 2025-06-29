@@ -256,6 +256,16 @@ namespace Kerberos
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<EnvironmentComponent>())
+		{
+			out << YAML::Key << "EnvironmentComponent";
+			out << YAML::BeginMap;
+			const auto& environmentComponent = entity.GetComponent<EnvironmentComponent>();
+			out << YAML::Key << "SkyboxTexture" << YAML::Value << environmentComponent.SkyboxTexture;
+			out << YAML::Key << "IsSkyboxEnabled" << YAML::Value << environmentComponent.IsSkyboxEnabled;
+			out << YAML::EndMap;
+		}
+
 		out << YAML::EndMap;
 
 	}
@@ -470,6 +480,13 @@ namespace Kerberos
 					{
 						staticMesh.StaticMesh = AssetManager::GetDefaultCubeMesh();
 					}
+				}
+
+				if (auto environmentComponent = entity["EnvironmentComponent"])
+				{
+					auto& environment = deserializedEntity.AddComponent<EnvironmentComponent>();
+					environment.SkyboxTexture = AssetHandle(environmentComponent["SkyboxTexture"].as<uint64_t>());
+					environment.IsSkyboxEnabled = environmentComponent["IsSkyboxEnabled"].as<bool>();
 				}
 			}
 		}

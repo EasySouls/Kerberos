@@ -69,13 +69,7 @@ namespace Kerberos
 		/// Used when toggling the cameras
 		bool m_IsPrimaryCamera = true;
 
-		bool m_IsScene3D = true;
-
 		int m_GizmoType = -1;
-
-		/// Later this should be handled by the ECS system
-		bool m_RenderSkybox = false;
-		bool m_RenderOceanSkybox = true;
 
 		bool m_ShowWireframe = false;
 

@@ -28,11 +28,8 @@ namespace Kerberos
 
 		const DirectionalLight* pSunLight = nullptr;
 
-		bool RenderSkybox = false;
-		bool RenderOceanSkybox = false;
 		Ref<Shader> SkyboxShader = nullptr;
-		Ref<TextureCube> StarmapSkyboxTexture = nullptr;
-		Ref<TextureCube> OceanSkyboxTexture = nullptr;
+		Ref<TextureCube> SkyboxTexture = nullptr;
 		Ref<VertexArray> SkyboxVertexArray = nullptr;
 
 		struct CameraDataUbo
@@ -105,8 +102,7 @@ namespace Kerberos
 			"assets/textures/starmap_cubemap_5.png",
 
 		};
-		s_RendererData.StarmapSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/starmap.kbrcubemap");
-		//s_RendererData.StarmapSkyboxTexture = TextureCube::Create("Starmap Skybox", skymapTextures, false);
+		//s_RendererData.StarmapSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/starmap.kbrcubemap");
 		const std::vector<std::string> oceanCubeTextures = {
 			"assets/textures/skybox/right.jpg",
 			"assets/textures/skybox/left.jpg",
@@ -115,8 +111,7 @@ namespace Kerberos
 			"assets/textures/skybox/front.jpg",
 			"assets/textures/skybox/back.jpg"
 		};
-		//s_RendererData.OceanSkyboxTexture = TextureCube::Create("Ocean Skybox", oceanCubeTextures, false);
-		s_RendererData.OceanSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/ocean.kbrcubemap");
+		//s_RendererData.OceanSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/ocean.kbrcubemap");
 		const std::vector<float> skyboxVertices = {
 			-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
@@ -185,7 +180,7 @@ namespace Kerberos
 	}
 
 	void Renderer3D::BeginScene(const EditorCamera& camera, const DirectionalLight* sun,
-		const std::vector<PointLight>& pointLights, const bool renderSkybox) 
+		const std::vector<PointLight>& pointLights, const Ref<TextureCube>& skyboxTexture) 
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -219,10 +214,10 @@ namespace Kerberos
 
 		s_RendererData.LightsUniformBuffer->SetData(&s_RendererData.LightsData, sizeof(Renderer3DData::LightsData), 0);
 
-		s_RendererData.RenderSkybox = renderSkybox;
+		s_RendererData.SkyboxTexture = skyboxTexture;
 	}
 
-	void Renderer3D::BeginScene(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights)
+	void Renderer3D::BeginScene(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights, const Ref<TextureCube>& skyboxTexture)
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -255,6 +250,8 @@ namespace Kerberos
 		}
 
 		s_RendererData.LightsUniformBuffer->SetData(&s_RendererData.LightsData, sizeof(Renderer3DData::LightsData), 0);
+
+		s_RendererData.SkyboxTexture = skyboxTexture;
 	}
 
 	void Renderer3D::EndScene() 
@@ -262,7 +259,7 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		/// Render the skybox last if enabled
-		if (!s_RendererData.RenderSkybox)
+		if (s_RendererData.SkyboxTexture == nullptr)
 			return;
 
 		RenderCommand::SetDepthFunc(DepthFunc::LessEqual);
@@ -283,10 +280,7 @@ namespace Kerberos
 		s_RendererData.SkyboxShader->SetInt("u_EntityID", -1);
 
 		s_RendererData.SkyboxVertexArray->Bind();
-		if (s_RendererData.RenderOceanSkybox)
-			s_RendererData.OceanSkyboxTexture->Bind(0);
-		else
-			s_RendererData.StarmapSkyboxTexture->Bind(0);
+		s_RendererData.SkyboxTexture->Bind(0);
 
 		/// Always 36 indices for the skybox
 		RenderCommand::DrawArray(s_RendererData.SkyboxVertexArray, 36);
@@ -348,11 +342,6 @@ namespace Kerberos
 			s_RendererData.ActiveShader->SetFloat3("u_GlobalAmbientColor", s_RendererData.LightsData.GlobalAmbientColor);
 			s_RendererData.ActiveShader->SetFloat("u_GlobalAmbientIntensity", s_RendererData.LightsData.GlobalAmbientIntensity);
 		}
-	}
-
-	void Renderer3D::ToggleSkyboxTexture() 
-	{
-		s_RendererData.RenderOceanSkybox = !s_RendererData.RenderOceanSkybox;
 	}
 
 	void Renderer3D::SetShowWireframe(const bool showWireframe) 
