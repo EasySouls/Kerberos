@@ -1,0 +1,46 @@
+AssetRegistry:
+  - Handle: 402434786640342992
+    Type: Texture2D
+    Path: Assets\textures\y2k_ice_texture.png
+  - Handle: 1271296461044679804
+    Type: Texture2D
+    Path: Assets\models\backpack\normal.png
+  - Handle: 1272437982232479923
+    Type: Texture2D
+    Path: Assets\models\backpack\ao.jpg
+  - Handle: 1482023877409938326
+    Type: TextureCube
+    Path: Assets\cubemaps\ocean.kbrcubemap
+  - Handle: 1552119077966551471
+    Type: Texture2D
+    Path: Assets\textures\starmap_cubemap_3.png
+  - Handle: 1810877628020842056
+    Type: Texture2D
+    Path: Assets\models\backpack\specular.jpg
+  - Handle: 3327285767317048976
+    Type: Texture2D
+    Path: Assets\models\backpack\roughness.jpg
+  - Handle: 4851784203174410810
+    Type: Texture2D
+    Path: Assets\textures\starmap_cubemap_4.png
+  - Handle: 5353067575751130433
+    Type: Texture2D
+    Path: Assets\textures\starmap_cubemap_2.png
+  - Handle: 7614295769033017730
+    Type: Texture2D
+    Path: Assets\textures\skybox\back.jpg
+  - Handle: 8187673179035048105
+    Type: Texture2D
+    Path: Assets\models\backpack\diffuse.jpg
+  - Handle: 9598681099830972806
+    Type: Texture2D
+    Path: Assets\textures\starmap_cubemap_0.png
+  - Handle: 13227031095336055275
+    Type: Texture2D
+    Path: Assets\textures\starmap_cubemap_1.png
+  - Handle: 15700455669564021845
+    Type: TextureCube
+    Path: Assets\cubemaps\starmap.kbrcubemap
+  - Handle: 18308762423730217315
+    Type: Texture2D
+    Path: Assets\textures\starmap_cubemap_5.png

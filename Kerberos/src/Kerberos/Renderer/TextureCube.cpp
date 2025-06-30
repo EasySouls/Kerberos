@@ -8,8 +8,7 @@
 
 namespace Kerberos
 {
-	Ref<TextureCube> TextureCube::Create(const std::string& name, const std::vector<std::string>& faces,
-		bool generateMipmaps, bool srgb) 
+	Ref<TextureCube> TextureCube::Create(const CubemapData& data) 
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -18,20 +17,21 @@ namespace Kerberos
 			return nullptr;
 
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLTextureCube>(name, faces, generateMipmaps, srgb);
+			return CreateRef<OpenGLTextureCube>(data);
 
 		case RendererAPI::API::D3D11:
-			return CreateRef<D3D11TextureCube>(name, faces, generateMipmaps, srgb);
+			return CreateRef<D3D11TextureCube>(data);
 
 		case RendererAPI::API::D3D12:
 			KBR_CORE_ASSERT(false, "D3D12 is currently not supported!");
-			return nullptr;	
+			return nullptr;
 
 		case RendererAPI::API::Vulkan:
-			return CreateRef<VulkanTextureCube>(name, faces, generateMipmaps, srgb);
+			return CreateRef<VulkanTextureCube>(data);
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
+
 }

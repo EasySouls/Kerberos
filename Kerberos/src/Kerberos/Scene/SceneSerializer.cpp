@@ -8,6 +8,8 @@
 
 #include <fstream>
 
+#include "Kerberos/Assets/AssetManager.h"
+
 namespace YAML
 {
 	template<>
@@ -153,7 +155,7 @@ namespace Kerberos
 
 		if (entity.HasComponent<NativeScriptComponent>())
 		{
-			
+
 		}
 
 		if (entity.HasComponent<DirectionalLightComponent>())
@@ -208,6 +210,8 @@ namespace Kerberos
 			out << YAML::Key << "Velocity" << YAML::Value << rigidBody.Velocity;
 			out << YAML::Key << "AngularVelocity" << YAML::Value << rigidBody.AngularVelocity;
 			out << YAML::Key << "UseGravity" << YAML::Value << rigidBody.UseGravity;
+			out << YAML::Key << "Friction" << YAML::Value << rigidBody.Friction;
+			out << YAML::Key << "Restitution" << YAML::Value << rigidBody.Restitution;
 			out << YAML::EndMap;
 		}
 
@@ -221,11 +225,52 @@ namespace Kerberos
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<StaticMeshComponent>())
+		{
+			out << YAML::Key << "StaticMeshComponent";
+			out << YAML::BeginMap;
+			const auto& staticMesh = entity.GetComponent<StaticMeshComponent>();
+			out << YAML::Key << "Mesh" << YAML::Value << 0; /// Placeholder for mesh index, to be replaced with actual mesh index
+			if (auto& mat = staticMesh.MeshMaterial)
+			{
+				//out << YAML::Key << "Material" << YAML::Value << staticMesh.MeshMaterial->GetHandle();
+				out << YAML::Key << "Material";
+				out << YAML::BeginMap;
+
+				out << YAML::Key << "Ambient" << YAML::Value << mat->Ambient;
+				out << YAML::Key << "Diffuse" << YAML::Value << mat->Diffuse;
+				out << YAML::Key << "Specular" << YAML::Value << mat->Specular;
+				out << YAML::Key << "Shininess" << YAML::Value << mat->Shininess;
+
+				out << YAML::EndMap;
+			}
+			//else
+			//{
+			//	out << YAML::Key << "Material" << YAML::Value << UUID::Invalid();
+			//}
+
+			if (staticMesh.MeshTexture)
+				out << YAML::Key << "Texture" << YAML::Value << staticMesh.MeshTexture->GetHandle();
+			else
+				out << YAML::Key << "Texture" << YAML::Value << UUID::Invalid();
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<EnvironmentComponent>())
+		{
+			out << YAML::Key << "EnvironmentComponent";
+			out << YAML::BeginMap;
+			const auto& environmentComponent = entity.GetComponent<EnvironmentComponent>();
+			out << YAML::Key << "SkyboxTexture" << YAML::Value << environmentComponent.SkyboxTexture;
+			out << YAML::Key << "IsSkyboxEnabled" << YAML::Value << environmentComponent.IsSkyboxEnabled;
+			out << YAML::EndMap;
+		}
+
 		out << YAML::EndMap;
 
 	}
 
-	void SceneSerializer::Serialize(const std::filesystem::path& filepath) const 
+	void SceneSerializer::Serialize(const std::filesystem::path& filepath) const
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
@@ -267,7 +312,7 @@ namespace Kerberos
 		throw std::logic_error("Not implemented");
 	}
 
-	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath) const 
+	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath) const
 	{
 		const std::ifstream inFile(filepath);
 		std::stringstream stream;
@@ -331,8 +376,15 @@ namespace Kerberos
 				{
 					/// The entity must have a HierarchyComponent already when created
 					auto& hierarchy = deserializedEntity.GetComponent<HierarchyComponent>();
-					const uint64_t parentId = hierarchyComponent["Parent"].as<uint64_t>();
-					hierarchy.Parent = UUID(parentId);
+					const UUID parentId = static_cast<UUID>(hierarchyComponent["Parent"].as<uint64_t>());
+					
+					hierarchy.Parent = parentId;
+					if (parentId.IsValid())
+					{
+						/// If the entity has a parent, it should not be a root entity
+						m_Scene->m_RootEntities.erase(static_cast<entt::entity>(deserializedEntity));
+					}
+
 					for (const auto& child : hierarchyComponent["Children"])
 					{
 						const uint64_t childUUID = child.as<uint64_t>();
@@ -387,6 +439,8 @@ namespace Kerberos
 					rigidBody.Velocity = rigidBodyComponent["Velocity"].as<glm::vec3>();
 					rigidBody.AngularVelocity = rigidBodyComponent["AngularVelocity"].as<glm::vec3>();
 					rigidBody.UseGravity = rigidBodyComponent["UseGravity"].as<bool>();
+					rigidBody.Friction = rigidBodyComponent["Friction"].as<float>();
+					rigidBody.Restitution = rigidBodyComponent["Restitution"].as<float>();
 				}
 
 				if (auto boxColliderComponent = entity["BoxCollider3DComponent"])
@@ -395,13 +449,52 @@ namespace Kerberos
 					boxCollider.Size = boxColliderComponent["Size"].as<glm::vec3>();
 					boxCollider.Offset = boxColliderComponent["Offset"].as<glm::vec3>();
 				}
+
+				if (auto staticMeshComponent = entity["StaticMeshComponent"])
+				{
+					auto& staticMesh = deserializedEntity.AddComponent<StaticMeshComponent>();
+
+					/// Get the material and texture handles
+					/// If they are valid, load the assets, else use default ones
+
+					/*const auto matNode = staticMeshComponent["Material"].as<std::uint64_t>();
+					const AssetHandle materialHandle = UUID(matNode);
+					if (materialHandle.IsValid())
+						staticMesh.MeshMaterial = AssetManager::GetAsset<Material>(materialHandle);*/
+
+					staticMesh.MeshMaterial = CreateRef<Material>();
+					if (auto matNode = staticMeshComponent["Material"])
+					{
+						staticMesh.MeshMaterial->Ambient = matNode["Ambient"].as<glm::vec3>();
+						staticMesh.MeshMaterial->Diffuse = matNode["Diffuse"].as<glm::vec3>();
+						staticMesh.MeshMaterial->Specular = matNode["Specular"].as<glm::vec3>();
+						staticMesh.MeshMaterial->Shininess = matNode["Shininess"].as<float>();
+					}
+
+					const AssetHandle textureHandle = UUID(staticMeshComponent["Texture"].as<uint64_t>());
+					if (textureHandle.IsValid())
+						staticMesh.MeshTexture = AssetManager::GetAsset<Texture2D>(UUID(staticMeshComponent["Texture"].as<uint64_t>()));
+
+					const auto mesh = staticMeshComponent["Mesh"].as<uint64_t>();
+					if (mesh == 0)
+					{
+						staticMesh.StaticMesh = AssetManager::GetDefaultCubeMesh();
+					}
+				}
+
+				if (auto environmentComponent = entity["EnvironmentComponent"])
+				{
+					auto& environment = deserializedEntity.AddComponent<EnvironmentComponent>();
+					environment.SkyboxTexture = AssetHandle(environmentComponent["SkyboxTexture"].as<uint64_t>());
+					environment.IsSkyboxEnabled = environmentComponent["IsSkyboxEnabled"].as<bool>();
+				}
 			}
 		}
 
 		return true;
 	}
 
-	bool SceneSerializer::DeserializeRuntime(const std::filesystem::path& filepath) const 
+	bool SceneSerializer::DeserializeRuntime(const std::filesystem::path& filepath) const
 	{
 		throw std::logic_error("Not implemented");
 	}

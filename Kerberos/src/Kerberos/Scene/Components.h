@@ -156,6 +156,7 @@ namespace Kerberos
 		Ref<Mesh> StaticMesh = nullptr;
 		Ref<Material> MeshMaterial = nullptr;
 		Ref<Texture2D> MeshTexture = nullptr;
+		//AssetHandle MeshTexture;
 		bool Visible = true;
 
 		StaticMeshComponent()
@@ -204,20 +205,6 @@ namespace Kerberos
 		{}
 	};
 
-	struct SkyboxComponent
-	{
-		Ref<TextureCube> SkyboxTexture = nullptr;
-		Ref<Shader> SkyboxShader = nullptr;
-
-		SkyboxComponent() = default;
-		explicit SkyboxComponent(const Ref<TextureCube>& texture)
-			: SkyboxTexture(texture)
-		{}
-		SkyboxComponent(const Ref<TextureCube>& texture, const Ref<Shader>& shader)
-			: SkyboxTexture(texture), SkyboxShader(shader)
-		{}
-	};
-
 	struct HierarchyComponent
 	{
 		UUID Parent = UUID::Invalid();
@@ -239,6 +226,10 @@ namespace Kerberos
 		glm::vec3 Velocity = glm::vec3(0.0f);
 		glm::vec3 AngularVelocity = glm::vec3(0.0f);
 		bool UseGravity = true;
+		/// Between 0 and 1
+		float Friction = 0.5f;
+		/// Between 0 and 1
+		float Restitution = 0.5f;
 
 		/// Pointer to the physics engine's runtime body
 		void* RuntimeBody = nullptr; 
@@ -261,6 +252,17 @@ namespace Kerberos
 		BoxCollider3DComponent() = default;
 		explicit BoxCollider3DComponent(const glm::vec3& size, const glm::vec3& offset = glm::vec3(0.0f), const bool isTrigger = false)
 			: Size(size), Offset(offset), IsTrigger(isTrigger)
+		{}
+	};
+
+	struct EnvironmentComponent
+	{
+		AssetHandle SkyboxTexture = AssetHandle::Invalid();
+		bool IsSkyboxEnabled = true;
+
+		EnvironmentComponent() = default;
+		explicit EnvironmentComponent(const AssetHandle& skyboxTexture, const bool isSkyboxEnabled = true)
+			: SkyboxTexture(skyboxTexture), IsSkyboxEnabled(isSkyboxEnabled)
 		{}
 	};
 }

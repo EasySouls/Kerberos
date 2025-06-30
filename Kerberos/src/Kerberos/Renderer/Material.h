@@ -1,11 +1,13 @@
 #pragma once
+
+#include "Kerberos/Assets/Asset.h"
 #include <glm/glm.hpp>
 
 namespace Kerberos
 {
 	class Shader;
 
-	struct Material
+	struct Material final : Asset
 	{
 		glm::vec3 Ambient = glm::vec3{ 0.1f };
 		glm::vec3 Diffuse = glm::vec3{ 1.0f };
@@ -23,5 +25,7 @@ namespace Kerberos
 		Material(const glm::vec3 ambient, const glm::vec3 diffuse, const glm::vec3 specular, const float shininess, const Ref<Shader>& shader)
 			: Ambient(ambient), Diffuse(diffuse), Specular(specular), Shininess(shininess), MaterialShader(shader)
 		{}
+
+		AssetType GetType() override { return AssetType::Material; }
 	};
 }

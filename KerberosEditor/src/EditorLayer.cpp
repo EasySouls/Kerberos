@@ -9,6 +9,8 @@
 #include "imgui/imgui.h"
 #include <ImGuizmo/ImGuizmo.h>
 
+#include "Kerberos/Assets/Importers/TextureImporter.h"
+
 #define PROFILE_SCOPE(name) Timer timer##__LINE__(name, 
 
 namespace Kerberos
@@ -29,13 +31,20 @@ namespace Kerberos
 
 		m_ActiveScene = CreateRef<Scene>();
 
+		/// TODO: Open the project passed as command line argument, if there is one
+
+		if (!OpenProject())
+		{
+			NewProject();
+		}
+
 		m_EditorCamera = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 		m_ViewportSize = { 1280.0f, 720.0f };
 
-		m_Texture = Texture2D::Create("assets/textures/y2k_ice_texture.png");
+		m_Texture = TextureImporter::ImportTexture("assets/textures/y2k_ice_texture.png");
 
-		m_SpriteSheet = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
+		m_SpriteSheet = TextureImporter::ImportTexture("assets/game/textures/RPGpack_sheet_2X.png");
 
 		m_TextureStairs = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 7, 6 }, { 128, 128 }, { 1, 1 });
 		m_TextureBarrel = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 8, 3 }, { 128, 128 }, { 1, 1 });
@@ -49,8 +58,6 @@ namespace Kerberos
 		squareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
 
 		const Ref<Material> whiteMaterial = CreateRef<Material>();
-
-		const auto skymapTexture = Texture2D::Create("assets/textures/starmap_cubemap_1.png");
 
 		{
 			Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
@@ -76,7 +83,12 @@ namespace Kerberos
 			planeEntity.AddComponent<StaticMeshComponent>(planeMesh, whiteMaterial, nullptr);
 			planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, -1.0f, 0.0f };
 			planeEntity.AddComponent<RigidBody3DComponent>().Type = RigidBody3DComponent::BodyType::Static;
-			planeEntity.AddComponent<BoxCollider3DComponent>().Size = { 10.f, 0.01f, 10.f };
+			planeEntity.AddComponent<BoxCollider3DComponent>().Size = { 10.f, 0.1f, 10.f };
+		}
+
+		{
+			Entity environmentEntity = m_ActiveScene->CreateEntity("Environment");
+			environmentEntity.AddComponent<EnvironmentComponent>();
 		}
 
 		m_SunlightEntity = m_ActiveScene->CreateEntity("Sun");
@@ -128,17 +140,17 @@ namespace Kerberos
 		/*Model deerModel = Model("assets/models/deer_demo/scene.gltf", "Deer");
 		deerModel.InitEntities(m_ActiveScene);*/
 
-		m_IconPlay = Texture2D::Create("assets/editor/play_button.png");
-		m_IconStop = Texture2D::Create("assets/editor/stop_button.png");
+		m_IconPlay = TextureImporter::ImportTexture("assets/editor/play_button.png");
+		m_IconStop = TextureImporter::ImportTexture("assets/editor/stop_button.png");
+
+		/// Calculate the world transforms of the entities initially
+		m_ActiveScene->CalculateEntityTransforms();
 	}
 
 	void EditorLayer::OnDetach()
 	{
 		Layer::OnDetach();
 	}
-
-	static uint64_t s_FrameCount = 0;
-	static constexpr int s_TransformCalculationFramespan = 3;
 
 	void EditorLayer::OnUpdate(const Timestep deltaTime)
 	{
@@ -147,19 +159,6 @@ namespace Kerberos
 		m_Fps = static_cast<float>(1) / deltaTime;
 
 		Timer timer("EditorLayer::OnUpdate", [&](const ProfileResult profileResult) { m_ProfileResults.push_back(profileResult); });
-
-		{
-			KBR_PROFILE_SCOPE("EditorLayer::OnUpdate - CalculateEntityTransforms");
-
-			/// TODO: Implement a valid logic from calculating only the dirty transforms
-			/// Calculates the children entities' world transform from their parents' and their own local transform
-			if (s_FrameCount % s_TransformCalculationFramespan == 0)
-			{
-				CalculateEntityTransforms();
-			}
-
-			s_FrameCount++;
-		}
 
 		/// Resize the camera if needed
 		if (const FramebufferSpecification spec = m_Framebuffer->GetSpecification();
@@ -215,7 +214,7 @@ namespace Kerberos
 			{
 			case SceneState::Edit:
 			case SceneState::Simulate:
-				m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera, m_RenderSkybox);
+				m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera);
 				break;
 			case SceneState::Play:
 				m_ActiveScene->OnUpdateRuntime(deltaTime);
@@ -327,7 +326,7 @@ namespace Kerberos
 		}
 
 		m_HierarchyPanel.OnImGuiRender();
-		m_AssetsPanel.OnImGuiRender();
+		m_AssetsPanel->OnImGuiRender();
 
 		ImGui::Begin("Settings");
 		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
@@ -352,18 +351,6 @@ namespace Kerberos
 		{
 			m_CameraEntity.GetComponent<CameraComponent>().IsPrimary = m_IsPrimaryCamera;
 			m_SecondCamera.GetComponent<CameraComponent>().IsPrimary = !m_IsPrimaryCamera;
-		}
-
-		if (ImGui::Checkbox("Toggle 3D", &m_IsScene3D))
-		{
-			m_ActiveScene->SetIs3D(m_IsScene3D);
-		}
-
-		ImGui::Checkbox("Render Skybox", &m_RenderSkybox);
-
-		if (ImGui::Checkbox("Toggle Skybox Texture", &m_RenderOceanSkybox))
-		{
-			Renderer3D::ToggleSkyboxTexture();
 		}
 
 		if (ImGui::Checkbox("Show Wireframe", &m_ShowWireframe))
@@ -425,7 +412,8 @@ namespace Kerberos
 		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
 		/// Gizmos
-		if (const Entity selectedEntity = m_HierarchyPanel.GetSelectedEntity(); selectedEntity && m_GizmoType != -1)
+		const bool gizmosEnabled = m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate;
+		if (const Entity selectedEntity = m_HierarchyPanel.GetSelectedEntity(); selectedEntity && m_GizmoType != -1 && gizmosEnabled)
 		{
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
@@ -467,6 +455,8 @@ namespace Kerberos
 				tc.Translation = translation;
 				tc.Rotation = glm::radians(rotationDegrees);
 				tc.Scale = scale;
+
+				CalculateEntityTransform(selectedEntity);
 			}
 		}
 
@@ -494,6 +484,7 @@ namespace Kerberos
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(KBR_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(KBR_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+		dispatcher.Dispatch<WindowDropEvent>(KBR_BIND_EVENT_FN(EditorLayer::OnWindowDrop));
 	}
 
 	bool EditorLayer::OnKeyPressed(const KeyPressedEvent& event)
@@ -561,6 +552,12 @@ namespace Kerberos
 		return false;
 	}
 
+	bool EditorLayer::OnWindowDrop(const WindowDropEvent& event) 
+	{
+		/// TODO: Implement when asset manager is done
+		return false;
+	}
+
 	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
@@ -600,9 +597,9 @@ namespace Kerberos
 		}
 	}
 
-	void EditorLayer::CalculateEntityTransforms() const
+	void EditorLayer::CalculateEntityTransform(const Entity& entity) const
 	{
-		m_ActiveScene->CalculateEntityTransforms();
+		m_ActiveScene->CalculateEntityTransform(entity);
 	}
 
 	void EditorLayer::NewScene()
@@ -652,7 +649,24 @@ namespace Kerberos
 
 	void EditorLayer::NewProject()
 	{
-		Project::New();
+		const auto newProject = Project::New();
+
+		NewScene();
+		const std::string newSceneName = "Unnamed Scene.kerberos";
+		const std::filesystem::path scenePath = Project::GetAssetDirectory() / "scenes" / newSceneName;
+
+		const SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize(scenePath.string());
+
+		m_NotificationManager.AddNotification("Scene saved to " + scenePath.string(), Notification::Type::Info);
+
+		ProjectInfo projInfo;
+		projInfo.Name = newProject->GetInfo().Name;
+		projInfo.StartScenePath = "scenes/" + newSceneName;
+		projInfo.AssetDirectory = Project::GetAssetDirectory();
+		newProject->SetInfo(projInfo);
+
+		m_AssetsPanel = CreateScope<AssetsPanel>(m_NotificationManager);
 	}
 
 	void EditorLayer::OpenProject(const std::filesystem::path& filepath)
@@ -661,7 +675,20 @@ namespace Kerberos
 		{
 			const auto startScenePath = Project::GetAssetDirectory() / project->GetInfo().StartScenePath;
 			OpenScene(startScenePath);
+
+			m_AssetsPanel = CreateScope<AssetsPanel>(m_NotificationManager);
 		}
+	}
+
+	bool EditorLayer::OpenProject()
+	{
+		const std::string filepathString = FileDialog::OpenFile("Kerberos Project (*.kbrproj)\0*.kbrproj\0");
+
+		if (filepathString.empty())
+			return false;
+
+		OpenProject(filepathString);
+		return true;
 	}
 
 	void EditorLayer::SaveScene()
@@ -672,9 +699,11 @@ namespace Kerberos
 		serializer.Serialize(scenePath.string());
 
 		m_NotificationManager.AddNotification("Scene saved to " + scenePath.string(), Notification::Type::Info);
+
+		Project::SaveActive();
 	}
 
-	void EditorLayer::SaveSceneAs() const
+	void EditorLayer::SaveSceneAs()
 	{
 		const std::string filepath = FileDialog::SaveFile("Kerberos Scene (*.kerberos)\0*.kerberos\0");
 		if (filepath.empty())
@@ -682,6 +711,10 @@ namespace Kerberos
 
 		const SceneSerializer serializer(m_ActiveScene);
 		serializer.Serialize(filepath);
+
+		m_NotificationManager.AddNotification("Scene saved to " + filepath, Notification::Type::Info);
+
+		Project::SaveActive();
 	}
 
 	void EditorLayer::LoadScene()

@@ -10,6 +10,7 @@ namespace Kerberos
 	public:
 		OpenGLTextureCube(std::string name, const std::vector<std::string>& faces,
 			bool generateMipmaps, bool srgb);
+		explicit OpenGLTextureCube(const CubemapData& data);
 		~OpenGLTextureCube() override;
 
 		void Bind(uint32_t slot = 0) const override;
@@ -18,6 +19,7 @@ namespace Kerberos
 		const std::string& GetName() const override { return m_Name; }
 		uint32_t GetWidth() const override;
 		uint32_t GetHeight() const override;
+		const TextureSpecification& GetSpecification() const override { return m_FacesSpecifications[0]; }
 
 		void SetData(void* data, uint32_t size) override;
 
@@ -30,5 +32,6 @@ namespace Kerberos
 		std::string m_Name;
 		bool m_GenerateMipmaps;
 		bool m_SRGB;
+		std::array<TextureSpecification, 6> m_FacesSpecifications;
 	};
 }

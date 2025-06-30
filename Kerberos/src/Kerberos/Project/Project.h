@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Kerberos/Core.h"
+#include "Kerberos/Assets/AssetManagerBase.h"
+#include "Kerberos/Assets/EditorAssetManager.h"
+#include "Kerberos/Assets/RuntimeAssetManager.h"
 
 #include <filesystem>
 
@@ -19,7 +22,7 @@ namespace Kerberos
 	public:
 		static Ref<Project> New();
 		static Ref<Project> Load(const std::filesystem::path& filepath);
-		static bool SaveActive(const std::filesystem::path& filepath);
+		static bool SaveActive();
 
 		/**
 		* Returns the path to the active project's asset directory.
@@ -45,13 +48,21 @@ namespace Kerberos
 			return GetProjectDirectory() / GetAssetDirectory() / assetPath;
 		}
 
-		ProjectInfo& GetInfo() { return m_Info; }
+		void SetInfo(const ProjectInfo& info);
 
+		ProjectInfo& GetInfo() { return m_Info; }
+		
 		static Ref<Project> GetActive() { return s_ActiveProject; }
+
+		Ref<AssetManagerBase> GetAssetManager() const { return m_AssetManager; }
+		Ref<EditorAssetManager> GetEditorAssetManager() const { return std::static_pointer_cast<EditorAssetManager>(m_AssetManager); }
+		Ref<RuntimeAssetManager> GetRuntimeAssetManager() const { return std::static_pointer_cast<RuntimeAssetManager>(m_AssetManager); }
 
 	private:
 		ProjectInfo m_Info;
 		std::filesystem::path m_ProjectDirectory;
+
+		Ref<AssetManagerBase> m_AssetManager;
 
 		inline static Ref<Project> s_ActiveProject;
 	};

@@ -10,11 +10,12 @@ namespace Kerberos
 	{
 	public:
 		explicit VulkanTexture2D(const std::string& path);
-		explicit VulkanTexture2D(uint32_t width, uint32_t height);
+		explicit VulkanTexture2D(const TextureSpecification& spec, Buffer data);
 		~VulkanTexture2D() override;
 
-		uint32_t GetWidth() const override { return m_Width; }
-		uint32_t GetHeight() const override { return m_Height; }
+		uint32_t GetWidth() const override { return m_Spec.Width; }
+		uint32_t GetHeight() const override { return m_Spec.Height; }
+		const TextureSpecification& GetSpecification() const override { return m_Spec; }
 
 		uint64_t GetRendererID() const override;
 
@@ -32,8 +33,7 @@ namespace Kerberos
 		void CleanupResources() const;
 
 	private:
-		uint32_t m_Width = 0;
-		uint32_t m_Height = 0;
+		TextureSpecification m_Spec;
 		std::string m_Path;
 
 		VkImage         m_Image;

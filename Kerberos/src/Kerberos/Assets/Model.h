@@ -32,6 +32,7 @@ namespace Kerberos
 
 		const std::vector<Ref<Mesh>>& GetMeshes() const { return m_Meshes; }
 		const std::vector<Ref<Texture2D>>& GetTextures() const { return m_Textures; }
+		const std::vector<Ref<Material>>& GetMaterials() const { return m_Materials; }
 
 	private:
 		void LoadModel(const std::filesystem::path& path);
@@ -40,12 +41,16 @@ namespace Kerberos
 		std::vector<Ref<Texture2D>> LoadMaterialTextures(const aiMaterial* mat, aiTextureType type,
 		                                          const std::string& typeName);
 
+		std::vector<Ref<Material>> LoadMtlFile(const std::filesystem::path& path);
+
 	private:
 		std::vector<Ref<Mesh>> m_Meshes;
 		std::vector<Ref<Texture2D>> m_Textures;
 
-		std::string m_Directory;
-		std::vector<std::string> m_LoadedTexturePaths;
+		std::filesystem::path m_Directory;
+		std::vector<std::filesystem::path> m_LoadedTexturePaths;
+
+		std::vector<Ref<Material>> m_Materials;
 
 		std::string m_Name;
 	};

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Kerberos/Core/Timestep.h"
-
-#include <entt.hpp>
-
 #include "EditorCamera.h"
 #include "Kerberos/Renderer/Camera.h"
 #include "Kerberos/Core/UUID.h"
+
+#include <entt.hpp>
+#include <set>
 
 namespace JPH
 {
@@ -36,7 +36,7 @@ namespace Kerberos
 		void OnRuntimeStart();
 		void OnRuntimeStop();
 
-		void OnUpdateEditor(Timestep ts, const EditorCamera& camera, bool renderSkybox);
+		void OnUpdateEditor(Timestep ts, const EditorCamera& camera);
 		void OnUpdateRuntime(Timestep ts);
 
 		/**
@@ -58,9 +58,11 @@ namespace Kerberos
 		Entity GetEntityByUUID(UUID uuid) const;
 
 		void SetParent(Entity child, Entity parent, bool keepWorldTransform = true);
-		Entity GetParent(Entity child);
+		Entity GetParent(Entity child) const;
 		void RemoveParent(Entity child);
-		std::vector<Entity> GetChildren(Entity parent);
+		std::vector<Entity> GetChildren(Entity parent) const;
+
+		const std::set<entt::entity>& GetRootEntities() const { return m_RootEntities; }
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 
@@ -68,6 +70,7 @@ namespace Kerberos
 
 		Entity GetPrimaryCameraEntity();
 		void CalculateEntityTransforms();
+		void CalculateEntityTransform(const Entity& entity);
 
 	private:
 		template<typename T>
@@ -75,7 +78,7 @@ namespace Kerberos
 
 		void Render2DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
 		void Render3DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
-		void Render3DEditor(const EditorCamera& camera, bool renderSkybox);
+		void Render3DEditor(const EditorCamera& camera);
 
 		void UpdateChildTransforms(Entity parent, const glm::mat4& parentTransform);
 
@@ -88,6 +91,8 @@ namespace Kerberos
 		bool m_Is3D = true;
 
 		std::unordered_map<UUID, Entity> m_UUIDToEntityMap;
+
+		std::set<entt::entity> m_RootEntities;
 
 		/// Physics related members
 		/// These are pointers, since i do not want to include Jolt headers in the Scene.h file,

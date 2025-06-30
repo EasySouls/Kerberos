@@ -22,6 +22,8 @@
 
 #include <algorithm>
 
+#include "Kerberos/Assets/AssetManager.h"
+
 #define USE_MAP_FOR_UUID 1
 
 namespace Kerberos
@@ -256,6 +258,8 @@ namespace Kerberos
 
 	static void ApplyJoltTransformToEntity(glm::mat4& worldTransform, const JPH::Body& body)
 	{
+		KBR_PROFILE_FUNCTION();
+
 		const JPH::RVec3 joltPosition = body.GetPosition();
 		const JPH::Quat joltRotation = body.GetRotation();
 
@@ -373,10 +377,13 @@ namespace Kerberos
 				auto& rigidBody = view.get<RigidBody3DComponent>(e);
 
 				JPH::ShapeRefC shape = nullptr;
+				bool isTrigger = false;
 
 				if (entity.HasComponent<BoxCollider3DComponent>())
 				{
 					auto& collider = entity.GetComponent<BoxCollider3DComponent>();
+					isTrigger = collider.IsTrigger;
+
 					if (collider.Size.x > 0.0f && collider.Size.y > 0.0f && collider.Size.z > 0.0f)
 					{
 						JPH::BoxShapeSettings shapeSettings(JPH::Vec3(collider.Size.x, collider.Size.y, collider.Size.z));
@@ -410,7 +417,12 @@ namespace Kerberos
 				const JPH::Quat rotation = JPH::Quat(glmRotation.x, glmRotation.y, glmRotation.z, glmRotation.w);
 
 				JPH::BodyCreationSettings bodySettings(shape, position, rotation, GetBodyTypeFromComponent(rigidBody.Type), GetObjectLayerFromComponent(rigidBody.Type));
+				bodySettings.mIsSensor = isTrigger;
+
 				JPH::Body* body = bodyInterface.CreateBody(bodySettings);
+
+				body->SetRestitution(rigidBody.Restitution);
+				body->SetFriction(rigidBody.Friction);
 
 				rigidBody.RuntimeBody = body;
 
@@ -461,9 +473,9 @@ namespace Kerberos
 		JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = nullptr;);
 	}
 
-	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera, const bool renderSkybox)
+	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera)
 	{
-		Render3DEditor(camera, renderSkybox);
+		Render3DEditor(camera);
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts)
@@ -543,7 +555,10 @@ namespace Kerberos
 
 	Entity Scene::CreateEntity(const std::string& name)
 	{
-		Entity entity = { m_Registry.create(), this };
+		const auto enttId = m_Registry.create();
+		Entity entity = { enttId, this };
+		m_RootEntities.insert(enttId);
+
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<HierarchyComponent>();
 
@@ -560,7 +575,10 @@ namespace Kerberos
 
 	Entity Scene::CreateEntityWithUUID(const std::string& name, const uint64_t uuid)
 	{
-		Entity entity = { m_Registry.create(), this };
+		const auto enttId = m_Registry.create();
+		Entity entity = { enttId, this };
+		m_RootEntities.insert(enttId);
+
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<HierarchyComponent>();
 
@@ -579,7 +597,20 @@ namespace Kerberos
 
 	void Scene::DestroyEntity(const Entity entity)
 	{
-		m_Registry.destroy(static_cast<entt::entity>(entity));
+		const entt::entity enttId = static_cast<entt::entity>(entity);
+		if (m_RootEntities.contains(enttId))
+		{
+			m_RootEntities.erase(enttId);
+		}
+
+		/// Destroy all children entities
+		const auto children = GetChildren(entity);
+		for (const auto& child : children)
+		{
+			DestroyEntity(child);
+		}
+
+		m_Registry.destroy(enttId);
 	}
 
 	Entity Scene::GetEntityByUUID(const UUID uuid) const 
@@ -608,6 +639,8 @@ namespace Kerberos
 	{
 		RemoveParent(child);
 
+		m_RootEntities.erase(static_cast<entt::entity>(child));
+
 		auto& childHierarchy = child.GetComponent<HierarchyComponent>();
 		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
 
@@ -615,7 +648,7 @@ namespace Kerberos
 		parentHierarchy.Children.emplace_back(child.GetUUID());
 	}
 
-	Entity Scene::GetParent(const Entity child)
+	Entity Scene::GetParent(const Entity child) const 
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -627,7 +660,7 @@ namespace Kerberos
 		return {};
 	}
 
-	void Scene::RemoveParent(const Entity child)
+	void Scene::RemoveParent(const Entity child) 
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -640,11 +673,14 @@ namespace Kerberos
 			{
 				parentHierarchy.Children.erase(it);
 			}
+
 			childHierarchy.Parent = UUID::Invalid();
+			/// The child is a root entity now
+			m_RootEntities.insert(static_cast<entt::entity>(child));
 		}
 	}
 
-	std::vector<Entity> Scene::GetChildren(const Entity parent)
+	std::vector<Entity> Scene::GetChildren(const Entity parent) const 
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -685,7 +721,7 @@ namespace Kerberos
 		{
 			auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
 
-			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+			Renderer2D::DrawQuad(transform.WorldTransform, sprite.Color);
 		}
 
 		Renderer2D::EndScene();
@@ -718,7 +754,19 @@ namespace Kerberos
 			}
 		}
 
-		Renderer3D::BeginScene(*mainCamera, mainCameraTransform, sun, pointLights);
+		Ref<TextureCube> skyboxTexture = nullptr;
+		const auto skyboxView = m_Registry.view<EnvironmentComponent>();
+		for (const auto entity : skyboxView)
+		{
+			const auto& skybox = skyboxView.get<EnvironmentComponent>(entity);
+			if (skybox.IsSkyboxEnabled && skybox.SkyboxTexture)
+			{
+				skyboxTexture = AssetManager::GetAsset<TextureCube>(skybox.SkyboxTexture);
+				break;
+			}
+		}
+
+		Renderer3D::BeginScene(*mainCamera, mainCameraTransform, sun, pointLights, skyboxTexture);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
 		for (const auto entity : view)
@@ -734,7 +782,7 @@ namespace Kerberos
 		Renderer3D::EndScene();
 	}
 
-	void Scene::Render3DEditor(const EditorCamera& camera, const bool renderSkybox)
+	void Scene::Render3DEditor(const EditorCamera& camera)
 	{
 		const DirectionalLight* sun = nullptr;
 		const auto sunView = m_Registry.view<DirectionalLightComponent, TransformComponent>();
@@ -759,7 +807,19 @@ namespace Kerberos
 			}
 		}
 
-		Renderer3D::BeginScene(camera, sun, pointLights, renderSkybox);
+		Ref<TextureCube> skyboxTexture = nullptr;
+		const auto skyboxView = m_Registry.view<EnvironmentComponent>();
+		for (const auto entity : skyboxView)
+		{
+			const auto& skybox = skyboxView.get<EnvironmentComponent>(entity);
+			if (skybox.IsSkyboxEnabled && skybox.SkyboxTexture)
+			{
+				skyboxTexture = AssetManager::GetAsset<TextureCube>(skybox.SkyboxTexture);
+				break;
+			}
+		}
+
+		Renderer3D::BeginScene(camera, sun, pointLights, skyboxTexture);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
 		for (const auto entity : view)
@@ -821,6 +881,11 @@ namespace Kerberos
 		}
 	}
 
+	void Scene::CalculateEntityTransform(const Entity& entity) 
+	{
+		UpdateChildTransforms(entity, glm::mat4(1.0f));
+	}
+
 	template <typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{
@@ -870,10 +935,6 @@ namespace Kerberos
 	{}
 
 	template <>
-	void Scene::OnComponentAdded<SkyboxComponent>(Entity entity, SkyboxComponent& component)
-	{}
-
-	template <>
 	void Scene::OnComponentAdded<HierarchyComponent>(Entity entity, HierarchyComponent& component)
 	{}
 
@@ -883,5 +944,9 @@ namespace Kerberos
 
 	template <>
 	void Scene::OnComponentAdded<BoxCollider3DComponent>(Entity entity, BoxCollider3DComponent& component)
+	{}
+
+	template <>
+	void Scene::OnComponentAdded<EnvironmentComponent>(Entity entity, EnvironmentComponent& component)
 	{}
 }

@@ -7,6 +7,7 @@
 #include "Texture.h"
 #include "VertexArray.h"
 #include "RenderCommand.h"
+#include "Kerberos/Assets/AssetManager.h"
 
 /*
 * Notes:
@@ -97,9 +98,7 @@ namespace Kerberos
 		s_Data.QuadVertexArray->SetIndexBuffer(quadIndexBuffer);
 		delete[] quadIndices;
 
-		s_Data.WhiteTexture = Texture2D::Create(1, 1);
-		uint32_t whiteTextureData = 0xffffffff;
-		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+		s_Data.WhiteTexture = AssetManager::GetDefaultTexture2D();
 
 		int32_t samplers[Renderer2DData::MaxTextureSlots];
 		for (int32_t i = 0; i < Renderer2DData::MaxTextureSlots; i++)

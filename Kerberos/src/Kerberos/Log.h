@@ -5,6 +5,11 @@
 #include "spdlog/fmt/ostr.h"
 
 #include <memory>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+
+#include "Core/UUID.h"
 
 namespace Kerberos
 {
@@ -35,3 +40,39 @@ namespace Kerberos
 #define KBR_WARN(...)          ::Kerberos::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define KBR_ERROR(...)         ::Kerberos::Log::GetClientLogger()->error(__VA_ARGS__)
 #define KBR_CRITICAL(...)      ::Kerberos::Log::GetClientLogger()->critical(__VA_ARGS__)
+
+template<>
+struct fmt::formatter<glm::vec2> : fmt::formatter<std::string>
+{
+	auto format(glm::vec2 vec, const format_context& ctx) const -> decltype(ctx.out())
+	{
+		return fmt::format_to(ctx.out(), "({}, {})", vec.x, vec.y);
+	}
+};
+
+template<>
+struct fmt::formatter<glm::vec3> : fmt::formatter<std::string>
+{
+	auto format(glm::vec3 vec, const format_context& ctx) const -> decltype(ctx.out())
+	{
+		return fmt::format_to(ctx.out(), "({}, {}, {})", vec.x, vec.y, vec.z);
+	}
+};
+
+template<>
+struct fmt::formatter<glm::vec4> : fmt::formatter<std::string>
+{
+	auto format(glm::vec4 vec, const format_context& ctx) const -> decltype(ctx.out())
+	{
+		return fmt::format_to(ctx.out(), "({}, {}, {}, {})", vec.x, vec.y, vec.z, vec.w);
+	}
+};
+
+template<>
+struct fmt::formatter<Kerberos::UUID> : fmt::formatter<std::string>
+{
+	auto format(const Kerberos::UUID uuid, const format_context& ctx) const -> decltype(ctx.out())
+	{
+		return fmt::format_to(ctx.out(), "{}", static_cast<uint64_t>(uuid));
+	}
+};

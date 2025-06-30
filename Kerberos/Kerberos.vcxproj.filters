@@ -22,6 +22,9 @@
     <Filter Include="src\Kerberos\ImGui">
       <UniqueIdentifier>{035609E0-EF39-CA35-589A-C488449DB4B7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Kerberos\Project">
+      <UniqueIdentifier>{5F1F0631-4BAE-8FFA-F4CC-A3F5E03AA0A0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Kerberos\Renderer">
       <UniqueIdentifier>{DF21D73E-4B8E-9239-1482-2A9780ADB4A1}</UniqueIdentifier>
     </Filter>
@@ -60,14 +63,41 @@
     <ClInclude Include="src\Kerberos\Application.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Asset.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Importers\AssetImporter.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Assets\AssetManager.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\AssetManagerBase.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\AssetMetadata.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\AssetRegistry.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\EditorAssetManager.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Assets\Model.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\RuntimeAssetManager.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Importers\TextureImporter.h">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Core.h">
       <Filter>src\Kerberos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Core\Buffer.h">
+      <Filter>src\Kerberos\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Core\Input.h">
       <Filter>src\Kerberos\Core</Filter>
@@ -119,6 +149,12 @@
     </ClInclude>
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h">
       <Filter>src\Kerberos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Project\Project.h">
+      <Filter>src\Kerberos\Project</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Project\ProjectSerializer.h">
+      <Filter>src\Kerberos\Project</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h">
       <Filter>src\Kerberos\Renderer</Filter>
@@ -303,15 +339,32 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Importers\CubemapImporter.h" />
+    <ClInclude Include="src\Platform\OpenGL\TextureUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
       <Filter>src\Kerberos</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\Importers\AssetImporter.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\AssetManager.cpp">
       <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\AssetRegistry.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\EditorAssetManager.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\Model.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\RuntimeAssetManager.cpp">
+      <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\Importers\TextureImporter.cpp">
       <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Core\UUID.cpp">
@@ -334,6 +387,12 @@
     </ClCompile>
     <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp">
       <Filter>src\Kerberos</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Project\Project.cpp">
+      <Filter>src\Kerberos\Project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Project\ProjectSerializer.cpp">
+      <Filter>src\Kerberos\Project</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Buffer.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
@@ -485,5 +544,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\Importers\CubemapImporter.cpp" />
   </ItemGroup>
 </Project>

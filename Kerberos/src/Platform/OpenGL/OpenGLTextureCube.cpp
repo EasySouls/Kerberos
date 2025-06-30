@@ -3,6 +3,8 @@
 
 #include <stb_image.h>
 
+#include "TextureUtils.h"
+
 
 namespace Kerberos 
 {
@@ -67,6 +69,34 @@ namespace Kerberos
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	}
+
+	OpenGLTextureCube::OpenGLTextureCube(const CubemapData& data) 
+    {
+        glGenTextures(1, &m_RendererID);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_RendererID);
+
+        for (size_t i = 0; i < data.Faces.size(); i++)
+        {
+            const auto& [Specification, Buffer] = data.Faces[i];
+            /// Internal format is how OpenGl will store the texture data internally (in the GPU)
+            const GLenum internalFormat = TextureUtils::KBRImageFormatToGLInternalFormat(Specification.Format);
+            /// Data format is the format of the texture data we provide to OpenGL
+            const GLenum dataFormat = TextureUtils::KBRImageFormatToGLDataFormat(Specification.Format);
+
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat,
+                static_cast<int>(Specification.Width), static_cast<int>(Specification.Height),
+                0, dataFormat, GL_UNSIGNED_BYTE, Buffer.Data);
+
+
+            m_FacesSpecifications[i] = Specification;
+        }
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    }
 
 	OpenGLTextureCube::~OpenGLTextureCube() 
     {
