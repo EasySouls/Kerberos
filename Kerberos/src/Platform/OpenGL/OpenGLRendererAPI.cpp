@@ -45,12 +45,16 @@ namespace Kerberos
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0f, 1.0f);
 		//glEnable(GL_LINE_SMOOTH);
+
+		//glEnable(GL_CULL_FACE);
+
+		/*glEnable(GL_FRAMEBUFFER_SRGB);*/
 	}
 
 	void OpenGLRendererAPI::SetViewport(const uint32_t x, const uint32_t y, const uint32_t width,
 		const uint32_t height) 
 	{
-		glViewport(x, y, width, height);
+		glViewport(static_cast<int>(x), static_cast<int>(y), static_cast<int>(width), static_cast<int>(height));
 	}
 
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color) 
