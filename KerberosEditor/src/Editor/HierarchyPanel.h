@@ -7,6 +7,7 @@
 #include "Kerberos/Renderer/Material.h"
 #include "Kerberos/Renderer/Mesh.h"
 #include "../Notification/NotificationManager.h"
+#include "Kerberos/Renderer/Framebuffer.h"
 
 namespace Kerberos
 {
@@ -33,6 +34,8 @@ namespace Kerberos
 
 		Entity m_SelectedEntity;
 
+		std::vector<Entity> m_DeletionQueue;
+
 		// Examples
 		Ref<Texture2D> m_IceTexture;
 		Ref<Texture2D> m_SpriteSheetTexture;
@@ -42,6 +45,8 @@ namespace Kerberos
 		Ref<Mesh> m_SphereMesh;
 		
 		Ref<Material> m_WhiteMaterial;
+
+		Ref<Framebuffer> m_CubemapFramebuffer;
 
 		NotificationManager m_NotificationManager;
 	};

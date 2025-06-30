@@ -603,6 +603,13 @@ namespace Kerberos
 			m_RootEntities.erase(enttId);
 		}
 
+		/// Destroy all children entities
+		const auto children = GetChildren(entity);
+		for (const auto& child : children)
+		{
+			DestroyEntity(child);
+		}
+
 		m_Registry.destroy(enttId);
 	}
 

@@ -33,6 +33,12 @@ namespace Kerberos
 		m_WhiteMaterial = CreateRef<Material>();
 
 		m_WhiteTexture = AssetManager::GetDefaultTexture2D();
+
+		FramebufferSpecification frameBufferSpec;
+		frameBufferSpec.Width = 256;
+		frameBufferSpec.Height = 256;
+		frameBufferSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
+		m_CubemapFramebuffer = Framebuffer::Create(frameBufferSpec);
 	}
 
 	void HierarchyPanel::OnImGuiRender()
@@ -137,6 +143,12 @@ namespace Kerberos
 		}
 		ImGui::End();
 
+		for (const auto& e : m_DeletionQueue)
+		{
+			m_Context->DestroyEntity(e);
+		}
+		m_DeletionQueue.clear();
+
 		m_NotificationManager.RenderNotifications();
 	}
 
@@ -183,7 +195,7 @@ namespace Kerberos
 
 		if (entityDeleted)
 		{
-			m_Context->DestroyEntity(entity);
+			m_DeletionQueue.push_back(entity);
 			if (m_SelectedEntity == entity)
 			{
 				m_SelectedEntity = {};
@@ -842,6 +854,10 @@ namespace Kerberos
 				auto& environment = entity.GetComponent<EnvironmentComponent>();
 				ImGui::Checkbox("Skybox Enabled", &environment.IsSkyboxEnabled);
 
+				/// Render the environment cubemap into an image
+				const uint64_t textureID = m_CubemapFramebuffer->GetColorAttachmentRendererID();
+				ImGui::Image(textureID, ImVec2{ 256, 256 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
 				/// Handle drag and drop for textures
 				if (ImGui::BeginDragDropTarget())
 				{
@@ -856,6 +872,10 @@ namespace Kerberos
 							return;
 						}
 						environment.SkyboxTexture = handle;
+
+						/// render the changed cube into the environment
+						m_CubemapFramebuffer->Bind();
+						m_CubemapFramebuffer->Unbind();
 					}
 					ImGui::EndDragDropTarget();
 				}
