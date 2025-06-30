@@ -10,6 +10,6 @@ namespace Kerberos
 		static Ref<Texture2D> ImportTexture(AssetHandle handle, const AssetMetadata& metadata);
 		static Ref<Texture2D> ImportTexture(const std::filesystem::path& filepath);
 
-		static std::pair<TextureSpecification, Buffer> LoadTextureData(const std::filesystem::path& filepath);
+		static std::pair<TextureSpecification, Buffer> LoadTextureData(const std::filesystem::path& filepath, bool flip);
 	};
 }

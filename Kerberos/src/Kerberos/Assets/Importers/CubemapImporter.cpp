@@ -57,7 +57,7 @@ namespace Kerberos
 		const auto loadFace = [](const std::filesystem::path& facePath) -> FaceData
 			{
 				FaceData faceData;
-				const auto [spec, buffer] = TextureImporter::LoadTextureData(facePath);
+				const auto [spec, buffer] = TextureImporter::LoadTextureData(facePath, false);
 				faceData.Specification = spec;
 				faceData.Buffer = buffer;
 				return faceData;

@@ -14,7 +14,7 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		const auto [spec, data] = LoadTextureData(filepath);
+		const auto [spec, data] = LoadTextureData(filepath, true);
 
 		auto texture = Texture2D::Create(spec, data);
 
@@ -23,10 +23,11 @@ namespace Kerberos
 		return texture;
 	}
 
-	std::pair<TextureSpecification, Buffer> TextureImporter::LoadTextureData(const std::filesystem::path& filepath) 
+	std::pair<TextureSpecification, Buffer> TextureImporter::LoadTextureData(const std::filesystem::path& filepath, const bool flip) 
 	{
 		int width, height, channels;
-		//stbi_set_flip_vertically_on_load(1);
+
+		stbi_set_flip_vertically_on_load(flip);
 		Buffer data;
 
 		{
