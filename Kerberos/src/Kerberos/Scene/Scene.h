@@ -8,6 +8,8 @@
 #include <entt.hpp>
 #include <set>
 
+#include "Kerberos/Renderer/Framebuffer.h"
+
 namespace JPH
 {
 	class PhysicsSystem;
@@ -67,6 +69,7 @@ namespace Kerberos
 		void OnViewportResize(uint32_t width, uint32_t height);
 
 		void SetIs3D(const bool is3D) { m_Is3D = is3D; }
+		void SetEnableShadowMapping(const bool enable) { m_EnableShadowMapping = enable; }
 
 		Entity GetPrimaryCameraEntity();
 		void CalculateEntityTransforms();
@@ -89,6 +92,10 @@ namespace Kerberos
 		uint32_t m_ViewportHeight = 0;
 
 		bool m_Is3D = true;
+		bool m_EnableShadowMapping = true;
+
+		Ref<Framebuffer> m_ShadowMapFramebuffer;
+		Ref<Framebuffer> m_EditorFramebuffer;
 
 		std::unordered_map<UUID, Entity> m_UUIDToEntityMap;
 

@@ -210,6 +210,24 @@ namespace Kerberos
 	Scene::Scene()
 	{
 		m_Registry = entt::basic_registry();
+
+		m_ShadowMapFramebuffer = Framebuffer::Create(FramebufferSpecification{
+			.Width = 2048,
+			.Height = 2048,
+			.Attachments = {
+				{ FramebufferTextureFormat::Depth }
+			}
+			});
+
+		m_EditorFramebuffer = Framebuffer::Create(FramebufferSpecification{
+			.Width = 1280,
+			.Height = 720,
+			.Attachments = {
+				{ FramebufferTextureFormat::RGBA8 },
+				{ FramebufferTextureFormat::RED_INTEGER },
+				{ FramebufferTextureFormat::Depth }
+			}
+			});
 	}
 
 	Scene::~Scene()
@@ -294,9 +312,9 @@ namespace Kerberos
 		JPH::Trace = TraceImpl;
 		JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = AssertFailedImpl;)
 
-		// Create a factory, this class is responsible for creating instances of classes based on their name or hash and is mainly used for deserialization of saved data.
-		// It is not directly used in this example but still required.
-		JPH::Factory::sInstance = new JPH::Factory();
+			// Create a factory, this class is responsible for creating instances of classes based on their name or hash and is mainly used for deserialization of saved data.
+			// It is not directly used in this example but still required.
+			JPH::Factory::sInstance = new JPH::Factory();
 
 		// Register all physics types with the factory and install their collision handlers with the CollisionDispatch class.
 		// If you have your own custom shape types you probably need to register their handlers with the CollisionDispatch before calling this function.
@@ -447,22 +465,22 @@ namespace Kerberos
 
 		delete m_BodyActivationListener;
 		m_BodyActivationListener = nullptr;
-		
+
 		delete m_PhysicsSystem;
 		m_PhysicsSystem = nullptr;
-		
+
 		delete m_ObjectVsObjectLayerFilter;
 		m_ObjectVsObjectLayerFilter = nullptr;
-		
+
 		delete m_ObjectVsBroadPhaseLayerFilter;
 		m_ObjectVsBroadPhaseLayerFilter = nullptr;
-		
+
 		delete m_BroadPhaseLayerInterface;
 		m_BroadPhaseLayerInterface = nullptr;
-		
+
 		delete m_PhysicsJobSystem;
 		m_PhysicsJobSystem = nullptr;
-		
+
 		delete m_PhysicsTempAllocator;
 		m_PhysicsTempAllocator = nullptr;
 
@@ -613,7 +631,7 @@ namespace Kerberos
 		m_Registry.destroy(enttId);
 	}
 
-	Entity Scene::GetEntityByUUID(const UUID uuid) const 
+	Entity Scene::GetEntityByUUID(const UUID uuid) const
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -648,7 +666,7 @@ namespace Kerberos
 		parentHierarchy.Children.emplace_back(child.GetUUID());
 	}
 
-	Entity Scene::GetParent(const Entity child) const 
+	Entity Scene::GetParent(const Entity child) const
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -660,7 +678,7 @@ namespace Kerberos
 		return {};
 	}
 
-	void Scene::RemoveParent(const Entity child) 
+	void Scene::RemoveParent(const Entity child)
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -680,7 +698,7 @@ namespace Kerberos
 		}
 	}
 
-	std::vector<Entity> Scene::GetChildren(const Entity parent) const 
+	std::vector<Entity> Scene::GetChildren(const Entity parent) const
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -766,7 +784,7 @@ namespace Kerberos
 			}
 		}
 
-		Renderer3D::BeginScene(*mainCamera, mainCameraTransform, sun, pointLights, skyboxTexture);
+		Renderer3D::BeginGeometryPass(*mainCamera, mainCameraTransform, sun, pointLights, skyboxTexture);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
 		for (const auto entity : view)
@@ -819,7 +837,7 @@ namespace Kerberos
 			}
 		}
 
-		Renderer3D::BeginScene(camera, sun, pointLights, skyboxTexture);
+		Renderer3D::BeginGeometryPass(camera, sun, pointLights, skyboxTexture);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
 		for (const auto entity : view)
@@ -881,7 +899,7 @@ namespace Kerberos
 		}
 	}
 
-	void Scene::CalculateEntityTransform(const Entity& entity) 
+	void Scene::CalculateEntityTransform(const Entity& entity)
 	{
 		UpdateChildTransforms(entity, glm::mat4(1.0f));
 	}

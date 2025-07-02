@@ -29,6 +29,12 @@ namespace Kerberos
 			return m_ColorAttachments.at(index);
 		}
 
+		uint64_t GetDepthAttachmentRendererID() const override 
+		{
+			KBR_CORE_ASSERT(m_DepthAttachment != 0, "Depth attachment is not set!");
+			return m_DepthAttachment;
+		}
+
 		FramebufferSpecification& GetSpecification() override { return m_Specification; }
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 

@@ -96,7 +96,7 @@ void Sandbox2D::OnUpdate(const Kerberos::Timestep deltaTime)
 		rotation += deltaTime * 20.0f;
 
 		KBR_PROFILE_SCOPE("Renderer2D Draw");
-		Kerberos::Renderer2D::BeginScene(m_CameraController.GetCamera());
+		Kerberos::Renderer2D::BeginGeometryPass(m_CameraController.GetCamera());
 
 		//Kerberos::Renderer2D::DrawTexturedQuad({ -0.1f, 0.0f, 1.0f }, { 1.0f, 1.0f }, 10.0f, m_SquareColor);
 		Kerberos::Renderer2D::DrawTexturedQuad({ 0.0f, 0.0f, -0.9f }, { 5.0f, 5.0f }, rotation, m_Texture, 5);

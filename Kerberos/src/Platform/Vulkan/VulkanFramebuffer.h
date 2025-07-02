@@ -23,6 +23,7 @@ namespace Kerberos
 		void ClearAttachment(uint32_t attachmentIndex, int value) override;
 
 		uint64_t GetColorAttachmentRendererID(uint32_t index = 0) const override;
+		uint64_t GetDepthAttachmentRendererID() const override;
 
 		FramebufferSpecification& GetSpecification() override { return m_Specification; }
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }

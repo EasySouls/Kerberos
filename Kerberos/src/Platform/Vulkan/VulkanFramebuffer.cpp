@@ -397,6 +397,11 @@ namespace Kerberos
 		return reinterpret_cast<ImTextureID>(m_ColorAttachmentDescriptorSet);
 	}
 
+	uint64_t VulkanFramebuffer::GetDepthAttachmentRendererID() const 
+	{
+		throw std::runtime_error("GetDepthAttachmentRendererID is not implemented for VulkanFramebuffer!");
+	}
+
 	void VulkanFramebuffer::ReleaseResources()
 	{
 		const VulkanContext& context = VulkanContext::Get();

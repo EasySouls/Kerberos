@@ -302,6 +302,11 @@ namespace Kerberos
         return reinterpret_cast<uint64_t>(m_ColorSRVs[index].Get());
 	}
 
+	uint64_t D3D11Framebuffer::GetDepthAttachmentRendererID() const 
+    {
+		throw std::runtime_error("D3D11Framebuffer::GetDepthAttachmentRendererID is not implemented yet!");
+    }
+
 	void D3D11Framebuffer::ReleaseResources() const 
     {
         for (auto & rtv : m_ColorRTVs) if (rtv) rtv->Release();
