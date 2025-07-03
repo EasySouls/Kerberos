@@ -283,11 +283,14 @@ namespace Kerberos
         return -1;
     }
 
+	void D3D11Framebuffer::BindColorTexture(uint32_t slot, uint32_t index) const {}
+	void D3D11Framebuffer::BindDepthTexture(uint32_t slot) const {}
+
 	void D3D11Framebuffer::ClearAttachment(uint32_t attachmentIndex, int value) 
     {
     }
 
-	void D3D11Framebuffer::ClearDepthAttachment(int value) const 
+	void D3D11Framebuffer::ClearDepthAttachment(float value) const 
     {
     }
 

@@ -388,11 +388,21 @@ namespace Kerberos
 		return -1;
 	}
 
+	void VulkanFramebuffer::BindColorTexture(uint32_t slot, uint32_t index) const 
+	{
+		// TODO: Implement binding of color texture to a specific slot
+	}
+
+	void VulkanFramebuffer::BindDepthTexture(uint32_t slot) const 
+	{
+		// TODO: Implement binding of depth texture to a specific slot
+	}
+
 	void VulkanFramebuffer::ClearAttachment(uint32_t attachmentIndex, int value) 
 	{
 	}
 
-	void VulkanFramebuffer::ClearDepthAttachment(int value) const 
+	void VulkanFramebuffer::ClearDepthAttachment(float value) const 
 	{
 	}
 

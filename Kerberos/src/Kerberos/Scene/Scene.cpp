@@ -215,7 +215,7 @@ namespace Kerberos
 			.Width = 2048,
 			.Height = 2048,
 			.Attachments = {
-				{ FramebufferTextureFormat::Depth }
+				{ FramebufferTextureFormat::DEPTH24 }
 			}
 			});
 
@@ -225,7 +225,7 @@ namespace Kerberos
 			.Attachments = {
 				{ FramebufferTextureFormat::RGBA8 },
 				{ FramebufferTextureFormat::RED_INTEGER },
-				{ FramebufferTextureFormat::Depth }
+				{ FramebufferTextureFormat::DEPTH24STENCIL8 }
 			}
 			});
 	}

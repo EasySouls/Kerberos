@@ -11,6 +11,7 @@ namespace Kerberos
 		{
 			switch (format)
 			{
+			case FramebufferTextureFormat::DEPTH24:
 			case FramebufferTextureFormat::DEPTH24STENCIL8:
 				return true;
 			case FramebufferTextureFormat::None:
@@ -214,6 +215,11 @@ namespace Kerberos
 					Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
 					break;
 				}
+				case FramebufferTextureFormat::DEPTH24:
+				{
+					Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH_COMPONENT24, GL_DEPTH_ATTACHMENT, m_Specification.Width, m_Specification.Height);
+					break;
+				}
 				default:
 					KBR_CORE_ASSERT(false, "Unknown framebuffer texture format!");
 			}
@@ -305,6 +311,20 @@ namespace Kerberos
 		return pixelData;
 	}
 
+	void OpenGLFramebuffer::BindColorTexture(const uint32_t slot, const uint32_t index) const 
+	{
+		KBR_PROFILE_FUNCTION();
+		KBR_CORE_ASSERT(index < m_ColorAttachments.size(), "Index out of bounds!");
+		glBindTextureUnit(slot, m_ColorAttachments[index]);
+	}
+
+	void OpenGLFramebuffer::BindDepthTexture(const uint32_t slot) const 
+	{
+		KBR_PROFILE_FUNCTION();
+		KBR_CORE_ASSERT(m_DepthAttachment != 0, "Depth attachment is not set!");
+		glBindTextureUnit(slot, m_DepthAttachment);
+	}
+
 	void OpenGLFramebuffer::ClearAttachment(const uint32_t attachmentIndex, const int value) 
 	{
 		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmenIndex is out of bounds");
@@ -314,12 +334,13 @@ namespace Kerberos
 		glClearTexImage(m_ColorAttachments[attachmentIndex], 0, Utils::ToGLFormat(spec.TextureFormat), GL_INT, &value);
 	}
 
-	void OpenGLFramebuffer::ClearDepthAttachment(const int value) const 
+	void OpenGLFramebuffer::ClearDepthAttachment(const float value) const 
 	{
 		KBR_CORE_ASSERT(m_DepthAttachment != 0, "Depth attachment is not set!");
 
-		//glClearTexImage(m_DepthAttachment, 0, GL_DEPTH_STENCIL, GL_INT, &value);
-		glClearBufferfi(GL_DEPTH_STENCIL, 0, static_cast<float>(value), 0);
+		glClearTexImage(m_DepthAttachment, 0, GL_DEPTH_COMPONENT, GL_FLOAT, &value);
+		//glClearBufferfi(GL_DEPTH_STENCIL, 0, value, 0);
+		//glClearDepth(value);
 
 		//KBR_CORE_ASSERT(glGetError() == GL_NO_ERROR, "Failed to clear depth attachment!");
 	}

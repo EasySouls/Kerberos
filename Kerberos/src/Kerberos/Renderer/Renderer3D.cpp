@@ -448,8 +448,9 @@ namespace Kerberos
 	}
 	void Renderer3D::BindShadowMap()
 	{
-		auto shadowMapTexture = s_RendererData.ShadowMapFramebuffer->GetDepthAttachmentRendererID();
-		/// TODO: Ghe shadow map texture from the framebuffer
-		s_RendererData.ActiveShader->SetInt("u_ShadowMap", 1);
+		/*auto shadowMapTexture = s_RendererData.ShadowMapFramebuffer->GetDepthAttachmentRendererID();*/
+		s_RendererData.ShadowMapFramebuffer->BindDepthTexture(1);
+		constexpr int shadowMapTextureSlot = 1;
+		s_RendererData.ActiveShader->SetInt("u_ShadowMap", shadowMapTextureSlot);
 	}
 }
