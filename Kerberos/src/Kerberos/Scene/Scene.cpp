@@ -884,7 +884,6 @@ namespace Kerberos
 
 		Renderer3D::EndPass();
 		Renderer3D::EndScene();
-		m_EditorFramebuffer->Unbind();
 	}
 
 	void Scene::UpdateChildTransforms(const Entity parent, const glm::mat4& parentTransform)
