@@ -438,6 +438,8 @@ namespace Kerberos
 		/// Calculate light space matrix
 		s_RendererData.LightSpaceMatrix = lightProjection * lightView;
 		s_RendererData.ShadowData.LightSpaceMatrix = s_RendererData.LightSpaceMatrix;
+		s_RendererData.ShadowData.EnableShadows = settings.EnableShadows ? 1 : 0;
+		s_RendererData.ShadowUniformBuffer->SetData(&s_RendererData.ShadowData, sizeof(Renderer3DData::ShadowDataUbo), 0);
 
 		/// Update camera data for shadow pass
 		s_RendererData.CameraData.ViewMatrix = lightView;
