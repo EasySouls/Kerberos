@@ -230,7 +230,7 @@ namespace Kerberos
 		{
 			/// If this framebuffer is only used for a depth pass
 			glDrawBuffer(GL_NONE);
-			//glReadBuffer(GL_NONE);
+			glReadBuffer(GL_NONE);
 		}
 
 		/// This is not used anymore, but kept for reference
@@ -294,7 +294,7 @@ namespace Kerberos
 		Invalidate();
 	}
 
-	int OpenGLFramebuffer::ReadPixel(const uint32_t attachmentIndex, int x, int y) 
+	int OpenGLFramebuffer::ReadPixel(const uint32_t attachmentIndex, const int x, const int y) 
 	{
 		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmenIndex is out of bounds");
 
@@ -312,5 +312,15 @@ namespace Kerberos
 		const auto& spec = m_ColorAttachmentSpecs[attachmentIndex];
 
 		glClearTexImage(m_ColorAttachments[attachmentIndex], 0, Utils::ToGLFormat(spec.TextureFormat), GL_INT, &value);
+	}
+
+	void OpenGLFramebuffer::ClearDepthAttachment(const int value) const 
+	{
+		KBR_CORE_ASSERT(m_DepthAttachment != 0, "Depth attachment is not set!");
+
+		//glClearTexImage(m_DepthAttachment, 0, GL_DEPTH_STENCIL, GL_INT, &value);
+		glClearBufferfi(GL_DEPTH_STENCIL, 0, static_cast<float>(value), 0);
+
+		//KBR_CORE_ASSERT(glGetError() == GL_NO_ERROR, "Failed to clear depth attachment!");
 	}
 }

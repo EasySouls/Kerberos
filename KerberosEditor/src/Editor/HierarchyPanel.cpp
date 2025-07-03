@@ -855,6 +855,7 @@ namespace Kerberos
 				ImGui::Checkbox("Skybox Enabled", &environment.IsSkyboxEnabled);
 
 				/// Render the environment cubemap into an image
+				ImGui::Text("Skybox Texture");
 				const uint64_t textureID = m_CubemapFramebuffer->GetColorAttachmentRendererID();
 				ImGui::Image(textureID, ImVec2{ 256, 256 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
@@ -879,6 +880,11 @@ namespace Kerberos
 					}
 					ImGui::EndDragDropTarget();
 				}
+
+				/// Render the shadow map texture
+				ImGui::Text("Shadow Map");
+				const uint64_t shadowMapTextureID = m_Context->GetShadowMapFramebuffer()->GetDepthAttachmentRendererID();
+				ImGui::Image(shadowMapTextureID, ImVec2{ 256, 256 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 				ImGui::TreePop();
 			}

@@ -814,6 +814,37 @@ namespace Kerberos
 			}
 		}
 
+		if (m_EnableShadowMapping && sun)
+		{
+			ShadowMapSettings shadowSettings;
+			shadowSettings.Resolution = 2048;
+			shadowSettings.OrthoSize = 15.0f;
+
+			m_ShadowMapFramebuffer->Bind();
+			m_ShadowMapFramebuffer->ClearDepthAttachment(0);
+
+			Renderer3D::BeginShadowPass(*sun, shadowSettings, m_ShadowMapFramebuffer);
+
+			/// Render all shadow-casting meshes
+			const auto meshView = m_Registry.view<StaticMeshComponent, TransformComponent>();
+			for (auto entity : meshView)
+			{
+				auto& meshComp = meshView.get<StaticMeshComponent>(entity);
+				auto& transformComp = meshView.get<TransformComponent>(entity);
+
+				if (meshComp.StaticMesh && meshComp.MeshMaterial)
+				{
+					Renderer3D::SubmitMesh(meshComp.StaticMesh, transformComp.GetTransform(),
+						meshComp.MeshMaterial, meshComp.MeshTexture, 1.0f,
+						static_cast<int>(entity), meshComp.CastShadows); // castShadows = true
+				}
+			}
+
+			Renderer3D::EndPass();
+
+			m_ShadowMapFramebuffer->Unbind();
+		}
+
 		std::vector<PointLight> pointLights;
 		const auto pointLightView = m_Registry.view<PointLightComponent, TransformComponent>();
 		for (const auto entity : pointLightView)
@@ -837,6 +868,7 @@ namespace Kerberos
 			}
 		}
 
+		m_EditorFramebuffer->Bind();
 		Renderer3D::BeginGeometryPass(camera, sun, pointLights, skyboxTexture);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
@@ -850,7 +882,9 @@ namespace Kerberos
 			}
 		}
 
+		Renderer3D::EndPass();
 		Renderer3D::EndScene();
+		m_EditorFramebuffer->Unbind();
 	}
 
 	void Scene::UpdateChildTransforms(const Entity parent, const glm::mat4& parentTransform)

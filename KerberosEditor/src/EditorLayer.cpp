@@ -23,12 +23,6 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		FramebufferSpecification frameBufferSpec;
-		frameBufferSpec.Width = 1280;
-		frameBufferSpec.Height = 720;
-		frameBufferSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
-		m_Framebuffer = Framebuffer::Create(frameBufferSpec);
-
 		m_ActiveScene = CreateRef<Scene>();
 
 		/// TODO: Open the project passed as command line argument, if there is one
@@ -161,11 +155,11 @@ namespace Kerberos
 		Timer timer("EditorLayer::OnUpdate", [&](const ProfileResult profileResult) { m_ProfileResults.push_back(profileResult); });
 
 		/// Resize the camera if needed
-		if (const FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+		if (const FramebufferSpecification spec = m_ActiveScene->GetEditorFramebuffer()->GetSpecification();
 			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
 			(spec.Width != static_cast<uint32_t>(m_ViewportSize.x) || spec.Height != static_cast<uint32_t>(m_ViewportSize.y)))
 		{
-			m_Framebuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+			m_ActiveScene->GetEditorFramebuffer()->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
 			//m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 
@@ -196,7 +190,7 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("Renderer Prep");
 
-			m_Framebuffer->Bind();
+			m_ActiveScene->GetEditorFramebuffer()->Bind();
 
 			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 			RenderCommand::Clear();
@@ -204,7 +198,7 @@ namespace Kerberos
 			/// Clear our entity ID attachment to -1, so when rendering entities they fill that space with their entity ID,
 			/// and empty spacces will have -1, signaling that there is no entity.
 			/// Used for mouse picking.
-			m_Framebuffer->ClearAttachment(1, -1);
+			m_ActiveScene->GetEditorFramebuffer()->ClearAttachment(1, -1);
 		}
 
 		{
@@ -236,7 +230,7 @@ namespace Kerberos
 
 			if (mouseX >= 0 && mouseY >= 0 && mouseX <= static_cast<int>(viewportSize.x) && mouseY <= static_cast<int>(viewportSize.y))
 			{
-				int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+				int pixelData = m_ActiveScene->GetEditorFramebuffer()->ReadPixel(1, mouseX, mouseY);
 
 				if (pixelData < 0)
 				{
@@ -249,7 +243,7 @@ namespace Kerberos
 			}
 		}
 
-		m_Framebuffer->Unbind();
+		m_ActiveScene->GetEditorFramebuffer()->Unbind();
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -396,7 +390,7 @@ namespace Kerberos
 		m_ViewportSize = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
 
 		/// Render the viewport into an image
-		const uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+		const uint64_t textureID = m_ActiveScene->GetEditorFramebuffer()->GetColorAttachmentRendererID();
 		ImGui::Image(textureID, ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 		HandleDragAndDrop();

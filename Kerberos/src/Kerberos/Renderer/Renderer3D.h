@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Camera.h"
+#include "Framebuffer.h"
 #include "Mesh.h"
 #include "OrthographicCamera.h"
 #include "Shader.h"
@@ -12,7 +13,7 @@
 
 namespace Kerberos
 {
-	enum class RenderPass
+	enum class RenderPass : uint8_t
 	{
 		Shadow,
 		Geometry,
@@ -34,7 +35,7 @@ namespace Kerberos
 		static void Init();
 		static void Shutdown();
 
-		static void BeginShadowPass(const DirectionalLight& light, const ShadowMapSettings& settings = {});
+		static void BeginShadowPass(const DirectionalLight& light, const ShadowMapSettings& settings = {}, const Ref<Framebuffer>& shadowMapFramebuffer = nullptr);
 
 		static void BeginGeometryPass(const OrthographicCamera& camera) = delete;
 		static void BeginGeometryPass(const EditorCamera& camera, const DirectionalLight* sun, const std::vector<PointLight>& pointLights, const Ref<TextureCube>& skyboxTexture);
@@ -43,7 +44,7 @@ namespace Kerberos
 		static void EndPass();
         static void EndScene();
 
-		static void SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture = nullptr, float tilingFactor = 1.0f, int entityID = -1);
+		static void SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture = nullptr, float tilingFactor = 1.0f, int entityID = -1, bool castShadows = true);
 
 		static void SetGlobalAmbientLight(const glm::vec3& color, float intensity);
 		static void SetShowWireframe(bool showWireframe);

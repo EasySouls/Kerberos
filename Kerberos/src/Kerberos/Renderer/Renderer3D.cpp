@@ -35,8 +35,7 @@ namespace Kerberos
 		Ref<TextureCube> SkyboxTexture = nullptr;
 		Ref<VertexArray> SkyboxVertexArray = nullptr;
 
-		ShadowMapSettings ShadowSettings = {};
-		Ref<Framebuffer> ShadowFramebuffer = nullptr;
+		Ref<Framebuffer> ShadowMapFramebuffer = nullptr;
 		glm::mat4 LightSpaceMatrix = glm::mat4(1.0f);
 
 		RenderPass CurrentPass = RenderPass::Geometry;
@@ -101,12 +100,6 @@ namespace Kerberos
 		KBR_CORE_INFO("Size of PerObjectData: {0} bytes", sizeof(Renderer3DData::PerObjectData));
 
 		s_RendererData = Renderer3DData();
-
-		FramebufferSpecification shadowSpec;
-		shadowSpec.Width = s_RendererData.ShadowSettings.Resolution;
-		shadowSpec.Height = s_RendererData.ShadowSettings.Resolution;
-		shadowSpec.Attachments = { FramebufferTextureFormat::Depth };
-		s_RendererData.ShadowFramebuffer = Framebuffer::Create(shadowSpec);
 
 		s_RendererData.BaseShader = Shader::Create("assets/shaders/shader3d.glsl");
 		s_RendererData.WireframeShader = Shader::Create("assets/shaders/wireframe3d.glsl");
@@ -208,18 +201,13 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 	}
 
-	void Renderer3D::BeginShadowPass(const DirectionalLight& light, const ShadowMapSettings& settings) 
+	void Renderer3D::BeginShadowPass(const DirectionalLight& light, const ShadowMapSettings& settings, const Ref<Framebuffer>& shadowMapFramebuffer) 
 	{
 		KBR_PROFILE_FUNCTION();
 
-		s_RendererData.ShadowSettings = settings;
 		s_RendererData.CurrentPass = RenderPass::Shadow;
 
-		/// Bind shadow map framebuffer
-		s_RendererData.ShadowFramebuffer->Bind();
-
-		/// Clear depth buffer
-		RenderCommand::Clear();
+		s_RendererData.ShadowMapFramebuffer = shadowMapFramebuffer;
 
 		SetupShadowCamera(light, settings);
 
@@ -229,10 +217,7 @@ namespace Kerberos
 
 	void Renderer3D::EndPass() 
 	{
-		if (s_RendererData.CurrentPass == RenderPass::Shadow)
-		{
-			s_RendererData.ShadowFramebuffer->Unbind();
-		}
+		
 	}
 
 	void Renderer3D::BeginGeometryPass(const EditorCamera& camera, const DirectionalLight* sun,
@@ -357,11 +342,17 @@ namespace Kerberos
 		s_Stats.DrawnMeshes++;
 	}
 
-	void Renderer3D::SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture, const float tilingFactor, const int entityID)
+	void Renderer3D::SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture, const float tilingFactor, const int entityID, const bool castShadows)
 	{
 		if (!mesh || !mesh->GetVertexArray() || mesh->GetIndexCount() == 0)
 		{
 			KBR_CORE_WARN("Invalid mesh or vertex array or index count!");
+			return;
+		}
+
+		if (s_RendererData.CurrentPass == RenderPass::Shadow && !castShadows)
+		{
+			/// Skip rendering this mesh in shadow pass if it doesn't cast shadows
 			return;
 		}
 
@@ -457,8 +448,8 @@ namespace Kerberos
 	}
 	void Renderer3D::BindShadowMap()
 	{
-		auto shadowMapTexture = s_RendererData.ShadowFramebuffer->GetDepthAttachmentRendererID();
-		/// TODO: I am not sure if this is correct
+		auto shadowMapTexture = s_RendererData.ShadowMapFramebuffer->GetDepthAttachmentRendererID();
+		/// TODO: Ghe shadow map texture from the framebuffer
 		s_RendererData.ActiveShader->SetInt("u_ShadowMap", 1);
 	}
 }

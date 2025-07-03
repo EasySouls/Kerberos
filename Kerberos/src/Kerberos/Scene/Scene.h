@@ -75,6 +75,9 @@ namespace Kerberos
 		void CalculateEntityTransforms();
 		void CalculateEntityTransform(const Entity& entity);
 
+		Ref<Framebuffer> GetShadowMapFramebuffer() const { return m_ShadowMapFramebuffer; }
+		Ref<Framebuffer> GetEditorFramebuffer() const { return m_EditorFramebuffer; }
+
 	private:
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
