@@ -25,7 +25,7 @@ namespace Kerberos
 		Ref<Shader> ActiveShader;
 		Ref<Texture2D> WhiteTexture;
 
-		Ref<Shader> BaseShader = nullptr;
+		Ref<Shader> GeometryShader = nullptr;
 		Ref<Shader> WireframeShader = nullptr;
 		Ref<Shader> ShadowMapShader = nullptr;
 
@@ -36,7 +36,6 @@ namespace Kerberos
 		Ref<VertexArray> SkyboxVertexArray = nullptr;
 
 		Ref<Framebuffer> ShadowMapFramebuffer = nullptr;
-		glm::mat4 LightSpaceMatrix = glm::mat4(1.0f);
 
 		RenderPass CurrentPass = RenderPass::Geometry;
 
@@ -101,36 +100,17 @@ namespace Kerberos
 
 		s_RendererData = Renderer3DData();
 
-		s_RendererData.BaseShader = Shader::Create("assets/shaders/shader3d.glsl");
+		s_RendererData.GeometryShader = Shader::Create("assets/shaders/shader3d.glsl");
 		s_RendererData.WireframeShader = Shader::Create("assets/shaders/wireframe3d.glsl");
 		s_RendererData.ShadowMapShader = Shader::Create("assets/shaders/shadow_map.glsl");
 
 		/// Set the default shader to the base shader
-		s_RendererData.ActiveShader = s_RendererData.BaseShader;
+		s_RendererData.ActiveShader = s_RendererData.GeometryShader;
 
 		s_RendererData.WhiteTexture = AssetManager::GetDefaultTexture2D();
 		s_RendererData.ActiveTexture = s_RendererData.WhiteTexture;
 
 		s_RendererData.SkyboxShader = Shader::Create("assets/shaders/skybox.glsl");
-		const std::vector<std::string> skymapTextures = {
-			"assets/textures/starmap_cubemap_0.png",
-			"assets/textures/starmap_cubemap_1.png",
-			"assets/textures/starmap_cubemap_2.png",
-			"assets/textures/starmap_cubemap_3.png",
-			"assets/textures/starmap_cubemap_4.png",
-			"assets/textures/starmap_cubemap_5.png",
-
-		};
-		//s_RendererData.StarmapSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/starmap.kbrcubemap");
-		const std::vector<std::string> oceanCubeTextures = {
-			"assets/textures/skybox/right.jpg",
-			"assets/textures/skybox/left.jpg",
-			"assets/textures/skybox/top.jpg",
-			"assets/textures/skybox/bottom.jpg",
-			"assets/textures/skybox/front.jpg",
-			"assets/textures/skybox/back.jpg"
-		};
-		//s_RendererData.OceanSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/ocean.kbrcubemap");
 		const std::vector<float> skyboxVertices = {
 			-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
@@ -208,6 +188,8 @@ namespace Kerberos
 		s_RendererData.CurrentPass = RenderPass::Shadow;
 
 		s_RendererData.ShadowMapFramebuffer = shadowMapFramebuffer;
+		shadowMapFramebuffer->Bind();
+		//shadowMapFramebuffer->ClearDepthAttachment(0);
 
 		SetupShadowCamera(light, settings);
 
@@ -217,7 +199,10 @@ namespace Kerberos
 
 	void Renderer3D::EndPass() 
 	{
-		
+		if (s_RendererData.CurrentPass == RenderPass::Shadow)
+		{
+			s_RendererData.ShadowMapFramebuffer->Unbind();
+		}
 	}
 
 	void Renderer3D::BeginGeometryPass(const EditorCamera& camera, const DirectionalLight* sun,
@@ -269,12 +254,13 @@ namespace Kerberos
 
 		s_RendererData.CurrentPass = RenderPass::Geometry;
 
-		const auto& viewProjection = camera.GetProjection() * glm::inverse(transform);
+		const glm::mat4& viewProjection = camera.GetProjection() * glm::inverse(transform);
 		s_RendererData.CameraData.ViewMatrix = glm::inverse(transform);
 		s_RendererData.CameraData.ProjectionMatrix = camera.GetProjection();
 		s_RendererData.CameraData.ViewProjectionMatrix = viewProjection;
 		s_RendererData.CameraData.Position = transform[3];
 
+		s_RendererData.ActiveShader = s_RendererData.GeometryShader;
 		s_RendererData.ActiveShader->Bind();
 
 		BindShadowMap();
@@ -400,7 +386,7 @@ namespace Kerberos
 
 	void Renderer3D::SetShowWireframe(const bool showWireframe) 
 	{
-		s_RendererData.ActiveShader = showWireframe ? s_RendererData.WireframeShader : s_RendererData.BaseShader;
+		s_RendererData.ActiveShader = showWireframe ? s_RendererData.WireframeShader : s_RendererData.GeometryShader;
 	}
 
 	Renderer3D::Statistics Renderer3D::GetStatistics() 
@@ -429,22 +415,16 @@ namespace Kerberos
 		const glm::mat4 lightProjection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, orthoNear, orthoFar);
 
 		/// Calculate light view matrix
-		const glm::vec3 lightPos = -glm::normalize(light.Direction) * 10.0f; /// Position light away from origin
+		const glm::vec3 lightPos = -glm::normalize(light.Direction) * 5.0f; /// Position light away from origin
 		constexpr glm::vec3 lightTarget = glm::vec3(0.0f); /// Look at origin
 		constexpr glm::vec3 lightUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 		const glm::mat4 lightView = glm::lookAt(lightPos, lightTarget, lightUp);
 
 		/// Calculate light space matrix
-		s_RendererData.LightSpaceMatrix = lightProjection * lightView;
-		s_RendererData.ShadowData.LightSpaceMatrix = s_RendererData.LightSpaceMatrix;
+		s_RendererData.ShadowData.LightSpaceMatrix = lightProjection * lightView;
 		s_RendererData.ShadowData.EnableShadows = settings.EnableShadows ? 1 : 0;
 		s_RendererData.ShadowUniformBuffer->SetData(&s_RendererData.ShadowData, sizeof(Renderer3DData::ShadowDataUbo), 0);
-
-		/// Update camera data for shadow pass
-		s_RendererData.CameraData.ViewMatrix = lightView;
-		s_RendererData.CameraData.ProjectionMatrix = lightProjection;
-		s_RendererData.CameraData.ViewProjectionMatrix = s_RendererData.LightSpaceMatrix;
 
 		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData, sizeof(Renderer3DData::CameraData), 0);
 	}

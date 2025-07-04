@@ -819,9 +819,9 @@ namespace Kerberos
 			ShadowMapSettings shadowSettings;
 			shadowSettings.Resolution = 2048;
 			shadowSettings.OrthoSize = 15.0f;
-
-			m_ShadowMapFramebuffer->Bind();
-			m_ShadowMapFramebuffer->ClearDepthAttachment(0);
+			shadowSettings.NearPlane = 1.0f;
+			shadowSettings.FarPlane = 10.0f;
+			shadowSettings.EnableShadows = true;
 
 			Renderer3D::BeginShadowPass(*sun, shadowSettings, m_ShadowMapFramebuffer);
 
@@ -834,15 +834,13 @@ namespace Kerberos
 
 				if (meshComp.StaticMesh && meshComp.MeshMaterial)
 				{
-					Renderer3D::SubmitMesh(meshComp.StaticMesh, transformComp.GetTransform(),
+					Renderer3D::SubmitMesh(meshComp.StaticMesh, transformComp.WorldTransform,
 						meshComp.MeshMaterial, meshComp.MeshTexture, 1.0f,
-						static_cast<int>(entity), meshComp.CastShadows); // castShadows = true
+						static_cast<int>(entity), meshComp.CastShadows);
 				}
 			}
 
 			Renderer3D::EndPass();
-
-			m_ShadowMapFramebuffer->Unbind();
 		}
 
 		std::vector<PointLight> pointLights;

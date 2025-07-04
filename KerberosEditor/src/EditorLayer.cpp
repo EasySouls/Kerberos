@@ -26,11 +26,15 @@ namespace Kerberos
 		m_ActiveScene = CreateRef<Scene>();
 
 		/// TODO: Open the project passed as command line argument, if there is one
-
+#define TESTING 1
+#if TESTING
+		OpenProject("C:\\Development\\Kerberos\\KerberosEditor\\World3D.kbrproj");
+#else
 		if (!OpenProject())
 		{
 			NewProject();
 		}
+#endif
 
 		m_EditorCamera = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
