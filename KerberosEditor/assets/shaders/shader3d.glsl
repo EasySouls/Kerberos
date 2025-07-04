@@ -35,9 +35,17 @@ layout(std140, binding = 2) uniform PerObjectData
     Material u_Material;
 };
 
+layout(std140, binding = 3) uniform ShadowData
+{
+    mat4 u_LightSpaceMatrix;
+    int u_EnableShadows;
+    float u_ShadowBias;
+};
+
 layout(location = 0) out vec3 v_FragPos_WorldSpace;
 layout(location = 1) out vec3 v_Normal_WorldSpace;
 layout(location = 2) out vec2 v_TexCoord;
+layout(location = 3) out vec4 v_FragPos_LightSpace;
 
 void main()
 {
@@ -46,6 +54,8 @@ void main()
 
     mat3 normalMatrix = transpose(inverse(mat3(u_Model)));
     v_Normal_WorldSpace = normalize(normalMatrix * a_Normal);
+
+	v_FragPos_LightSpace = u_LightSpaceMatrix * vec4(v_FragPos_WorldSpace, 1.0);
 
     v_TexCoord = a_TexCoord;
     gl_Position = u_ViewProjection * worldPos;
@@ -62,19 +72,13 @@ layout(std140, binding = 0) uniform Camera
     mat4 u_ViewProjection;
 };
 
-layout(std140, binding = 3) uniform ShadowData
-{
-    mat4 u_LightSpaceMatrix;
-    int u_EnableShadows;
-    float u_ShadowBias;
-};
-
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
 
 layout(location = 0) in vec3 v_FragPos_WorldSpace;
 layout(location = 1) in vec3 v_Normal_WorldSpace;
 layout(location = 2) in vec2 v_TexCoord;
+layout(location = 3) in vec4 v_FragPos_LightSpace;
 
 layout(binding = 0) uniform sampler2D u_Texture;
 layout(binding = 1) uniform sampler2D u_ShadowMap;
@@ -131,33 +135,42 @@ layout(std140, binding = 2) uniform PerObjectData
     Material u_Material;
 };
 
-float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
+layout(std140, binding = 3) uniform ShadowData
+{
+    mat4 u_LightSpaceMatrix;
+    int u_EnableShadows;
+    float u_ShadowBias;
+};
+
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
 {
     // Perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
 
-    if (projCoords.z > 1.0)
-        return 0.0;
+   /* if (projCoords.z > 1.0)
+        return 0.0;*/
 
     float closestDepth = texture(u_ShadowMap, projCoords.xy).r;
     float currentDepth = projCoords.z;
 
-    // Bias to prevent shadow acne
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), u_ShadowBias);
+    float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
 
-    // PCF (Percentage Closer Filtering)
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
-    for (int x = -1; x <= 1; ++x)
-    {
-        for (int y = -1; y <= 1; ++y)
-        {
-            float pcfDepth = texture(u_ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
-        }
-    }
-    shadow /= 9.0;
+    //// Bias to prevent shadow acne
+    //float bias = max(0.05 * (1.0 - dot(normal, lightDir)), u_ShadowBias);
+
+    //// PCF (Percentage Closer Filtering)
+    //float shadow = 0.0;
+    //vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
+    //for (int x = -1; x <= 1; ++x)
+    //{
+    //    for (int y = -1; y <= 1; ++y)
+    //    {
+    //        float pcfDepth = texture(u_ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+    //        shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+    //    }
+    //}
+    //shadow /= 9.0;
 
     return shadow;
 }
@@ -227,9 +240,7 @@ void main()
     float shadow = 0.0;
     if (u_EnableShadows == 1 && u_DirectionalLight.enabled)
     {
-        vec4 fragPosLightSpace = u_LightSpaceMatrix * vec4(v_FragPos_WorldSpace, 1.0);
-		vec3 lightDir = normalize(-u_DirectionalLight.direction);
-        shadow = ShadowCalculation(fragPosLightSpace, norm, lightDir);
+        shadow = ShadowCalculation(v_FragPos_LightSpace, norm);
 	}
 
     // Directional Light

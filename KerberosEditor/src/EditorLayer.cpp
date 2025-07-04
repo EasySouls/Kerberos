@@ -52,6 +52,8 @@ namespace Kerberos
 		m_TextureDirt = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 6, 11 }, { 128, 128 }, { 1, 1 });
 		m_TextureWater = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128, 128 }, { 1, 1 });
 
+#define FIRST_TIME_LOADING_SCENE 1
+#if FIRST_TIME_LOADING_SCENE
 		Entity squareEntity = m_ActiveScene->CreateEntity("Square");
 		squareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
 
@@ -98,16 +100,14 @@ namespace Kerberos
 		auto& pointLightComponent = pointLightEntity.AddComponent<PointLightComponent>();
 		pointLightComponent.Light.Color = { 0.8f, 0.2f, 0.2f };
 		pointLightComponent.Light.Position = { 0.9f, 4.1f, 3.9f };
+		pointLightComponent.IsEnabled = false;
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
 		auto& cameraComponent = m_CameraEntity.AddComponent<CameraComponent>();
 		cameraComponent.Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
 		auto& cameraTransformComponent = m_CameraEntity.GetComponent<TransformComponent>();
 		cameraTransformComponent.Translation = { 0.0f, 0.0f, 5.0f };
-
-		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
-		auto& secondCameraComponent = m_SecondCamera.AddComponent<CameraComponent>();
-		secondCameraComponent.IsPrimary = false;
+#endif
 
 		class CameraController : public ScriptableEntity
 		{
@@ -128,12 +128,13 @@ namespace Kerberos
 			}
 		};
 
+		m_CameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
-		Model backpackModel = Model("assets/models/backpack/backpack.obj", "Backpack");
-		backpackModel.InitEntities(m_ActiveScene);
+		//const Model backpackModel = Model("assets/models/backpack/backpack.obj", "Backpack");
+		//backpackModel.InitEntities(m_ActiveScene);
 
 		/*Model deerModel = Model("assets/models/deer_demo/scene.gltf", "Deer");
 		deerModel.InitEntities(m_ActiveScene);*/

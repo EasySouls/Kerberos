@@ -218,6 +218,7 @@ namespace Kerberos
 		s_RendererData.CameraData.ViewProjectionMatrix = viewProjection;
 		s_RendererData.CameraData.Position = camera.GetPosition();
 
+		s_RendererData.ActiveShader = s_RendererData.GeometryShader;
 		s_RendererData.ActiveShader->Bind();
 
 		BindShadowMap();
