@@ -344,4 +344,25 @@ namespace Kerberos
 
 		//KBR_CORE_ASSERT(glGetError() == GL_NO_ERROR, "Failed to clear depth attachment!");
 	}
+
+	void OpenGLFramebuffer::SetDebugName(const std::string& name) const 
+	{
+		KBR_PROFILE_FUNCTION();
+
+		if (m_RendererID)
+		{
+			glObjectLabel(GL_FRAMEBUFFER, m_RendererID, -1, name.c_str());
+		}
+		for (size_t i = 0; i < m_ColorAttachments.size(); ++i)
+		{
+			const auto colorAttachment = m_ColorAttachments[i];
+			const std::string colorAttachmentName = name + " Color Attachment " + std::to_string(i);
+			glObjectLabel(GL_TEXTURE, colorAttachment, -1, colorAttachmentName.c_str());
+		}
+		if (m_DepthAttachment)
+		{
+			const std::string depthAttachmentName = name + " Depth Attachment";
+			glObjectLabel(GL_TEXTURE, m_DepthAttachment, -1, depthAttachmentName.c_str());
+		}
+	}
 }

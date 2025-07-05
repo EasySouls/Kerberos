@@ -27,6 +27,8 @@ namespace Kerberos
 			return m_RendererID == dynamic_cast<const OpenGLTexture2D&>(other).m_RendererID;
 		}
 
+		void SetDebugName(const std::string& name) override;
+
 	private:
 		std::string m_Path;
 		TextureSpecification m_Spec;

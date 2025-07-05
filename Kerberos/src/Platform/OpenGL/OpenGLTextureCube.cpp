@@ -116,16 +116,23 @@ namespace Kerberos
 
 	uint32_t OpenGLTextureCube::GetWidth() const 
     {
-		throw std::runtime_error("OpenGLTextureCube::GetWidth() is not yet implemented.");
+        /// Assuming all faces have the same width
+		return m_FacesSpecifications[0].Width;
     }
 
 	uint32_t OpenGLTextureCube::GetHeight() const 
     {
-		throw std::runtime_error("OpenGLTextureCube::GetHeight() is not yet implemented.");
+		/// Assuming all faces have the same height
+		return m_FacesSpecifications[0].Height;
     }
 
 	void OpenGLTextureCube::SetData(void* data, uint32_t size) 
     {
 		throw std::runtime_error("OpenGLTextureCube::SetData() is not yet implemented.");
+    }
+
+	void OpenGLTextureCube::SetDebugName(const std::string& name) 
+    {
+		glObjectLabel(GL_TEXTURE_CUBE_MAP, m_RendererID, -1, name.c_str());
     }
 }

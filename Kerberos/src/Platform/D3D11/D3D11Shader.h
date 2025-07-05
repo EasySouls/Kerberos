@@ -32,6 +32,8 @@ namespace Kerberos
 
 		const std::string& GetName() const override { return m_Name; }
 
+		void SetDebugName(const std::string& name) const override;
+
 	private:
 		/*
 		* Compiles the shader from the given file.

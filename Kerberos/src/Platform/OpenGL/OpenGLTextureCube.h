@@ -27,6 +27,9 @@ namespace Kerberos
 		{
 			return m_RendererID == dynamic_cast<const OpenGLTextureCube&>(other).m_RendererID;
 		}
+
+		void SetDebugName(const std::string& name) override;
+
 	private:
 		uint32_t m_RendererID;
 		std::string m_Name;

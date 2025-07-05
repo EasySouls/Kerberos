@@ -83,6 +83,8 @@ namespace Kerberos
 			return nullptr;
 		}
 
+		cubemapTexture->SetDebugName(descriptor.Name);
+
 		return cubemapTexture;
 	}
 }

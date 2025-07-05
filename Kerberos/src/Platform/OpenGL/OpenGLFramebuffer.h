@@ -42,6 +42,8 @@ namespace Kerberos
 		FramebufferSpecification& GetSpecification() override { return m_Specification; }
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 
+		void SetDebugName(const std::string& name) const override;
+
 	private:
 		RendererID m_RendererID = 0;
 

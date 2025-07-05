@@ -5,11 +5,11 @@
 
 namespace Kerberos
 {
-	void OpenGLMessageCallback(
+	static void OpenGLMessageCallback(
 		unsigned source,
 		unsigned type,
 		unsigned id,
-		unsigned severity,
+		const unsigned severity,
 		int length,
 		const char* message,
 		const void* userParam)

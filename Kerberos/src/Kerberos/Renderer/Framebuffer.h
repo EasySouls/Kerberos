@@ -75,6 +75,8 @@ namespace Kerberos
 
 		virtual FramebufferSpecification& GetSpecification() = 0;
 		virtual const FramebufferSpecification& GetSpecification() const = 0;
+		
+		virtual void SetDebugName(const std::string& name) const = 0;
 
 		template<typename T>
 		T& As()

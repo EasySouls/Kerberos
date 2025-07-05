@@ -153,16 +153,16 @@
     <ClInclude Include="src\Kerberos.h" />
     <ClInclude Include="src\Kerberos\Application.h" />
     <ClInclude Include="src\Kerberos\Assets\Asset.h" />
-    <ClInclude Include="src\Kerberos\Assets\Importers\AssetImporter.h" />
     <ClInclude Include="src\Kerberos\Assets\AssetManager.h" />
     <ClInclude Include="src\Kerberos\Assets\AssetManagerBase.h" />
     <ClInclude Include="src\Kerberos\Assets\AssetMetadata.h" />
     <ClInclude Include="src\Kerberos\Assets\AssetRegistry.h" />
     <ClInclude Include="src\Kerberos\Assets\EditorAssetManager.h" />
+    <ClInclude Include="src\Kerberos\Assets\Importers\AssetImporter.h" />
     <ClInclude Include="src\Kerberos\Assets\Importers\CubemapImporter.h" />
+    <ClInclude Include="src\Kerberos\Assets\Importers\TextureImporter.h" />
     <ClInclude Include="src\Kerberos\Assets\Model.h" />
     <ClInclude Include="src\Kerberos\Assets\RuntimeAssetManager.h" />
-    <ClInclude Include="src\Kerberos\Assets\Importers\TextureImporter.h" />
     <ClInclude Include="src\Kerberos\Core.h" />
     <ClInclude Include="src\Kerberos\Core\Buffer.h" />
     <ClInclude Include="src\Kerberos\Core\Input.h" />
@@ -249,14 +249,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp" />
-    <ClCompile Include="src\Kerberos\Assets\Importers\AssetImporter.cpp" />
     <ClCompile Include="src\Kerberos\Assets\AssetManager.cpp" />
     <ClCompile Include="src\Kerberos\Assets\AssetRegistry.cpp" />
     <ClCompile Include="src\Kerberos\Assets\EditorAssetManager.cpp" />
+    <ClCompile Include="src\Kerberos\Assets\Importers\AssetImporter.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Importers\CubemapImporter.cpp" />
+    <ClCompile Include="src\Kerberos\Assets\Importers\TextureImporter.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Model.cpp" />
     <ClCompile Include="src\Kerberos\Assets\RuntimeAssetManager.cpp" />
-    <ClCompile Include="src\Kerberos\Assets\Importers\TextureImporter.cpp" />
     <ClCompile Include="src\Kerberos\Core\UUID.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp" />
@@ -305,6 +305,7 @@
     <ClCompile Include="src\Platform\Vulkan\VulkanBuffer.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanContext.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanFramebuffer.cpp" />
+    <ClCompile Include="src\Platform\Vulkan\VulkanHelpers.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanRendererAPI.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanShader.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanTexture.cpp" />

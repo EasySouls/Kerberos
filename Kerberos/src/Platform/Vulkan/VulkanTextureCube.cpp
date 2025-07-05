@@ -1,6 +1,9 @@
 #include "kbrpch.h"
 #include "VulkanTextureCube.h"
 
+#include "VulkanContext.h"
+#include "VulkanHelpers.h"
+
 namespace Kerberos
 {
 	VulkanTextureCube::VulkanTextureCube(const CubemapData& data) 
@@ -31,5 +34,10 @@ namespace Kerberos
 	void VulkanTextureCube::SetData(void* data, uint32_t size)
 	{
 		
+	}
+
+	void VulkanTextureCube::SetDebugName(const std::string& name) 
+	{
+		VulkanHelpers::SetObjectDebugName(VulkanContext::Get().GetDevice(), VK_OBJECT_TYPE_DESCRIPTOR_SET, m_RendererID, name);
 	}
 }

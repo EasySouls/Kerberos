@@ -416,6 +416,44 @@ namespace Kerberos
 		throw std::runtime_error("GetDepthAttachmentRendererID is not implemented for VulkanFramebuffer!");
 	}
 
+	void VulkanFramebuffer::SetDebugName(const std::string& name) const 
+	{
+		KBR_PROFILE_FUNCTION();
+		const auto& device = VulkanContext::Get().GetDevice();
+		if (m_Framebuffer != VK_NULL_HANDLE)
+		{
+			VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_FRAMEBUFFER, reinterpret_cast<uint64_t>(m_Framebuffer), name);
+		}
+		if (m_RenderPass != VK_NULL_HANDLE)
+		{
+			VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_RENDER_PASS, reinterpret_cast<uint64_t>(m_RenderPass), name);
+		}
+		if (m_DepthAttachmentView != VK_NULL_HANDLE)
+		{
+			VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_IMAGE_VIEW, reinterpret_cast<uint64_t>(m_DepthAttachmentView), name + " Depth Attachment View");
+		}
+		for (size_t i = 0; i < m_ColorAttachmentViews.size(); ++i)
+		{
+			VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_IMAGE_VIEW, reinterpret_cast<uint64_t>(m_ColorAttachmentViews[i]), name + " Color Attachment View " + std::to_string(i));
+		}
+		if (m_ColorAttachmentSampler != VK_NULL_HANDLE)
+		{
+			VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_SAMPLER, reinterpret_cast<uint64_t>(m_ColorAttachmentSampler), name + " Color Attachment Sampler");
+		}
+		if (m_CommandPool != VK_NULL_HANDLE)
+		{
+			VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_COMMAND_POOL, reinterpret_cast<uint64_t>(m_CommandPool), name + " Command Pool");
+		}
+		if (m_CommandBuffer != VK_NULL_HANDLE)
+		{
+			VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_COMMAND_BUFFER, reinterpret_cast<uint64_t>(m_CommandBuffer), name + " Command Buffer");
+		}
+		if (m_Fence != VK_NULL_HANDLE)
+		{
+			VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_FENCE, reinterpret_cast<uint64_t>(m_Fence), name + " Fence");
+		}
+	}
+
 	void VulkanFramebuffer::ReleaseResources()
 	{
 		const VulkanContext& context = VulkanContext::Get();

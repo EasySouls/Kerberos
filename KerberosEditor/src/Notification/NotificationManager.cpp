@@ -24,12 +24,12 @@ namespace Kerberos
         const double currentTime = ImGui::GetTime();
 
         // Iterate backwards to safely remove elements
-        for (int i = m_Notifications.size() - 1; i >= 0; --i)
+        for (int i = static_cast<int>(m_Notifications.size()) - 1; i >= 0; --i)
         {
             Notification& notif = m_Notifications[i];
 
             // --- Update Alpha for fading in/out ---
-            const float timeSinceStart = currentTime - notif.startTime;
+            const float timeSinceStart = static_cast<float>(currentTime) - notif.startTime;
             constexpr float fadeTime = 0.5f; // Time for fade in/out
 
             if (timeSinceStart < fadeTime)

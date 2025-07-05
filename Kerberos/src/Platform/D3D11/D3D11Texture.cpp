@@ -228,4 +228,9 @@ namespace Kerberos
 		const uint32_t rowPitch = m_Spec.Width * bytesPerPixel;
 		context->UpdateSubresource(m_Texture.Get(), 0, nullptr, data, rowPitch, 0);
 	}
+
+	void D3D11Texture2D::SetDebugName(const std::string& name) 
+	{
+		throw std::runtime_error("SetDebugName is not implemented for D3D11Texture2D!");
+	}
 }

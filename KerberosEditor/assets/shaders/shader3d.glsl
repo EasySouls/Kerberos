@@ -142,22 +142,22 @@ layout(std140, binding = 3) uniform ShadowData
     float u_ShadowBias;
 };
 
-float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 {
     // Perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
 
-   /* if (projCoords.z > 1.0)
-        return 0.0;*/
+    if (projCoords.z > 1.0)
+        return 0.0;
 
     float closestDepth = texture(u_ShadowMap, projCoords.xy).r;
     float currentDepth = projCoords.z;
 
-    float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+    // Bias to prevent shadow acne
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 
-    //// Bias to prevent shadow acne
-    //float bias = max(0.05 * (1.0 - dot(normal, lightDir)), u_ShadowBias);
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
     //// PCF (Percentage Closer Filtering)
     //float shadow = 0.0;
@@ -240,7 +240,8 @@ void main()
     float shadow = 0.0;
     if (u_EnableShadows == 1 && u_DirectionalLight.enabled)
     {
-        shadow = ShadowCalculation(v_FragPos_LightSpace, norm);
+        vec3 lightDir = normalize(u_DirectionalLight.direction);
+        shadow = ShadowCalculation(v_FragPos_LightSpace, norm, lightDir);
 	}
 
     // Directional Light
@@ -252,8 +253,8 @@ void main()
         totalLighting += CalculatePointLight(u_PointLights[i], norm, v_FragPos_WorldSpace, viewDir, albedo);
     }
 
-    color = vec4(totalLighting, alpha);
-    //color = vec4(albedo, 1.0);
+    //color = vec4(totalLighting, alpha);
+    color = vec4(shadow, 0.0, 0.0, 1.0);
 
     color2 = u_EntityID;
 }

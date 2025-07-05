@@ -104,6 +104,10 @@ namespace Kerberos
 		s_RendererData.WireframeShader = Shader::Create("assets/shaders/wireframe3d.glsl");
 		s_RendererData.ShadowMapShader = Shader::Create("assets/shaders/shadow_map.glsl");
 
+		s_RendererData.GeometryShader->SetDebugName("Geometry");
+		s_RendererData.WireframeShader->SetDebugName("Wireframe");
+		s_RendererData.ShadowMapShader->SetDebugName("Shadow Map");
+
 		/// Set the default shader to the base shader
 		s_RendererData.ActiveShader = s_RendererData.GeometryShader;
 
@@ -160,6 +164,7 @@ namespace Kerberos
 			{ ShaderDataType::Float3, "a_Position" }
 			});
 		s_RendererData.SkyboxVertexArray->AddVertexBuffer(skyboxVertexBuffer);
+		s_RendererData.SkyboxShader->SetDebugName("Skybox");
 
 		s_RendererData.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::CameraData), 0);
 		s_RendererData.CameraUniformBuffer->SetDebugName("Camera Uniform Buffer");
@@ -416,8 +421,13 @@ namespace Kerberos
 		const glm::mat4 lightProjection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, orthoNear, orthoFar);
 
 		/// Calculate light view matrix
-		const glm::vec3 lightPos = -glm::normalize(light.Direction) * 5.0f; /// Position light away from origin
-		constexpr glm::vec3 lightTarget = glm::vec3(0.0f); /// Look at origin
+		constexpr glm::vec3 sceneCenter = glm::vec3(0.0f, 0.0f, 0.0f);
+		constexpr float lightDistance = 20.0f;
+
+		/// TODO: Use light's direction
+		//const glm::vec3 lightPos = sceneCenter - glm::normalize(light.Direction) * lightDistance; /// Position light away from origin
+		constexpr glm::vec3 lightPos = glm::vec3(-38.0f, 13.224f, 6.62f);
+		constexpr glm::vec3 lightTarget = sceneCenter; /// Look at origin
 		constexpr glm::vec3 lightUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 		const glm::mat4 lightView = glm::lookAt(lightPos, lightTarget, lightUp);

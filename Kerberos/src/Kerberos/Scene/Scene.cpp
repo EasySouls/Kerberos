@@ -195,8 +195,7 @@ namespace Kerberos
 	static JPH::ObjectLayer GetObjectLayerFromComponent(const RigidBody3DComponent::BodyType& type)
 	{
 		switch (type)
-		{
-		case RigidBody3DComponent::BodyType::Static:
+		{		case RigidBody3DComponent::BodyType::Static:
 			return Physics::Layers::NON_MOVING;
 		case RigidBody3DComponent::BodyType::Kinematic:
 		case RigidBody3DComponent::BodyType::Dynamic:
@@ -218,6 +217,7 @@ namespace Kerberos
 				{ FramebufferTextureFormat::DEPTH24 }
 			}
 			});
+		m_ShadowMapFramebuffer->SetDebugName("ShadowMapFramebuffer");
 
 		m_EditorFramebuffer = Framebuffer::Create(FramebufferSpecification{
 			.Width = 1280,
@@ -228,6 +228,7 @@ namespace Kerberos
 				{ FramebufferTextureFormat::DEPTH24STENCIL8 }
 			}
 			});
+		m_EditorFramebuffer->SetDebugName("EditorFramebuffer");
 	}
 
 	Scene::~Scene()
@@ -876,7 +877,7 @@ namespace Kerberos
 
 			if (mesh.Visible)
 			{
-				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.WorldTransform, mesh.MeshMaterial, mesh.MeshTexture, 1.0f, static_cast<int>(entity));
+				Renderer3D::SubmitMesh(mesh.StaticMesh, transform.WorldTransform, mesh.MeshMaterial, mesh.MeshTexture, 1.0f, static_cast<int>(entity), mesh.CastShadows);
 			}
 		}
 

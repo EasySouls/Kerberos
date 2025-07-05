@@ -118,4 +118,14 @@ namespace Kerberos
 
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, static_cast<int>(m_Spec.Width), static_cast<int>(m_Spec.Height), m_DataFormat, GL_UNSIGNED_BYTE, data);
 	}
+
+	void OpenGLTexture2D::SetDebugName(const std::string& name) 
+	{
+		KBR_PROFILE_FUNCTION();
+
+		if (m_RendererID)
+		{
+			glObjectLabel(GL_TEXTURE, m_RendererID, -1, name.c_str());
+		}
+	}
 }

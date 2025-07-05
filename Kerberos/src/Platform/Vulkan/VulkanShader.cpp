@@ -259,6 +259,19 @@ namespace Kerberos
 
 	}
 
+	void VulkanShader::SetDebugName(const std::string& name) const 
+	{
+		KBR_PROFILE_FUNCTION();
+
+		for (const auto& module : m_ShaderModules | std::views::values)
+		{
+			if (module != VK_NULL_HANDLE)
+			{
+				VulkanHelpers::SetObjectDebugName(VulkanContext::Get().GetDevice(), VK_OBJECT_TYPE_SHADER_MODULE, reinterpret_cast<uint64_t>(module), name);
+			}
+		}
+	}
+
 	std::string VulkanShader::ReadShaderFile(const std::string& filename)
 	{
 		KBR_PROFILE_FUNCTION();

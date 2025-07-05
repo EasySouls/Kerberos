@@ -18,6 +18,9 @@ namespace Kerberos
 
 		auto texture = Texture2D::Create(spec, data);
 
+		const std::string name = filepath.filename().string();
+		texture->SetDebugName(name);
+
 		stbi_image_free(data.Data);
 
 		return texture;

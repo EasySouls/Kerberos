@@ -39,6 +39,7 @@ namespace Kerberos
 		frameBufferSpec.Height = 256;
 		frameBufferSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
 		m_CubemapFramebuffer = Framebuffer::Create(frameBufferSpec);
+		m_CubemapFramebuffer->SetDebugName("Depth Map Visualization");
 	}
 
 	void HierarchyPanel::OnImGuiRender()
@@ -875,8 +876,8 @@ namespace Kerberos
 						environment.SkyboxTexture = handle;
 
 						/// render the changed cube into the environment
-						m_CubemapFramebuffer->Bind();
-						m_CubemapFramebuffer->Unbind();
+						/*m_CubemapFramebuffer->Bind();
+						m_CubemapFramebuffer->Unbind();*/
 					}
 					ImGui::EndDragDropTarget();
 				}

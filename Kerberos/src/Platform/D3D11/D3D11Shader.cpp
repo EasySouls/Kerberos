@@ -21,8 +21,13 @@ namespace Kerberos
 	void D3D11Shader::Bind() const {}
 	void D3D11Shader::Unbind() const {}
 
+	void D3D11Shader::SetDebugName(const std::string& name) const 
+	{
+		throw std::runtime_error("SetDebugName is not implemented for D3D11Shader!");
+	}
+
 	bool D3D11Shader::CompileShaderFromFile(const std::wstring& fileName, const std::string& entryPoint,
-		const std::string& profile, ComPtr<ID3DBlob>& shaderBlob)
+	                                        const std::string& profile, ComPtr<ID3DBlob>& shaderBlob)
 	{
 		constexpr UINT compileFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 

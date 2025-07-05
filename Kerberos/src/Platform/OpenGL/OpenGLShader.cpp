@@ -194,6 +194,24 @@ namespace Kerberos
 		UploadUniformFloat(name + ".shininess", material->Shininess);
 	}
 
+	void OpenGLShader::SetDebugName(const std::string& name) const 
+	{
+		glObjectLabel(GL_PROGRAM, m_RendererID, -1, (name + "Shader Program").c_str());
+		/// The shaders are deleted after the program is created, so we can't label them.
+		//for (const auto& [stage, shaderId] : m_OpenGLShaderIDs)
+		//{
+		//	if (stage == GL_VERTEX_SHADER)
+		//		glObjectLabel(GL_SHADER, shaderId, -1, (name + "Vertex Shader").c_str());
+		//	else if (stage == GL_FRAGMENT_SHADER)
+		//		glObjectLabel(GL_SHADER, shaderId, -1, (name + "Fragment Shader").c_str());
+		//	else if (stage == GL_GEOMETRY_SHADER)
+		//		glObjectLabel(GL_SHADER, shaderId, -1, (name + "Geometry Shader").c_str());
+		//	else
+		//		KBR_CORE_ASSERT(false, "Unknown shader stage for OpenGL debug name!");
+		//}
+
+	}
+
 	void OpenGLShader::UploadUniformInt(const std::string& name, const int value) const
 	{
 		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
@@ -627,9 +645,11 @@ namespace Kerberos
 		for (auto&& [stage, spirv] : m_OpenGLSPIRV)
 		{
 			GLuint shaderID = shaderIDs.emplace_back(glCreateShader(stage));
-			glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t));
+			glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), static_cast<int>(spirv.size() * sizeof(uint32_t)));
 			glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
 			glAttachShader(program, shaderID);
+
+			m_OpenGLShaderIDs[stage] = shaderID;
 		}
 
 		glLinkProgram(program);
@@ -687,10 +707,11 @@ namespace Kerberos
 			const size_t memberCount = bufferType.member_types.size();
 			for (size_t i = 0; i < memberCount; ++i)
 			{
+				const uint32_t index = static_cast<uint32_t>(i);
 				const auto& memberType = compiler.get_type(bufferType.member_types[i]);
-				const std::string& memberName = compiler.get_member_name(bufferType.self, i);
-				size_t memberOffset = compiler.get_member_decoration(bufferType.self, i, spv::DecorationOffset);
-				size_t memberSize = compiler.get_declared_struct_member_size(bufferType, i);
+				const std::string& memberName = compiler.get_member_name(bufferType.self, index);
+				size_t memberOffset = compiler.get_member_decoration(bufferType.self, index, spv::DecorationOffset);
+				size_t memberSize = compiler.get_declared_struct_member_size(bufferType, index);
 
 				KBR_CORE_TRACE("        Member: {0}, Offset: {1}, DeclaredSize: {2}",
 					memberName, memberOffset, memberSize);

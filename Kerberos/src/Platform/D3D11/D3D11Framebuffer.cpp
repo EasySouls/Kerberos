@@ -314,6 +314,11 @@ namespace Kerberos
 		throw std::runtime_error("D3D11Framebuffer::GetDepthAttachmentRendererID is not implemented yet!");
     }
 
+	void D3D11Framebuffer::SetDebugName(const std::string& name) const 
+    {
+		// TODO: Implement setting debug name for D3D11 resources
+    }
+
 	void D3D11Framebuffer::ReleaseResources() const 
     {
         for (auto & rtv : m_ColorRTVs) if (rtv) rtv->Release();

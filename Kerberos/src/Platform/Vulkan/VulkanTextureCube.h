@@ -29,6 +29,8 @@ namespace Kerberos
 			return m_RendererID == dynamic_cast<const VulkanTextureCube&>(other).m_RendererID;
 		}
 
+		void SetDebugName(const std::string& name) override;
+
 	private:
 		RendererID m_RendererID;
 		std::string m_Name;
