@@ -41,6 +41,20 @@ namespace Kerberos
 		context->ClearRenderTargetView(rtv, glm::value_ptr(m_ClearColor));
 	}
 
+	void D3D11RendererAPI::ClearDepth() 
+	{
+		const auto context = D3D11Context::Get().GetImmediateContext();
+		ID3D11DepthStencilView* dsv = nullptr;
+		context->OMGetRenderTargets(0, nullptr, &dsv);
+		if (!dsv || !context)
+		{
+			KBR_CORE_ASSERT(false, "Depth stencil view or device context is null!");
+			return;
+		}
+		context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		dsv->Release();
+	}
+
 	void D3D11RendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
 		//const auto context = D3D11Context::Get().GetImmediateContext();

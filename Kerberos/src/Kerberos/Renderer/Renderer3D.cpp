@@ -194,6 +194,8 @@ namespace Kerberos
 
 		s_RendererData.ShadowMapFramebuffer = shadowMapFramebuffer;
 		shadowMapFramebuffer->Bind();
+
+		RenderCommand::ClearDepth();
 		//shadowMapFramebuffer->ClearDepthAttachment(0);
 
 		SetupShadowCamera(light, settings);
@@ -425,8 +427,9 @@ namespace Kerberos
 		constexpr float lightDistance = 20.0f;
 
 		/// TODO: Use light's direction
-		//const glm::vec3 lightPos = sceneCenter - glm::normalize(light.Direction) * lightDistance; /// Position light away from origin
-		constexpr glm::vec3 lightPos = glm::vec3(-38.0f, 13.224f, 6.62f);
+		const glm::vec3 lightPos = sceneCenter - glm::normalize(light.Direction) * lightDistance; /// Position light away from origin
+		KBR_CORE_INFO("Light Position: {0}, Light Direction: {1}", lightPos, light.Direction);
+		//constexpr glm::vec3 lightPos = glm::vec3(-38.0f, 13.224f, 6.62f);
 		constexpr glm::vec3 lightTarget = sceneCenter; /// Look at origin
 		constexpr glm::vec3 lightUp = glm::vec3(0.0f, 1.0f, 0.0f);
 

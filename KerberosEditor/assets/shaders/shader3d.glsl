@@ -253,8 +253,8 @@ void main()
         totalLighting += CalculatePointLight(u_PointLights[i], norm, v_FragPos_WorldSpace, viewDir, albedo);
     }
 
-    //color = vec4(totalLighting, alpha);
-    color = vec4(shadow, 0.0, 0.0, 1.0);
+    color = vec4(totalLighting, alpha);
+    //color = vec4(shadow, 0.0, 0.0, 1.0);
 
     color2 = u_EntityID;
 }

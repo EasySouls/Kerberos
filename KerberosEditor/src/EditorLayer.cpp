@@ -94,7 +94,7 @@ namespace Kerberos
 		m_SunlightEntity = m_ActiveScene->CreateEntity("Sun");
 		auto& sunlightComponent = m_SunlightEntity.AddComponent<DirectionalLightComponent>();
 		sunlightComponent.Light.Color = { 1.0f, 1.0f, 0.8f };
-		sunlightComponent.Light.Direction = { 123, 80, 130 };
+		sunlightComponent.Light.Direction = { 123, -230, 130 };
 
 		Entity pointLightEntity = m_ActiveScene->CreateEntity("Point Light");
 		auto& pointLightComponent = pointLightEntity.AddComponent<PointLightComponent>();
@@ -195,15 +195,15 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("Renderer Prep");
 
-			m_ActiveScene->GetEditorFramebuffer()->Bind();
+			//m_ActiveScene->GetEditorFramebuffer()->Bind();
 
-			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-			RenderCommand::Clear();
+			//RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+			//RenderCommand::Clear();
 
-			/// Clear our entity ID attachment to -1, so when rendering entities they fill that space with their entity ID,
-			/// and empty spacces will have -1, signaling that there is no entity.
-			/// Used for mouse picking.
-			m_ActiveScene->GetEditorFramebuffer()->ClearAttachment(1, -1);
+			///// Clear our entity ID attachment to -1, so when rendering entities they fill that space with their entity ID,
+			///// and empty spacces will have -1, signaling that there is no entity.
+			///// Used for mouse picking.
+			//m_ActiveScene->GetEditorFramebuffer()->ClearAttachment(1, -1);
 		}
 
 		{
@@ -378,6 +378,13 @@ namespace Kerberos
 		ImGui::Text("Position: (%.2f, %.2f, %.2f)", cameraPosition.x, cameraPosition.y, cameraPosition.z);
 		ImGui::Text("Rotation: (Pitch: %.2f, Yaw: %.2f)", m_EditorCamera.GetPitch(), m_EditorCamera.GetYaw());
 		ImGui::Text("Distance: %.2f", m_EditorCamera.GetDistance());
+
+		ImGui::Separator();
+
+		/// Render the shadow map texture
+		ImGui::Text("Shadow Map");
+		const uint64_t shadowMapTextureID = m_ActiveScene->GetShadowMapFramebuffer()->GetDepthAttachmentRendererID();
+		ImGui::Image(shadowMapTextureID, ImVec2{ 256, 256 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 		ImGui::End();
 

@@ -16,6 +16,7 @@ namespace Kerberos
 
 		static void SetClearColor(const glm::vec4& color) { s_RendererAPI->SetClearColor(color); }
 		static void Clear() { s_RendererAPI->Clear(); }
+		static void ClearDepth() { s_RendererAPI->ClearDepth(); }
 
 		static void SetDepthTest(const bool enabled) { s_RendererAPI->SetDepthTest(enabled); }
 		static void SetDepthFunc(const DepthFunc func) { s_RendererAPI->SetDepthFunc(func); }

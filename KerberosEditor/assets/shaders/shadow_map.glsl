@@ -35,5 +35,6 @@ void main()
 
 void main()
 {
-    // Depth is automatically written to gl_FragDepth
+    // Depth is automatically written to gl_FragDepth by the way
+	gl_FragDepth = gl_FragCoord.z;
 }

@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include "Kerberos/Assets/AssetManager.h"
+#include "Kerberos/Renderer/RenderCommand.h"
 
 #define USE_MAP_FOR_UUID 1
 
@@ -785,6 +786,16 @@ namespace Kerberos
 			}
 		}
 
+		m_EditorFramebuffer->Bind();
+
+		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		RenderCommand::Clear();
+
+		/// Clear our entity ID attachment to -1, so when rendering entities they fill that space with their entity ID,
+		/// and empty spacces will have -1, signaling that there is no entity.
+		/// Used for mouse picking.
+		m_EditorFramebuffer->ClearAttachment(1, -1);
+
 		Renderer3D::BeginGeometryPass(*mainCamera, mainCameraTransform, sun, pointLights, skyboxTexture);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
@@ -821,7 +832,7 @@ namespace Kerberos
 			shadowSettings.Resolution = 2048;
 			shadowSettings.OrthoSize = 15.0f;
 			shadowSettings.NearPlane = 1.0f;
-			shadowSettings.FarPlane = 10.0f;
+			shadowSettings.FarPlane = 100.0f;
 			shadowSettings.EnableShadows = true;
 
 			Renderer3D::BeginShadowPass(*sun, shadowSettings, m_ShadowMapFramebuffer);
@@ -868,6 +879,15 @@ namespace Kerberos
 		}
 
 		m_EditorFramebuffer->Bind();
+
+		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		RenderCommand::Clear();
+
+		/// Clear our entity ID attachment to -1, so when rendering entities they fill that space with their entity ID,
+		/// and empty spacces will have -1, signaling that there is no entity.
+		/// Used for mouse picking.
+		m_EditorFramebuffer->ClearAttachment(1, -1);
+
 		Renderer3D::BeginGeometryPass(camera, sun, pointLights, skyboxTexture);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
