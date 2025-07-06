@@ -177,6 +177,10 @@ namespace Kerberos
 	{
 		DirectionalLight Light;
 		bool IsEnabled = true;
+		bool CastShadows = true;
+
+		/// Used to update the light's shadow map only when necessary
+		bool NeedsUpdate = true; 
 
 		DirectionalLightComponent() = default;
 		explicit DirectionalLightComponent(const DirectionalLight& light)

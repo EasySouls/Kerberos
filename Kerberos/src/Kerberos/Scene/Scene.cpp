@@ -434,6 +434,7 @@ namespace Kerberos
 
 				/// Extract rotation quaternion from the transform matrix
 				glm::quat glmRotation = glm::quat_cast(glm::mat3(transform.WorldTransform));
+				glmRotation = glm::normalize(glmRotation); /// Ensure the quaternion is normalized
 				const JPH::Quat rotation = JPH::Quat(glmRotation.x, glmRotation.y, glmRotation.z, glmRotation.w);
 
 				JPH::BodyCreationSettings bodySettings(shape, position, rotation, GetBodyTypeFromComponent(rigidBody.Type), GetObjectLayerFromComponent(rigidBody.Type));
@@ -751,19 +752,19 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		const DirectionalLight* sun = nullptr;
+		DirectionalLightComponent* dlc = nullptr;
 		const auto sunView = m_Registry.view<DirectionalLightComponent, TransformComponent>();
 		for (const auto entity : sunView)
 		{
 			auto [light, transform] = sunView.get<DirectionalLightComponent, TransformComponent>(entity);
 			if (light.IsEnabled)
 			{
-				sun = &light.Light;
+				dlc = &light;
 				break;
 			}
 		}
 
-		if (m_EnableShadowMapping && sun)
+		if (ShouldRenderShadows(dlc))
 		{
 			ShadowMapSettings shadowSettings;
 			shadowSettings.Resolution = 1024;
@@ -772,7 +773,7 @@ namespace Kerberos
 			shadowSettings.FarPlane = 100.0f;
 			shadowSettings.EnableShadows = true;
 
-			Renderer3D::BeginShadowPass(*sun, shadowSettings, m_ShadowMapFramebuffer);
+			Renderer3D::BeginShadowPass(dlc->Light, shadowSettings, m_ShadowMapFramebuffer);
 
 			/// Render all shadow-casting meshes
 			const auto meshView = m_Registry.view<StaticMeshComponent, TransformComponent>();
@@ -788,6 +789,8 @@ namespace Kerberos
 						static_cast<int>(entity), meshComp.CastShadows);
 				}
 			}
+
+			dlc->NeedsUpdate = false;
 
 			Renderer3D::EndPass();
 		}
@@ -825,7 +828,7 @@ namespace Kerberos
 		/// Used for mouse picking.
 		m_EditorFramebuffer->ClearAttachment(1, -1);
 
-		Renderer3D::BeginGeometryPass(*mainCamera, mainCameraTransform, sun, pointLights, skyboxTexture);
+		Renderer3D::BeginGeometryPass(*mainCamera, mainCameraTransform, &dlc->Light, pointLights, skyboxTexture);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
 		for (const auto entity : view)
@@ -843,19 +846,19 @@ namespace Kerberos
 
 	void Scene::Render3DEditor(const EditorCamera& camera)
 	{
-		const DirectionalLight* sun = nullptr;
+		DirectionalLightComponent* dlc = nullptr;
 		const auto sunView = m_Registry.view<DirectionalLightComponent, TransformComponent>();
 		for (const auto entity : sunView)
 		{
 			auto [light, transform] = sunView.get<DirectionalLightComponent, TransformComponent>(entity);
 			if (light.IsEnabled)
 			{
-				sun = &light.Light;
+				dlc = &light;
 				break;
 			}
 		}
 
-		if (m_EnableShadowMapping && sun)
+		if (ShouldRenderShadows(dlc))
 		{
 			ShadowMapSettings shadowSettings;
 			shadowSettings.Resolution = 1024;
@@ -864,7 +867,7 @@ namespace Kerberos
 			shadowSettings.FarPlane = 100.0f;
 			shadowSettings.EnableShadows = true;
 
-			Renderer3D::BeginShadowPass(*sun, shadowSettings, m_ShadowMapFramebuffer);
+			Renderer3D::BeginShadowPass(dlc->Light, shadowSettings, m_ShadowMapFramebuffer);
 
 			/// Render all shadow-casting meshes
 			const auto meshView = m_Registry.view<StaticMeshComponent, TransformComponent>();
@@ -880,6 +883,8 @@ namespace Kerberos
 						static_cast<int>(entity), meshComp.CastShadows);
 				}
 			}
+
+			dlc->NeedsUpdate = false;
 
 			Renderer3D::EndPass();
 		}
@@ -917,7 +922,7 @@ namespace Kerberos
 		/// Used for mouse picking.
 		m_EditorFramebuffer->ClearAttachment(1, -1);
 
-		Renderer3D::BeginGeometryPass(camera, sun, pointLights, skyboxTexture);
+		Renderer3D::BeginGeometryPass(camera, &dlc->Light, pointLights, skyboxTexture);
 
 		const auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
 		for (const auto entity : view)
@@ -944,6 +949,11 @@ namespace Kerberos
 		{
 			UpdateChildTransforms(child, tsc.WorldTransform);
 		}
+	}
+
+	bool Scene::ShouldRenderShadows(const DirectionalLightComponent* dlc) const 
+	{
+		return m_EnableShadowMapping && dlc && dlc->IsEnabled && dlc->CastShadows && dlc->NeedsUpdate;
 	}
 
 	Entity Scene::GetPrimaryCameraEntity()

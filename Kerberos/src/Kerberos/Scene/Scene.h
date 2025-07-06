@@ -8,6 +8,7 @@
 #include <entt.hpp>
 #include <set>
 
+#include "Components.h"
 #include "Kerberos/Renderer/Framebuffer.h"
 
 namespace JPH
@@ -87,6 +88,8 @@ namespace Kerberos
 		void Render3DEditor(const EditorCamera& camera);
 
 		void UpdateChildTransforms(Entity parent, const glm::mat4& parentTransform);
+
+		bool ShouldRenderShadows(const DirectionalLightComponent* dlc) const;
 
 	private:
 		entt::registry m_Registry;

@@ -9,7 +9,8 @@
 
 #ifdef KBR_DEBUG
 	#define KBR_ENABLE_ASSERTS
-	#define KBR_PROFILE
+/// For the testing and profiling purposes, we do not need profiling to files.
+	//#define KBR_PROFILE
 #endif
 
 #ifdef KBR_ENABLE_ASSERTS

@@ -144,8 +144,8 @@ namespace Kerberos
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
-		//const Model backpackModel = Model("assets/models/backpack/backpack.obj", "Backpack");
-		//backpackModel.InitEntities(m_ActiveScene);
+		/*const Model backpackModel = Model("assets/models/backpack/backpack.obj", "Backpack");
+		backpackModel.InitEntities(m_ActiveScene);*/
 
 		/*Model deerModel = Model("assets/models/deer_demo/scene.gltf", "Deer");
 		deerModel.InitEntities(m_ActiveScene);*/
