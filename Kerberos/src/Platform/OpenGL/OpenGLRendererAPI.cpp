@@ -5,11 +5,11 @@
 
 namespace Kerberos
 {
-	void OpenGLMessageCallback(
+	static void OpenGLMessageCallback(
 		unsigned source,
 		unsigned type,
 		unsigned id,
-		unsigned severity,
+		const unsigned severity,
 		int length,
 		const char* message,
 		const void* userParam)
@@ -20,9 +20,8 @@ namespace Kerberos
 		case GL_DEBUG_SEVERITY_MEDIUM:       KBR_CORE_ERROR(message); return;
 		case GL_DEBUG_SEVERITY_LOW:          KBR_CORE_WARN(message); return;
 		case GL_DEBUG_SEVERITY_NOTIFICATION: KBR_CORE_TRACE(message); return;
+		default: KBR_CORE_ASSERT(false, "Unknown severity level!");
 		}
-
-		KBR_CORE_ASSERT(false, "Unknown severity level!");
 	}
 
 	void OpenGLRendererAPI::Init() 
@@ -36,17 +35,19 @@ namespace Kerberos
 	#endif
 
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0f, 1.0f);
+		/*glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(1.0f, 1.0f);*/
 		//glEnable(GL_LINE_SMOOTH);
 
-		//glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CCW);
+		/*glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);*/
 
 		/*glEnable(GL_FRAMEBUFFER_SRGB);*/
 	}
@@ -65,6 +66,11 @@ namespace Kerberos
 	void OpenGLRendererAPI::Clear()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	void OpenGLRendererAPI::ClearDepth() 
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 
 	void OpenGLRendererAPI::SetDepthTest(const bool enabled) 

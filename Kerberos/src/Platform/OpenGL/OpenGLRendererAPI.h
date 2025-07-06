@@ -13,6 +13,7 @@ namespace Kerberos
 
 		void SetClearColor(const glm::vec4& color) override;
 		void Clear() override;
+		void ClearDepth() override;
 
 		void SetDepthTest(bool enabled) override;
 		void SetDepthFunc(DepthFunc func) override;

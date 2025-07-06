@@ -30,6 +30,8 @@ namespace Kerberos
 
 		void SetMaterial(const std::string& name, const Ref<Material>& material) override;
 
+		void SetDebugName(const std::string& name) const override;
+
 	private:
 		static std::string ReadFile(const std::string& filepath);
 		static std::unordered_map<unsigned int, std::string> Preprocess(const std::string& shaderSource);
@@ -58,6 +60,7 @@ namespace Kerberos
 
 		std::unordered_map<GLenum, std::vector<uint32_t>> m_VulkanSPIRV;
 		std::unordered_map<GLenum, std::vector<uint32_t>> m_OpenGLSPIRV;
+		std::unordered_map<GLenum, uint32_t> m_OpenGLShaderIDs;
 
 		std::unordered_map<GLenum, std::string> m_OpenGLSourceCode;
 	};

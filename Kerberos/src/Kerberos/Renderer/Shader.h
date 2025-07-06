@@ -28,6 +28,8 @@ namespace Kerberos
 
 		virtual const std::string& GetName() const = 0;
 
+		virtual void SetDebugName(const std::string& name) const = 0;
+
 		template<typename T>
 		T& As()
 		{

@@ -39,6 +39,7 @@ namespace Kerberos
 		frameBufferSpec.Height = 256;
 		frameBufferSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
 		m_CubemapFramebuffer = Framebuffer::Create(frameBufferSpec);
+		m_CubemapFramebuffer->SetDebugName("Depth Map Visualization");
 	}
 
 	void HierarchyPanel::OnImGuiRender()
@@ -330,9 +331,9 @@ namespace Kerberos
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
 				const auto onValueChanged = [&entity, this]()
-				{
-					m_Context->CalculateEntityTransform(entity);
-				};
+					{
+						m_Context->CalculateEntityTransform(entity);
+					};
 
 				DrawVec3Control("Position", transform.Translation, 0.0f, 80.0f, onValueChanged);
 				DrawVec3Control("Rotation", transform.Rotation, 0.0f, 80.0f, onValueChanged);
@@ -507,9 +508,16 @@ namespace Kerberos
 			{
 				auto& directionalLight = entity.GetComponent<DirectionalLightComponent>();
 				ImGui::ColorEdit3("Color", &directionalLight.Light.Color[0]);
-				ImGui::DragFloat("Intensity", &directionalLight.Light.Intensity, 0.01f, 0.0f, 10.0f);
-				DrawVec3Control("Direction", directionalLight.Light.Direction);
+				if (ImGui::DragFloat("Intensity", &directionalLight.Light.Intensity, 0.01f, 0.0f, 10.0f))
+				{
+					directionalLight.NeedsUpdate = true;
+				}
+				DrawVec3Control("Direction", directionalLight.Light.Direction, 0.0f, 80.0f, [&directionalLight]()
+					{
+						directionalLight.NeedsUpdate = true;
+					});
 				ImGui::Checkbox("Enabled", &directionalLight.IsEnabled);
+				ImGui::Checkbox("Cast Shadows", &directionalLight.CastShadows);
 
 				ImGui::TreePop();
 			}
@@ -855,6 +863,7 @@ namespace Kerberos
 				ImGui::Checkbox("Skybox Enabled", &environment.IsSkyboxEnabled);
 
 				/// Render the environment cubemap into an image
+				ImGui::Text("Skybox Texture");
 				const uint64_t textureID = m_CubemapFramebuffer->GetColorAttachmentRendererID();
 				ImGui::Image(textureID, ImVec2{ 256, 256 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
@@ -874,8 +883,8 @@ namespace Kerberos
 						environment.SkyboxTexture = handle;
 
 						/// render the changed cube into the environment
-						m_CubemapFramebuffer->Bind();
-						m_CubemapFramebuffer->Unbind();
+						/*m_CubemapFramebuffer->Bind();
+						m_CubemapFramebuffer->Unbind();*/
 					}
 					ImGui::EndDragDropTarget();
 				}

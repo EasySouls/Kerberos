@@ -11,6 +11,7 @@ namespace Kerberos
 		{
 			switch (format)
 			{
+			case FramebufferTextureFormat::DEPTH24:
 			case FramebufferTextureFormat::DEPTH24STENCIL8:
 				return true;
 			case FramebufferTextureFormat::None:
@@ -214,6 +215,11 @@ namespace Kerberos
 					Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
 					break;
 				}
+				case FramebufferTextureFormat::DEPTH24:
+				{
+					Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH_COMPONENT24, GL_DEPTH_ATTACHMENT, m_Specification.Width, m_Specification.Height);
+					break;
+				}
 				default:
 					KBR_CORE_ASSERT(false, "Unknown framebuffer texture format!");
 			}
@@ -230,7 +236,7 @@ namespace Kerberos
 		{
 			/// If this framebuffer is only used for a depth pass
 			glDrawBuffer(GL_NONE);
-			//glReadBuffer(GL_NONE);
+			glReadBuffer(GL_NONE);
 		}
 
 		/// This is not used anymore, but kept for reference
@@ -294,7 +300,7 @@ namespace Kerberos
 		Invalidate();
 	}
 
-	int OpenGLFramebuffer::ReadPixel(const uint32_t attachmentIndex, int x, int y) 
+	int OpenGLFramebuffer::ReadPixel(const uint32_t attachmentIndex, const int x, const int y) 
 	{
 		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmenIndex is out of bounds");
 
@@ -305,6 +311,20 @@ namespace Kerberos
 		return pixelData;
 	}
 
+	void OpenGLFramebuffer::BindColorTexture(const uint32_t slot, const uint32_t index) const 
+	{
+		KBR_PROFILE_FUNCTION();
+		KBR_CORE_ASSERT(index < m_ColorAttachments.size(), "Index out of bounds!");
+		glBindTextureUnit(slot, m_ColorAttachments[index]);
+	}
+
+	void OpenGLFramebuffer::BindDepthTexture(const uint32_t slot) const 
+	{
+		KBR_PROFILE_FUNCTION();
+		KBR_CORE_ASSERT(m_DepthAttachment != 0, "Depth attachment is not set!");
+		glBindTextureUnit(slot, m_DepthAttachment);
+	}
+
 	void OpenGLFramebuffer::ClearAttachment(const uint32_t attachmentIndex, const int value) 
 	{
 		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmenIndex is out of bounds");
@@ -312,5 +332,37 @@ namespace Kerberos
 		const auto& spec = m_ColorAttachmentSpecs[attachmentIndex];
 
 		glClearTexImage(m_ColorAttachments[attachmentIndex], 0, Utils::ToGLFormat(spec.TextureFormat), GL_INT, &value);
+	}
+
+	void OpenGLFramebuffer::ClearDepthAttachment(const float value) const 
+	{
+		KBR_CORE_ASSERT(m_DepthAttachment != 0, "Depth attachment is not set!");
+
+		glClearTexImage(m_DepthAttachment, 0, GL_DEPTH_COMPONENT, GL_FLOAT, &value);
+		//glClearBufferfi(GL_DEPTH_STENCIL, 0, value, 0);
+		//glClearDepth(value);
+
+		//KBR_CORE_ASSERT(glGetError() == GL_NO_ERROR, "Failed to clear depth attachment!");
+	}
+
+	void OpenGLFramebuffer::SetDebugName(const std::string& name) const 
+	{
+		KBR_PROFILE_FUNCTION();
+
+		if (m_RendererID)
+		{
+			glObjectLabel(GL_FRAMEBUFFER, m_RendererID, -1, name.c_str());
+		}
+		for (size_t i = 0; i < m_ColorAttachments.size(); ++i)
+		{
+			const auto colorAttachment = m_ColorAttachments[i];
+			const std::string colorAttachmentName = name + " Color Attachment " + std::to_string(i);
+			glObjectLabel(GL_TEXTURE, colorAttachment, -1, colorAttachmentName.c_str());
+		}
+		if (m_DepthAttachment)
+		{
+			const std::string depthAttachmentName = name + " Depth Attachment";
+			glObjectLabel(GL_TEXTURE, m_DepthAttachment, -1, depthAttachmentName.c_str());
+		}
 	}
 }

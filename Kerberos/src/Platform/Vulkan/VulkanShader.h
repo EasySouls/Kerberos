@@ -28,6 +28,8 @@ namespace Kerberos
 		void SetMat4(const std::string& name, const glm::mat4& value) override;
 		void SetMaterial(const std::string& name, const Ref<Material>& material) override;
 
+		void SetDebugName(const std::string& name) const override;
+
 		std::unordered_map<VkShaderStageFlagBits, VkShaderModule>& GetShaderModules() { return m_ShaderModules; }
 		std::unordered_map<VkShaderStageFlagBits, VkPipelineShaderStageCreateInfo>& GetPipelineShaderStageCreateInfos() { return m_PipelineShaderStageCreateInfos; }
 		const std::vector<VkDescriptorSetLayout>& GetDescriptorSetLayouts() const { return m_DescriptorSetLayouts; }

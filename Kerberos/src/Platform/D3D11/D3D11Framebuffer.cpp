@@ -283,7 +283,14 @@ namespace Kerberos
         return -1;
     }
 
+	void D3D11Framebuffer::BindColorTexture(uint32_t slot, uint32_t index) const {}
+	void D3D11Framebuffer::BindDepthTexture(uint32_t slot) const {}
+
 	void D3D11Framebuffer::ClearAttachment(uint32_t attachmentIndex, int value) 
+    {
+    }
+
+	void D3D11Framebuffer::ClearDepthAttachment(float value) const 
     {
     }
 
@@ -301,6 +308,16 @@ namespace Kerberos
         KBR_CORE_ASSERT(index < m_ColorSRVs.size(), "SRV index out of bounds!");
         return reinterpret_cast<uint64_t>(m_ColorSRVs[index].Get());
 	}
+
+	uint64_t D3D11Framebuffer::GetDepthAttachmentRendererID() const 
+    {
+		throw std::runtime_error("D3D11Framebuffer::GetDepthAttachmentRendererID is not implemented yet!");
+    }
+
+	void D3D11Framebuffer::SetDebugName(const std::string& name) const 
+    {
+		// TODO: Implement setting debug name for D3D11 resources
+    }
 
 	void D3D11Framebuffer::ReleaseResources() const 
     {

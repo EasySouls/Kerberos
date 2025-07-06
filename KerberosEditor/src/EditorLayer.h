@@ -47,7 +47,6 @@ namespace Kerberos
 
 	private:
 		OrthographicCameraController m_CameraController;
-		Ref<Framebuffer> m_Framebuffer;
 
 		EditorCamera m_EditorCamera;
 

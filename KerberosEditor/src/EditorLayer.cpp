@@ -23,22 +23,20 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		FramebufferSpecification frameBufferSpec;
-		frameBufferSpec.Width = 1280;
-		frameBufferSpec.Height = 720;
-		frameBufferSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
-		m_Framebuffer = Framebuffer::Create(frameBufferSpec);
-
 		m_ActiveScene = CreateRef<Scene>();
 
 		/// TODO: Open the project passed as command line argument, if there is one
-
+#define TESTING 1
+#if TESTING
+		OpenProject(R"(C:\Development\Kerberos\KerberosEditor\World3D.kbrproj)");
+#else
 		if (!OpenProject())
 		{
 			NewProject();
 		}
+#endif
 
-		m_EditorCamera = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
+		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 		m_ViewportSize = { 1280.0f, 720.0f };
 
@@ -54,6 +52,8 @@ namespace Kerberos
 		m_TextureDirt = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 6, 11 }, { 128, 128 }, { 1, 1 });
 		m_TextureWater = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128, 128 }, { 1, 1 });
 
+#define FIRST_TIME_LOADING_SCENE 1
+#if FIRST_TIME_LOADING_SCENE
 		Entity squareEntity = m_ActiveScene->CreateEntity("Square");
 		squareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
 
@@ -77,13 +77,24 @@ namespace Kerberos
 			sphereEntity.GetComponent<TransformComponent>().Translation = { 2.0f, 1.2f, -2.0f };
 		}
 
+		//{
+		//	Entity planeEntity = m_ActiveScene->CreateEntity("Plane");
+		//	const Ref<Mesh> planeMesh = Mesh::CreatePlane(10.0f, 10.0f);
+		//	planeEntity.AddComponent<StaticMeshComponent>(planeMesh, whiteMaterial, nullptr);
+		//	planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, -1.0f, 0.0f };
+		//	planeEntity.AddComponent<RigidBody3DComponent>().Type = RigidBody3DComponent::BodyType::Static;
+		//	planeEntity.AddComponent<BoxCollider3DComponent>().Size = { 10.f, 0.1f, 10.f };
+		//}
+
 		{
-			Entity planeEntity = m_ActiveScene->CreateEntity("Plane");
-			const Ref<Mesh> planeMesh = Mesh::CreatePlane(10.0f, 10.0f);
-			planeEntity.AddComponent<StaticMeshComponent>(planeMesh, whiteMaterial, nullptr);
-			planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, -1.0f, 0.0f };
-			planeEntity.AddComponent<RigidBody3DComponent>().Type = RigidBody3DComponent::BodyType::Static;
-			planeEntity.AddComponent<BoxCollider3DComponent>().Size = { 10.f, 0.1f, 10.f };
+			Entity groundEntity = m_ActiveScene->CreateEntity("Ground");
+			const Ref<Mesh> groundMesh = Mesh::CreateCube(1.0f);
+			groundEntity.AddComponent<StaticMeshComponent>(groundMesh, whiteMaterial, nullptr);
+			auto& transform = groundEntity.GetComponent<TransformComponent>();
+			transform.Translation = { 0.0f, -2.0f, 0.0f };
+			transform.Scale = { 25.0f, 0.2f, 25.0f };
+			groundEntity.AddComponent<RigidBody3DComponent>().Type = RigidBody3DComponent::BodyType::Static;
+			groundEntity.AddComponent<BoxCollider3DComponent>().Size = { 25.0f, 0.2f, 25.f };
 		}
 
 		{
@@ -94,22 +105,20 @@ namespace Kerberos
 		m_SunlightEntity = m_ActiveScene->CreateEntity("Sun");
 		auto& sunlightComponent = m_SunlightEntity.AddComponent<DirectionalLightComponent>();
 		sunlightComponent.Light.Color = { 1.0f, 1.0f, 0.8f };
-		sunlightComponent.Light.Direction = { 123, 80, 130 };
+		sunlightComponent.Light.Direction = { 123, -230, 130 };
 
 		Entity pointLightEntity = m_ActiveScene->CreateEntity("Point Light");
 		auto& pointLightComponent = pointLightEntity.AddComponent<PointLightComponent>();
 		pointLightComponent.Light.Color = { 0.8f, 0.2f, 0.2f };
 		pointLightComponent.Light.Position = { 0.9f, 4.1f, 3.9f };
+		pointLightComponent.IsEnabled = false;
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
 		auto& cameraComponent = m_CameraEntity.AddComponent<CameraComponent>();
 		cameraComponent.Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
 		auto& cameraTransformComponent = m_CameraEntity.GetComponent<TransformComponent>();
 		cameraTransformComponent.Translation = { 0.0f, 0.0f, 5.0f };
-
-		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
-		auto& secondCameraComponent = m_SecondCamera.AddComponent<CameraComponent>();
-		secondCameraComponent.IsPrimary = false;
+#endif
 
 		class CameraController : public ScriptableEntity
 		{
@@ -130,12 +139,13 @@ namespace Kerberos
 			}
 		};
 
+		m_CameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
-		Model backpackModel = Model("assets/models/backpack/backpack.obj", "Backpack");
-		backpackModel.InitEntities(m_ActiveScene);
+		/*const Model backpackModel = Model("assets/models/backpack/backpack.obj", "Backpack");
+		backpackModel.InitEntities(m_ActiveScene);*/
 
 		/*Model deerModel = Model("assets/models/deer_demo/scene.gltf", "Deer");
 		deerModel.InitEntities(m_ActiveScene);*/
@@ -161,11 +171,11 @@ namespace Kerberos
 		Timer timer("EditorLayer::OnUpdate", [&](const ProfileResult profileResult) { m_ProfileResults.push_back(profileResult); });
 
 		/// Resize the camera if needed
-		if (const FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+		if (const FramebufferSpecification spec = m_ActiveScene->GetEditorFramebuffer()->GetSpecification();
 			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
 			(spec.Width != static_cast<uint32_t>(m_ViewportSize.x) || spec.Height != static_cast<uint32_t>(m_ViewportSize.y)))
 		{
-			m_Framebuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+			m_ActiveScene->GetEditorFramebuffer()->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
 			//m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 
@@ -196,15 +206,15 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("Renderer Prep");
 
-			m_Framebuffer->Bind();
+			//m_ActiveScene->GetEditorFramebuffer()->Bind();
 
-			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-			RenderCommand::Clear();
+			//RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+			//RenderCommand::Clear();
 
-			/// Clear our entity ID attachment to -1, so when rendering entities they fill that space with their entity ID,
-			/// and empty spacces will have -1, signaling that there is no entity.
-			/// Used for mouse picking.
-			m_Framebuffer->ClearAttachment(1, -1);
+			///// Clear our entity ID attachment to -1, so when rendering entities they fill that space with their entity ID,
+			///// and empty spacces will have -1, signaling that there is no entity.
+			///// Used for mouse picking.
+			//m_ActiveScene->GetEditorFramebuffer()->ClearAttachment(1, -1);
 		}
 
 		{
@@ -236,7 +246,7 @@ namespace Kerberos
 
 			if (mouseX >= 0 && mouseY >= 0 && mouseX <= static_cast<int>(viewportSize.x) && mouseY <= static_cast<int>(viewportSize.y))
 			{
-				int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+				int pixelData = m_ActiveScene->GetEditorFramebuffer()->ReadPixel(1, mouseX, mouseY);
 
 				if (pixelData < 0)
 				{
@@ -249,7 +259,7 @@ namespace Kerberos
 			}
 		}
 
-		m_Framebuffer->Unbind();
+		m_ActiveScene->GetEditorFramebuffer()->Unbind();
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -380,6 +390,13 @@ namespace Kerberos
 		ImGui::Text("Rotation: (Pitch: %.2f, Yaw: %.2f)", m_EditorCamera.GetPitch(), m_EditorCamera.GetYaw());
 		ImGui::Text("Distance: %.2f", m_EditorCamera.GetDistance());
 
+		ImGui::Separator();
+
+		/// Render the shadow map texture
+		ImGui::Text("Shadow Map");
+		const uint64_t shadowMapTextureID = m_ActiveScene->GetShadowMapFramebuffer()->GetDepthAttachmentRendererID();
+		ImGui::Image(shadowMapTextureID, ImVec2{ 256, 256 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
 		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -396,7 +413,7 @@ namespace Kerberos
 		m_ViewportSize = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
 
 		/// Render the viewport into an image
-		const uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+		const uint64_t textureID = m_ActiveScene->GetEditorFramebuffer()->GetColorAttachmentRendererID();
 		ImGui::Image(textureID, ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 		HandleDragAndDrop();

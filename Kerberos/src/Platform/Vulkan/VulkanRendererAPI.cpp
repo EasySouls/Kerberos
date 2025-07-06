@@ -81,6 +81,14 @@ namespace Kerberos
 		//vkEndCommandBuffer(commandBuffer);
 	}
 
+	void VulkanRendererAPI::ClearDepth() 
+	{
+
+		const VkCommandBuffer commandBuffer = VulkanContext::Get().GetOneTimeCommandBuffer();
+		
+		/// TODO: Implement clearing depth buffer in Vulkan
+	}
+
 	void VulkanRendererAPI::SetDepthTest(bool enabled) 
 	{
 		throw std::runtime_error("Depth test not implemented in VulkanRendererAPI yet!");

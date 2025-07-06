@@ -12,7 +12,7 @@ namespace Kerberos
 
 	class D3D11Texture2D final : public Texture2D
 	{
-	using RendererID = uint64_t;
+		using RendererID = uint64_t;
 
 	public:
 		explicit D3D11Texture2D(const std::string& path);
@@ -34,7 +34,9 @@ namespace Kerberos
 			return m_RendererID == dynamic_cast<const D3D11Texture2D&>(other).m_RendererID;
 		}
 
-private:
+		void SetDebugName(const std::string& name) const override;
+
+	private:
 		std::string m_Path;
 		TextureSpecification m_Spec;
 		RendererID m_RendererID;

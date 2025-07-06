@@ -29,6 +29,8 @@ namespace Kerberos
 			return m_RendererID == dynamic_cast<const D3D11TextureCube&>(other).m_RendererID;
 		}
 
+		void SetDebugName(const std::string& name) const override;
+
 	private:
 		RendererID m_RendererID;
 		std::string m_Name;

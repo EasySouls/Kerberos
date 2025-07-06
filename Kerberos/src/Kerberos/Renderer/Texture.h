@@ -41,6 +41,8 @@ namespace Kerberos
 
 		virtual bool operator==(const Texture& other) const = 0;
 
+		virtual void SetDebugName(const std::string& name) const = 0;
+
 		template<typename T>
 		T& As()
 		{

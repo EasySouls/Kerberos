@@ -194,6 +194,24 @@ namespace Kerberos
 		UploadUniformFloat(name + ".shininess", material->Shininess);
 	}
 
+	void OpenGLShader::SetDebugName(const std::string& name) const 
+	{
+		glObjectLabel(GL_PROGRAM, m_RendererID, -1, (name + "Shader Program").c_str());
+		/// The shaders are deleted after the program is created, so we can't label them.
+		//for (const auto& [stage, shaderId] : m_OpenGLShaderIDs)
+		//{
+		//	if (stage == GL_VERTEX_SHADER)
+		//		glObjectLabel(GL_SHADER, shaderId, -1, (name + "Vertex Shader").c_str());
+		//	else if (stage == GL_FRAGMENT_SHADER)
+		//		glObjectLabel(GL_SHADER, shaderId, -1, (name + "Fragment Shader").c_str());
+		//	else if (stage == GL_GEOMETRY_SHADER)
+		//		glObjectLabel(GL_SHADER, shaderId, -1, (name + "Geometry Shader").c_str());
+		//	else
+		//		KBR_CORE_ASSERT(false, "Unknown shader stage for OpenGL debug name!");
+		//}
+
+	}
+
 	void OpenGLShader::UploadUniformInt(const std::string& name, const int value) const
 	{
 		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
@@ -381,26 +399,81 @@ namespace Kerberos
 
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
 
+		/// Get source file modification time
+		std::filesystem::file_time_type sourceModTime{};
+		if (!m_FilePath.empty() && std::filesystem::exists(m_FilePath))
+		{
+			sourceModTime = std::filesystem::last_write_time(m_FilePath);
+		}
+
 		auto& shaderData = m_VulkanSPIRV;
 		shaderData.clear();
+
 		for (auto&& [stage, source] : shaderSources)
 		{
 			std::filesystem::path shaderFilePath = m_FilePath;
 			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedVulkanFileExtension(stage));
 
-			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
-			if (in.is_open())
-			{
-				in.seekg(0, std::ios::end);
-				auto size = in.tellg();
-				in.seekg(0, std::ios::beg);
+			bool needsCompilation = true;
 
-				auto& data = shaderData[stage];
-				data.resize(size / sizeof(uint32_t));
-				in.read(reinterpret_cast<char*>(data.data()), size);
+			/// Check if cached file exists and is newer than source
+			if (std::filesystem::exists(cachedPath))
+			{
+				auto cacheModTime = std::filesystem::last_write_time(cachedPath);
+
+				/// If source file exists and cache is newer than source, we can use cache
+				if (!m_FilePath.empty() && std::filesystem::exists(m_FilePath))
+				{
+					needsCompilation = sourceModTime > cacheModTime;
+
+					if (!needsCompilation)
+					{
+						KBR_CORE_TRACE("Using cached SPIR-V for stage {0}: {1}", Utils::GLShaderStageToString(stage), cachedPath.string());
+					}
+					else
+					{
+						KBR_CORE_TRACE("Source newer than cache for stage {0}, recompiling: {1}", Utils::GLShaderStageToString(stage), cachedPath.string());
+					}
+				}
+				else
+				{
+					// If no source file (e.g., shader created from strings), always use cache if available
+					needsCompilation = false;
+					KBR_CORE_TRACE("Using cached SPIR-V (no source file) for stage {0}: {1}", Utils::GLShaderStageToString(stage), cachedPath.string());
+				}
 			}
 			else
 			{
+				KBR_CORE_TRACE("No cache found for stage {0}, compiling: {1}", Utils::GLShaderStageToString(stage), cachedPath.string());
+			}
+
+			if (!needsCompilation)
+			{
+				/// Load from cache
+				std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
+				if (in.is_open())
+				{
+					in.seekg(0, std::ios::end);
+					auto size = in.tellg();
+					in.seekg(0, std::ios::beg);
+
+					auto& data = shaderData[stage];
+					data.resize(size / sizeof(uint32_t));
+					in.read(reinterpret_cast<char*>(data.data()), size);
+					in.close();
+				}
+				else
+				{
+					KBR_CORE_WARN("Failed to read cached SPIR-V file: {0}, will recompile", cachedPath.string());
+					needsCompilation = true;
+				}
+			}
+
+			if (needsCompilation)
+			{
+				/// Compile from source
+				KBR_CORE_TRACE("Compiling SPIR-V for stage {0}", Utils::GLShaderStageToString(stage));
+
 				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str(), options);
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
 				{
@@ -412,6 +485,7 @@ namespace Kerberos
 
 				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
 
+				/// Save to cache
 				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
 				if (out.is_open())
 				{
@@ -419,6 +493,12 @@ namespace Kerberos
 					out.write(reinterpret_cast<char*>(data.data()), data.size() * sizeof(uint32_t));
 					out.flush();
 					out.close();
+
+					KBR_CORE_TRACE("Saved compiled SPIR-V to cache: {0}", cachedPath.string());
+				}
+				else
+				{
+					KBR_CORE_WARN("Failed to write SPIR-V cache file: {0}", cachedPath.string());
 				}
 			}
 		}
@@ -445,32 +525,82 @@ namespace Kerberos
 
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
 
+		/// Get source file modification time
+		std::filesystem::file_time_type sourceModTime{};
+		if (!m_FilePath.empty() && std::filesystem::exists(m_FilePath))
+		{
+			sourceModTime = std::filesystem::last_write_time(m_FilePath);
+		}
+
 		shaderData.clear();
 		m_OpenGLSourceCode.clear();
+
 		for (auto&& [stage, spirv] : m_VulkanSPIRV)
 		{
 			std::filesystem::path shaderFilePath = m_FilePath;
 			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedOpenGLFileExtension(stage));
 
-			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
-			if (in.is_open())
-			{
-				in.seekg(0, std::ios::end);
-				auto size = in.tellg();
-				in.seekg(0, std::ios::beg);
+			bool needsRecompile = true;
 
-				auto& data = shaderData[stage];
-				data.resize(size / sizeof(uint32_t));
-				in.read(reinterpret_cast<char*>(data.data()), size);
+			/// Check if cached file exists and is newer than source
+			if (std::filesystem::exists(cachedPath))
+			{
+				auto cacheModTime = std::filesystem::last_write_time(cachedPath);
+
+				/// If source file exists and cache is newer than source, we can use cache
+				if (!m_FilePath.empty() && std::filesystem::exists(m_FilePath))
+				{
+					needsRecompile = sourceModTime > cacheModTime;
+
+					if (!needsRecompile)
+					{
+						KBR_CORE_TRACE("Using cached OpenGL SPIR-V for stage {0}: {1}", Utils::GLShaderStageToString(stage), cachedPath.string());
+					}
+					else
+					{
+						KBR_CORE_TRACE("Source newer than OpenGL cache for stage {0}, recompiling: {1}", Utils::GLShaderStageToString(stage), cachedPath.string());
+					}
+				}
+				else
+				{
+					/// If no source file, always use cache if available
+					needsRecompile = false;
+					KBR_CORE_TRACE("Using cached OpenGL SPIR-V (no source file) for stage {0}: {1}", Utils::GLShaderStageToString(stage), cachedPath.string());
+				}
 			}
 			else
 			{
-				spirv_cross::CompilerGLSL glslCompiler(spirv);
-				/*spirv_cross::CompilerGLSL::Options glslOptions = glslCompiler.get_common_options();
-				glslOptions.emit_push_constant_as_uniform_buffer = false;
-				glslOptions.vulkan_semantics = false;
-				glslCompiler.set_common_options(glslOptions);*/
+				KBR_CORE_TRACE("No OpenGL cache found for stage {0}, compiling: {1}", Utils::GLShaderStageToString(stage), cachedPath.string());
+			}
 
+			if (!needsRecompile)
+			{
+				// Load from cache
+				std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
+				if (in.is_open())
+				{
+					in.seekg(0, std::ios::end);
+					auto size = in.tellg();
+					in.seekg(0, std::ios::beg);
+
+					auto& data = shaderData[stage];
+					data.resize(size / sizeof(uint32_t));
+					in.read(reinterpret_cast<char*>(data.data()), size);
+					in.close();
+				}
+				else
+				{
+					KBR_CORE_WARN("Failed to read cached OpenGL SPIR-V file: {0}, will recompile", cachedPath.string());
+					needsRecompile = true;
+				}
+			}
+
+			if (needsRecompile)
+			{
+				/// Cross-compile from Vulkan SPIR-V to OpenGL GLSL, then compile to OpenGL SPIR-V
+				KBR_CORE_TRACE("Cross-compiling OpenGL SPIR-V for stage {0}", Utils::GLShaderStageToString(stage));
+
+				spirv_cross::CompilerGLSL glslCompiler(spirv);
 				m_OpenGLSourceCode[stage] = glslCompiler.compile();
 				auto& source = m_OpenGLSourceCode[stage];
 
@@ -485,13 +615,20 @@ namespace Kerberos
 
 				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
 
+				/// Save to cache
 				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
 				if (out.is_open())
 				{
 					auto& data = shaderData[stage];
-					out.write(reinterpret_cast<char*>(data.data()), data.size() * sizeof(uint32_t));
+					out.write(reinterpret_cast<char*>(data.data()), static_cast<std::streamsize>(data.size()) * sizeof(uint32_t));
 					out.flush();
 					out.close();
+
+					KBR_CORE_TRACE("Saved compiled OpenGL SPIR-V to cache: {0}", cachedPath.string());
+				}
+				else
+				{
+					KBR_CORE_WARN("Failed to write OpenGL SPIR-V cache file: {0}", cachedPath.string());
 				}
 			}
 		}
@@ -508,9 +645,11 @@ namespace Kerberos
 		for (auto&& [stage, spirv] : m_OpenGLSPIRV)
 		{
 			GLuint shaderID = shaderIDs.emplace_back(glCreateShader(stage));
-			glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t));
+			glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), static_cast<int>(spirv.size() * sizeof(uint32_t)));
 			glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
 			glAttachShader(program, shaderID);
+
+			m_OpenGLShaderIDs[stage] = shaderID;
 		}
 
 		glLinkProgram(program);
@@ -568,10 +707,11 @@ namespace Kerberos
 			const size_t memberCount = bufferType.member_types.size();
 			for (size_t i = 0; i < memberCount; ++i)
 			{
+				const uint32_t index = static_cast<uint32_t>(i);
 				const auto& memberType = compiler.get_type(bufferType.member_types[i]);
-				const std::string& memberName = compiler.get_member_name(bufferType.self, i);
-				size_t memberOffset = compiler.get_member_decoration(bufferType.self, i, spv::DecorationOffset);
-				size_t memberSize = compiler.get_declared_struct_member_size(bufferType, i);
+				const std::string& memberName = compiler.get_member_name(bufferType.self, index);
+				size_t memberOffset = compiler.get_member_decoration(bufferType.self, index, spv::DecorationOffset);
+				size_t memberSize = compiler.get_declared_struct_member_size(bufferType, index);
 
 				KBR_CORE_TRACE("        Member: {0}, Offset: {1}, DeclaredSize: {2}",
 					memberName, memberOffset, memberSize);

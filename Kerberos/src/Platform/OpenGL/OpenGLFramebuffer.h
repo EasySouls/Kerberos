@@ -21,7 +21,11 @@ namespace Kerberos
 
 		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
 
+		void BindColorTexture(uint32_t slot, uint32_t index) const override;
+		void BindDepthTexture(uint32_t slot) const override;
+
 		void ClearAttachment(uint32_t attachmentIndex, int value) override;
+		void ClearDepthAttachment(float value) const override;
 
 		uint64_t GetColorAttachmentRendererID(const uint32_t index = 0) const override 
 		{
@@ -29,8 +33,16 @@ namespace Kerberos
 			return m_ColorAttachments.at(index);
 		}
 
+		uint64_t GetDepthAttachmentRendererID() const override 
+		{
+			KBR_CORE_ASSERT(m_DepthAttachment != 0, "Depth attachment is not set!");
+			return m_DepthAttachment;
+		}
+
 		FramebufferSpecification& GetSpecification() override { return m_Specification; }
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
+
+		void SetDebugName(const std::string& name) const override;
 
 	private:
 		RendererID m_RendererID = 0;

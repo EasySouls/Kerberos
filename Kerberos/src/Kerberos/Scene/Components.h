@@ -158,6 +158,7 @@ namespace Kerberos
 		Ref<Texture2D> MeshTexture = nullptr;
 		//AssetHandle MeshTexture;
 		bool Visible = true;
+		bool CastShadows = true;
 
 		StaticMeshComponent()
 		{
@@ -176,6 +177,10 @@ namespace Kerberos
 	{
 		DirectionalLight Light;
 		bool IsEnabled = true;
+		bool CastShadows = true;
+
+		/// Used to update the light's shadow map only when necessary
+		bool NeedsUpdate = true; 
 
 		DirectionalLightComponent() = default;
 		explicit DirectionalLightComponent(const DirectionalLight& light)

@@ -1,5 +1,7 @@
 #include "kbrpch.h"
 #include "Renderer3D.h"
+
+#include "Framebuffer.h"
 #include "RenderCommand.h"
 #include "TextureCube.h"
 #include "UniformBuffer.h"
@@ -23,14 +25,28 @@ namespace Kerberos
 		Ref<Shader> ActiveShader;
 		Ref<Texture2D> WhiteTexture;
 
-		Ref<Shader> BaseShader = nullptr;
+		Ref<Shader> GeometryShader = nullptr;
 		Ref<Shader> WireframeShader = nullptr;
+		Ref<Shader> ShadowMapShader = nullptr;
 
 		const DirectionalLight* pSunLight = nullptr;
 
 		Ref<Shader> SkyboxShader = nullptr;
 		Ref<TextureCube> SkyboxTexture = nullptr;
 		Ref<VertexArray> SkyboxVertexArray = nullptr;
+
+		Ref<Framebuffer> ShadowMapFramebuffer = nullptr;
+
+		RenderPass CurrentPass = RenderPass::Geometry;
+
+		struct ShadowDataUbo
+		{
+			alignas(16) glm::mat4 LightSpaceMatrix;
+			alignas(4) int EnableShadows = 1;
+			alignas(4) float ShadowBias = 0.005f;
+		} ShadowData;
+
+		Ref<UniformBuffer> ShadowUniformBuffer = nullptr;
 
 		struct CameraDataUbo
 		{
@@ -84,34 +100,21 @@ namespace Kerberos
 
 		s_RendererData = Renderer3DData();
 
-		s_RendererData.BaseShader = Shader::Create("assets/shaders/shader3d.glsl");
+		s_RendererData.GeometryShader = Shader::Create("assets/shaders/shader3d.glsl");
 		s_RendererData.WireframeShader = Shader::Create("assets/shaders/wireframe3d.glsl");
+		s_RendererData.ShadowMapShader = Shader::Create("assets/shaders/shadow_map.glsl");
+
+		s_RendererData.GeometryShader->SetDebugName("Geometry");
+		s_RendererData.WireframeShader->SetDebugName("Wireframe");
+		s_RendererData.ShadowMapShader->SetDebugName("Shadow Map");
+
 		/// Set the default shader to the base shader
-		s_RendererData.ActiveShader = s_RendererData.BaseShader;
+		s_RendererData.ActiveShader = s_RendererData.GeometryShader;
 
 		s_RendererData.WhiteTexture = AssetManager::GetDefaultTexture2D();
 		s_RendererData.ActiveTexture = s_RendererData.WhiteTexture;
 
 		s_RendererData.SkyboxShader = Shader::Create("assets/shaders/skybox.glsl");
-		const std::vector<std::string> skymapTextures = {
-			"assets/textures/starmap_cubemap_0.png",
-			"assets/textures/starmap_cubemap_1.png",
-			"assets/textures/starmap_cubemap_2.png",
-			"assets/textures/starmap_cubemap_3.png",
-			"assets/textures/starmap_cubemap_4.png",
-			"assets/textures/starmap_cubemap_5.png",
-
-		};
-		//s_RendererData.StarmapSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/starmap.kbrcubemap");
-		const std::vector<std::string> oceanCubeTextures = {
-			"assets/textures/skybox/right.jpg",
-			"assets/textures/skybox/left.jpg",
-			"assets/textures/skybox/top.jpg",
-			"assets/textures/skybox/bottom.jpg",
-			"assets/textures/skybox/front.jpg",
-			"assets/textures/skybox/back.jpg"
-		};
-		//s_RendererData.OceanSkyboxTexture = CubemapImporter::ImportCubemap("assets/cubemaps/ocean.kbrcubemap");
 		const std::vector<float> skyboxVertices = {
 			-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
@@ -161,6 +164,7 @@ namespace Kerberos
 			{ ShaderDataType::Float3, "a_Position" }
 			});
 		s_RendererData.SkyboxVertexArray->AddVertexBuffer(skyboxVertexBuffer);
+		s_RendererData.SkyboxShader->SetDebugName("Skybox");
 
 		s_RendererData.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::CameraData), 0);
 		s_RendererData.CameraUniformBuffer->SetDebugName("Camera Uniform Buffer");
@@ -171,6 +175,9 @@ namespace Kerberos
 		s_RendererData.PerObjectUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::PerObjectData), 2);
 		s_RendererData.PerObjectUniformBuffer->SetDebugName("PerObject Uniform Buffer");
 
+		s_RendererData.ShadowUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::ShadowDataUbo), 3);
+		s_RendererData.ShadowUniformBuffer->SetDebugName("Shadow Uniform Buffer");
+
 		ResetStatistics();
 	}
 
@@ -179,10 +186,38 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 	}
 
-	void Renderer3D::BeginScene(const EditorCamera& camera, const DirectionalLight* sun,
-		const std::vector<PointLight>& pointLights, const Ref<TextureCube>& skyboxTexture) 
+	void Renderer3D::BeginShadowPass(const DirectionalLight& light, const ShadowMapSettings& settings, const Ref<Framebuffer>& shadowMapFramebuffer) 
 	{
 		KBR_PROFILE_FUNCTION();
+
+		s_RendererData.CurrentPass = RenderPass::Shadow;
+
+		s_RendererData.ShadowMapFramebuffer = shadowMapFramebuffer;
+		shadowMapFramebuffer->Bind();
+
+		RenderCommand::ClearDepth();
+		//shadowMapFramebuffer->ClearDepthAttachment(0);
+
+		SetupShadowCamera(light, settings);
+
+		s_RendererData.ActiveShader = s_RendererData.ShadowMapShader;
+		s_RendererData.ActiveShader->Bind();
+	}
+
+	void Renderer3D::EndPass() 
+	{
+		if (s_RendererData.CurrentPass == RenderPass::Shadow)
+		{
+			s_RendererData.ShadowMapFramebuffer->Unbind();
+		}
+	}
+
+	void Renderer3D::BeginGeometryPass(const EditorCamera& camera, const DirectionalLight* sun,
+	                                   const std::vector<PointLight>& pointLights, const Ref<TextureCube>& skyboxTexture) 
+	{
+		KBR_PROFILE_FUNCTION();
+
+		s_RendererData.CurrentPass = RenderPass::Geometry;
 
 		const auto& viewProjection = camera.GetViewProjectionMatrix();
 		s_RendererData.CameraData.ViewMatrix = camera.GetViewMatrix();
@@ -190,7 +225,11 @@ namespace Kerberos
 		s_RendererData.CameraData.ViewProjectionMatrix = viewProjection;
 		s_RendererData.CameraData.Position = camera.GetPosition();
 
+		s_RendererData.ActiveShader = s_RendererData.GeometryShader;
 		s_RendererData.ActiveShader->Bind();
+
+		BindShadowMap();
+
 		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData, sizeof(Renderer3DData::CameraData), 0);
 
 		s_RendererData.pSunLight = sun;
@@ -217,17 +256,23 @@ namespace Kerberos
 		s_RendererData.SkyboxTexture = skyboxTexture;
 	}
 
-	void Renderer3D::BeginScene(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights, const Ref<TextureCube>& skyboxTexture)
+	void Renderer3D::BeginGeometryPass(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights, const Ref<TextureCube>& skyboxTexture)
 	{
 		KBR_PROFILE_FUNCTION();
 
-		const auto& viewProjection = camera.GetProjection() * glm::inverse(transform);
+		s_RendererData.CurrentPass = RenderPass::Geometry;
+
+		const glm::mat4& viewProjection = camera.GetProjection() * glm::inverse(transform);
 		s_RendererData.CameraData.ViewMatrix = glm::inverse(transform);
 		s_RendererData.CameraData.ProjectionMatrix = camera.GetProjection();
 		s_RendererData.CameraData.ViewProjectionMatrix = viewProjection;
 		s_RendererData.CameraData.Position = transform[3];
 
+		s_RendererData.ActiveShader = s_RendererData.GeometryShader;
 		s_RendererData.ActiveShader->Bind();
+
+		BindShadowMap();
+
 		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData, sizeof(Renderer3DData::CameraData), 0);
 
 		s_RendererData.pSunLight = sun;
@@ -273,9 +318,6 @@ namespace Kerberos
 		constexpr int viewMatrixOffset = offsetof(Renderer3DData::CameraDataUbo, ViewMatrix);
 		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData.ViewMatrix, sizeof(Renderer3DData::CameraDataUbo::ViewMatrix), viewMatrixOffset);
 
-		//s_RendererData.SkyboxShader->SetMat4("u_View", skyboxView);
-		//s_RendererData.SkyboxShader->SetMat4("u_Projection", s_RendererData.CameraData.ProjectionMatrix);
-
 		/// Set the hovered entity's id to an invalid value
 		s_RendererData.SkyboxShader->SetInt("u_EntityID", -1);
 
@@ -294,11 +336,17 @@ namespace Kerberos
 		s_Stats.DrawnMeshes++;
 	}
 
-	void Renderer3D::SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture, const float tilingFactor, const int entityID)
+	void Renderer3D::SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture, const float tilingFactor, const int entityID, const bool castShadows)
 	{
 		if (!mesh || !mesh->GetVertexArray() || mesh->GetIndexCount() == 0)
 		{
 			KBR_CORE_WARN("Invalid mesh or vertex array or index count!");
+			return;
+		}
+
+		if (s_RendererData.CurrentPass == RenderPass::Shadow && !castShadows)
+		{
+			/// Skip rendering this mesh in shadow pass if it doesn't cast shadows
 			return;
 		}
 
@@ -346,7 +394,7 @@ namespace Kerberos
 
 	void Renderer3D::SetShowWireframe(const bool showWireframe) 
 	{
-		s_RendererData.ActiveShader = showWireframe ? s_RendererData.WireframeShader : s_RendererData.BaseShader;
+		s_RendererData.ActiveShader = showWireframe ? s_RendererData.WireframeShader : s_RendererData.GeometryShader;
 	}
 
 	Renderer3D::Statistics Renderer3D::GetStatistics() 
@@ -360,5 +408,40 @@ namespace Kerberos
 		s_Stats.DrawnMeshes = 0;
 		s_Stats.Faces = 0;
 		s_Stats.Vertices = 0;
+	}
+
+	void Renderer3D::SetupShadowCamera(const DirectionalLight& light, const ShadowMapSettings& settings)
+	{
+		/// Create orthographic projection for directional light
+		const float orthoLeft = -settings.OrthoSize;
+		const float orthoRight = settings.OrthoSize;
+		const float orthoBottom = -settings.OrthoSize;
+		const float orthoTop = settings.OrthoSize;
+		const float orthoNear = settings.NearPlane;
+		const float orthoFar = settings.FarPlane;
+
+		const glm::mat4 lightProjection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, orthoNear, orthoFar);
+
+		/// Calculate light view matrix
+		constexpr glm::vec3 sceneCenter = glm::vec3(0.0f, 0.0f, 0.0f);
+		constexpr float lightDistance = 20.0f;
+
+		const glm::vec3 lightPos = sceneCenter - glm::normalize(light.Direction) * lightDistance; /// Position light away from origin
+		constexpr glm::vec3 lightTarget = sceneCenter; /// Look at origin
+		constexpr glm::vec3 lightUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+		const glm::mat4 lightView = glm::lookAt(lightPos, lightTarget, lightUp);
+
+		/// Calculate light space matrix
+		s_RendererData.ShadowData.LightSpaceMatrix = lightProjection * lightView;
+		s_RendererData.ShadowData.EnableShadows = settings.EnableShadows ? 1 : 0;
+		s_RendererData.ShadowUniformBuffer->SetData(&s_RendererData.ShadowData, sizeof(Renderer3DData::ShadowDataUbo), 0);
+	}
+	void Renderer3D::BindShadowMap()
+	{
+		/*auto shadowMapTexture = s_RendererData.ShadowMapFramebuffer->GetDepthAttachmentRendererID();*/
+		s_RendererData.ShadowMapFramebuffer->BindDepthTexture(1);
+		constexpr int shadowMapTextureSlot = 1;
+		s_RendererData.ActiveShader->SetInt("u_ShadowMap", shadowMapTextureSlot);
 	}
 }

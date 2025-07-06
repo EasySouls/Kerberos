@@ -15,6 +15,8 @@ namespace Kerberos
 
 		/// Depth and stencil
 		DEPTH24STENCIL8,
+
+		DEPTH24,
 		
 		Depth = DEPTH24STENCIL8,
 	};
@@ -63,11 +65,18 @@ namespace Kerberos
 		virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) = 0;
 
 		virtual void ClearAttachment(uint32_t attachmentIndex, int value) = 0;
+		virtual void ClearDepthAttachment(float value) const = 0;
+
+		virtual void BindColorTexture(uint32_t slot, uint32_t index = 0) const = 0;
+		virtual void BindDepthTexture(uint32_t slot) const = 0;
 
 		virtual uint64_t GetColorAttachmentRendererID(uint32_t index = 0) const = 0;
+		virtual uint64_t GetDepthAttachmentRendererID() const = 0;
 
 		virtual FramebufferSpecification& GetSpecification() = 0;
 		virtual const FramebufferSpecification& GetSpecification() const = 0;
+		
+		virtual void SetDebugName(const std::string& name) const = 0;
 
 		template<typename T>
 		T& As()

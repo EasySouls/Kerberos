@@ -10,6 +10,9 @@
     <Filter Include="src\Kerberos\Assets">
       <UniqueIdentifier>{DB420FCF-47A4-ECDC-D011-338F3C72239C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Kerberos\Assets\Importers">
+      <UniqueIdentifier>{2FC70471-9BDF-EB9A-648C-7B34D0638034}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Kerberos\Core">
       <UniqueIdentifier>{11CE04FF-7DE4-0295-C65B-8EB632B1D31C}</UniqueIdentifier>
     </Filter>
@@ -66,9 +69,6 @@
     <ClInclude Include="src\Kerberos\Assets\Asset.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Assets\Importers\AssetImporter.h">
-      <Filter>src\Kerberos\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="src\Kerberos\Assets\AssetManager.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
@@ -84,13 +84,19 @@
     <ClInclude Include="src\Kerberos\Assets\EditorAssetManager.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Importers\AssetImporter.h">
+      <Filter>src\Kerberos\Assets\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Importers\CubemapImporter.h">
+      <Filter>src\Kerberos\Assets\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Importers\TextureImporter.h">
+      <Filter>src\Kerberos\Assets\Importers</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Assets\Model.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Assets\RuntimeAssetManager.h">
-      <Filter>src\Kerberos\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Kerberos\Assets\Importers\TextureImporter.h">
       <Filter>src\Kerberos\Assets</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Core.h">
@@ -297,6 +303,9 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\TextureUtils.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\Vulkan\VulkanBuffer.h">
       <Filter>src\Platform\Vulkan</Filter>
     </ClInclude>
@@ -339,15 +348,10 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Assets\Importers\CubemapImporter.h" />
-    <ClInclude Include="src\Platform\OpenGL\TextureUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
       <Filter>src\Kerberos</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Kerberos\Assets\Importers\AssetImporter.cpp">
-      <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\AssetManager.cpp">
       <Filter>src\Kerberos\Assets</Filter>
@@ -358,13 +362,19 @@
     <ClCompile Include="src\Kerberos\Assets\EditorAssetManager.cpp">
       <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\Importers\AssetImporter.cpp">
+      <Filter>src\Kerberos\Assets\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\Importers\CubemapImporter.cpp">
+      <Filter>src\Kerberos\Assets\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\Importers\TextureImporter.cpp">
+      <Filter>src\Kerberos\Assets\Importers</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\Model.cpp">
       <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\RuntimeAssetManager.cpp">
-      <Filter>src\Kerberos\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Kerberos\Assets\Importers\TextureImporter.cpp">
       <Filter>src\Kerberos\Assets</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Core\UUID.cpp">
@@ -511,6 +521,9 @@
     <ClCompile Include="src\Platform\Vulkan\VulkanFramebuffer.cpp">
       <Filter>src\Platform\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\Vulkan\VulkanHelpers.cpp">
+      <Filter>src\Platform\Vulkan</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\Vulkan\VulkanRendererAPI.cpp">
       <Filter>src\Platform\Vulkan</Filter>
     </ClCompile>
@@ -544,6 +557,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Assets\Importers\CubemapImporter.cpp" />
   </ItemGroup>
 </Project>
