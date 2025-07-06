@@ -45,7 +45,9 @@ namespace Kerberos
 		glPolygonOffset(1.0f, 1.0f);*/
 		//glEnable(GL_LINE_SMOOTH);
 
-		//glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CCW);
+		/*glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);*/
 
 		/*glEnable(GL_FRAMEBUFFER_SRGB);*/
 	}

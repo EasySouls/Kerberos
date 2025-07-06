@@ -198,7 +198,8 @@ namespace Kerberos
 	static JPH::ObjectLayer GetObjectLayerFromComponent(const RigidBody3DComponent::BodyType& type)
 	{
 		switch (type)
-		{		case RigidBody3DComponent::BodyType::Static:
+		{
+		case RigidBody3DComponent::BodyType::Static:
 			return Physics::Layers::NON_MOVING;
 		case RigidBody3DComponent::BodyType::Kinematic:
 		case RigidBody3DComponent::BodyType::Dynamic:
@@ -953,7 +954,7 @@ namespace Kerberos
 		}
 	}
 
-	bool Scene::ShouldRenderShadows(const DirectionalLightComponent* dlc) const 
+	bool Scene::ShouldRenderShadows(const DirectionalLightComponent* dlc) const
 	{
 		if (onlyRenderShadowMapIfLightHasChanged)
 		{

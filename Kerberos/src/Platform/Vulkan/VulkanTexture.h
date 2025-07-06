@@ -29,7 +29,7 @@ namespace Kerberos
 			return m_DescriptorSet == dynamic_cast<const VulkanTexture2D&>(other).m_DescriptorSet;
 		}
 
-		void SetDebugName(const std::string& name) override;
+		void SetDebugName(const std::string& name) const override;
 
 	private:
 		void CleanupResources() const;

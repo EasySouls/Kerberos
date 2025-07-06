@@ -78,12 +78,12 @@ namespace Kerberos
         for (size_t i = 0; i < data.Faces.size(); i++)
         {
             const auto& [Specification, Buffer] = data.Faces[i];
-            /// Internal format is how OpenGl will store the texture data internally (in the GPU)
+            /// Internal format is how OpenGL will store the texture data internally (in the GPU)
             const GLenum internalFormat = TextureUtils::KBRImageFormatToGLInternalFormat(Specification.Format);
             /// Data format is the format of the texture data we provide to OpenGL
             const GLenum dataFormat = TextureUtils::KBRImageFormatToGLDataFormat(Specification.Format);
 
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat,
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, static_cast<int>(internalFormat),
                 static_cast<int>(Specification.Width), static_cast<int>(Specification.Height),
                 0, dataFormat, GL_UNSIGNED_BYTE, Buffer.Data);
 
@@ -131,8 +131,7 @@ namespace Kerberos
 		throw std::runtime_error("OpenGLTextureCube::SetData() is not yet implemented.");
     }
 
-	void OpenGLTextureCube::SetDebugName(const std::string& name) 
-    {
+	void OpenGLTextureCube::SetDebugName(const std::string& name) const {
 		glObjectLabel(GL_TEXTURE_CUBE_MAP, m_RendererID, -1, name.c_str());
     }
 }

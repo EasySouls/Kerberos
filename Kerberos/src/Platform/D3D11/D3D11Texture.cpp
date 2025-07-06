@@ -229,8 +229,7 @@ namespace Kerberos
 		context->UpdateSubresource(m_Texture.Get(), 0, nullptr, data, rowPitch, 0);
 	}
 
-	void D3D11Texture2D::SetDebugName(const std::string& name) 
-	{
+	void D3D11Texture2D::SetDebugName(const std::string& name) const {
 		throw std::runtime_error("SetDebugName is not implemented for D3D11Texture2D!");
 	}
 }

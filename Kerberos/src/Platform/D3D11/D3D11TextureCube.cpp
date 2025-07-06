@@ -29,8 +29,7 @@ namespace Kerberos
 		throw std::runtime_error("D3D11TextureCube::GetWidth() is not yet implemented.");
 	}
 
-	void D3D11TextureCube::SetDebugName(const std::string& name) 
-	{
+	void D3D11TextureCube::SetDebugName(const std::string& name) const {
 		throw std::runtime_error("D3D11TextureCube::SetDebugName(const std::string&) is not yet implemented.");
 	}
 }

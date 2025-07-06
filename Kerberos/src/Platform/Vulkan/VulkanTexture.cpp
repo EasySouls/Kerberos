@@ -550,8 +550,7 @@ namespace Kerberos
         context.SubmitCommandBuffer(commandBuffer);
 	}
 
-	void VulkanTexture2D::SetDebugName(const std::string& name) 
-    {
+	void VulkanTexture2D::SetDebugName(const std::string& name) const {
 		KBR_PROFILE_FUNCTION();
 
 		const VkDevice& device = VulkanContext::Get().GetDevice();

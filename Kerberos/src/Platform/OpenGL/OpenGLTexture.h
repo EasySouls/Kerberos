@@ -27,7 +27,7 @@ namespace Kerberos
 			return m_RendererID == dynamic_cast<const OpenGLTexture2D&>(other).m_RendererID;
 		}
 
-		void SetDebugName(const std::string& name) override;
+		void SetDebugName(const std::string& name) const override;
 
 	private:
 		std::string m_Path;

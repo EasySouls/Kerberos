@@ -36,8 +36,12 @@ namespace Kerberos
 		
 	}
 
-	void VulkanTextureCube::SetDebugName(const std::string& name) 
+	void VulkanTextureCube::SetDebugName(const std::string& name) const 
 	{
-		VulkanHelpers::SetObjectDebugName(VulkanContext::Get().GetDevice(), VK_OBJECT_TYPE_DESCRIPTOR_SET, m_RendererID, name);
+		const VkDevice& device = VulkanContext::Get().GetDevice();
+		/*VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_IMAGE, reinterpret_cast<uint64_t>(m_Image), name + " Image");
+		VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_IMAGE_VIEW, reinterpret_cast<uint64_t>(m_ImageView), name + " Image View");
+		VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_SAMPLER, reinterpret_cast<uint64_t>(m_Sampler), name + " Sampler");*/
+		VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_DESCRIPTOR_SET, m_RendererID, name + " Descriptor Set");
 	}
 }

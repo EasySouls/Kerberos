@@ -39,6 +39,7 @@ namespace Kerberos
 		}
 
 		context->ClearRenderTargetView(rtv, glm::value_ptr(m_ClearColor));
+		rtv->Release();
 	}
 
 	void D3D11RendererAPI::ClearDepth() 
