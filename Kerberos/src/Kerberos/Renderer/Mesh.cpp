@@ -21,6 +21,7 @@ namespace Kerberos
 	Ref<Mesh> Mesh::CreateCube(const float size) 
 	{
 		std::vector<Vertex> vertices;
+		vertices.reserve(24); /// 6 faces * 4 vertices per face
 
 		constexpr glm::vec3 positions[] = {
 			{ -1.0f, -1.0f, -1.0f}, {1.0f, -1.0f, -1.0f}, {1.0f,  1.0f, -1.0f}, {-1.0f,  1.0f, -1.0f},
@@ -28,8 +29,12 @@ namespace Kerberos
 		};
 
 		constexpr glm::vec3 normals[] = {
-			{0,0,1}, {0,0,-1}, {1,0,0}, {-1,0,0},
-			{0,1,0}, {0,-1,0}
+			{0,0,-1},	/// Front
+			{0,0,1},	/// Back
+			{1,0,0},	/// Right
+			{-1,0,0},	/// Left
+			{0,1,0},	/// Top
+			{0,-1,0}	/// Bottom
 		};
 
 		constexpr glm::vec2 texCoords[] = {
@@ -76,7 +81,7 @@ namespace Kerberos
 		vertices.push_back({ .Position = positions[4] * halfSize, .Normal = normals[3], .TexCoord = texCoords[3] });
 
 		std::vector<uint32_t> indices;
-		indices.reserve(6 * 2 * 3); /// 6 faces, 2 triangles per face, 3 indices per triangle
+		indices.reserve(static_cast<size_t>(6 * 2 * 3)); /// 6 faces, 2 triangles per face, 3 indices per triangle
 		for (uint32_t i = 0; i < 6; i++)
 		{
 			const uint32_t offset = i * 4;
@@ -103,7 +108,7 @@ namespace Kerberos
 
 			for (uint32_t i = 0; i <= stackCount; ++i)
 			{
-				const float stackAngle = glm::pi<float>() / 2 - i * stackStep; // starting from pi/2 to -pi/2
+				const float stackAngle = glm::pi<float>() / 2 - static_cast<float>(i) * stackStep; // starting from pi/2 to -pi/2
 				const float xy = radius * cosf(stackAngle);             // r * cos(u)
 				float z = radius * sinf(stackAngle);              // r * sin(u)
 
@@ -111,7 +116,7 @@ namespace Kerberos
 				// the first and last vertices have same position and normal, but different tex coords
 				for (uint32_t j = 0; j <= sectorCount; ++j)
 				{
-					const float sectorAngle = j * sectorStep;           // starting from 0 to 2pi
+					const float sectorAngle = static_cast<float>(j) * sectorStep;           // starting from 0 to 2pi
 
 					// vertex position (x, y, z)
 					float x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
