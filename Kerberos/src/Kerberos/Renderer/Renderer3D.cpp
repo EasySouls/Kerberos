@@ -426,10 +426,7 @@ namespace Kerberos
 		constexpr glm::vec3 sceneCenter = glm::vec3(0.0f, 0.0f, 0.0f);
 		constexpr float lightDistance = 20.0f;
 
-		/// TODO: Use light's direction
 		const glm::vec3 lightPos = sceneCenter - glm::normalize(light.Direction) * lightDistance; /// Position light away from origin
-		KBR_CORE_INFO("Light Position: {0}, Light Direction: {1}", lightPos, light.Direction);
-		//constexpr glm::vec3 lightPos = glm::vec3(-38.0f, 13.224f, 6.62f);
 		constexpr glm::vec3 lightTarget = sceneCenter; /// Look at origin
 		constexpr glm::vec3 lightUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -439,8 +436,6 @@ namespace Kerberos
 		s_RendererData.ShadowData.LightSpaceMatrix = lightProjection * lightView;
 		s_RendererData.ShadowData.EnableShadows = settings.EnableShadows ? 1 : 0;
 		s_RendererData.ShadowUniformBuffer->SetData(&s_RendererData.ShadowData, sizeof(Renderer3DData::ShadowDataUbo), 0);
-
-		s_RendererData.CameraUniformBuffer->SetData(&s_RendererData.CameraData, sizeof(Renderer3DData::CameraData), 0);
 	}
 	void Renderer3D::BindShadowMap()
 	{

@@ -28,7 +28,7 @@ namespace Kerberos
 		/// TODO: Open the project passed as command line argument, if there is one
 #define TESTING 1
 #if TESTING
-		OpenProject("C:\\Development\\Kerberos\\KerberosEditor\\World3D.kbrproj");
+		OpenProject(R"(C:\Development\Kerberos\KerberosEditor\World3D.kbrproj)");
 #else
 		if (!OpenProject())
 		{
@@ -36,7 +36,7 @@ namespace Kerberos
 		}
 #endif
 
-		m_EditorCamera = EditorCamera(30.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
+		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 		m_ViewportSize = { 1280.0f, 720.0f };
 
@@ -77,13 +77,24 @@ namespace Kerberos
 			sphereEntity.GetComponent<TransformComponent>().Translation = { 2.0f, 1.2f, -2.0f };
 		}
 
+		//{
+		//	Entity planeEntity = m_ActiveScene->CreateEntity("Plane");
+		//	const Ref<Mesh> planeMesh = Mesh::CreatePlane(10.0f, 10.0f);
+		//	planeEntity.AddComponent<StaticMeshComponent>(planeMesh, whiteMaterial, nullptr);
+		//	planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, -1.0f, 0.0f };
+		//	planeEntity.AddComponent<RigidBody3DComponent>().Type = RigidBody3DComponent::BodyType::Static;
+		//	planeEntity.AddComponent<BoxCollider3DComponent>().Size = { 10.f, 0.1f, 10.f };
+		//}
+
 		{
-			Entity planeEntity = m_ActiveScene->CreateEntity("Plane");
-			const Ref<Mesh> planeMesh = Mesh::CreatePlane(10.0f, 10.0f);
-			planeEntity.AddComponent<StaticMeshComponent>(planeMesh, whiteMaterial, nullptr);
-			planeEntity.GetComponent<TransformComponent>().Translation = { 0.0f, -1.0f, 0.0f };
-			planeEntity.AddComponent<RigidBody3DComponent>().Type = RigidBody3DComponent::BodyType::Static;
-			planeEntity.AddComponent<BoxCollider3DComponent>().Size = { 10.f, 0.1f, 10.f };
+			Entity groundEntity = m_ActiveScene->CreateEntity("Ground");
+			const Ref<Mesh> groundMesh = Mesh::CreateCube(1.0f);
+			groundEntity.AddComponent<StaticMeshComponent>(groundMesh, whiteMaterial, nullptr);
+			auto& transform = groundEntity.GetComponent<TransformComponent>();
+			transform.Translation = { 0.0f, -2.0f, 0.0f };
+			transform.Scale = { 25.0f, 0.2f, 25.0f };
+			groundEntity.AddComponent<RigidBody3DComponent>().Type = RigidBody3DComponent::BodyType::Static;
+			groundEntity.AddComponent<BoxCollider3DComponent>().Size = { 25.0f, 0.2f, 25.f };
 		}
 
 		{

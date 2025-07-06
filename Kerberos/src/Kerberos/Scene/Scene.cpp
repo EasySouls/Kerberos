@@ -212,8 +212,8 @@ namespace Kerberos
 		m_Registry = entt::basic_registry();
 
 		m_ShadowMapFramebuffer = Framebuffer::Create(FramebufferSpecification{
-			.Width = 2048,
-			.Height = 2048,
+			.Width = 1024,
+			.Height = 1024,
 			.Attachments = {
 				{ FramebufferTextureFormat::DEPTH24 }
 			}
@@ -829,7 +829,7 @@ namespace Kerberos
 		if (m_EnableShadowMapping && sun)
 		{
 			ShadowMapSettings shadowSettings;
-			shadowSettings.Resolution = 2048;
+			shadowSettings.Resolution = 1024;
 			shadowSettings.OrthoSize = 15.0f;
 			shadowSettings.NearPlane = 1.0f;
 			shadowSettings.FarPlane = 100.0f;
