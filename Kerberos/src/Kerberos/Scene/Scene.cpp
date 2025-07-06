@@ -763,6 +763,35 @@ namespace Kerberos
 			}
 		}
 
+		if (m_EnableShadowMapping && sun)
+		{
+			ShadowMapSettings shadowSettings;
+			shadowSettings.Resolution = 1024;
+			shadowSettings.OrthoSize = 15.0f;
+			shadowSettings.NearPlane = 1.0f;
+			shadowSettings.FarPlane = 100.0f;
+			shadowSettings.EnableShadows = true;
+
+			Renderer3D::BeginShadowPass(*sun, shadowSettings, m_ShadowMapFramebuffer);
+
+			/// Render all shadow-casting meshes
+			const auto meshView = m_Registry.view<StaticMeshComponent, TransformComponent>();
+			for (auto entity : meshView)
+			{
+				auto& meshComp = meshView.get<StaticMeshComponent>(entity);
+				auto& transformComp = meshView.get<TransformComponent>(entity);
+
+				if (meshComp.StaticMesh && meshComp.MeshMaterial)
+				{
+					Renderer3D::SubmitMesh(meshComp.StaticMesh, transformComp.WorldTransform,
+						meshComp.MeshMaterial, meshComp.MeshTexture, 1.0f,
+						static_cast<int>(entity), meshComp.CastShadows);
+				}
+			}
+
+			Renderer3D::EndPass();
+		}
+
 		std::vector<PointLight> pointLights;
 		const auto pointLightView = m_Registry.view<PointLightComponent, TransformComponent>();
 		for (const auto entity : pointLightView)
