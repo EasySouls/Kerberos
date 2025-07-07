@@ -27,8 +27,6 @@
 
 #define USE_MAP_FOR_UUID 1
 
-constexpr bool onlyRenderShadowMapIfLightHasChanged = true;
-
 namespace Kerberos
 {
 	static JPH::EMotionType GetBodyTypeFromComponent(const RigidBody3DComponent::BodyType& type)
@@ -956,7 +954,7 @@ namespace Kerberos
 
 	bool Scene::ShouldRenderShadows(const DirectionalLightComponent* dlc) const
 	{
-		if (onlyRenderShadowMapIfLightHasChanged)
+		if (m_OnlyRenderShadowMapIfLightHasChanged)
 		{
 			return m_EnableShadowMapping && dlc && dlc->IsEnabled && dlc->CastShadows && dlc->NeedsUpdate;
 		}

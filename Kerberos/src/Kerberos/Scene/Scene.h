@@ -78,6 +78,7 @@ namespace Kerberos
 
 		Ref<Framebuffer> GetShadowMapFramebuffer() const { return m_ShadowMapFramebuffer; }
 		Ref<Framebuffer> GetEditorFramebuffer() const { return m_EditorFramebuffer; }
+		bool& GetOnlyRenderShadowMapIfLightHasChanged() { return m_OnlyRenderShadowMapIfLightHasChanged; }
 
 	private:
 		template<typename T>
@@ -99,6 +100,7 @@ namespace Kerberos
 
 		bool m_Is3D = true;
 		bool m_EnableShadowMapping = true;
+		bool m_OnlyRenderShadowMapIfLightHasChanged = false;
 
 		Ref<Framebuffer> m_ShadowMapFramebuffer;
 		Ref<Framebuffer> m_EditorFramebuffer;

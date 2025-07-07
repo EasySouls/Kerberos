@@ -2,15 +2,16 @@
 
 #include "Vertex.h"
 #include "VertexArray.h"
+#include "Kerberos/Assets/Asset.h"
 
 namespace Kerberos
 {
-	class Mesh
+	class Mesh : public Asset
 	{
 	public:
 		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
 		explicit Mesh(const std::string& filePath);
-		~Mesh() = default;
+		~Mesh() override = default;
 
 		static Ref<Mesh> CreateCube(float size);
 		static Ref<Mesh> CreateSphere(float radius, uint32_t sectorCount, uint32_t stackCount);

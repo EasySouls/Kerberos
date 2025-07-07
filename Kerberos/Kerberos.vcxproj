@@ -160,6 +160,7 @@
     <ClInclude Include="src\Kerberos\Assets\EditorAssetManager.h" />
     <ClInclude Include="src\Kerberos\Assets\Importers\AssetImporter.h" />
     <ClInclude Include="src\Kerberos\Assets\Importers\CubemapImporter.h" />
+    <ClInclude Include="src\Kerberos\Assets\Importers\MeshImporter.h" />
     <ClInclude Include="src\Kerberos\Assets\Importers\TextureImporter.h" />
     <ClInclude Include="src\Kerberos\Assets\Model.h" />
     <ClInclude Include="src\Kerberos\Assets\RuntimeAssetManager.h" />
@@ -254,6 +255,7 @@
     <ClCompile Include="src\Kerberos\Assets\EditorAssetManager.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Importers\AssetImporter.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Importers\CubemapImporter.cpp" />
+    <ClCompile Include="src\Kerberos\Assets\Importers\MeshImporter.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Importers\TextureImporter.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Model.cpp" />
     <ClCompile Include="src\Kerberos\Assets\RuntimeAssetManager.cpp" />

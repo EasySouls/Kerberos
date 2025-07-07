@@ -3,6 +3,7 @@
 
 #include "CubemapImporter.h"
 #include "TextureImporter.h"
+#include "MeshImporter.h"
 #include "Kerberos/Renderer/Texture.h"
 
 namespace Kerberos
@@ -15,9 +16,9 @@ namespace Kerberos
 			return TextureImporter::ImportTexture(handle, metadata);
 		case AssetType::TextureCube:
 			return CubemapImporter::ImportCubemap(handle, metadata);
-			break;
 		case AssetType::Material:
 		case AssetType::Mesh:
+			return MeshImporter::ImportMesh(handle, metadata);
 		case AssetType::Scene:
 			break;
 		}

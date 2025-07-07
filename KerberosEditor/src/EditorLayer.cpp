@@ -396,6 +396,7 @@ namespace Kerberos
 		ImGui::Text("Shadow Map");
 		const uint64_t shadowMapTextureID = m_ActiveScene->GetShadowMapFramebuffer()->GetDepthAttachmentRendererID();
 		ImGui::Image(shadowMapTextureID, ImVec2{ 256, 256 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		ImGui::Checkbox("Only render shadow map if light has changed", &m_ActiveScene->GetOnlyRenderShadowMapIfLightHasChanged());
 
 		ImGui::End();
 
