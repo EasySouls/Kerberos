@@ -8,8 +8,22 @@
 
 namespace Kerberos
 {
-	Ref<Mesh> MeshImporter::ImportMesh(AssetHandle handle, const AssetMetadata& metadata) {}
-	Ref<Mesh> MeshImporter::ImportMesh(const std::filesystem::path& filepath) {}
+	Ref<Mesh> MeshImporter::ImportMesh(AssetHandle handle, const AssetMetadata& metadata) 
+    {
+		return ImportMesh(metadata.Filepath);
+    }
+
+	Ref<Mesh> MeshImporter::ImportMesh(const std::filesystem::path& filepath) 
+    {
+        LoadModel(filepath);
+
+        if (m_Submeshes.empty())
+        {
+			KBR_CORE_ERROR("No meshes found in the model at {}", filepath.string());
+            return nullptr;
+        }
+		return m_Submeshes[0].Mesh;
+    }
 
 	void MeshImporter::LoadModel(const std::filesystem::path& path) 
 	{

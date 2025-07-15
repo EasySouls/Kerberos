@@ -1,6 +1,25 @@
 Scene: Unnamed Scene
 Entities:
-  - Entity: 15082812970396837153
+  - Entity: 8661147219098593607
+    TagComponent:
+      Tag: Backpack
+    TransformComponent:
+      Translation: [0, -0.1, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+    StaticMeshComponent:
+      Mesh: 792555746016710845
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 0
+  - Entity: 10573320759344478143
     TagComponent:
       Tag: Camera
     TransformComponent:
@@ -22,7 +41,7 @@ Entities:
       Parent: 0
       Children:
         []
-  - Entity: 15051789441427578749
+  - Entity: 18331116116599322623
     TagComponent:
       Tag: Point Light
     TransformComponent:
@@ -40,7 +59,7 @@ Entities:
       Constant: 1
       Linear: 0.09
       Quadratic: 0.032
-  - Entity: 13642748868940137754
+  - Entity: 15663710797600851639
     TagComponent:
       Tag: Sun
     TransformComponent:
@@ -53,9 +72,9 @@ Entities:
         []
     DirectionalLightComponent:
       Color: [1, 1, 0.8]
-      Direction: [123, 80, 130]
+      Direction: [123, -230, 130]
       Intensity: 1
-  - Entity: 15539974534599324582
+  - Entity: 7666815495503119488
     TagComponent:
       Tag: Environment
     TransformComponent:
@@ -69,13 +88,13 @@ Entities:
     EnvironmentComponent:
       SkyboxTexture: 0
       IsSkyboxEnabled: true
-  - Entity: 18188737741152214715
+  - Entity: 13817990924954201533
     TagComponent:
-      Tag: Plane
+      Tag: Ground
     TransformComponent:
-      Translation: [0, -1, 0]
+      Translation: [0, -2, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Scale: [25, 0.2, 25]
     HierarchyComponent:
       Parent: 0
       Children:
@@ -89,7 +108,7 @@ Entities:
       Friction: 0.5
       Restitution: 0.5
     BoxCollider3DComponent:
-      Size: [10, 0.1, 10]
+      Size: [25, 0.2, 25]
       Offset: [0, 0, 0]
     StaticMeshComponent:
       Mesh: 0
@@ -99,7 +118,7 @@ Entities:
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
       Texture: 0
-  - Entity: 1196801508338085739
+  - Entity: 4360239269841397876
     TagComponent:
       Tag: Sphere
     TransformComponent:
@@ -117,8 +136,8 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 764720494901967554
-  - Entity: 15106019748286352535
+      Texture: 13183149988982282770
+  - Entity: 4692536428728826302
     TagComponent:
       Tag: Cube
     TransformComponent:
@@ -147,8 +166,8 @@ Entities:
         Diffuse: [1, 1, 1]
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
-      Texture: 764720494901967554
-  - Entity: 13352857840823251269
+      Texture: 13183149988982282770
+  - Entity: 281781342221464787
     TagComponent:
       Tag: Square
     TransformComponent:

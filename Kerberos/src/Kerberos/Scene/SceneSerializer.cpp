@@ -473,11 +473,16 @@ namespace Kerberos
 
 					const AssetHandle textureHandle = UUID(staticMeshComponent["Texture"].as<uint64_t>());
 					if (textureHandle.IsValid())
-						staticMesh.MeshTexture = AssetManager::GetAsset<Texture2D>(UUID(staticMeshComponent["Texture"].as<uint64_t>()));
+						staticMesh.MeshTexture = AssetManager::GetAsset<Texture2D>(textureHandle);
 
-					const auto mesh = staticMeshComponent["Mesh"].as<uint64_t>();
-					if (mesh == 0)
+					const AssetHandle meshHandle = UUID(staticMeshComponent["Mesh"].as<uint64_t>());
+					if (meshHandle.IsValid())
 					{
+						staticMesh.StaticMesh = AssetManager::GetAsset<Mesh>(meshHandle);
+					}
+					else
+					{
+						KBR_CORE_WARN("AssetHandle for mesh is invalid, using default cube mesh.");
 						staticMesh.StaticMesh = AssetManager::GetDefaultCubeMesh();
 					}
 				}

@@ -2,6 +2,9 @@ AssetRegistry:
   - Handle: 402434786640342992
     Type: Texture2D
     Path: Assets\textures\y2k_ice_texture.png
+  - Handle: 792555746016710845
+    Type: Mesh
+    Path: Assets\models\backpack\backpack.obj
   - Handle: 1271296461044679804
     Type: Texture2D
     Path: Assets\models\backpack\normal.png

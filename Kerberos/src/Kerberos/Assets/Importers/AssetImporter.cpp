@@ -18,7 +18,10 @@ namespace Kerberos
 			return CubemapImporter::ImportCubemap(handle, metadata);
 		case AssetType::Material:
 		case AssetType::Mesh:
-			return MeshImporter::ImportMesh(handle, metadata);
+		{
+			MeshImporter meshImporter;
+			return meshImporter.ImportMesh(metadata.Filepath);
+		}
 		case AssetType::Scene:
 			break;
 		}

@@ -16,7 +16,7 @@ namespace Kerberos
 			return AssetType::Texture2D;
 		if (extension == ".kbrcubemap")
 			return AssetType::TextureCube;
-		if (extension == ".fbx" || extension == ".obj")
+		if (extension == ".fbx" || extension == ".obj" || extension == ".gltf")
 			return AssetType::Mesh;
 		if (extension == ".kerberos")
 			return AssetType::Scene;
@@ -183,7 +183,7 @@ namespace Kerberos
 			const std::filesystem::path filepath = assetNode["Path"].as<std::string>();
 
 			const AssetType type = AssetTypeFromString(typeStr);
-			if (type == AssetType::Texture2D || type == AssetType::TextureCube)
+			if (type == AssetType::Texture2D || type == AssetType::TextureCube || type == AssetType::Mesh)
 			{
 				m_AssetRegistry.Add(handle, { .Type = type, .Filepath = filepath });
 			}
