@@ -90,6 +90,9 @@
     <ClInclude Include="src\Kerberos\Assets\Importers\CubemapImporter.h">
       <Filter>src\Kerberos\Assets\Importers</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Importers\MeshImporter.h">
+      <Filter>src\Kerberos\Assets\Importers</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Assets\Importers\TextureImporter.h">
       <Filter>src\Kerberos\Assets\Importers</Filter>
     </ClInclude>
@@ -366,6 +369,9 @@
       <Filter>src\Kerberos\Assets\Importers</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\Importers\CubemapImporter.cpp">
+      <Filter>src\Kerberos\Assets\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\Importers\MeshImporter.cpp">
       <Filter>src\Kerberos\Assets\Importers</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\Importers\TextureImporter.cpp">
