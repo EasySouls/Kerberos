@@ -109,7 +109,7 @@ project "Kerberos"
 	kind "StaticLib"
 	staticruntime "off"
 	language "C++"
-	cppdialect "C++20"
+	cppdialect "C++23"
 	
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -261,7 +261,7 @@ project "Sandbox"
 	kind "ConsoleApp"
 	staticruntime "off"
 	language "C++"
-	cppdialect "C++20"
+	cppdialect "C++23"
 	
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -313,7 +313,7 @@ project "KerberosEditor"
 	kind "ConsoleApp"
 	staticruntime "off"
 	language "C++"
-	cppdialect "C++20"
+	cppdialect "C++23"
 	
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
