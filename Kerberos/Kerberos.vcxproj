@@ -179,7 +179,6 @@
     <ClInclude Include="src\Kerberos\Events\KeyEvent.h" />
     <ClInclude Include="src\Kerberos\Events\MouseEvent.h" />
     <ClInclude Include="src\Kerberos\ImGui\ImGuiLayer.h" />
-    <ClInclude Include="src\Kerberos\Internal\ThreadPool.h" />
     <ClInclude Include="src\Kerberos\Layer.h" />
     <ClInclude Include="src\Kerberos\LayerStack.h" />
     <ClInclude Include="src\Kerberos\Log.h" />
@@ -263,7 +262,7 @@
     <ClCompile Include="src\Kerberos\Core\UUID.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp" />
-    <ClCompile Include="src\Kerberos\Internal\ThreadPool.cpp" />
+    <ClCompile Include="src\Kerberos\Internal\ThreadPool.ixx" />
     <ClCompile Include="src\Kerberos\Layer.cpp" />
     <ClCompile Include="src\Kerberos\LayerStack.cpp" />
     <ClCompile Include="src\Kerberos\Log.cpp" />

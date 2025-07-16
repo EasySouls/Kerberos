@@ -6,9 +6,11 @@
 namespace Kerberos
 {
 
-	class EditorAssetManager : public AssetManagerBase
+	class EditorAssetManager final : public AssetManagerBase
 	{
 	public:
+		EditorAssetManager();
+
 		Ref<Asset> GetAsset(AssetHandle handle) override;
 
 		bool IsAssetHandleValid(AssetHandle handle) const override;

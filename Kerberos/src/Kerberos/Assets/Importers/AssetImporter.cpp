@@ -8,6 +8,14 @@
 
 namespace Kerberos
 {
+	void AssetImporter::Init()
+	{
+		m_ThreadPool.Enqueue([]()
+		{
+			KBR_CORE_INFO("AssetImporter thread pool initialized with 4 threads.");
+			});
+	}
+
 	Ref<Asset> AssetImporter::ImportAsset(const AssetHandle handle, const AssetMetadata& metadata) 
 	{
 		switch (metadata.Type)
@@ -17,6 +25,7 @@ namespace Kerberos
 		case AssetType::TextureCube:
 			return CubemapImporter::ImportCubemap(handle, metadata);
 		case AssetType::Material:
+			break;
 		case AssetType::Mesh:
 		{
 			MeshImporter meshImporter;

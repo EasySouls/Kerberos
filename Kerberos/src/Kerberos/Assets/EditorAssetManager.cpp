@@ -24,6 +24,11 @@ namespace Kerberos
 		return AssetType::Texture2D;
 	}
 
+	EditorAssetManager::EditorAssetManager() 
+	{
+		AssetImporter::Init();
+	}
+
 	Ref<Asset> EditorAssetManager::GetAsset(const AssetHandle handle) 
 	{
 		if (!IsAssetHandleValid(handle))
