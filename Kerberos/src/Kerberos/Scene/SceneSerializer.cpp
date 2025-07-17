@@ -230,7 +230,7 @@ namespace Kerberos
 			out << YAML::Key << "StaticMeshComponent";
 			out << YAML::BeginMap;
 			const auto& staticMesh = entity.GetComponent<StaticMeshComponent>();
-			out << YAML::Key << "Mesh" << YAML::Value << 0; /// Placeholder for mesh index, to be replaced with actual mesh index
+			out << YAML::Key << "Mesh" << YAML::Value << staticMesh.StaticMesh->GetHandle();
 			if (auto& mat = staticMesh.MeshMaterial)
 			{
 				//out << YAML::Key << "Material" << YAML::Value << staticMesh.MeshMaterial->GetHandle();
