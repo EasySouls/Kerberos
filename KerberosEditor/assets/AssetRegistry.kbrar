@@ -1,4 +1,7 @@
 AssetRegistry:
+  - Handle: 69186964614645221
+    Type: Mesh
+    Path: Assets\models\plane\plane.obj
   - Handle: 402434786640342992
     Type: Texture2D
     Path: Assets\textures\y2k_ice_texture.png
@@ -26,7 +29,7 @@ AssetRegistry:
   - Handle: 4851784203174410810
     Type: Texture2D
     Path: Assets\textures\starmap_cubemap_4.png
-  - Handle: 5353067575751130433
+  - Handle: 5228577459280505740
     Type: Texture2D
     Path: Assets\textures\starmap_cubemap_2.png
   - Handle: 7614295769033017730
@@ -44,6 +47,9 @@ AssetRegistry:
   - Handle: 15700455669564021845
     Type: TextureCube
     Path: Assets\cubemaps\starmap.kbrcubemap
+  - Handle: 17235766386814756524
+    Type: Mesh
+    Path: Assets\models\cube\cube.obj
   - Handle: 18308762423730217315
     Type: Texture2D
     Path: Assets\textures\starmap_cubemap_5.png

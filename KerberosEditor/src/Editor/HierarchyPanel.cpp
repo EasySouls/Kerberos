@@ -10,8 +10,6 @@
 
 namespace Kerberos
 {
-	static const std::filesystem::path ASSETS_DIRECTORY = "Assets";
-
 	HierarchyPanel::HierarchyPanel(const Ref<Scene>& context)
 		: m_Context(context)
 	{
@@ -640,36 +638,25 @@ namespace Kerberos
 				auto& staticMesh = entity.GetComponent<StaticMeshComponent>();
 				ImGui::Checkbox("Visible", &staticMesh.Visible);
 
-				const char* meshTypes[] = { "Cube", "Sphere" };
-				const char* currentMeshTypeString = meshTypes[0];
+				/// TODO: Visualize the static mesh in the editor
+				ImGui::Button("Static Mesh");
 
-				if (ImGui::BeginCombo("Mesh Type", currentMeshTypeString))
+				/// Handle drag and drop for meshes
+				if (ImGui::BeginDragDropTarget())
 				{
-					for (auto& meshType : meshTypes)
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_MESH"))
 					{
-						const std::string meshTypeString = currentMeshTypeString;
-
-						const bool isSelected = (currentMeshTypeString == meshType);
-						if (ImGui::Selectable(meshType, isSelected))
+						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
+						if (AssetManager::GetAssetType(handle) != AssetType::Mesh)
 						{
-							if (meshTypeString == "Cube")
-							{
-								staticMesh.StaticMesh = m_CubeMesh;
-								currentMeshTypeString = "Cube";
-							}
-							else if (meshTypeString == "Sphere")
-							{
-								staticMesh.StaticMesh = m_CubeMesh;
-								currentMeshTypeString = "Sphere";
-							}
+							KBR_ERROR("Asset is not a mesh: {0}", handle);
+							m_NotificationManager.AddNotification("Asset is not a mesh", Notification::Type::Error);
+							return;
 						}
-						if (isSelected)
-						{
-							ImGui::SetItemDefaultFocus();
-						}
+						const Ref<Mesh> mesh = AssetManager::GetAsset<Mesh>(handle);
+						staticMesh.StaticMesh = mesh;
 					}
-
-					ImGui::EndCombo();
+					ImGui::EndDragDropTarget();
 				}
 
 				if (staticMesh.MeshMaterial)
