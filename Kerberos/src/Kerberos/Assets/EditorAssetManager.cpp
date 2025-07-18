@@ -59,9 +59,19 @@ namespace Kerberos
 	bool EditorAssetManager::IsAssetHandleValid(const AssetHandle handle) const
 	{
 		if (!handle.IsValid())
+		{
+			KBR_CORE_WARN("Asset handle is not valid: {}", handle);
 			return false;
+		}
+	
+		const bool isInAssetRegistry = m_AssetRegistry.Contains(handle);
+		if (!isInAssetRegistry)
+		{
+			KBR_CORE_WARN("Asset handle is not in asset registry: {}", handle);
+			return false;
+		}
 
-		return m_AssetRegistry.Contains(handle);
+		return true;
 	}
 
 	bool EditorAssetManager::IsAssetLoaded(const AssetHandle handle) const

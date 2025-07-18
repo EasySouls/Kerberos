@@ -2,8 +2,6 @@
 
 #include "Kerberos/Utils/PlatformUtils.h"
 
-#include <glm/ext/matrix_clip_space.hpp>
-#include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.inl>
 
 #include "imgui/imgui.h"
@@ -52,7 +50,7 @@ namespace Kerberos
 		m_TextureDirt = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 6, 11 }, { 128, 128 }, { 1, 1 });
 		m_TextureWater = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128, 128 }, { 1, 1 });
 
-#define FIRST_TIME_LOADING_SCENE_TEST 1
+#define FIRST_TIME_LOADING_SCENE_TEST 0
 #if FIRST_TIME_LOADING_SCENE_TEST
 		Entity squareEntity = m_ActiveScene->CreateEntity("Square");
 		squareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
