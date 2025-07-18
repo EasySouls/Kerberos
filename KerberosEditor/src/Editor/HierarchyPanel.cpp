@@ -641,6 +641,12 @@ namespace Kerberos
 				/// TODO: Visualize the static mesh in the editor
 				ImGui::Button("Static Mesh");
 
+				ImGui::Separator();
+
+				ImGui::Checkbox("Cast Shadows", &staticMesh.CastShadows);
+
+				ImGui::Separator();
+
 				/// Handle drag and drop for meshes
 				if (ImGui::BeginDragDropTarget())
 				{

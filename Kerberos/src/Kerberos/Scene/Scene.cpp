@@ -783,7 +783,7 @@ namespace Kerberos
 				auto& meshComp = meshView.get<StaticMeshComponent>(entity);
 				auto& transformComp = meshView.get<TransformComponent>(entity);
 
-				if (meshComp.StaticMesh && meshComp.MeshMaterial)
+				if (meshComp.StaticMesh && meshComp.MeshMaterial && meshComp.Visible)
 				{
 					Renderer3D::SubmitMesh(meshComp.StaticMesh, transformComp.WorldTransform,
 						meshComp.MeshMaterial, meshComp.MeshTexture, 1.0f,
@@ -877,7 +877,7 @@ namespace Kerberos
 				auto& meshComp = meshView.get<StaticMeshComponent>(entity);
 				auto& transformComp = meshView.get<TransformComponent>(entity);
 
-				if (meshComp.StaticMesh && meshComp.MeshMaterial)
+				if (meshComp.StaticMesh && meshComp.MeshMaterial && meshComp.Visible)
 				{
 					Renderer3D::SubmitMesh(meshComp.StaticMesh, transformComp.WorldTransform,
 						meshComp.MeshMaterial, meshComp.MeshTexture, 1.0f,

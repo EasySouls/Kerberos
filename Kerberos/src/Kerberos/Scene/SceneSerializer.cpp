@@ -230,7 +230,7 @@ namespace Kerberos
 			out << YAML::Key << "StaticMeshComponent";
 			out << YAML::BeginMap;
 			const auto& staticMesh = entity.GetComponent<StaticMeshComponent>();
-			out << YAML::Key << "Mesh" << YAML::Value << staticMesh.StaticMesh->GetHandle();
+			out << YAML::Key << "Mesh" << YAML::Value << (staticMesh.StaticMesh ? staticMesh.StaticMesh->GetHandle() : UUID::Invalid());
 			if (auto& mat = staticMesh.MeshMaterial)
 			{
 				//out << YAML::Key << "Material" << YAML::Value << staticMesh.MeshMaterial->GetHandle();
@@ -471,11 +471,11 @@ namespace Kerberos
 						staticMesh.MeshMaterial->Shininess = matNode["Shininess"].as<float>();
 					}
 
-					const AssetHandle textureHandle = UUID(staticMeshComponent["Texture"].as<uint64_t>());
+					const AssetHandle textureHandle = AssetHandle(staticMeshComponent["Texture"].as<uint64_t>());
 					if (textureHandle.IsValid())
 						staticMesh.MeshTexture = AssetManager::GetAsset<Texture2D>(textureHandle);
 
-					const AssetHandle meshHandle = UUID(staticMeshComponent["Mesh"].as<uint64_t>());
+					const AssetHandle meshHandle = AssetHandle(staticMeshComponent["Mesh"].as<uint64_t>());
 					if (meshHandle.IsValid())
 					{
 						staticMesh.StaticMesh = AssetManager::GetAsset<Mesh>(meshHandle);

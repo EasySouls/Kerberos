@@ -2,11 +2,11 @@
 #include "Kerberos/Assets/AssetMetadata.h"
 #include "Kerberos/Renderer/Material.h"
 #include "Kerberos/Renderer/Mesh.h"
-
-#include <Assimp/Importer.hpp>
-
-#include "assimp/material.h"
 #include "Kerberos/Renderer/Texture.h"
+
+#include <filesystem>
+
+struct aiScene;
 
 namespace Kerberos
 {

@@ -1,10 +1,14 @@
 #include "kbrpch.h"
-#include "MeshImporter.h"
 
-#include "TextureImporter.h"
-#include "assimp/postprocess.h"
-#include "assimp/scene.h"
 #include "Kerberos/Core/Timer.h"
+#include "MeshImporter.h"
+#include "TextureImporter.h"
+
+#include "Assimp/postprocess.h"
+#include "Assimp/scene.h"
+#include <Assimp/Importer.hpp>
+
+#include "assimp/material.h"
 
 namespace Kerberos
 {

@@ -49,6 +49,9 @@ namespace Kerberos
 				return nullptr;
 			}
 
+			/// Assign the handle to the asset, since a random one was generated when creating the asset
+			asset->GetHandle() = handle;
+
 			/// Save the loaded asset
 			m_LoadedAssets[handle] = asset;
 		}
@@ -97,6 +100,12 @@ namespace Kerberos
 		AssetMetadata metadata;
 		metadata.Filepath = filepath;
 		metadata.Type = AssetTypeFromFileExtension(filepath);
+
+		/// If the asset is already in the registry, return its handle
+		if (m_AssetRegistry.ContainsPath(filepath))
+		{
+			return m_AssetRegistry.GetHandle(filepath);
+		}
 
 		const Ref<Asset> asset = AssetImporter::ImportAsset(handle, metadata);
 		if (!asset)
