@@ -2,13 +2,12 @@
 
 #include "Kerberos/Utils/PlatformUtils.h"
 
-#include <glm/ext/matrix_clip_space.hpp>
-#include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.inl>
 
 #include "imgui/imgui.h"
 #include <ImGuizmo/ImGuizmo.h>
 
+#include "Kerberos/Assets/Importers/MeshImporter.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"
 
 #define PROFILE_SCOPE(name) Timer timer##__LINE__(name, 
@@ -40,9 +39,13 @@ namespace Kerberos
 
 		m_ViewportSize = { 1280.0f, 720.0f };
 
-		m_Texture = TextureImporter::ImportTexture("assets/textures/y2k_ice_texture.png");
+		const Ref<EditorAssetManager> assetManager = Project::GetActive()->GetEditorAssetManager();
 
-		m_SpriteSheet = TextureImporter::ImportTexture("assets/game/textures/RPGpack_sheet_2X.png");
+		const AssetHandle texHandle = assetManager->ImportAsset("assets/textures/y2k_ice_texture.png");
+		m_Texture = AssetManager::GetAsset<Texture2D>(texHandle);
+
+		const AssetHandle spriteSheetHandle = assetManager->ImportAsset("assets/game/textures/RPGpack_sheet_2X.png");
+		m_SpriteSheet = AssetManager::GetAsset<Texture2D>(spriteSheetHandle);
 
 		m_TextureStairs = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 7, 6 }, { 128, 128 }, { 1, 1 });
 		m_TextureBarrel = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 8, 3 }, { 128, 128 }, { 1, 1 });
@@ -52,8 +55,16 @@ namespace Kerberos
 		m_TextureDirt = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 6, 11 }, { 128, 128 }, { 1, 1 });
 		m_TextureWater = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128, 128 }, { 1, 1 });
 
-#define FIRST_TIME_LOADING_SCENE 1
-#if FIRST_TIME_LOADING_SCENE
+#define FIRST_TIME_LOADING_SCENE_TEST 0
+#if FIRST_TIME_LOADING_SCENE_TEST
+
+		/// There are copied from the asset registry file
+
+		const AssetHandle cubeMeshHandle = AssetHandle(17235766386814756524);
+		const AssetHandle sphereMeshHandle = AssetHandle(12370507570964552446);
+		const AssetHandle backpackMeshHandle = AssetHandle(792555746016710845);
+		const AssetHandle planeMeshHandle = AssetHandle(69186964614645221);
+
 		Entity squareEntity = m_ActiveScene->CreateEntity("Square");
 		squareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
 
@@ -61,7 +72,7 @@ namespace Kerberos
 
 		{
 			Entity cubeEntity = m_ActiveScene->CreateEntity("Cube");
-			const Ref<Mesh> cubeMesh = Mesh::CreateCube(1.0f);
+			const Ref<Mesh> cubeMesh = AssetManager::GetAsset<Mesh>(cubeMeshHandle);
 			cubeEntity.AddComponent<StaticMeshComponent>(cubeMesh, whiteMaterial, m_Texture);
 			auto& transform = cubeEntity.GetComponent<TransformComponent>();
 			transform.Translation = { -2.0f, 2.0f, -2.0f };
@@ -72,9 +83,17 @@ namespace Kerberos
 
 		{
 			Entity sphereEntity = m_ActiveScene->CreateEntity("Sphere");
-			const Ref<Mesh> sphereMesh = Mesh::CreateSphere(1.0f, 32, 32);
+			const Ref<Mesh> sphereMesh = AssetManager::GetAsset<Mesh>(sphereMeshHandle);
 			sphereEntity.AddComponent<StaticMeshComponent>(sphereMesh, whiteMaterial, m_Texture);
 			sphereEntity.GetComponent<TransformComponent>().Translation = { 2.0f, 1.2f, -2.0f };
+		}
+
+		{
+			Entity backpackEntity = m_ActiveScene->CreateEntity("Backpack");
+			const Ref<Mesh> backpackMesh = AssetManager::GetAsset<Mesh>(backpackMeshHandle);
+			const AssetHandle backpackTexHandle = assetManager->ImportAsset("Assets/models/backpack/diffuse.jpg");
+			const Ref<Texture2D> backpackTexture = AssetManager::GetAsset<Texture2D>(backpackTexHandle);
+			backpackEntity.AddComponent<StaticMeshComponent>(backpackMesh, whiteMaterial, backpackTexture);
 		}
 
 		//{
@@ -88,7 +107,7 @@ namespace Kerberos
 
 		{
 			Entity groundEntity = m_ActiveScene->CreateEntity("Ground");
-			const Ref<Mesh> groundMesh = Mesh::CreateCube(1.0f);
+			const Ref<Mesh> groundMesh = AssetManager::GetAsset<Mesh>(cubeMeshHandle);
 			groundEntity.AddComponent<StaticMeshComponent>(groundMesh, whiteMaterial, nullptr);
 			auto& transform = groundEntity.GetComponent<TransformComponent>();
 			transform.Translation = { 0.0f, -2.0f, 0.0f };
@@ -143,9 +162,6 @@ namespace Kerberos
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
-
-		/*const Model backpackModel = Model("assets/models/backpack/backpack.obj", "Backpack");
-		backpackModel.InitEntities(m_ActiveScene);*/
 
 		/*Model deerModel = Model("assets/models/deer_demo/scene.gltf", "Deer");
 		deerModel.InitEntities(m_ActiveScene);*/
@@ -396,6 +412,7 @@ namespace Kerberos
 		ImGui::Text("Shadow Map");
 		const uint64_t shadowMapTextureID = m_ActiveScene->GetShadowMapFramebuffer()->GetDepthAttachmentRendererID();
 		ImGui::Image(shadowMapTextureID, ImVec2{ 256, 256 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		ImGui::Checkbox("Only render shadow map if light has changed", &m_ActiveScene->GetOnlyRenderShadowMapIfLightHasChanged());
 
 		ImGui::End();
 

@@ -230,7 +230,7 @@ namespace Kerberos
 			out << YAML::Key << "StaticMeshComponent";
 			out << YAML::BeginMap;
 			const auto& staticMesh = entity.GetComponent<StaticMeshComponent>();
-			out << YAML::Key << "Mesh" << YAML::Value << 0; /// Placeholder for mesh index, to be replaced with actual mesh index
+			out << YAML::Key << "Mesh" << YAML::Value << (staticMesh.StaticMesh ? staticMesh.StaticMesh->GetHandle() : UUID::Invalid());
 			if (auto& mat = staticMesh.MeshMaterial)
 			{
 				//out << YAML::Key << "Material" << YAML::Value << staticMesh.MeshMaterial->GetHandle();
@@ -471,13 +471,18 @@ namespace Kerberos
 						staticMesh.MeshMaterial->Shininess = matNode["Shininess"].as<float>();
 					}
 
-					const AssetHandle textureHandle = UUID(staticMeshComponent["Texture"].as<uint64_t>());
+					const AssetHandle textureHandle = AssetHandle(staticMeshComponent["Texture"].as<uint64_t>());
 					if (textureHandle.IsValid())
-						staticMesh.MeshTexture = AssetManager::GetAsset<Texture2D>(UUID(staticMeshComponent["Texture"].as<uint64_t>()));
+						staticMesh.MeshTexture = AssetManager::GetAsset<Texture2D>(textureHandle);
 
-					const auto mesh = staticMeshComponent["Mesh"].as<uint64_t>();
-					if (mesh == 0)
+					const AssetHandle meshHandle = AssetHandle(staticMeshComponent["Mesh"].as<uint64_t>());
+					if (meshHandle.IsValid())
 					{
+						staticMesh.StaticMesh = AssetManager::GetAsset<Mesh>(meshHandle);
+					}
+					else
+					{
+						KBR_CORE_WARN("AssetHandle for mesh is invalid, using default cube mesh.");
 						staticMesh.StaticMesh = AssetManager::GetDefaultCubeMesh();
 					}
 				}

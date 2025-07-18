@@ -57,7 +57,14 @@
 
 /// ---- Assets ---------------------
 #include "Kerberos/Assets/Model.h"
-//#include "Kerberos/Assets/AssetManager.h"
+#include "Kerberos/Assets/AssetManager.h"
+#include "Kerberos/Assets/Asset.h"
+#include "Kerberos/Assets/AssetMetadata.h"
+#include "Kerberos/Assets/EditorAssetManager.h"
+#include "Kerberos/Assets/Importers/AssetImporter.h"
+#include "Kerberos/Assets/Importers/CubemapImporter.h"
+#include "Kerberos/Assets/Importers/TextureImporter.h"
+#include "Kerberos/Assets/Importers/MeshImporter.h"
 /// ---------------------------------
 
 /// ---- Project --------------------

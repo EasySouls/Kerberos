@@ -1,6 +1,8 @@
 #include "kbrpch.h"
 #include "AssetRegistry.h"
 
+#include <ranges>
+
 namespace Kerberos
 {
 	//static std::mutex s_AssetRegistryMutex;
@@ -40,5 +42,32 @@ namespace Kerberos
 	void AssetRegistry::Add(const AssetHandle handle, const AssetMetadata& metadata)
 	{
 		m_Registry[handle] = metadata;
+	}
+
+	bool AssetRegistry::ContainsPath(const std::filesystem::path& path) const 
+	{
+		for (const auto& [Type, Filepath] : m_Registry | std::views::values)
+		{
+			if (Filepath == path)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	AssetHandle AssetRegistry::GetHandle(const std::filesystem::path& path) const 
+	{
+		for (const auto& [Handle, Metadata] : m_Registry)
+		{
+			if (Metadata.Filepath == path)
+			{
+				return Handle;
+			}
+		}
+
+		KBR_CORE_ERROR("AssetRegistry::GetHandle - no handle found for path: {}", path.string());
+		return AssetHandle::Invalid();
 	}
 }

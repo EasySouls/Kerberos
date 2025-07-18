@@ -90,6 +90,9 @@
     <ClInclude Include="src\Kerberos\Assets\Importers\CubemapImporter.h">
       <Filter>src\Kerberos\Assets\Importers</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Assets\Importers\MeshImporter.h">
+      <Filter>src\Kerberos\Assets\Importers</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Assets\Importers\TextureImporter.h">
       <Filter>src\Kerberos\Assets\Importers</Filter>
     </ClInclude>
@@ -368,6 +371,9 @@
     <ClCompile Include="src\Kerberos\Assets\Importers\CubemapImporter.cpp">
       <Filter>src\Kerberos\Assets\Importers</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Assets\Importers\MeshImporter.cpp">
+      <Filter>src\Kerberos\Assets\Importers</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\Importers\TextureImporter.cpp">
       <Filter>src\Kerberos\Assets\Importers</Filter>
     </ClCompile>
@@ -557,5 +563,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Internal\ThreadPool.ixx" />
   </ItemGroup>
 </Project>

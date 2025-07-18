@@ -16,12 +16,17 @@ namespace Kerberos
 			return AssetType::Texture2D;
 		if (extension == ".kbrcubemap")
 			return AssetType::TextureCube;
-		if (extension == ".fbx" || extension == ".obj")
+		if (extension == ".fbx" || extension == ".obj" || extension == ".gltf")
 			return AssetType::Mesh;
 		if (extension == ".kerberos")
 			return AssetType::Scene;
 		KBR_CORE_WARN("Unknown asset type for file: {0}", filepath.string());
 		return AssetType::Texture2D;
+	}
+
+	EditorAssetManager::EditorAssetManager() 
+	{
+		AssetImporter::Init();
 	}
 
 	Ref<Asset> EditorAssetManager::GetAsset(const AssetHandle handle) 
@@ -44,6 +49,9 @@ namespace Kerberos
 				return nullptr;
 			}
 
+			/// Assign the handle to the asset, since a random one was generated when creating the asset
+			asset->GetHandle() = handle;
+
 			/// Save the loaded asset
 			m_LoadedAssets[handle] = asset;
 		}
@@ -54,9 +62,19 @@ namespace Kerberos
 	bool EditorAssetManager::IsAssetHandleValid(const AssetHandle handle) const
 	{
 		if (!handle.IsValid())
+		{
+			KBR_CORE_WARN("Asset handle is not valid: {}", handle);
 			return false;
+		}
+	
+		const bool isInAssetRegistry = m_AssetRegistry.Contains(handle);
+		if (!isInAssetRegistry)
+		{
+			KBR_CORE_WARN("Asset handle is not in asset registry: {}", handle);
+			return false;
+		}
 
-		return m_AssetRegistry.Contains(handle);
+		return true;
 	}
 
 	bool EditorAssetManager::IsAssetLoaded(const AssetHandle handle) const
@@ -82,6 +100,12 @@ namespace Kerberos
 		AssetMetadata metadata;
 		metadata.Filepath = filepath;
 		metadata.Type = AssetTypeFromFileExtension(filepath);
+
+		/// If the asset is already in the registry, return its handle
+		if (m_AssetRegistry.ContainsPath(filepath))
+		{
+			return m_AssetRegistry.GetHandle(filepath);
+		}
 
 		const Ref<Asset> asset = AssetImporter::ImportAsset(handle, metadata);
 		if (!asset)
@@ -183,7 +207,7 @@ namespace Kerberos
 			const std::filesystem::path filepath = assetNode["Path"].as<std::string>();
 
 			const AssetType type = AssetTypeFromString(typeStr);
-			if (type == AssetType::Texture2D || type == AssetType::TextureCube)
+			if (type == AssetType::Texture2D || type == AssetType::TextureCube || type == AssetType::Mesh)
 			{
 				m_AssetRegistry.Add(handle, { .Type = type, .Filepath = filepath });
 			}

@@ -8,8 +8,8 @@ namespace Kerberos
 	class KerberosEditorApp : public Application
 	{
 	public:
-		KerberosEditorApp()
-			: Application("Kerberos Editor")
+		explicit KerberosEditorApp(const ApplicationSpecification& spec)
+			: Application(spec)
 		{
 			PushLayer(new EditorLayer());
 		}
@@ -17,11 +17,15 @@ namespace Kerberos
 		~KerberosEditorApp() override = default;
 	};
 
-	Application* CreateApplication()
+	Application* CreateApplication(const ApplicationCommandLineArgs args)
 	{
+		ApplicationSpecification spec;
+		spec.Name = "Kerberos Editor";
+		spec.CommandLineArgs = args;
+
 		/// This is only needed so when the editor initializes, the static project shouldn't be null
 		Project::New();
 
-		return new KerberosEditorApp();
+		return new KerberosEditorApp(spec);
 	}
 }

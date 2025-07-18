@@ -3,6 +3,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.inl>
 #include "imgui/imgui.h"
+#include "Kerberos/Assets/Importers/TextureImporter.h"
 
 #include "Kerberos/Core/Input.h"
 
@@ -35,9 +36,9 @@ void Sandbox2D::OnAttach()
 {
 	KBR_PROFILE_FUNCTION();
 
-	m_Texture = Kerberos::Texture2D::Create("assets/textures/y2k_ice_texture.png");
+	m_Texture = Kerberos::TextureImporter::ImportTexture("assets/textures/y2k_ice_texture.png");
 
-	m_SpriteSheet = Kerberos::Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
+	m_SpriteSheet = Kerberos::TextureImporter::ImportTexture("assets/game/textures/RPGpack_sheet_2X.png");
 
 	m_TextureStairs = Kerberos::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 7, 6 }, { 128, 128 }, { 1, 1 });
 	m_TextureBarrel = Kerberos::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 8, 3 }, { 128, 128 }, { 1, 1 });

@@ -13,6 +13,16 @@
 
 namespace Kerberos
 {
+	enum class LogLevel
+	{
+		Trace = 0,
+		Debug,
+		Info,
+		Warn,
+		Error,
+		Critical
+	};
+
 	class Log
 	{
 	public:
@@ -20,6 +30,51 @@ namespace Kerberos
 
 		inline static Ref<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
 		inline static Ref<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
+
+		
+		/**
+		 * Sets the log level for the core logger.
+		 * @param level The minimum log level.
+		 */
+		static void SetCoreLogLevel(const LogLevel level)
+		{
+			switch (level)
+			{
+			case LogLevel::Trace: s_CoreLogger->set_level(spdlog::level::trace); break;
+			case LogLevel::Debug: s_CoreLogger->set_level(spdlog::level::debug); break;
+			case LogLevel::Info: s_CoreLogger->set_level(spdlog::level::info); break;
+			case LogLevel::Warn: s_CoreLogger->set_level(spdlog::level::warn); break;
+			case LogLevel::Error: s_CoreLogger->set_level(spdlog::level::err); break;
+			case LogLevel::Critical: s_CoreLogger->set_level(spdlog::level::critical); break;
+			}
+		}
+
+		/**
+		 * Sets the log level for the client logger.
+		 * @param level The minimum log level.
+		 */
+		static void SetClientLogLevel(const LogLevel level)
+		{
+			switch (level)
+			{
+			case LogLevel::Trace: s_ClientLogger->set_level(spdlog::level::trace); break;
+			case LogLevel::Debug: s_ClientLogger->set_level(spdlog::level::debug); break;
+			case LogLevel::Info: s_ClientLogger->set_level(spdlog::level::info); break;
+			case LogLevel::Warn: s_ClientLogger->set_level(spdlog::level::warn); break;
+			case LogLevel::Error: s_ClientLogger->set_level(spdlog::level::err); break;
+			case LogLevel::Critical: s_ClientLogger->set_level(spdlog::level::critical); break;
+			}
+		}
+
+		/**
+		 * Sets the log level for both core and client loggers.
+		 * @param level The minimum log level.
+		 */
+		static void SetLogLevel(const LogLevel level)
+		{
+			SetCoreLogLevel(level);
+			SetClientLogLevel(level);
+		}
 
 	private:
 		static Ref<spdlog::logger> s_CoreLogger;

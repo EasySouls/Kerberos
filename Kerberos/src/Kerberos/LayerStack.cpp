@@ -29,7 +29,7 @@ namespace Kerberos
 
 	void LayerStack::PopLayer(Layer* layer)
 	{
-		const auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
+		const auto it = std::ranges::find(m_Layers, layer);
 		if (it != m_Layers.end())
 		{
 			layer->OnDetach();
@@ -39,7 +39,7 @@ namespace Kerberos
 	}
 	void LayerStack::PopOverlay(Layer* overlay)
 	{
-		const auto it = std::find(m_Layers.begin(), m_Layers.end(), overlay);
+		const auto it = std::ranges::find(m_Layers, overlay);
 		if (it != m_Layers.end())
 		{
 			overlay->OnDetach();

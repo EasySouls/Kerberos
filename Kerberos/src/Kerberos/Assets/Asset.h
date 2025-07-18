@@ -4,7 +4,6 @@
 #include "Kerberos/Core.h"
 #include "Kerberos/Log.h"
 
-#include <string>
 
 namespace Kerberos
 {
@@ -26,7 +25,8 @@ namespace Kerberos
 
 		virtual AssetType GetType() = 0;
 
-		UUID GetHandle() const { return m_Handle; }
+		AssetHandle GetHandle() const { return m_Handle; }
+		AssetHandle& GetHandle() { return m_Handle; }
 
 	protected:
 		/**
@@ -35,7 +35,7 @@ namespace Kerberos
 		AssetHandle m_Handle{};
 	};
 
-	static std::string_view AssetTypeToString(const AssetType type)
+	static constexpr std::string_view AssetTypeToString(const AssetType type)
 	{
 		switch (type)
 		{
@@ -55,7 +55,7 @@ namespace Kerberos
 		return "";
 	}
 
-	static AssetType AssetTypeFromString(const std::string_view str)
+	static constexpr AssetType AssetTypeFromString(const std::string_view str)
 	{
 		if (str == "Texture2D")
 			return AssetType::Texture2D;

@@ -8,6 +8,25 @@
 
 namespace Kerberos
 {
+	struct ApplicationCommandLineArgs
+	{
+		int Count = 0;
+		char** Args = nullptr;
+
+		const char* operator[](const int index) const
+		{
+			KBR_CORE_ASSERT(index < Count, "Wrong index into ApplicationCommandLineArgs");
+			return Args[index];
+		}
+	};
+
+	struct ApplicationSpecification
+	{
+		std::string Name = "Kerberos Application";
+		std::string WorkingDirectory;
+		ApplicationCommandLineArgs CommandLineArgs;
+	};
+
 	class Application
 	{
 	public:
@@ -15,7 +34,7 @@ namespace Kerberos
 		/**
 		 * Initializes the window, the renderer, and creates the ImGuiLayer.
 		 */
-		explicit Application(const std::string& name);
+		explicit Application(const ApplicationSpecification& spec);
 		virtual ~Application();
 
 		void Run();
@@ -35,6 +54,7 @@ namespace Kerberos
 		bool OnWindowResize(const WindowResizeEvent& e);
 
 	private:
+		ApplicationSpecification m_Specification;
 		bool m_Running = true;
 		bool m_Minimized = false;
 		float m_LastFrameTime = 0;
@@ -47,7 +67,7 @@ namespace Kerberos
 	};
 
 	// To be defined in client
-	Application* CreateApplication();
+	Application* CreateApplication(ApplicationCommandLineArgs args);
 
 }
 

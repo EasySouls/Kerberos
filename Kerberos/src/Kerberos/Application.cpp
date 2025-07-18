@@ -13,14 +13,27 @@ namespace Kerberos
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application(const std::string& name)
+	Application::Application(const ApplicationSpecification& spec) 
 	{
 		KBR_PROFILE_FUNCTION();
 
 		KBR_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		const WindowProps props{ name, true, 1280, 720 };
+		m_Specification = spec;
+
+		/// Set the working directory
+		if (!spec.WorkingDirectory.empty())
+		{
+			std::filesystem::current_path(spec.WorkingDirectory);
+			KBR_CORE_INFO("Working directory set to: {0}", std::filesystem::current_path().string());
+		}
+		else
+		{
+			KBR_CORE_WARN("No working directory specified, using current path: {0}", std::filesystem::current_path().string());
+		}
+
+		const WindowProps props{ spec.Name, true, 1280, 720 };
 		m_Window = Window::Create(props);
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 

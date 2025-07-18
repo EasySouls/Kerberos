@@ -54,20 +54,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\bin\Debug-windows-x86_64\Kerberos\</OutDir>
-    <IntDir>..\bin-int\Debug-windows-x86_64\Kerberos\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\Debug-windows-x86_64\Kerberos\</OutDir>
+    <IntDir>$(ProjectDir)..\bin-int\Debug-windows-x86_64\Kerberos\</IntDir>
     <TargetName>Kerberos</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\bin\Release-windows-x86_64\Kerberos\</OutDir>
-    <IntDir>..\bin-int\Release-windows-x86_64\Kerberos\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\Release-windows-x86_64\Kerberos\</OutDir>
+    <IntDir>$(ProjectDir)..\bin-int\Release-windows-x86_64\Kerberos\</IntDir>
     <TargetName>Kerberos</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
-    <OutDir>..\bin\Dist-windows-x86_64\Kerberos\</OutDir>
-    <IntDir>..\bin-int\Dist-windows-x86_64\Kerberos\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\Dist-windows-x86_64\Kerberos\</OutDir>
+    <IntDir>$(ProjectDir)..\bin-int\Dist-windows-x86_64\Kerberos\</IntDir>
     <TargetName>Kerberos</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
@@ -83,7 +83,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
@@ -109,7 +109,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
@@ -136,7 +136,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
@@ -160,6 +160,7 @@
     <ClInclude Include="src\Kerberos\Assets\EditorAssetManager.h" />
     <ClInclude Include="src\Kerberos\Assets\Importers\AssetImporter.h" />
     <ClInclude Include="src\Kerberos\Assets\Importers\CubemapImporter.h" />
+    <ClInclude Include="src\Kerberos\Assets\Importers\MeshImporter.h" />
     <ClInclude Include="src\Kerberos\Assets\Importers\TextureImporter.h" />
     <ClInclude Include="src\Kerberos\Assets\Model.h" />
     <ClInclude Include="src\Kerberos\Assets\RuntimeAssetManager.h" />
@@ -254,12 +255,14 @@
     <ClCompile Include="src\Kerberos\Assets\EditorAssetManager.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Importers\AssetImporter.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Importers\CubemapImporter.cpp" />
+    <ClCompile Include="src\Kerberos\Assets\Importers\MeshImporter.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Importers\TextureImporter.cpp" />
     <ClCompile Include="src\Kerberos\Assets\Model.cpp" />
     <ClCompile Include="src\Kerberos\Assets\RuntimeAssetManager.cpp" />
     <ClCompile Include="src\Kerberos\Core\UUID.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp" />
+    <ClCompile Include="src\Kerberos\Internal\ThreadPool.ixx" />
     <ClCompile Include="src\Kerberos\Layer.cpp" />
     <ClCompile Include="src\Kerberos\LayerStack.cpp" />
     <ClCompile Include="src\Kerberos\Log.cpp" />
