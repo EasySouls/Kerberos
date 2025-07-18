@@ -1,17 +1,18 @@
 #pragma once
 
 #ifdef KBR_PLATFORM_WINDOWS
+#include "Application.h"
 
-extern Kerberos::Application* Kerberos::CreateApplication();
+extern Kerberos::Application* Kerberos::CreateApplication(ApplicationCommandLineArgs args);
 
-int main(int argc, char** argv)
+int main(const int argc, char** argv)
 {
 	Kerberos::Log::Init();
 	KBR_CORE_INFO("Core logger initialized");
 	KBR_INFO("Client logger initialized");
 
 	KBR_PROFILE_BEGIN_SESSION("Startup", "KerberosProfile-Startup.json");
-	const auto app = Kerberos::CreateApplication();
+	const auto app = Kerberos::CreateApplication({ .Count = argc, .Args = argv });
 	KBR_PROFILE_END_SESSION();
 
 	KBR_PROFILE_BEGIN_SESSION("Runtime", "KerberosProfile-Runtime.json");

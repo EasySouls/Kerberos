@@ -6,8 +6,8 @@
 class Sandbox : public Kerberos::Application
 {
 public:
-	Sandbox()
-		: Application("Sandbox")
+	Sandbox(const Kerberos::ApplicationSpecification& spec)
+		: Application(spec)
 	{
 		//PushLayer(new ExampleLayer());
 		PushLayer(new Sandbox2D());
@@ -16,7 +16,11 @@ public:
 	~Sandbox() override = default;
 };
 
-Kerberos::Application* Kerberos::CreateApplication()
+Kerberos::Application* Kerberos::CreateApplication(const ApplicationCommandLineArgs args)
 {
-	return new Sandbox();
+	ApplicationSpecification spec;
+	spec.Name = "Sandbox";
+	spec.CommandLineArgs = args;
+
+	return new Sandbox(spec);
 }
