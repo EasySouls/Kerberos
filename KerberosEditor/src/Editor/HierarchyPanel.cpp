@@ -655,12 +655,6 @@ namespace Kerberos
 				/// TODO: Visualize the static mesh in the editor
 				ImGui::Button("Static Mesh");
 
-				ImGui::Separator();
-
-				ImGui::Checkbox("Cast Shadows", &staticMesh.CastShadows);
-
-				ImGui::Separator();
-
 				/// Handle drag and drop for meshes
 				if (ImGui::BeginDragDropTarget())
 				{
@@ -679,6 +673,25 @@ namespace Kerberos
 					ImGui::EndDragDropTarget();
 				}
 
+				std::string meshLabel = "None";
+				if (staticMesh.StaticMesh)
+				{
+					if (AssetManager::IsAssetHandleValid(staticMesh.StaticMesh->GetHandle()))
+					{
+						const auto& [Type, Filepath] = Project::GetActive()->GetEditorAssetManager()->GetMetadata(staticMesh.StaticMesh->GetHandle());
+						meshLabel = Filepath.filename().string();
+					}
+					else
+					{
+						meshLabel = "Invalid Mesh";
+					}
+				}
+				ImGui::Text("%s", meshLabel.c_str());
+
+				ImGui::Separator();
+
+				ImGui::Checkbox("Cast Shadows", &staticMesh.CastShadows);
+
 				if (staticMesh.MeshMaterial)
 				{
 					ImGui::Separator();
@@ -691,15 +704,29 @@ namespace Kerberos
 
 				ImGui::Separator();
 				ImGui::Text("Texture");
+
+				std::string textureLabel = "None";
 				uint64_t textureID;
 				if (staticMesh.MeshTexture)
 				{
+					if (AssetManager::IsAssetHandleValid(staticMesh.MeshTexture->GetHandle()))
+					{
+						const auto& [Type, Filepath] = Project::GetActive()->GetEditorAssetManager()->GetMetadata(staticMesh.MeshTexture->GetHandle());
+						textureLabel = Filepath.filename().string();
+					}
+					else
+					{
+						textureLabel = "Invalid texture";
+					}
+
 					textureID = staticMesh.MeshTexture->GetRendererID();
 				}
 				else
 				{
 					textureID = m_WhiteTexture->GetRendererID();
 				}
+				ImGui::Text("%s", textureLabel.c_str());
+
 				ImGui::Image(textureID, ImVec2{ 64, 64 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 				/// Handle drag and drop for textures

@@ -6,7 +6,6 @@
 #include "TextureCube.h"
 #include "UniformBuffer.h"
 #include "Kerberos/Assets/AssetManager.h"
-#include "Kerberos/Assets/Importers/CubemapImporter.h"
 
 static constexpr int MAX_POINT_LIGHTS = 10;
 

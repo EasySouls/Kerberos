@@ -22,6 +22,11 @@ namespace Kerberos
 			return Project::GetActive()->GetAssetManager()->GetAssetType(handle);
 		}
 
+		static bool IsAssetHandleValid(const AssetHandle handle)
+		{
+			return Project::GetActive()->GetAssetManager()->IsAssetHandleValid(handle);
+		}
+
 		static Ref<Texture2D> GetDefaultTexture2D();
 		static Ref<Mesh> GetDefaultCubeMesh();
 	};
