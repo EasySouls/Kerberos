@@ -53,6 +53,7 @@ namespace Kerberos
 		}
 
 		UUID GetUUID() const { return GetComponent<IDComponent>().ID; }
+		std::string_view GetName() const { return GetComponent<TagComponent>().Tag; }
 
 		explicit operator bool() const { return m_EntityHandle != entt::null; }
 
