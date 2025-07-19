@@ -635,7 +635,7 @@ namespace Kerberos
 		m_Registry.destroy(enttId);
 	}
 
-	void Scene::DuplicateEntity(const Entity entity, const bool duplicateChildren) 
+	void Scene::DuplicateEntity(const Entity entity, const bool duplicateChildren)
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -645,7 +645,7 @@ namespace Kerberos
 		Entity newEntity = CreateEntity(newName);
 
 		newEntity.GetComponent<TransformComponent>() = entity.GetComponent<TransformComponent>();
-		
+
 		if (entity.HasComponent<SpriteRendererComponent>())
 		{
 			newEntity.AddComponent<SpriteRendererComponent>(entity.GetComponent<SpriteRendererComponent>());
@@ -659,9 +659,17 @@ namespace Kerberos
 		if (entity.HasComponent<NativeScriptComponent>())
 		{
 			auto& script = entity.GetComponent<NativeScriptComponent>();
-			newEntity.AddComponent<NativeScriptComponent>(script);
-			newEntity.GetComponent<NativeScriptComponent>().Instantiate();
-			newEntity.GetComponent<NativeScriptComponent>().Instance->m_Entity = newEntity;
+			/// Instantiate the script instance, so that script.Instance is not nullptr,
+			/// when calling script.Instantiate() in the new entity.
+			script.Instantiate();
+
+			auto& newScriptComp = newEntity.AddComponent<NativeScriptComponent>(script);
+			newScriptComp.Instantiate = [&]() { newScriptComp.Instance = script.Instance; };
+			newScriptComp.Destroy = [&]()
+				{
+					delete newScriptComp.Instance;
+					newScriptComp.Instance = nullptr;
+				};
 		}
 		if (entity.HasComponent<StaticMeshComponent>())
 		{
@@ -701,7 +709,7 @@ namespace Kerberos
 		}
 	}
 
-	void Scene::CreateChild(const Entity entity) 
+	void Scene::CreateChild(const Entity entity)
 	{
 		const Entity child = CreateEntity("Unnamed");
 		SetParent(child, entity);
@@ -805,6 +813,88 @@ namespace Kerberos
 			}
 		}
 	}
+
+	Ref<Scene> Scene::Copy(const Ref<Scene>& other)
+	{
+		Ref<Scene> newScene = CreateRef<Scene>();
+
+		newScene->m_ViewportWidth = other->m_ViewportWidth;
+		newScene->m_ViewportHeight = other->m_ViewportHeight;
+
+		auto& sourceRegistry = other->m_Registry;
+		auto& newRegistry = newScene->m_Registry;
+
+		const auto idView = sourceRegistry.view<IDComponent>();
+		for (const auto& entity : idView)
+		{
+			UUID sourceID = sourceRegistry.get<IDComponent>(entity).ID;
+			const auto& tag = sourceRegistry.get<TagComponent>(entity).Tag;
+			Entity newEntity = newScene->CreateEntityWithUUID(tag, sourceID);
+
+			/// Copy all components
+
+			newEntity.GetComponent<TransformComponent>() = sourceRegistry.get<TransformComponent>(entity);
+
+			if (sourceRegistry.all_of<SpriteRendererComponent>(entity))
+			{
+				newEntity.AddComponent<SpriteRendererComponent>(sourceRegistry.get<SpriteRendererComponent>(entity));
+			}
+			if (sourceRegistry.all_of<CameraComponent>(entity))
+			{
+				auto& cameraComp = sourceRegistry.get<CameraComponent>(entity);
+				newEntity.AddComponent<CameraComponent>(cameraComp);
+				newEntity.GetComponent<CameraComponent>().Camera.SetViewportSize(newScene->m_ViewportWidth, newScene->m_ViewportHeight);
+			}
+			if (sourceRegistry.all_of<NativeScriptComponent>(entity))
+			{
+				auto& scriptComp = sourceRegistry.get<NativeScriptComponent>(entity);
+				/// Instantiate the script instance, so that script.Instance is not nullptr,
+				/// when calling script.Instantiate() in the new entity.
+				scriptComp.Instantiate();
+
+				auto& newScriptComp = newEntity.AddComponent<NativeScriptComponent>();
+				newScriptComp.Instantiate = [&]() { newScriptComp.Instance = scriptComp.Instance; };
+				newScriptComp.Destroy = [&]()
+					{
+						delete newScriptComp.Instance;
+						newScriptComp.Instance = nullptr;
+					};
+			}
+			if (sourceRegistry.all_of<StaticMeshComponent>(entity))
+			{
+				newEntity.AddComponent<StaticMeshComponent>(sourceRegistry.get<StaticMeshComponent>(entity));
+			}
+			if (sourceRegistry.all_of<RigidBody3DComponent>(entity))
+			{
+				auto& rigidBodyComp = sourceRegistry.get<RigidBody3DComponent>(entity);
+				newEntity.AddComponent<RigidBody3DComponent>(rigidBodyComp);
+				newEntity.GetComponent<RigidBody3DComponent>().RuntimeBody = nullptr; // Reset runtime body
+			}
+			if (sourceRegistry.all_of<BoxCollider3DComponent>(entity))
+			{
+				newEntity.AddComponent<BoxCollider3DComponent>(sourceRegistry.get<BoxCollider3DComponent>(entity));
+			}
+			if (sourceRegistry.all_of<DirectionalLightComponent>(entity))
+			{
+				newEntity.AddComponent<DirectionalLightComponent>(sourceRegistry.get<DirectionalLightComponent>(entity));
+			}
+			if (sourceRegistry.all_of<PointLightComponent>(entity))
+			{
+				newEntity.AddComponent<PointLightComponent>(sourceRegistry.get<PointLightComponent>(entity));
+			}
+			if (sourceRegistry.all_of<SpotLightComponent>(entity))
+			{
+				newEntity.AddComponent<SpotLightComponent>(sourceRegistry.get<SpotLightComponent>(entity));
+			}
+			if (sourceRegistry.all_of<EnvironmentComponent>(entity))
+			{
+				newEntity.AddComponent<EnvironmentComponent>(sourceRegistry.get<EnvironmentComponent>(entity));
+			}
+		}
+
+		return newScene;
+	}
+
 
 	void Scene::Render2DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform)
 	{

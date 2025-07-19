@@ -24,7 +24,6 @@ namespace Kerberos
 
 		m_ActiveScene = CreateRef<Scene>();
 
-		/// TODO: Open the project passed as command line argument, if there is one
 #define TESTING 1
 #if TESTING
 		OpenProject(R"(C:\Development\Kerberos\KerberosEditor\World3D.kbrproj)");
@@ -623,7 +622,11 @@ namespace Kerberos
 	{
 		m_SceneState = SceneState::Play;
 
-		m_ActiveScene->OnRuntimeStart();
+		m_RuntimeScene = Scene::Copy(m_EditorScene);
+
+		m_RuntimeScene->OnRuntimeStart();
+
+		m_ActiveScene = m_RuntimeScene;
 	}
 
 	void EditorLayer::OnSceneStop()
@@ -631,6 +634,9 @@ namespace Kerberos
 		m_SceneState = SceneState::Edit;
 
 		m_ActiveScene->OnRuntimeStop();
+		m_RuntimeScene = nullptr;
+
+		m_ActiveScene = m_EditorScene;
 	}
 
 	void EditorLayer::HandleDragAndDrop()

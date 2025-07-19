@@ -93,6 +93,8 @@ namespace Kerberos
 		Ref<Framebuffer> GetEditorFramebuffer() const { return m_EditorFramebuffer; }
 		bool& GetOnlyRenderShadowMapIfLightHasChanged() { return m_OnlyRenderShadowMapIfLightHasChanged; }
 
+		static Ref<Scene> Copy(const Ref<Scene>& other);
+
 	private:
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
@@ -104,6 +106,12 @@ namespace Kerberos
 		void UpdateChildTransforms(Entity parent, const glm::mat4& parentTransform);
 
 		bool ShouldRenderShadows(const DirectionalLightComponent* dlc) const;
+
+		template<typename Component>
+		static void CopyComponent(entt::registry& dst, entt::registry& src)
+		{
+
+		}
 
 	private:
 		entt::registry m_Registry;
