@@ -394,6 +394,7 @@ namespace Kerberos
 		std::string hoveredEntityName = "None";
 		if (m_HoveredEntity)
 		{
+			/// TODO: If the hovered entity is deleted, this will crash
 			hoveredEntityName = m_HoveredEntity.GetComponent<TagComponent>().Tag;
 		}
 		ImGui::Text("Hovered entity: %s", hoveredEntityName.c_str());

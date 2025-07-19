@@ -635,6 +635,78 @@ namespace Kerberos
 		m_Registry.destroy(enttId);
 	}
 
+	void Scene::DuplicateEntity(const Entity entity, const bool duplicateChildren) 
+	{
+		KBR_PROFILE_FUNCTION();
+
+		const std::string name = entity.GetComponent<TagComponent>().Tag;
+		const std::string newName = name + " Copy";
+
+		Entity newEntity = CreateEntity(newName);
+
+		newEntity.GetComponent<TransformComponent>() = entity.GetComponent<TransformComponent>();
+		
+		if (entity.HasComponent<SpriteRendererComponent>())
+		{
+			newEntity.AddComponent<SpriteRendererComponent>(entity.GetComponent<SpriteRendererComponent>());
+		}
+		if (entity.HasComponent<CameraComponent>())
+		{
+			newEntity.AddComponent<CameraComponent>(entity.GetComponent<CameraComponent>());
+			auto& camera = newEntity.GetComponent<CameraComponent>();
+			camera.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+		}
+		if (entity.HasComponent<NativeScriptComponent>())
+		{
+			auto& script = entity.GetComponent<NativeScriptComponent>();
+			newEntity.AddComponent<NativeScriptComponent>(script);
+			newEntity.GetComponent<NativeScriptComponent>().Instantiate();
+			newEntity.GetComponent<NativeScriptComponent>().Instance->m_Entity = newEntity;
+		}
+		if (entity.HasComponent<StaticMeshComponent>())
+		{
+			newEntity.AddComponent<StaticMeshComponent>(entity.GetComponent<StaticMeshComponent>());
+		}
+		if (entity.HasComponent<RigidBody3DComponent>())
+		{
+			newEntity.AddComponent<RigidBody3DComponent>(entity.GetComponent<RigidBody3DComponent>());
+			auto& rigidBody = newEntity.GetComponent<RigidBody3DComponent>();
+			rigidBody.RuntimeBody = nullptr;
+		}
+		if (entity.HasComponent<BoxCollider3DComponent>())
+		{
+			newEntity.AddComponent<BoxCollider3DComponent>(entity.GetComponent<BoxCollider3DComponent>());
+		}
+		if (entity.HasComponent<DirectionalLightComponent>())
+		{
+			newEntity.AddComponent<DirectionalLightComponent>(entity.GetComponent<DirectionalLightComponent>());
+		}
+		if (entity.HasComponent<PointLightComponent>())
+		{
+			newEntity.AddComponent<PointLightComponent>(entity.GetComponent<PointLightComponent>());
+		}
+		if (entity.HasComponent<SpotLightComponent>())
+		{
+			newEntity.AddComponent<SpotLightComponent>(entity.GetComponent<SpotLightComponent>());
+		}
+
+		if (duplicateChildren)
+		{
+			const auto children = GetChildren(entity);
+			for (const auto& child : children)
+			{
+				DuplicateEntity(child, true);
+				SetParent(child, newEntity, false);
+			}
+		}
+	}
+
+	void Scene::CreateChild(const Entity entity) 
+	{
+		const Entity child = CreateEntity("Unnamed");
+		SetParent(child, entity);
+	}
+
 	Entity Scene::GetEntityByUUID(const UUID uuid) const
 	{
 		KBR_PROFILE_FUNCTION();

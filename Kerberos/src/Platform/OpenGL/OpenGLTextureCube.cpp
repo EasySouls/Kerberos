@@ -132,6 +132,6 @@ namespace Kerberos
     }
 
 	void OpenGLTextureCube::SetDebugName(const std::string& name) const {
-		glObjectLabel(GL_TEXTURE_CUBE_MAP, m_RendererID, -1, name.c_str());
+		glObjectLabel(GL_TEXTURE, m_RendererID, -1, name.c_str());
     }
 }

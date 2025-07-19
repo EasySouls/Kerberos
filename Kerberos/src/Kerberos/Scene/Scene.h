@@ -58,6 +58,18 @@ namespace Kerberos
 		 */
 		void DestroyEntity(Entity entity);
 
+		/**
+		 * @brief Duplicates an entity in the scene
+		 * 
+		 * It new entity gets the associated assets, so if the assets are modified, the duplicated entity will reflect those changes.
+		 *
+		 * @param entity The entity to duplicate
+		 * @param duplicateChildren If true, duplicates the children of the entity as well
+		 */
+		void DuplicateEntity(Entity entity, bool duplicateChildren);
+
+		void CreateChild(Entity entity);
+
 		Entity GetEntityByUUID(UUID uuid) const;
 
 		void SetParent(Entity child, Entity parent, bool keepWorldTransform = true);
@@ -76,6 +88,7 @@ namespace Kerberos
 		void CalculateEntityTransforms();
 		void CalculateEntityTransform(const Entity& entity);
 
+		Ref<Framebuffer> GetOmniShadowMapFramebuffer() const { return m_OmniShadowMapFramebuffer; }
 		Ref<Framebuffer> GetShadowMapFramebuffer() const { return m_ShadowMapFramebuffer; }
 		Ref<Framebuffer> GetEditorFramebuffer() const { return m_EditorFramebuffer; }
 		bool& GetOnlyRenderShadowMapIfLightHasChanged() { return m_OnlyRenderShadowMapIfLightHasChanged; }
@@ -102,6 +115,7 @@ namespace Kerberos
 		bool m_EnableShadowMapping = true;
 		bool m_OnlyRenderShadowMapIfLightHasChanged = false;
 
+		Ref<Framebuffer> m_OmniShadowMapFramebuffer;
 		Ref<Framebuffer> m_ShadowMapFramebuffer;
 		Ref<Framebuffer> m_EditorFramebuffer;
 

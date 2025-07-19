@@ -144,6 +144,7 @@ namespace Kerberos
 
 		for (const auto& e : m_DeletionQueue)
 		{
+			m_NotificationManager.AddNotification("Entity deleted: " + e.GetComponent<TagComponent>().Tag, Notification::Type::Info);
 			m_Context->DestroyEntity(e);
 		}
 		m_DeletionQueue.clear();
@@ -171,15 +172,28 @@ namespace Kerberos
 			m_SelectedEntity = entity;
 		}
 
-		/// Defer the deletion of the entity until the popup is closed to avoid invalidating the iterator
 		bool entityDeleted = false;
-		if (ImGui::BeginPopupContextItem())
+
+		/// Context menu on entity right-click
 		{
-			if (ImGui::MenuItem("Delete Entity"))
+
+			if (ImGui::BeginPopupContextItem())
 			{
-				entityDeleted = true;
+				if (ImGui::MenuItem("Delete Entity"))
+				{
+					/// Defer the deletion of the entity until the popup is closed to avoid invalidating the iterator
+					entityDeleted = true;
+				}
+				if (ImGui::MenuItem("Duplicate Entity"))
+				{
+					m_Context->DuplicateEntity(entity, true);
+				}
+				if (ImGui::MenuItem("Create child"))
+				{
+					m_Context->CreateChild(entity);
+				}
+				ImGui::EndPopup();
 			}
-			ImGui::EndPopup();
 		}
 
 		if (opened)

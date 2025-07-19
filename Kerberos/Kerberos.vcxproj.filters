@@ -25,6 +25,9 @@
     <Filter Include="src\Kerberos\ImGui">
       <UniqueIdentifier>{035609E0-EF39-CA35-589A-C488449DB4B7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Kerberos\Internal">
+      <UniqueIdentifier>{65E46AB3-D150-26AE-9A44-BE0B06704816}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Kerberos\Project">
       <UniqueIdentifier>{5F1F0631-4BAE-8FFA-F4CC-A3F5E03AA0A0}</UniqueIdentifier>
     </Filter>
@@ -392,6 +395,9 @@
     <ClCompile Include="src\Kerberos\ImGui\ImGuiLayer.cpp">
       <Filter>src\Kerberos\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Internal\ThreadPool.ixx">
+      <Filter>src\Kerberos\Internal</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Layer.cpp">
       <Filter>src\Kerberos</Filter>
     </ClCompile>
@@ -563,6 +569,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Internal\ThreadPool.ixx" />
   </ItemGroup>
 </Project>
