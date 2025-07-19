@@ -8,6 +8,9 @@
 #include "imgui/imgui_internal.h"
 #include <filesystem>
 
+#include "Kerberos/Core/Input.h"
+#include "Kerberos/Events/KeyEvent.h"
+
 namespace Kerberos
 {
 	HierarchyPanel::HierarchyPanel(const Ref<Scene>& context)
@@ -157,6 +160,12 @@ namespace Kerberos
 		m_SelectedEntity = entity;
 	}
 
+	void HierarchyPanel::OnEvent(Event& event) 
+	{
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<KeyPressedEvent>(KBR_BIND_EVENT_FN(HierarchyPanel::OnKeyPressed));
+	}
+
 	void HierarchyPanel::DrawEntityNode(const Entity& entity)
 	{
 		const auto& tag = entity.GetComponent<TagComponent>().Tag;
@@ -179,12 +188,12 @@ namespace Kerberos
 
 			if (ImGui::BeginPopupContextItem())
 			{
-				if (ImGui::MenuItem("Delete Entity"))
+				if (ImGui::MenuItem("Delete Entity", "Delete"))
 				{
 					/// Defer the deletion of the entity until the popup is closed to avoid invalidating the iterator
 					entityDeleted = true;
 				}
-				if (ImGui::MenuItem("Duplicate Entity"))
+				if (ImGui::MenuItem("Duplicate Entity", "Ctrl + D"))
 				{
 					m_Context->DuplicateEntity(entity, true);
 				}
@@ -214,6 +223,39 @@ namespace Kerberos
 				m_SelectedEntity = {};
 			}
 		}
+	}
+
+	bool HierarchyPanel::OnKeyPressed(const KeyPressedEvent& event) 
+	{
+		/// Shortcuts
+		if (event.GetRepeatCount() > 0)
+			return false;
+
+		const bool ctrl = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+		const bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+
+		switch (event.GetKeyCode())
+		{
+		case Key::Delete:
+			if (m_SelectedEntity)
+			{
+				m_DeletionQueue.push_back(m_SelectedEntity);
+				m_SelectedEntity = {};
+				return true;
+			}
+			break;
+		case Key::D:
+			if (m_SelectedEntity && ctrl)
+			{
+				m_Context->DuplicateEntity(m_SelectedEntity, true);
+				return true;
+			}
+			break;
+		default:
+			break;
+		}
+
+		return false;
 	}
 
 	static void DrawVec3Control(const std::string& label, glm::vec3& values, const float resetValue = 0.0f, const float columnWidth = 80.0f, const std::function<void()>& onValueChanged = nullptr)

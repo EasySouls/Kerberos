@@ -7,6 +7,7 @@
 #include "Kerberos/Renderer/Material.h"
 #include "Kerberos/Renderer/Mesh.h"
 #include "../Notification/NotificationManager.h"
+#include "Kerberos/Events/KeyEvent.h"
 #include "Kerberos/Renderer/Framebuffer.h"
 
 namespace Kerberos
@@ -26,8 +27,12 @@ namespace Kerberos
 		Entity GetSelectedEntity() const { return m_SelectedEntity; }
 		void SetSelectedEntity(Entity entity);
 
+		void OnEvent(Event& event);
+
 	private:
 		void DrawEntityNode(const Entity& entity);
+
+		bool OnKeyPressed(const KeyPressedEvent& event);
 
 	private:
 		Ref<Scene> m_Context;

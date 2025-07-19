@@ -9,8 +9,6 @@
 
 namespace Kerberos
 {
-#define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
-
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application(const ApplicationSpecification& spec) 
@@ -35,7 +33,7 @@ namespace Kerberos
 
 		const WindowProps props{ spec.Name, true, 1280, 720 };
 		m_Window = Window::Create(props);
-		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+		m_Window->SetEventCallback(KBR_BIND_EVENT_FN(Application::OnEvent));
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
@@ -77,8 +75,8 @@ namespace Kerberos
 	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClosed));
-		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResize));
+		dispatcher.Dispatch<WindowCloseEvent>(KBR_BIND_EVENT_FN(Application::OnWindowClosed));
+		dispatcher.Dispatch<WindowResizeEvent>(KBR_BIND_EVENT_FN(Application::OnWindowResize));
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
 		{

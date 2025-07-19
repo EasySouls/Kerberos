@@ -171,6 +171,9 @@ namespace Kerberos
 
 		/// Calculate the world transforms of the entities initially
 		m_ActiveScene->CalculateEntityTransforms();
+
+		/// Set the default gizmo type to translate
+		m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
 	}
 
 	void EditorLayer::OnDetach()
@@ -322,7 +325,10 @@ namespace Kerberos
 			if (ImGui::BeginMenu("File"))
 			{
 				if (ImGui::MenuItem("Exit"))
+				{
+					/// TODO: Show a confirmation dialog and whether to save the scene if there are unsaved changes 
 					Application::Get().Close();
+				}
 
 				ImGui::MenuItem("Fullscreen", nullptr, &optFullscreenPersistent);
 
@@ -480,7 +486,7 @@ namespace Kerberos
 			const float snapValues[3] = { snap ? snapValue : 0.0f, snap ? snapValue : 0.0f, snap ? snapValue : 0.0f };
 
 			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-				static_cast<ImGuizmo::OPERATION>(m_GizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform), nullptr, snapValues);
+				static_cast<ImGuizmo::OPERATION>(m_GizmoType), ImGuizmo::WORLD, glm::value_ptr(transform), nullptr, snapValues);
 
 			if (ImGuizmo::IsUsing())
 			{
@@ -515,6 +521,7 @@ namespace Kerberos
 	{
 		m_CameraController.OnEvent(event);
 		m_EditorCamera.OnEvent(event);
+		m_HierarchyPanel.OnEvent(event);
 
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(KBR_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
