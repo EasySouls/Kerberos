@@ -23,8 +23,8 @@ namespace Kerberos
 		spec.Name = "Kerberos Editor";
 		spec.CommandLineArgs = args;
 
-		/// This is only needed so when the editor initializes, the static project shouldn't be null
-		Project::New();
+		/*/// This is only needed so when the editor initializes, the static project shouldn't be null
+		Project::New();*/
 
 		return new KerberosEditorApp(spec);
 	}

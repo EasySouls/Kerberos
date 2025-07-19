@@ -29,9 +29,28 @@ namespace Kerberos
 #if TESTING
 		OpenProject(R"(C:\Development\Kerberos\KerberosEditor\World3D.kbrproj)");
 #else
-		if (!OpenProject())
+
+		/// If there is a command line argument, try to open the project specified in it
+		const auto& [Count, Args] = Application::Get().GetSpecification().CommandLineArgs;
+		if (Count > 1)
 		{
-			NewProject();
+			const std::filesystem::path projectPath = Args[1];
+			if (std::filesystem::exists(projectPath))
+			{
+				OpenProject(projectPath);
+			}
+			else
+			{
+				NewProject();
+			}
+		}
+		else
+		{
+			/// If there is no command line argument, the user is prompted to open a project
+			if (!OpenProject())
+			{
+				Application::Get().Close();
+			}
 		}
 #endif
 
@@ -766,28 +785,31 @@ namespace Kerberos
 		if (filepathString.empty())
 			return;
 
-		/// Create a new scene, since otherwise the deserialized entities would be added to the current scene
-		m_ActiveScene = CreateRef<Scene>();
-		m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
-		m_HierarchyPanel.SetContext(m_ActiveScene);
-
-		const SceneSerializer serializer(m_ActiveScene);
-		if (!serializer.Deserialize(filepathString))
-		{
-			KBR_ERROR("Failed to load scene from {0}", filepathString);
-		}
+		OpenScene(filepathString);
 	}
 
 	void EditorLayer::OpenScene(const std::filesystem::path& filepath)
 	{
-		m_ActiveScene = CreateRef<Scene>();
-		m_ActiveScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
-		m_HierarchyPanel.SetContext(m_ActiveScene);
+		if (m_SceneState != SceneState::Edit)
+		{
+			OnSceneStop();
+		}
 
-		const SceneSerializer serializer(m_ActiveScene);
+		/// TODO: Prompt to save the current scene if there are unsaved changes
+
+		const Ref<Scene> newScene = CreateRef<Scene>();
+		const SceneSerializer serializer(newScene);
+
 		if (!serializer.Deserialize(filepath))
 		{
 			KBR_ERROR("Failed to load scene from {0}", filepath.string());
+			return;
 		}
+
+		m_EditorScene = newScene;
+		m_EditorScene->OnViewportResize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+		m_HierarchyPanel.SetContext(m_EditorScene);
+
+		m_ActiveScene = m_EditorScene;
 	}
 }

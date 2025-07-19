@@ -39,7 +39,16 @@ namespace Kerberos
 
 		void SaveScene();
 		void SaveSceneAs();
+
+		/**
+		 * Opens the file system dialog to select a scene file to open.
+		 */
 		void LoadScene();
+
+		/**
+		 * Loads a scene from the specified file path.	
+		 * @param filepath The path to the scene file to open.
+		 */
 		void OpenScene(const std::filesystem::path& filepath);
 		void NewScene();
 
@@ -51,6 +60,9 @@ namespace Kerberos
 		EditorCamera m_EditorCamera;
 
 		Ref<Scene> m_ActiveScene;
+		Ref<Scene> m_EditorScene;
+		Ref<Scene> m_RuntimeScene;
+
 		Entity m_CameraEntity;
 		Entity m_SecondCamera;
 		Entity m_SunlightEntity;
@@ -87,6 +99,8 @@ namespace Kerberos
 		float m_Fps = 0;
 
 		std::vector<ProfileResult> m_ProfileResults;
+
+		ApplicationCommandLineArgs m_CommandLineArgs;
 
 		/// Editor Panels
 		HierarchyPanel m_HierarchyPanel;
