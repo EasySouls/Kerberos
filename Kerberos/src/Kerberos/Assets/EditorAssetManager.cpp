@@ -6,20 +6,31 @@
 
 #include <yaml-cpp/yaml.h>
 #include <fstream>
+#include <map>
 
 namespace Kerberos
 {
+	static const std::map<std::string_view, AssetType> s_AssetExtensionMap = {
+		{ ".png", AssetType::Texture2D },
+		{ ".jpg", AssetType::Texture2D },
+		{ ".jpeg", AssetType::Texture2D },
+		{ ".kbrcubemap", AssetType::TextureCube },
+		{ ".fbx", AssetType::Mesh },
+		{ ".obj", AssetType::Mesh },
+		{ ".gltf", AssetType::Mesh },
+		{ ".kerberos", AssetType::Scene }
+	};
+
 	static AssetType AssetTypeFromFileExtension(const std::filesystem::path& filepath)
 	{
 		const std::string extension = filepath.extension().string();
-		if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
-			return AssetType::Texture2D;
-		if (extension == ".kbrcubemap")
-			return AssetType::TextureCube;
-		if (extension == ".fbx" || extension == ".obj" || extension == ".gltf")
-			return AssetType::Mesh;
-		if (extension == ".kerberos")
-			return AssetType::Scene;
+		const std::string_view extensionView(extension);
+
+		if (s_AssetExtensionMap.contains(extensionView))
+		{
+			return s_AssetExtensionMap.at(extensionView);
+		}
+
 		KBR_CORE_WARN("Unknown asset type for file: {0}", filepath.string());
 		return AssetType::Texture2D;
 	}
