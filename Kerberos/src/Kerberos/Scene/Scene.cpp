@@ -6,6 +6,7 @@
 #include "Components.h"
 #include "Kerberos/Renderer/Renderer2D.h"
 #include "Kerberos/Renderer/Renderer3D.h"
+#include "Kerberos/Physics/Utils.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/RegisterTypes.h>
@@ -22,8 +23,14 @@
 
 #include <algorithm>
 
+#include "Jolt/Physics/Collision/Shape/CapsuleShape.h"
+#include "Jolt/Physics/Collision/Shape/ConvexHullShape.h"
+#include "Jolt/Physics/Collision/Shape/MeshShape.h"
+#include "Jolt/Physics/Collision/Shape/SphereShape.h"
 #include "Kerberos/Assets/AssetManager.h"
 #include "Kerberos/Renderer/RenderCommand.h"
+
+import Components.PhysicsComponents;
 
 #define USE_MAP_FOR_UUID 1
 
@@ -45,7 +52,7 @@ namespace Kerberos
 		return JPH::EMotionType::Static;
 	}
 
-	namespace Physics
+	namespace PhysicsTemp
 	{
 		// Layer that objects can be in, determines which other objects it can collide with
 		// Typically you at least want to have 1 layer for moving bodies and 1 layer for static bodies, but you can have more
@@ -198,14 +205,14 @@ namespace Kerberos
 		switch (type)
 		{
 		case RigidBody3DComponent::BodyType::Static:
-			return Physics::Layers::NON_MOVING;
+			return PhysicsTemp::Layers::NON_MOVING;
 		case RigidBody3DComponent::BodyType::Kinematic:
 		case RigidBody3DComponent::BodyType::Dynamic:
-			return Physics::Layers::MOVING;
+			return PhysicsTemp::Layers::MOVING;
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown body type!");
-		return Physics::Layers::NON_MOVING;
+		return PhysicsTemp::Layers::NON_MOVING;
 	}
 
 	Scene::Scene()
@@ -333,7 +340,7 @@ namespace Kerberos
 		m_PhysicsTempAllocator = new JPH::TempAllocatorImpl(cTempAllocatorSize);
 
 		// We need a job system that will execute physics jobs on multiple threads. Typically
-		// you would implement the JobSystem interface yourself and let Jolt Physics run on top
+		// you would implement the JobSystem interface yourself and let Jolt PhysicsTemp run on top
 		// of your own job scheduler. JobSystemThreadPool is an example implementation.
 		m_PhysicsJobSystem = new JPH::JobSystemThreadPool(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, static_cast<int>(std::thread::hardware_concurrency()) - 1);
 
@@ -358,17 +365,17 @@ namespace Kerberos
 		// Create mapping table from object layer to broadphase layer
 		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
 		// Also have a look at BroadPhaseLayerInterfaceTable or BroadPhaseLayerInterfaceMask for a simpler interface.
-		m_BroadPhaseLayerInterface = new Physics::BPLayerInterfaceImpl();
+		m_BroadPhaseLayerInterface = new PhysicsTemp::BPLayerInterfaceImpl();
 
 		// Create class that filters object vs broadphase layers
 		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
 		// Also have a look at ObjectVsBroadPhaseLayerFilterTable or ObjectVsBroadPhaseLayerFilterMask for a simpler interface.
-		m_ObjectVsBroadPhaseLayerFilter = new Physics::ObjectVsBroadPhaseLayerFilterImpl();
+		m_ObjectVsBroadPhaseLayerFilter = new PhysicsTemp::ObjectVsBroadPhaseLayerFilterImpl();
 
 		// Create class that filters object vs object layers
 		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
 		// Also have a look at ObjectLayerPairFilterTable or ObjectLayerPairFilterMask for a simpler interface.
-		m_ObjectVsObjectLayerFilter = new Physics::ObjectLayerPairFilterImpl();
+		m_ObjectVsObjectLayerFilter = new PhysicsTemp::ObjectLayerPairFilterImpl();
 
 		m_PhysicsSystem = new JPH::PhysicsSystem();
 		m_PhysicsSystem->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, *m_BroadPhaseLayerInterface, *m_ObjectVsBroadPhaseLayerFilter, *m_ObjectVsObjectLayerFilter);
@@ -376,13 +383,13 @@ namespace Kerberos
 		// A body activation listener gets notified when bodies activate and go to sleep
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
 		// Registering one is entirely optional.
-		m_BodyActivationListener = new Physics::KBRBodyActivationListener();
+		m_BodyActivationListener = new PhysicsTemp::KBRBodyActivationListener();
 		m_PhysicsSystem->SetBodyActivationListener(m_BodyActivationListener);
 
 		// A contact listener gets notified when bodies (are about to) collide, and when they separate again.
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
 		// Registering one is entirely optional.
-		m_ContactListener = new Physics::KBRContactListener();
+		m_ContactListener = new PhysicsTemp::KBRContactListener();
 		m_PhysicsSystem->SetContactListener(m_ContactListener);
 
 		// The main way to interact with the bodies in the physics system is through the body interface. There is a locking and a non-locking
@@ -399,6 +406,7 @@ namespace Kerberos
 
 				JPH::ShapeRefC shape = nullptr;
 				bool isTrigger = false;
+				bool hasToOverrideMassProperties = false;
 
 				if (entity.HasComponent<BoxCollider3DComponent>())
 				{
@@ -417,6 +425,59 @@ namespace Kerberos
 							continue;
 						}
 						shape = shapeResult.Get();
+					}
+				}
+				if (entity.HasComponent<SphereCollider3DComponent>())
+				{
+					auto& collider = entity.GetComponent<SphereCollider3DComponent>();
+					isTrigger = collider.IsTrigger;
+					if (collider.Radius > 0.0f)
+					{
+						JPH::SphereShapeSettings shapeSettings(collider.Radius);
+						shapeSettings.SetEmbedded();
+						JPH::ShapeSettings::ShapeResult shapeResult = shapeSettings.Create();
+						if (shapeResult.HasError())
+						{
+							KBR_CORE_ERROR("Jolt: shape error on entity {}: {}", entity.GetComponent<TagComponent>().Tag, shapeResult.GetError().c_str());
+							continue;
+						}
+						shape = shapeResult.Get();
+					}
+				}
+				if (entity.HasComponent<CapsuleCollider3DComponent>())
+				{
+					auto& collider = entity.GetComponent<CapsuleCollider3DComponent>();
+					isTrigger = collider.IsTrigger;
+					if (collider.Radius > 0.0f && collider.Height > 0.0f)
+					{
+						JPH::CapsuleShapeSettings shapeSettings(collider.Radius, collider.Height);
+						shapeSettings.SetEmbedded();
+						JPH::ShapeSettings::ShapeResult shapeResult = shapeSettings.Create();
+						if (shapeResult.HasError())
+						{
+							KBR_CORE_ERROR("Jolt: shape error on entity {}: {}", entity.GetComponent<TagComponent>().Tag, shapeResult.GetError().c_str());
+							continue;
+						}
+						shape = shapeResult.Get();
+					}
+				}
+				if (entity.HasComponent<MeshCollider3DComponent>())
+				{
+					auto& collider = entity.GetComponent<MeshCollider3DComponent>();
+					isTrigger = collider.IsTrigger;
+
+					if (collider.Mesh)
+					{
+						Ref<Mesh> mesh = AssetManager::GetAsset<Mesh>(collider.Mesh->GetHandle());
+						if (!mesh)
+						{
+							KBR_CORE_ERROR("MeshCollider3DComponent on entity {} does not have a valid mesh!", entity.GetComponent<TagComponent>().Tag);
+							continue;
+						}
+
+						shape = Physics::Utils::CreateJoltMeshShape(mesh, entity.GetComponent<TagComponent>().Tag);
+
+						hasToOverrideMassProperties = true;
 					}
 				}
 
@@ -440,6 +501,14 @@ namespace Kerberos
 
 				JPH::BodyCreationSettings bodySettings(shape, position, rotation, GetBodyTypeFromComponent(rigidBody.Type), GetObjectLayerFromComponent(rigidBody.Type));
 				bodySettings.mIsSensor = isTrigger;
+
+				if (hasToOverrideMassProperties)
+				{
+					bodySettings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
+					auto massProperties = JPH::MassProperties();
+					massProperties.mMass = rigidBody.Mass;
+					bodySettings.mMassPropertiesOverride = massProperties;
+				}
 
 				JPH::Body* body = bodyInterface.CreateBody(bodySettings);
 
@@ -523,7 +592,7 @@ namespace Kerberos
 
 		/// Physics
 		{
-			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - Physics update");
+			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - PhysicsTemp update");
 
 			constexpr int collisionSteps = 1;
 			m_PhysicsSystem->Update(ts, collisionSteps, m_PhysicsTempAllocator, m_PhysicsJobSystem);
@@ -684,6 +753,18 @@ namespace Kerberos
 		if (entity.HasComponent<BoxCollider3DComponent>())
 		{
 			newEntity.AddComponent<BoxCollider3DComponent>(entity.GetComponent<BoxCollider3DComponent>());
+		}
+		if (entity.HasComponent<SphereCollider3DComponent>())
+		{
+			newEntity.AddComponent<SphereCollider3DComponent>(entity.GetComponent<SphereCollider3DComponent>());
+		}
+		if (entity.HasComponent<CapsuleCollider3DComponent>())
+		{
+			newEntity.AddComponent<CapsuleCollider3DComponent>(entity.GetComponent<CapsuleCollider3DComponent>());
+		}
+		if (entity.HasComponent<MeshCollider3DComponent>())
+		{
+			newEntity.AddComponent<MeshCollider3DComponent>(entity.GetComponent<MeshCollider3DComponent>());
 		}
 		if (entity.HasComponent<DirectionalLightComponent>())
 		{
@@ -873,6 +954,18 @@ namespace Kerberos
 			if (sourceRegistry.all_of<BoxCollider3DComponent>(entity))
 			{
 				newEntity.AddComponent<BoxCollider3DComponent>(sourceRegistry.get<BoxCollider3DComponent>(entity));
+			}
+			if (sourceRegistry.all_of<SphereCollider3DComponent>(entity))
+			{
+				newEntity.AddComponent<SphereCollider3DComponent>(sourceRegistry.get<SphereCollider3DComponent>(entity));
+			}
+			if (sourceRegistry.all_of<CapsuleCollider3DComponent>(entity))
+			{
+				newEntity.AddComponent<CapsuleCollider3DComponent>(sourceRegistry.get<CapsuleCollider3DComponent>(entity));
+			}
+			if (sourceRegistry.all_of<MeshCollider3DComponent>(entity))
+			{
+				newEntity.AddComponent<MeshCollider3DComponent>(sourceRegistry.get<MeshCollider3DComponent>(entity));
 			}
 			if (sourceRegistry.all_of<DirectionalLightComponent>(entity))
 			{
@@ -1221,6 +1314,26 @@ namespace Kerberos
 	template <>
 	void Scene::OnComponentAdded<BoxCollider3DComponent>(Entity entity, BoxCollider3DComponent& component)
 	{}
+
+	template <>
+	void Scene::OnComponentAdded<SphereCollider3DComponent>(Entity entity, SphereCollider3DComponent& component)
+	{}
+
+	template <>
+	void Scene::OnComponentAdded<CapsuleCollider3DComponent>(Entity entity, CapsuleCollider3DComponent& component)
+	{}
+
+	template <>
+	void Scene::OnComponentAdded<MeshCollider3DComponent>(const Entity entity, MeshCollider3DComponent& component)
+	{
+		const auto& smc = entity.GetComponent<StaticMeshComponent>();
+		if (smc.StaticMesh == nullptr)
+		{
+			KBR_CORE_ERROR("MeshCollider3DComponent on entity {} does not have a valid static mesh!", entity.GetComponent<TagComponent>().Tag);
+		}
+		
+		component.Mesh = smc.StaticMesh;
+	}
 
 	template <>
 	void Scene::OnComponentAdded<EnvironmentComponent>(Entity entity, EnvironmentComponent& component)

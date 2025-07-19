@@ -10,6 +10,8 @@
 
 #include "Kerberos/Assets/AssetManager.h"
 
+import Components.PhysicsComponents;
+
 namespace YAML
 {
 	template<>
@@ -222,6 +224,37 @@ namespace Kerberos
 			const auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
 			out << YAML::Key << "Size" << YAML::Value << boxCollider.Size;
 			out << YAML::Key << "Offset" << YAML::Value << boxCollider.Offset;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<SphereCollider3DComponent>())
+		{
+			out << YAML::Key << "SphereCollider3DComponent";
+			out << YAML::BeginMap;
+			const auto& sphereCollider = entity.GetComponent<SphereCollider3DComponent>();
+			out << YAML::Key << "Radius" << YAML::Value << sphereCollider.Radius;
+			out << YAML::Key << "Offset" << YAML::Value << sphereCollider.Offset;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<CapsuleCollider3DComponent>())
+		{
+			out << YAML::Key << "CapsuleCollider3DComponent";
+			out << YAML::BeginMap;
+			const auto& capsuleCollider = entity.GetComponent<CapsuleCollider3DComponent>();
+			out << YAML::Key << "Radius" << YAML::Value << capsuleCollider.Radius;
+			out << YAML::Key << "Height" << YAML::Value << capsuleCollider.Height;
+			out << YAML::Key << "Offset" << YAML::Value << capsuleCollider.Offset;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<MeshCollider3DComponent>())
+		{
+			out << YAML::Key << "MeshCollider3DComponent";
+			out << YAML::BeginMap;
+			const auto& meshCollider = entity.GetComponent<MeshCollider3DComponent>();
+			out << YAML::Key << "Mesh" << YAML::Value << (meshCollider.Mesh ? meshCollider.Mesh->GetHandle() : UUID::Invalid());
+			out << YAML::Key << "IsTrigger" << YAML::Value << meshCollider.IsTrigger;
 			out << YAML::EndMap;
 		}
 
@@ -448,6 +481,32 @@ namespace Kerberos
 					auto& boxCollider = deserializedEntity.AddComponent<BoxCollider3DComponent>();
 					boxCollider.Size = boxColliderComponent["Size"].as<glm::vec3>();
 					boxCollider.Offset = boxColliderComponent["Offset"].as<glm::vec3>();
+				}
+
+				if (auto sphereColliderComponent = entity["SphereCollider3DComponent"])
+				{
+					auto& sphereCollider = deserializedEntity.AddComponent<SphereCollider3DComponent>();
+					sphereCollider.Radius = sphereColliderComponent["Radius"].as<float>();
+					sphereCollider.Offset = sphereColliderComponent["Offset"].as<glm::vec3>();
+				}
+
+				if (auto capsuleColliderComponent = entity["CapsuleCollider3DComponent"])
+				{
+					auto& capsuleCollider = deserializedEntity.AddComponent<CapsuleCollider3DComponent>();
+					capsuleCollider.Radius = capsuleColliderComponent["Radius"].as<float>();
+					capsuleCollider.Height = capsuleColliderComponent["Height"].as<float>();
+					capsuleCollider.Offset = capsuleColliderComponent["Offset"].as<glm::vec3>();
+				}
+
+				if (auto meshColliderComponent = entity["MeshCollider3DComponent"])
+				{
+					auto& meshCollider = deserializedEntity.AddComponent<MeshCollider3DComponent>();
+					meshCollider.IsTrigger = meshColliderComponent["IsTrigger"].as<bool>();
+					const AssetHandle meshHandle = AssetHandle(meshColliderComponent["Mesh"].as<uint64_t>());
+					if (meshHandle.IsValid())
+					{
+						meshCollider.Mesh = AssetManager::GetAsset<Mesh>(meshHandle);
+					}
 				}
 
 				if (auto staticMeshComponent = entity["StaticMeshComponent"])

@@ -36,6 +36,9 @@ namespace Kerberos
 			return 0; 
 		}
 
+		const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
+		const std::vector<uint32_t>& GetIndices() const { return m_Indices; }
+
 		AssetType GetType() override { return AssetType::Mesh; }
 
 	private:
@@ -44,6 +47,9 @@ namespace Kerberos
 	private:
 		Ref<VertexArray> m_VertexArray;
 		uint32_t m_IndexCount = 0;
+
+		std::vector<Vertex> m_Vertices;
+		std::vector<uint32_t> m_Indices;
 	};
 }
 

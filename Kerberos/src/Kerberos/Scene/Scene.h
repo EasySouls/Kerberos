@@ -131,7 +131,7 @@ namespace Kerberos
 
 		std::set<entt::entity> m_RootEntities;
 
-		/// Physics related members
+		/// PhysicsTemp related members
 		/// These are pointers, since i do not want to include Jolt headers in the Scene.h file,
 		/// and non-complete types are not allowed in the class definition
 		

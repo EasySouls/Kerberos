@@ -11,6 +11,8 @@
 #include "Kerberos/Core/Input.h"
 #include "Kerberos/Events/KeyEvent.h"
 
+import Components.PhysicsComponents;
+
 namespace Kerberos
 {
 	HierarchyPanel::HierarchyPanel(const Ref<Scene>& context)
@@ -85,63 +87,7 @@ namespace Kerberos
 		{
 			DrawComponents(m_SelectedEntity);
 
-			if (ImGui::Button("Add Component"))
-			{
-				ImGui::OpenPopup("Add Component");
-			}
-
-			if (ImGui::BeginPopup("Add Component"))
-			{
-				if (ImGui::MenuItem("Camera"))
-				{
-					m_SelectedEntity.AddComponent<CameraComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("Sprite Renderer"))
-				{
-					m_SelectedEntity.AddComponent<SpriteRendererComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("Directional Light"))
-				{
-					m_SelectedEntity.AddComponent<DirectionalLightComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("Point Light"))
-				{
-					m_SelectedEntity.AddComponent<PointLightComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("Static Mesh"))
-				{
-					m_SelectedEntity.AddComponent<StaticMeshComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("Rigidbody3D"))
-				{
-					m_SelectedEntity.AddComponent<RigidBody3DComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("Box Collider 3D"))
-				{
-					m_SelectedEntity.AddComponent<BoxCollider3DComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("Environment"))
-				{
-					m_SelectedEntity.AddComponent<EnvironmentComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				ImGui::EndPopup();
-			}
+			AddComponentPopup(m_SelectedEntity);
 		}
 		ImGui::End();
 
@@ -160,7 +106,7 @@ namespace Kerberos
 		m_SelectedEntity = entity;
 	}
 
-	void HierarchyPanel::OnEvent(Event& event) 
+	void HierarchyPanel::OnEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(KBR_BIND_EVENT_FN(HierarchyPanel::OnKeyPressed));
@@ -225,7 +171,86 @@ namespace Kerberos
 		}
 	}
 
-	bool HierarchyPanel::OnKeyPressed(const KeyPressedEvent& event) 
+	void HierarchyPanel::AddComponentPopup(Entity entity)
+	{
+		if (ImGui::Button("Add Component"))
+		{
+			ImGui::OpenPopup("Add Component");
+		}
+
+		if (ImGui::BeginPopup("Add Component"))
+		{
+			if (ImGui::MenuItem("Camera"))
+			{
+				entity.AddComponent<CameraComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Sprite Renderer"))
+			{
+				entity.AddComponent<SpriteRendererComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Directional Light"))
+			{
+				entity.AddComponent<DirectionalLightComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Point Light"))
+			{
+				entity.AddComponent<PointLightComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Static Mesh"))
+			{
+				entity.AddComponent<StaticMeshComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Rigidbody3D"))
+			{
+				entity.AddComponent<RigidBody3DComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Box Collider 3D"))
+			{
+				entity.AddComponent<BoxCollider3DComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Sphere Collider 3D"))
+			{
+				entity.AddComponent<SphereCollider3DComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Capsule Collider 3D"))
+			{
+				entity.AddComponent<CapsuleCollider3DComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Mesh Collider 3D"))
+			{
+				entity.AddComponent<MeshCollider3DComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Environment"))
+			{
+				entity.AddComponent<EnvironmentComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	bool HierarchyPanel::OnKeyPressed(const KeyPressedEvent& event)
 	{
 		/// Shortcuts
 		if (event.GetRepeatCount() > 0)
@@ -909,6 +934,130 @@ namespace Kerberos
 			if (componentDeleted)
 			{
 				entity.RemoveComponent<BoxCollider3DComponent>();
+			}
+		}
+		if (entity.HasComponent<SphereCollider3DComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(SphereCollider3DComponent).hash_code()), treeNodeFlags, "SphereCollider3D");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("SphereCollider3D Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (opened)
+			{
+				auto& collider = entity.GetComponent<SphereCollider3DComponent>();
+				ImGui::DragFloat("Radius", &collider.Radius, 0.1f);
+				ImGui::DragFloat3("Offset", glm::value_ptr(collider.Offset), 0.1f);
+				ImGui::Checkbox("Is Trigger", &collider.IsTrigger);
+				ImGui::TreePop();
+			}
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<SphereCollider3DComponent>();
+			}
+		}
+		if (entity.HasComponent<CapsuleCollider3DComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(CapsuleCollider3DComponent).hash_code()), treeNodeFlags, "CapsuleCollider3D");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("CapsuleCollider3D Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (opened)
+			{
+				auto& collider = entity.GetComponent<CapsuleCollider3DComponent>();
+				ImGui::DragFloat("Radius", &collider.Radius, 0.1f);
+				ImGui::DragFloat("Height", &collider.Height, 0.1f);
+				ImGui::DragFloat3("Offset", glm::value_ptr(collider.Offset), 0.1f);
+				ImGui::Checkbox("Is Trigger", &collider.IsTrigger);
+				ImGui::TreePop();
+			}
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<CapsuleCollider3DComponent>();
+			}
+		}
+		if (entity.HasComponent<MeshCollider3DComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(MeshCollider3DComponent).hash_code()), treeNodeFlags, "MeshCollider3D");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("MeshCollider3D Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (opened)
+			{
+				auto& collider = entity.GetComponent<MeshCollider3DComponent>();
+				ImGui::Checkbox("Is Trigger", &collider.IsTrigger);
+				std::string meshLabel = "None";
+				if (collider.Mesh)
+				{
+					if (AssetManager::IsAssetHandleValid(collider.Mesh->GetHandle()))
+					{
+						const auto& [Type, Filepath] = Project::GetActive()->GetEditorAssetManager()->GetMetadata(collider.Mesh->GetHandle());
+						meshLabel = Filepath.filename().string();
+					}
+					else
+					{
+						meshLabel = "Invalid Mesh";
+					}
+				}
+				ImGui::Text("Mesh: %s", meshLabel.c_str());
+				ImGui::Separator();
+				//if (ImGui::Button("Select Mesh"))
+				//{
+				//	m_Context->SetSelectedEntity(entity);
+				//	m_Context->OpenAssetBrowser(AssetType::Mesh);
+				//}
+				ImGui::TreePop();
+			}
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<MeshCollider3DComponent>();
 			}
 		}
 		if (entity.HasComponent<EnvironmentComponent>())
