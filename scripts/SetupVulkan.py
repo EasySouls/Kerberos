@@ -45,6 +45,11 @@ class VulkanConfiguration:
     @classmethod
     def __InstallVulkanSDK(cls):
         permissionGranted = False
+
+        isInCI = os.getenv('CI', 'false').lower() == 'true'
+        if isInCI:
+            permissionGranted = True
+
         while not permissionGranted:
             reply = str(input("Would you like to install VulkanSDK {0:s}? [Y/N]: ".format(cls.installVulkanVersion))).lower().strip()[:1]
             if reply == 'n':

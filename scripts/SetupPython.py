@@ -32,6 +32,11 @@ class PythonConfiguration:
     @classmethod
     def __InstallPackage(cls, packageName):
         permissionGranted = False
+
+        isInCI = os.getenv('CI', 'false').lower() =='true'
+        if isInCI:
+            permissionGranted = True
+
         while not permissionGranted:
             reply = str(input("Would you like to install Python package '{0:s}'? [Y/N]: ".format(packageName))).lower().strip()[:1]
             if reply == 'n':
