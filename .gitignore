@@ -10,3 +10,5 @@ KerberosEditor/assets/shadercache/
 # Profiling stats
 Sandbox/*.json
 KerberosEditor/*.json
+
+scripts/__pycache__

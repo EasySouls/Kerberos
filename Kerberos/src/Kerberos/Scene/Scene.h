@@ -107,6 +107,11 @@ namespace Kerberos
 
 		bool ShouldRenderShadows(const DirectionalLightComponent* dlc) const;
 
+		void SetupPhysics();
+		void InitializePhysicsSystem();
+		void InitializePhysicsCollidersAndBodies();
+		void CleanupPhysics();
+
 		template<typename Component>
 		static void CopyComponent(entt::registry& dst, entt::registry& src)
 		{

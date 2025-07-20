@@ -28,6 +28,9 @@
     <Filter Include="src\Kerberos\Internal">
       <UniqueIdentifier>{65E46AB3-D150-26AE-9A44-BE0B06704816}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Kerberos\Physics">
+      <UniqueIdentifier>{8B7E6C1A-770D-F6E3-202C-0ADF0C9A068A}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Kerberos\Project">
       <UniqueIdentifier>{5F1F0631-4BAE-8FFA-F4CC-A3F5E03AA0A0}</UniqueIdentifier>
     </Filter>
@@ -36,6 +39,9 @@
     </Filter>
     <Filter Include="src\Kerberos\Scene">
       <UniqueIdentifier>{F64DB9E0-E231-7A36-4B92-7489379564B8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Kerberos\Scene\Components">
+      <UniqueIdentifier>{4BCD37F5-B7E5-1E1F-8092-AEB8EC69B3B8}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Kerberos\Utils">
       <UniqueIdentifier>{39E2E6E0-25C6-A736-8E26-A2897A2992B8}</UniqueIdentifier>
@@ -161,6 +167,9 @@
     </ClInclude>
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h">
       <Filter>src\Kerberos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Physics\Utils.h">
+      <Filter>src\Kerberos\Physics</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Project\Project.h">
       <Filter>src\Kerberos\Project</Filter>
@@ -354,7 +363,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Physics\Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -461,6 +469,9 @@
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Scene\Components\PhysicsComponents.ixx">
+      <Filter>src\Kerberos\Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Scene\EditorCamera.cpp">
       <Filter>src\Kerberos\Scene</Filter>
@@ -570,6 +581,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Scene\Components\PhysicsComponents.ixx" />
   </ItemGroup>
 </Project>

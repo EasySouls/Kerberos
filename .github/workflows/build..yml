@@ -19,6 +19,11 @@ jobs:
       - name: Setup MSBuild and Visual Studio
         uses: microsoft/setup-msbuild@v2
 
+      - name: Run setup scripts
+        run: |
+          ./scripts/Setup.bat
+        shell: powershell
+
       - name: Run Premake5 to generate VS2022 project
         run: |
           ./vendor/premake/premake5.exe vs2022
