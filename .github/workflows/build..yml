@@ -20,6 +20,8 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Run setup scripts
+        env:
+          PYTHONIOENCODING: utf-8
         run: |
           ./scripts/Setup.bat
         shell: powershell
