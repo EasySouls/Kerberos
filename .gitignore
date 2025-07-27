@@ -11,4 +11,7 @@ KerberosEditor/assets/shadercache/
 Sandbox/*.json
 KerberosEditor/*.json
 
+# Log files
+KerberosEditor/*.log
+
 scripts/__pycache__

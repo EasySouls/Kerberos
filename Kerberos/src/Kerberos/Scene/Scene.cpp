@@ -1353,6 +1353,7 @@ namespace Kerberos
 		if (smc.StaticMesh == nullptr)
 		{
 			KBR_CORE_ERROR("MeshCollider3DComponent on entity {} does not have a valid static mesh!", entity.GetComponent<TagComponent>().Tag);
+			return;
 		}
 
 		component.Mesh = smc.StaticMesh;

@@ -2,6 +2,7 @@
 
 #include "Log.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/sinks/basic_file_sink.h"
 
 namespace Kerberos
 {
@@ -13,10 +14,20 @@ namespace Kerberos
 		// [Timestamp] [name of logger]: [message]
 		spdlog::set_pattern("%^[%T] %n: %v%$");
 
-		s_CoreLogger = spdlog::stdout_color_mt("KERBEROS");
+		auto coreConsoleSink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
+		coreConsoleSink->set_level(spdlog::level::trace);
+		auto coreFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("Kerberos.log", true);
+		coreFileSink->set_level(spdlog::level::trace);
+
+		s_CoreLogger = CreateRef<spdlog::logger>(spdlog::logger("KERBEROS", { coreConsoleSink, coreFileSink }));
 		s_CoreLogger->set_level(spdlog::level::info);
 
-		s_ClientLogger = spdlog::stdout_color_mt("APP");
+		auto clientConsoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+		clientConsoleSink->set_level(spdlog::level::trace);
+		auto clientFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("KerberosClient.log", true);
+		clientFileSink->set_level(spdlog::level::trace);
+
+		s_ClientLogger = CreateRef<spdlog::logger>(spdlog::logger("APP", { clientConsoleSink, clientFileSink }));
 		s_ClientLogger->set_level(spdlog::level::info);
 	}
 }
