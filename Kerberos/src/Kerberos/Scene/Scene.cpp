@@ -288,6 +288,8 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
+		/// TODO: Update the transform, rotation and scale of the entity, not its world transform
+
 		const JPH::RVec3 joltPosition = body.GetPosition();
 		const JPH::Quat joltRotation = body.GetRotation();
 
