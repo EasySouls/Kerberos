@@ -1,12 +1,16 @@
 #pragma once
 
+import Components.PhysicsComponents;
+
 #include "Kerberos/Renderer/Vertex.h"
+#include "Layers.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Array.h>
-
 #include "Jolt/Core/Reference.h"
 #include "Jolt/Geometry/IndexedTriangle.h"
+#include "Jolt/Physics/Body/MotionType.h"
+#include "Jolt/Physics/Collision/ObjectLayer.h"
 #include "Jolt/Physics/Collision/Shape/MeshShape.h"
 #include "Jolt/Physics/Collision/Shape/Shape.h"
 
@@ -16,6 +20,22 @@ namespace Kerberos::Physics
 	class Utils
 	{
 	public:
+        static JPH::EMotionType GetJPHMotionTypeFromComponent(const RigidBody3DComponent& rb)
+        {
+            switch (rb.Type)
+            {
+            case RigidBody3DComponent::BodyType::Static:
+                return JPH::EMotionType::Static;
+            case RigidBody3DComponent::BodyType::Kinematic:
+                return JPH::EMotionType::Kinematic;
+            case RigidBody3DComponent::BodyType::Dynamic:
+                return JPH::EMotionType::Dynamic;
+            }
+
+            KBR_CORE_ASSERT(false, "Unknown body type!");
+            return JPH::EMotionType::Static;
+        }
+
 		static JPH::Array<JPH::Vec3> KBRVerticesToJoltVertices(const std::vector<Vertex>& vertices)
 		{
 			JPH::Array<JPH::Vec3> joltVertices;
@@ -26,6 +46,21 @@ namespace Kerberos::Physics
 			}
 			return joltVertices;
 		}
+
+        static JPH::ObjectLayer GetObjectLayerFromComponent(const RigidBody3DComponent& rb)
+        {
+            switch (rb.Type)
+            {
+            case RigidBody3DComponent::BodyType::Static:
+                return Layers::NON_MOVING;
+            case RigidBody3DComponent::BodyType::Kinematic:
+            case RigidBody3DComponent::BodyType::Dynamic:
+                return Layers::MOVING;
+            }
+
+            KBR_CORE_ASSERT(false, "Unknown body type!");
+            return Layers::NON_MOVING;
+        }
 
         static JPH::Ref<JPH::Shape> CreateJoltMeshShape(const Ref<Mesh>& mesh, const std::string& debugName)
         {

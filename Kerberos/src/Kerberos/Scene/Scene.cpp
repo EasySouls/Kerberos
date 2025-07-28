@@ -1,4 +1,7 @@
 #include "kbrpch.h"
+
+import Components.PhysicsComponents;
+
 #include "Scene.h"
 #include "Kerberos/Scene/Entity.h"
 #include "Kerberos/Scene/ScriptableEntity.h"
@@ -21,200 +24,17 @@
 
 #include <glm/gtx/matrix_decompose.hpp>
 
-#include <algorithm>
-
 #include "Jolt/Physics/Collision/Shape/CapsuleShape.h"
-#include "Jolt/Physics/Collision/Shape/ConvexHullShape.h"
-#include "Jolt/Physics/Collision/Shape/MeshShape.h"
 #include "Jolt/Physics/Collision/Shape/SphereShape.h"
 #include "Kerberos/Assets/AssetManager.h"
+#include "Kerberos/Physics/BodyActivationListener.h"
+#include "Kerberos/Physics/ContactListener.h"
 #include "Kerberos/Renderer/RenderCommand.h"
-
-import Components.PhysicsComponents;
 
 #define USE_MAP_FOR_UUID 1
 
 namespace Kerberos
 {
-	static JPH::EMotionType GetBodyTypeFromComponent(const RigidBody3DComponent::BodyType& type)
-	{
-		switch (type)
-		{
-		case RigidBody3DComponent::BodyType::Static:
-			return JPH::EMotionType::Static;
-		case RigidBody3DComponent::BodyType::Kinematic:
-			return JPH::EMotionType::Kinematic;
-		case RigidBody3DComponent::BodyType::Dynamic:
-			return JPH::EMotionType::Dynamic;
-		}
-
-		KBR_CORE_ASSERT(false, "Unknown body type!");
-		return JPH::EMotionType::Static;
-	}
-
-	namespace PhysicsTemp
-	{
-		// Layer that objects can be in, determines which other objects it can collide with
-		// Typically you at least want to have 1 layer for moving bodies and 1 layer for static bodies, but you can have more
-		// layers if you want. E.g. you could have a layer for high detail collision (which is not used by the physics simulation
-		// but only if you do collision testing).
-		namespace Layers
-		{
-			static constexpr JPH::ObjectLayer NON_MOVING = 0;
-			static constexpr JPH::ObjectLayer MOVING = 1;
-			static constexpr JPH::ObjectLayer NUM_LAYERS = 2;
-		};
-
-		/// Class that determines if two object layers can collide
-		class ObjectLayerPairFilterImpl : public JPH::ObjectLayerPairFilter
-		{
-		public:
-			virtual bool ShouldCollide(const JPH::ObjectLayer inObject1, const JPH::ObjectLayer inObject2) const override
-			{
-				switch (inObject1)
-				{
-				case Layers::NON_MOVING:
-					return inObject2 == Layers::MOVING; // Non moving only collides with moving
-				case Layers::MOVING:
-					return true; // Moving collides with everything
-				default:
-					JPH_ASSERT(false);
-					return false;
-				}
-			}
-		};
-
-		// Each broadphase layer results in a separate bounding volume tree in the broad phase. You at least want to have
-		// a layer for non-moving and moving objects to avoid having to update a tree full of static objects every frame.
-		// You can have a 1-on-1 mapping between object layers and broadphase layers (like in this case) but if you have
-		// many object layers you'll be creating many broad phase trees, which is not efficient. If you want to fine tune
-		// your broadphase layers define JPH_TRACK_BROADPHASE_STATS and look at the stats reported on the TTY.
-		namespace BroadPhaseLayers
-		{
-			static constexpr JPH::BroadPhaseLayer NON_MOVING(0);
-			static constexpr JPH::BroadPhaseLayer MOVING(1);
-			static constexpr uint32_t NUM_LAYERS(2);
-		};
-
-		// BroadPhaseLayerInterface implementation
-		// This defines a mapping between object and broadphase layers.
-		class BPLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface
-		{
-		public:
-			BPLayerInterfaceImpl()
-			{
-				// Create a mapping table from object to broad phase layer
-				mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
-				mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
-			}
-
-			virtual uint32_t GetNumBroadPhaseLayers() const override
-			{
-				return BroadPhaseLayers::NUM_LAYERS;
-			}
-
-			virtual JPH::BroadPhaseLayer			GetBroadPhaseLayer(JPH::ObjectLayer inLayer) const override
-			{
-				JPH_ASSERT(inLayer < Layers::NUM_LAYERS);
-				return mObjectToBroadPhase[inLayer];
-			}
-
-#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
-			virtual const char* GetBroadPhaseLayerName(BroadPhaseLayer inLayer) const override
-			{
-				switch ((BroadPhaseLayer::Type)inLayer)
-				{
-				case (BroadPhaseLayer::Type)BroadPhaseLayers::NON_MOVING:	return "NON_MOVING";
-				case (BroadPhaseLayer::Type)BroadPhaseLayers::MOVING:		return "MOVING";
-				default:													JPH_ASSERT(false); return "INVALID";
-				}
-			}
-#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
-
-		private:
-			JPH::BroadPhaseLayer mObjectToBroadPhase[Layers::NUM_LAYERS];
-		};
-
-		/// Class that determines if an object layer can collide with a broadphase layer
-		class ObjectVsBroadPhaseLayerFilterImpl : public JPH::ObjectVsBroadPhaseLayerFilter
-		{
-		public:
-			virtual bool ShouldCollide(const JPH::ObjectLayer inLayer1, const JPH::BroadPhaseLayer inLayer2) const override
-			{
-				switch (inLayer1)
-				{
-				case Layers::NON_MOVING:
-					return inLayer2 == BroadPhaseLayers::MOVING;
-				case Layers::MOVING:
-					return true;
-				default:
-					JPH_ASSERT(false);
-					return false;
-				}
-			}
-		};
-
-		// An example contact listener
-		class KBRContactListener : public JPH::ContactListener
-		{
-		public:
-			// See: ContactListener
-			virtual JPH::ValidateResult	OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult) override
-			{
-				KBR_CORE_TRACE("Contact validate callback: {} - {}", inBody1.GetID().GetIndex(), inBody2.GetID().GetIndex());
-
-				// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
-				return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
-			}
-
-			virtual void OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override
-			{
-				KBR_CORE_TRACE("A contact was added: {} - {}", inBody1.GetID().GetIndex(), inBody2.GetID().GetIndex());
-			}
-
-			virtual void OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override
-			{
-				KBR_CORE_TRACE("A contact was persisted: {} - {}", inBody1.GetID().GetIndex(), inBody2.GetID().GetIndex());
-			}
-
-			virtual void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override
-			{
-				KBR_CORE_TRACE("A contact was removed: {} - {}", inSubShapePair.GetBody1ID().GetIndex(), inSubShapePair.GetBody2ID().GetIndex());
-			}
-		};
-
-		// An example activation listener
-		class KBRBodyActivationListener : public JPH::BodyActivationListener
-		{
-		public:
-			virtual void OnBodyActivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData) override
-			{
-				KBR_CORE_TRACE("A body got activated: {}", inBodyID.GetIndex());
-			}
-
-			virtual void OnBodyDeactivated(const JPH::BodyID& inBodyID, uint64_t inBodyUserData) override
-			{
-				KBR_CORE_TRACE("A body went to sleep: {}", inBodyID.GetIndex());
-
-			}
-		};
-	}
-
-	static JPH::ObjectLayer GetObjectLayerFromComponent(const RigidBody3DComponent::BodyType& type)
-	{
-		switch (type)
-		{
-		case RigidBody3DComponent::BodyType::Static:
-			return PhysicsTemp::Layers::NON_MOVING;
-		case RigidBody3DComponent::BodyType::Kinematic:
-		case RigidBody3DComponent::BodyType::Dynamic:
-			return PhysicsTemp::Layers::MOVING;
-		}
-
-		KBR_CORE_ASSERT(false, "Unknown body type!");
-		return PhysicsTemp::Layers::NON_MOVING;
-	}
-
 	Scene::Scene()
 	{
 		m_Registry = entt::basic_registry();
@@ -1079,17 +899,17 @@ namespace Kerberos
 		// Create mapping table from object layer to broadphase layer
 		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
 		// Also have a look at BroadPhaseLayerInterfaceTable or BroadPhaseLayerInterfaceMask for a simpler interface.
-		m_BroadPhaseLayerInterface = new PhysicsTemp::BPLayerInterfaceImpl();
+		m_BroadPhaseLayerInterface = new Physics::BroadPhaseLayerInterfaceImpl();
 
 		// Create class that filters object vs broadphase layers
 		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
 		// Also have a look at ObjectVsBroadPhaseLayerFilterTable or ObjectVsBroadPhaseLayerFilterMask for a simpler interface.
-		m_ObjectVsBroadPhaseLayerFilter = new PhysicsTemp::ObjectVsBroadPhaseLayerFilterImpl();
+		m_ObjectVsBroadPhaseLayerFilter = new Physics::ObjectVsBroadPhaseLayerFilterImpl();
 
 		// Create class that filters object vs object layers
 		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
 		// Also have a look at ObjectLayerPairFilterTable or ObjectLayerPairFilterMask for a simpler interface.
-		m_ObjectVsObjectLayerFilter = new PhysicsTemp::ObjectLayerPairFilterImpl();
+		m_ObjectVsObjectLayerFilter = new Physics::ObjectLayerPairFilterImpl();
 
 		m_PhysicsSystem = new JPH::PhysicsSystem();
 		m_PhysicsSystem->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, *m_BroadPhaseLayerInterface, *m_ObjectVsBroadPhaseLayerFilter, *m_ObjectVsObjectLayerFilter);
@@ -1097,13 +917,13 @@ namespace Kerberos
 		// A body activation listener gets notified when bodies activate and go to sleep
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
 		// Registering one is entirely optional.
-		m_BodyActivationListener = new PhysicsTemp::KBRBodyActivationListener();
+		m_BodyActivationListener = new Physics::BodyActivationListener();
 		m_PhysicsSystem->SetBodyActivationListener(m_BodyActivationListener);
 
 		// A contact listener gets notified when bodies (are about to) collide, and when they separate again.
 		// Note that this is called from a job so whatever you do here needs to be thread safe.
 		// Registering one is entirely optional.
-		m_ContactListener = new PhysicsTemp::KBRContactListener();
+		m_ContactListener = new Physics::ContactListener();
 		m_PhysicsSystem->SetContactListener(m_ContactListener);
 	}
 
@@ -1216,7 +1036,7 @@ namespace Kerberos
 			glmRotation = glm::normalize(glmRotation); /// Ensure the quaternion is normalized
 			const JPH::Quat rotation = JPH::Quat(glmRotation.x, glmRotation.y, glmRotation.z, glmRotation.w);
 
-			JPH::BodyCreationSettings bodySettings(shape, position, rotation, GetBodyTypeFromComponent(rigidBody.Type), GetObjectLayerFromComponent(rigidBody.Type));
+			JPH::BodyCreationSettings bodySettings(shape, position, rotation, Physics::Utils::GetJPHMotionTypeFromComponent(rigidBody), Physics::Utils::GetObjectLayerFromComponent(rigidBody));
 			bodySettings.mIsSensor = isTrigger;
 
 			if (hasToOverrideMassProperties)

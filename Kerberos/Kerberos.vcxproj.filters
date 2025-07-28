@@ -363,6 +363,10 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Physics\PhysicsSystem.h" />
+    <ClInclude Include="src\Kerberos\Physics\Layers.h" />
+    <ClInclude Include="src\Kerberos\Physics\ContactListener.h" />
+    <ClInclude Include="src\Kerberos\Physics\BodyActivationListener.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -581,5 +585,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Physics\PhysicsSystem.cpp" />
   </ItemGroup>
 </Project>
