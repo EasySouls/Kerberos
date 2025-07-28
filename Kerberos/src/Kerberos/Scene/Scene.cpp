@@ -19,7 +19,6 @@ import Components.PhysicsComponents;
 #include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
-#include <Jolt/Physics/Body/BodyActivationListener.h>
 #include "Jolt/Physics/Collision/Shape/BoxShape.h"
 
 #include <glm/gtx/matrix_decompose.hpp>
@@ -29,6 +28,7 @@ import Components.PhysicsComponents;
 #include "Kerberos/Assets/AssetManager.h"
 #include "Kerberos/Physics/BodyActivationListener.h"
 #include "Kerberos/Physics/ContactListener.h"
+#include "Kerberos/Physics/JoltImpl.h"
 #include "Kerberos/Renderer/RenderCommand.h"
 
 #define USE_MAP_FOR_UUID 1
@@ -66,44 +66,6 @@ namespace Kerberos
 		m_Registry.clear<entt::entity>();
 	}
 
-	static void TraceImpl(const char* inFmt, ...)
-	{
-		// Format the message
-		va_list list;
-		va_start(list, inFmt);
-		char buffer[1024];
-		vsnprintf(buffer, sizeof(buffer), inFmt, list);
-		va_end(list);
-
-		KBR_CORE_TRACE("Jolt: {}", buffer);
-	}
-
-	static bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, uint32_t inLine)
-	{
-		KBR_CORE_ERROR("{}:{}: ({}) {}", inFile, inLine, inExpression, inMessage != nullptr ? inMessage : "");
-
-		return true;
-	};
-
-	static inline glm::vec3 ToGlmVec3(const JPH::RVec3& v)
-	{
-		return {
-			(v.GetX()),
-			(v.GetY()),
-			(v.GetZ())
-		};
-	}
-
-	static inline glm::quat ToGlmQuat(const JPH::Quat& q)
-	{
-		return {
-			(q.GetW()),
-			(q.GetX()),
-			(q.GetY()),
-			(q.GetZ())
-		};
-	}
-
 	static void ApplyJoltTransformToEntity(glm::mat4& worldTransform, const JPH::Body& body)
 	{
 		KBR_PROFILE_FUNCTION();
@@ -113,8 +75,8 @@ namespace Kerberos
 		const JPH::RVec3 joltPosition = body.GetPosition();
 		const JPH::Quat joltRotation = body.GetRotation();
 
-		glm::vec3 position = ToGlmVec3(joltPosition);
-		glm::quat rotation = ToGlmQuat(joltRotation);
+		glm::vec3 position = Physics::Utils::ToGlmVec3(joltPosition);
+		glm::quat rotation = Physics::Utils::ToGlmQuat(joltRotation);
 
 		// Decompose the current transform to get the scale
 		glm::vec3 scale, skew;
@@ -136,12 +98,12 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		SetupPhysics();
+		m_PhysicsSystem.Initialize();
 	}
 
 	void Scene::OnRuntimeStop()
 	{
-		CleanupPhysics();
+		m_PhysicsSystem.Cleanup();
 	}
 
 	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera)
@@ -170,13 +132,10 @@ namespace Kerberos
 				});
 		}
 
+		m_PhysicsSystem.Update(ts);
+
 		/// Physics
 		{
-			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - PhysicsTemp update");
-
-			constexpr int collisionSteps = 1;
-			m_PhysicsSystem->Update(ts, collisionSteps, m_PhysicsTempAllocator, m_PhysicsJobSystem);
-
 			const auto view = m_Registry.view<RigidBody3DComponent, TransformComponent>();
 			for (const auto e : view)
 			{
@@ -835,103 +794,9 @@ namespace Kerberos
 		UpdateChildTransforms(entity, glm::mat4(1.0f));
 	}
 
-	void Scene::SetupPhysics()
-	{
-		KBR_PROFILE_FUNCTION();
-
-		InitializePhysicsSystem();
-
-		InitializePhysicsCollidersAndBodies();
-	}
-
-	void Scene::InitializePhysicsSystem()
-	{
-		KBR_PROFILE_FUNCTION();
-
-		// Register allocation hook. In this example we'll just let Jolt use malloc / free but you can override these if you want (see Memory.h).
-		// This needs to be done before any other Jolt function is called.
-		JPH::RegisterDefaultAllocator();
-
-		// Install trace and assert callbacks
-		JPH::Trace = TraceImpl;
-		JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = AssertFailedImpl;);
-
-		// Create a factory, this class is responsible for creating instances of classes based on their name or hash and is mainly used for deserialization of saved data.
-		// It is not directly used in this example but still required.
-		JPH::Factory::sInstance = new JPH::Factory();
-
-		// Register all physics types with the factory and install their collision handlers with the CollisionDispatch class.
-		// If you have your own custom shape types you probably need to register their handlers with the CollisionDispatch before calling this function.
-		// If you implement your own default material (PhysicsMaterial::sDefault) make sure to initialize it before this function or else this function will create one for you.
-		JPH::RegisterTypes();
-
-		// We need a temp allocator for temporary allocations during the physics update. We're
-		// pre-allocating 10 MB to avoid having to do allocations during the physics update.
-		// B.t.w. 10 MB is way too much for this example but it is a typical value you can use.
-		// If you don't want to pre-allocate you can also use TempAllocatorMalloc to fall back to
-		// malloc / free.
-		constexpr size_t cTempAllocatorSize = 10 * 1024 * 1024; // 10 MB
-		m_PhysicsTempAllocator = new JPH::TempAllocatorImpl(cTempAllocatorSize);
-
-		// We need a job system that will execute physics jobs on multiple threads. Typically
-		// you would implement the JobSystem interface yourself and let Jolt PhysicsTemp run on top
-		// of your own job scheduler. JobSystemThreadPool is an example implementation.
-		m_PhysicsJobSystem = new JPH::JobSystemThreadPool(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, static_cast<int>(std::thread::hardware_concurrency()) - 1);
-
-		// This is the max amount of rigid bodies that you can add to the physics system. If you try to add more you'll get an error.
-		// Note: This value is low because this is a simple test. For a real project use something in the order of 65536.
-		constexpr uint32_t cMaxBodies = 1024;
-
-		// This determines how many mutexes to allocate to protect rigid bodies from concurrent access. Set it to 0 for the default settings.
-		constexpr uint32_t cNumBodyMutexes = 0;
-
-		// This is the max amount of body pairs that can be queued at any time (the broad phase will detect overlapping
-		// body pairs based on their bounding boxes and will insert them into a queue for the narrowphase). If you make this buffer
-		// too small the queue will fill up and the broad phase jobs will start to do narrow phase work. This is slightly less efficient.
-		// Note: This value is low because this is a simple test. For a real project use something in the order of 65536.
-		constexpr uint32_t cMaxBodyPairs = 1024;
-
-		// This is the maximum size of the contact constraint buffer. If more contacts (collisions between bodies) are detected than this
-		// number then these contacts will be ignored and bodies will start interpenetrating / fall through the world.
-		// Note: This value is low because this is a simple test. For a real project use something in the order of 10240.
-		constexpr uint32_t cMaxContactConstraints = 1024;
-
-		// Create mapping table from object layer to broadphase layer
-		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
-		// Also have a look at BroadPhaseLayerInterfaceTable or BroadPhaseLayerInterfaceMask for a simpler interface.
-		m_BroadPhaseLayerInterface = new Physics::BroadPhaseLayerInterfaceImpl();
-
-		// Create class that filters object vs broadphase layers
-		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
-		// Also have a look at ObjectVsBroadPhaseLayerFilterTable or ObjectVsBroadPhaseLayerFilterMask for a simpler interface.
-		m_ObjectVsBroadPhaseLayerFilter = new Physics::ObjectVsBroadPhaseLayerFilterImpl();
-
-		// Create class that filters object vs object layers
-		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
-		// Also have a look at ObjectLayerPairFilterTable or ObjectLayerPairFilterMask for a simpler interface.
-		m_ObjectVsObjectLayerFilter = new Physics::ObjectLayerPairFilterImpl();
-
-		m_PhysicsSystem = new JPH::PhysicsSystem();
-		m_PhysicsSystem->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, *m_BroadPhaseLayerInterface, *m_ObjectVsBroadPhaseLayerFilter, *m_ObjectVsObjectLayerFilter);
-
-		// A body activation listener gets notified when bodies activate and go to sleep
-		// Note that this is called from a job so whatever you do here needs to be thread safe.
-		// Registering one is entirely optional.
-		m_BodyActivationListener = new Physics::BodyActivationListener();
-		m_PhysicsSystem->SetBodyActivationListener(m_BodyActivationListener);
-
-		// A contact listener gets notified when bodies (are about to) collide, and when they separate again.
-		// Note that this is called from a job so whatever you do here needs to be thread safe.
-		// Registering one is entirely optional.
-		m_ContactListener = new Physics::ContactListener();
-		m_PhysicsSystem->SetContactListener(m_ContactListener);
-	}
-
 	void Scene::InitializePhysicsCollidersAndBodies()
 	{
 		KBR_PROFILE_FUNCTION();
-
-		KBR_CORE_ASSERT(m_PhysicsSystem, "Physics system is not initialized!");
 
 		JPH::BodyInterface& bodyInterface = m_PhysicsSystem->GetBodyInterface();
 		const auto view = m_Registry.view<RigidBody3DComponent>();
@@ -1060,7 +925,7 @@ namespace Kerberos
 		}
 	}
 
-	void Scene::CleanupPhysics()
+	/*void Scene::CleanupPhysics()
 	{
 		const auto view = m_Registry.view<RigidBody3DComponent>();
 		for (const auto e : view)
@@ -1068,37 +933,7 @@ namespace Kerberos
 			auto& rigidbody = view.get<RigidBody3DComponent>(e);
 			rigidbody.RuntimeBody = nullptr;
 		}
-
-		delete m_ContactListener;
-		m_ContactListener = nullptr;
-
-		delete m_BodyActivationListener;
-		m_BodyActivationListener = nullptr;
-
-		delete m_PhysicsSystem;
-		m_PhysicsSystem = nullptr;
-
-		delete m_ObjectVsObjectLayerFilter;
-		m_ObjectVsObjectLayerFilter = nullptr;
-
-		delete m_ObjectVsBroadPhaseLayerFilter;
-		m_ObjectVsBroadPhaseLayerFilter = nullptr;
-
-		delete m_BroadPhaseLayerInterface;
-		m_BroadPhaseLayerInterface = nullptr;
-
-		delete m_PhysicsJobSystem;
-		m_PhysicsJobSystem = nullptr;
-
-		delete m_PhysicsTempAllocator;
-		m_PhysicsTempAllocator = nullptr;
-
-		delete JPH::Factory::sInstance;
-		JPH::Factory::sInstance = nullptr;
-
-		JPH::Trace = nullptr;
-		JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = nullptr;);
-	}
+	}*/
 
 	template <typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)

@@ -2,17 +2,19 @@
 
 import Components.PhysicsComponents;
 
-#include "Kerberos/Renderer/Vertex.h"
 #include "Layers.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Array.h>
-#include "Jolt/Core/Reference.h"
-#include "Jolt/Geometry/IndexedTriangle.h"
-#include "Jolt/Physics/Body/MotionType.h"
-#include "Jolt/Physics/Collision/ObjectLayer.h"
-#include "Jolt/Physics/Collision/Shape/MeshShape.h"
-#include "Jolt/Physics/Collision/Shape/Shape.h"
+#include <Jolt/Core/Reference.h>
+#include <Jolt/Geometry/IndexedTriangle.h>
+#include <Jolt/Physics/Body/MotionType.h>
+#include <Jolt/Physics/Collision/ObjectLayer.h>
+#include <Jolt/Physics/Collision/Shape/MeshShape.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 
 namespace Kerberos::Physics
@@ -104,6 +106,25 @@ namespace Kerberos::Physics
             }
            
             return shapeResult.Get();
+        }
+
+        static glm::vec3 ToGlmVec3(const JPH::RVec3& v)
+        {
+            return {
+                (v.GetX()),
+                (v.GetY()),
+                (v.GetZ())
+            };
+        }
+
+        static glm::quat ToGlmQuat(const JPH::Quat& q)
+        {
+            return {
+                (q.GetW()),
+                (q.GetX()),
+                (q.GetY()),
+                (q.GetZ())
+            };
         }
 	};
 }

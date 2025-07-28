@@ -367,6 +367,7 @@
     <ClInclude Include="src\Kerberos\Physics\Layers.h" />
     <ClInclude Include="src\Kerberos\Physics\ContactListener.h" />
     <ClInclude Include="src\Kerberos\Physics\BodyActivationListener.h" />
+    <ClInclude Include="src\Kerberos\Physics\JoltImpl.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">

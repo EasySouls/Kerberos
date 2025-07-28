@@ -185,6 +185,7 @@
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
     <ClInclude Include="src\Kerberos\Physics\BodyActivationListener.h" />
     <ClInclude Include="src\Kerberos\Physics\ContactListener.h" />
+    <ClInclude Include="src\Kerberos\Physics\JoltImpl.h" />
     <ClInclude Include="src\Kerberos\Physics\Layers.h" />
     <ClInclude Include="src\Kerberos\Physics\PhysicsSystem.h" />
     <ClInclude Include="src\Kerberos\Physics\Utils.h" />
