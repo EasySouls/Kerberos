@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Jolt/Jolt.h>
-
 namespace Kerberos::Physics
 {
 	static void TraceImpl(const char* inFmt, ...)

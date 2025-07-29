@@ -3,6 +3,8 @@
 import Components.PhysicsComponents;
 
 #include "Layers.h"
+#include "Kerberos/Renderer/Mesh.h"
+#include "Kerberos/Renderer/Vertex.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Array.h>
@@ -12,10 +14,14 @@ import Components.PhysicsComponents;
 #include <Jolt/Physics/Collision/ObjectLayer.h>
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #include <Jolt/Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Body/Body.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 
 
 namespace Kerberos::Physics
@@ -74,8 +80,8 @@ namespace Kerberos::Physics
             const JPH::RVec3 joltPosition = body.GetPosition();
             const JPH::Quat joltRotation = body.GetRotation();
 
-            glm::vec3 position = Physics::Utils::ToGlmVec3(joltPosition);
-            glm::quat rotation = Physics::Utils::ToGlmQuat(joltRotation);
+            glm::vec3 position = ToGlmVec3(joltPosition);
+            glm::quat rotation = ToGlmQuat(joltRotation);
 
             /// Decompose the current transform to get the scale
             glm::vec3 scale, skew;

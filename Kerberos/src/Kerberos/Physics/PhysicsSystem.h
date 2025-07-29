@@ -1,17 +1,31 @@
 #pragma once
 
 #include "Kerberos/Core.h"
-#include "Kerberos/Scene/Scene.h"
 
-#include <Jolt/Jolt.h>
-#include <Jolt/Physics/PhysicsSystem.h>
-#include <Jolt/Physics/Collision/Shape/Shape.h>
-#include <Jolt/Physics/Body/BodyActivationListener.h>
+namespace JPH
+{
+	class PhysicsSystem;
+	class TempAllocator;
+	class JobSystem;
+	class Shape;
+	class Body;
 
+	template <class T>
+	class RefConst;
 
+	class ObjectVsBroadPhaseLayerFilter;
+	class BroadPhaseLayerInterface;
+	class ContactListener;
+	class BodyActivationListener;
+	class ObjectLayerPairFilter;
+}
 
 namespace Kerberos
 {
+	class Entity;
+	class Scene;
+
+
 	class PhysicsSystem
 	{
 	public:
@@ -28,6 +42,8 @@ namespace Kerberos
 		JPH::RefConst<JPH::Shape> CreateShapeForEntity(const Entity& entity);
 
 		void SyncTransforms() const;
+
+		static bool IsColliderTrigger(const Entity& entity);
 
 	private:
 		Ref<Scene> m_Scene = nullptr;

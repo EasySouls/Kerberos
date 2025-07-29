@@ -3,27 +3,26 @@
 import Components.PhysicsComponents;
 
 #include "PhysicsSystem.h"
-
 #include "BodyActivationListener.h"
 #include "ContactListener.h"
 #include "JoltImpl.h"
 #include "Layers.h"
+#include "Utils.h"
 #include "Kerberos/Scene/Entity.h"
+#include "Kerberos/Scene/Scene.h"
 
 #include <Jolt/Jolt.h>
+#include <Jolt/Core/TempAllocator.h>
 #include <Jolt/Physics/PhysicsSystem.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
-#include <Jolt/Core/TempAllocator.h>
 #include <Jolt/Physics/PhysicsSettings.h>
-
-#include "Utils.h"
 #include "Jolt/Physics/Collision/Shape/BoxShape.h"
 #include "Jolt/Physics/Collision/Shape/SphereShape.h"
 #include "Jolt/Physics/Collision/Shape/StaticCompoundShape.h"
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
-
 #include "Jolt/Physics/Collision/Shape/CapsuleShape.h"
 #include "Jolt/Physics/Collision/Shape/OffsetCenterOfMassShape.h"
 
@@ -135,7 +134,7 @@ namespace Kerberos
 	void PhysicsSystem::UpdateAndCreatePhysicsBodies() 
 	{
 		// Handle entities with rigidbodies but no physics body created yet
-		const auto newBodies = m_Scene->m_Registry.view<RigidBody3DComponent, TransformComponent>(entt::exclude<>);
+		const auto newBodies = m_Scene->m_Registry.view<RigidBody3DComponent, TransformComponent>(/*entt::exclude<>*/ );
 		for (const entt::entity id : newBodies)
 		{
 			const Entity entity(id, m_Scene);
@@ -166,8 +165,10 @@ namespace Kerberos
 				/// Remove the old body if it exists
 				if (rb.RuntimeBody)
 				{
+					/// TODO: Do not remove and destroy the old body, but modify it
 					JPH::BodyInterface& bodyInterface = m_JoltSystem->GetBodyInterface();
 					bodyInterface.RemoveBody(static_cast<JPH::Body*>(rb.RuntimeBody)->GetID());
+					bodyInterface.DestroyBody(static_cast<JPH::Body*>(rb.RuntimeBody)->GetID());
 					rb.RuntimeBody = nullptr;
 				}
 
@@ -251,12 +252,20 @@ namespace Kerberos
 			Physics::Utils::GetJPHMotionTypeFromComponent(rigidBody), Physics::Utils::GetObjectLayerFromComponent(rigidBody)
 		);
 
+		const bool isTrigger = IsColliderTrigger(entity);
+
+		bodySettings.mIsSensor = isTrigger;
 		bodySettings.mMassPropertiesOverride.mMass = rigidBody.Mass;
 		bodySettings.mFriction = rigidBody.Friction;
 		bodySettings.mRestitution = rigidBody.Restitution;
 		//bodySettings.mLinearDamping = rigidBody.LinearDamping;
 		//bodySettings.mAngularDamping = rigidBody.AngularDamping;
 		bodySettings.mGravityFactor = rigidBody.UseGravity ? 1.0f : 0.0f;
+
+		bodySettings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
+		auto massProperties = JPH::MassProperties();
+		massProperties.mMass = rigidBody.Mass;
+		bodySettings.mMassPropertiesOverride = massProperties;
 
 		JPH::BodyInterface& bodyInterface = m_JoltSystem->GetBodyInterface();
 		JPH::Body* body = bodyInterface.CreateBody(bodySettings);
@@ -332,17 +341,37 @@ namespace Kerberos
 		return compoundSettings.Create().Get();
 	}
 
+	bool PhysicsSystem::IsColliderTrigger(const Entity& entity) 
+	{
+		if (entity.HasComponent<BoxCollider3DComponent>())
+		{
+			return entity.GetComponent<BoxCollider3DComponent>().IsTrigger;
+		}
+		if (entity.HasComponent<SphereCollider3DComponent>())
+		{
+			return entity.GetComponent<SphereCollider3DComponent>().IsTrigger;
+		}
+		if (entity.HasComponent<CapsuleCollider3DComponent>())
+		{
+			return entity.GetComponent<CapsuleCollider3DComponent>().IsTrigger;
+		}
+		if (entity.HasComponent<MeshCollider3DComponent>())
+		{
+			return entity.GetComponent<MeshCollider3DComponent>().IsTrigger;
+		}
+		return false;
+	}
 
 	void PhysicsSystem::Cleanup() 
 	{
 		KBR_PROFILE_FUNCTION();
 
-		const auto view = m_Scene->m_Registry.view<RigidBody3DComponent>();
-		for (const auto e : view)
-		{
-			auto& rigidbody = view.get<RigidBody3DComponent>(e);
-			rigidbody.RuntimeBody = nullptr;
-		}
+		//const auto view = m_Scene->m_Registry.view<RigidBody3DComponent>();
+		//for (const auto e : view)
+		//{
+		//	auto& rigidbody = view.get<RigidBody3DComponent>(e);
+		//	rigidbody.RuntimeBody = nullptr;
+		//}
 
 		delete m_ContactListener;
 		m_ContactListener = nullptr;
