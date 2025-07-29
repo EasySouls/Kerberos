@@ -1,4 +1,7 @@
 #include "kbrpch.h"
+
+import Components.PhysicsComponents;
+
 #include "PhysicsSystem.h"
 
 #include "BodyActivationListener.h"
@@ -21,7 +24,9 @@
 #include "Jolt/Physics/Collision/Shape/StaticCompoundShape.h"
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 
-import Components.PhysicsComponents;
+#include "Jolt/Physics/Collision/Shape/CapsuleShape.h"
+#include "Jolt/Physics/Collision/Shape/OffsetCenterOfMassShape.h"
+
 
 namespace Kerberos
 {
@@ -57,7 +62,7 @@ namespace Kerberos
 		/// B.t.w. 10 MB is way too much for this example but it is a typical value you can use.
 		/// If you don't want to pre-allocate you can also use TempAllocatorMalloc to fall back to
 		/// malloc / free.
-		constexpr size_t cTempAllocatorSize = 10 * 1024 * 1024; // 10 MB
+		constexpr size_t cTempAllocatorSize = 10 * 1024 * 1024; /// 10 MB
 		m_PhysicsTempAllocator = new JPH::TempAllocatorImpl(cTempAllocatorSize);
 
 		/// We need a job system that will execute physics jobs on multiple threads. Typically
@@ -119,7 +124,7 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		UpdatePhysicsBodies();
+		UpdateAndCreatePhysicsBodies();
 
 		constexpr int collisionSteps = 3;
 		m_JoltSystem->Update(deltaTime, collisionSteps, m_PhysicsTempAllocator, m_PhysicsJobSystem);
@@ -127,36 +132,95 @@ namespace Kerberos
 		SyncTransforms();
 	}
 
-	void PhysicsSystem::UpdatePhysicsBodies() {}
-
-	void PhysicsSystem::SyncTransforms() 
+	void PhysicsSystem::UpdateAndCreatePhysicsBodies() 
 	{
-		const JPH::BodyInterface& bodyInterface = m_JoltSystem->GetBodyInterface();
-
-		const auto view = m_Scene->m_Registry.view<RigidBody3DComponent, TransformComponent>();
-		for (const entt::entity id : view)
+		// Handle entities with rigidbodies but no physics body created yet
+		const auto newBodies = m_Scene->m_Registry.view<RigidBody3DComponent, TransformComponent>(entt::exclude<>);
+		for (const entt::entity id : newBodies)
 		{
 			const Entity entity(id, m_Scene);
 			auto& rb = entity.GetComponent<RigidBody3DComponent>();
-			auto& transform = entity.GetComponent<TransformComponent>();
-
-			if (rb.bodyID == JPH::BodyID::cInvalidBodyID) continue;
-			if (rb.motionType == JPH::EMotionType::Static) continue;
-
-			// Get position and rotation from physics body
-			JPH::RVec3 position = bodyInterface.GetPosition(rb.bodyID);
-			JPH::Quat rotation = bodyInterface.GetRotation(rb.bodyID);
-
-			// Update transform
-			transform.Translation = glm::vec3(position.GetX(), position.GetY(), position.GetZ());
-			transform.Rotation = glm::quat(rotation.GetW(), rotation.GetX(), rotation.GetY(), rotation.GetZ());
-
-			// Update velocity for access by other systems
-			JPH::Vec3 vel = bodyInterface.GetLinearVelocity(rb.bodyID);
-			JPH::Vec3 angVel = bodyInterface.GetAngularVelocity(rb.bodyID);
-			rb.Velocity = glm::vec3(vel.GetX(), vel.GetY(), vel.GetZ());
-			rb.AngularVelocity = glm::vec3(angVel.GetX(), angVel.GetY(), angVel.GetZ());
+			/*if (rb.bodyID == JPH::BodyID::cInvalidBodyID)
+			{
+				CreatePhysicsBody(id);
+			}*/
+			if (!rb.RuntimeBody)
+			{
+				CreatePhysicsBody(entity);
+				rb.IsDirty = false;
+			}
+			/*else
+			{
+				rb.IsDirty = true;
+			}*/
 		}
+
+		/// Update existing bodies that are marked dirty
+		const auto existingBodies = m_Scene->m_Registry.view<RigidBody3DComponent, TransformComponent>();
+		for (const entt::entity id : existingBodies)
+		{
+			const Entity entity(id, m_Scene);
+			auto& rb = entity.GetComponent<RigidBody3DComponent>();
+			if (rb.IsDirty)
+			{
+				/// Remove the old body if it exists
+				if (rb.RuntimeBody)
+				{
+					JPH::BodyInterface& bodyInterface = m_JoltSystem->GetBodyInterface();
+					bodyInterface.RemoveBody(static_cast<JPH::Body*>(rb.RuntimeBody)->GetID());
+					rb.RuntimeBody = nullptr;
+				}
+
+				CreatePhysicsBody(entity);
+				rb.IsDirty = false;
+			}
+		}
+	}
+
+	void PhysicsSystem::SyncTransforms() const 
+	{
+		const auto view = m_Scene->m_Registry.view<RigidBody3DComponent, TransformComponent>();
+		for (const auto e : view)
+		{
+			auto& transform = view.get<TransformComponent>(e);
+			const auto& rigidBody = view.get<RigidBody3DComponent>(e);
+
+			if (rigidBody.RuntimeBody)
+			{
+				const JPH::Body* body = static_cast<JPH::Body*>(rigidBody.RuntimeBody);
+
+				Physics::Utils::ApplyJoltTransformToEntity(transform.WorldTransform, *body);
+			}
+		}
+
+		/// There probably is a better solution, but lets just stick to something that mostly works for now.
+
+		//const JPH::BodyInterface& bodyInterface = m_JoltSystem->GetBodyInterface();
+
+		//const auto view = m_Scene->m_Registry.view<RigidBody3DComponent, TransformComponent>();
+		//for (const entt::entity id : view)
+		//{
+		//	const Entity entity(id, m_Scene);
+		//	auto& rb = entity.GetComponent<RigidBody3DComponent>();
+		//	auto& transform = entity.GetComponent<TransformComponent>();
+
+		//	if (rb.bodyID == JPH::BodyID::cInvalidBodyID) continue;
+		//	if (rb.motionType == JPH::EMotionType::Static) continue;
+
+		//	// Get position and rotation from physics body
+		//	JPH::RVec3 position = bodyInterface.GetPosition(rb.bodyID);
+		//	JPH::Quat rotation = bodyInterface.GetRotation(rb.bodyID);
+
+		//	// Update transform
+		//	transform.Translation = glm::vec3(position.GetX(), position.GetY(), position.GetZ());
+		//	transform.Rotation = glm::quat(rotation.GetW(), rotation.GetX(), rotation.GetY(), rotation.GetZ());
+
+		//	// Update velocity for access by other systems
+		//	JPH::Vec3 vel = bodyInterface.GetLinearVelocity(rb.bodyID);
+		//	JPH::Vec3 angVel = bodyInterface.GetAngularVelocity(rb.bodyID);
+		//	rb.Velocity = glm::vec3(vel.GetX(), vel.GetY(), vel.GetZ());
+		//	rb.AngularVelocity = glm::vec3(angVel.GetX(), angVel.GetY(), angVel.GetZ());
+		//}
 	}
 
 	void PhysicsSystem::CreatePhysicsBody(const Entity& entity) 
@@ -201,7 +265,7 @@ namespace Kerberos
 		//bodyInterface.AddBody(body->GetID(), rigidBody.isActive ? JPH::EActivation::Activate : JPH::EActivation::DontActivate);
 		bodyInterface.AddBody(body->GetID(), JPH::EActivation::Activate);
 
-		rigidBody.isDirty = false;
+		rigidBody.IsDirty = false;
 	}
 
 	JPH::RefConst<JPH::Shape> PhysicsSystem::CreateShapeForEntity(const Entity& entity) 
@@ -211,10 +275,10 @@ namespace Kerberos
 		if (entity.HasComponent<BoxCollider3DComponent>())
 		{
 			const auto& coll = entity.GetComponent<BoxCollider3DComponent>();
-			auto shape = new JPH::BoxShape(JPH::Vec3(coll.Size.x / 2, coll.Size.y / 2, coll.Size.z / 2));
+			const JPH::Shape* shape = new JPH::BoxShape(JPH::Vec3(coll.Size.x / 2, coll.Size.y / 2, coll.Size.z / 2));
 			if (coll.Offset != glm::vec3(0.0f))
 			{
-				shape = new JPH::OffsetCenterOfMassShape(JPH::Vec3(coll.Offset.x, coll.Offset.y, coll.Offset.z), shape);
+				shape = new JPH::OffsetCenterOfMassShape(shape, JPH::Vec3(coll.Offset.x, coll.Offset.y, coll.Offset.z));
 			}
 			shapes.push_back(shape);
 		}
@@ -222,12 +286,35 @@ namespace Kerberos
 		if (entity.HasComponent<SphereCollider3DComponent>())
 		{
 			const auto& coll = entity.GetComponent<SphereCollider3DComponent>();
-			auto shape = new JPH::SphereShape(coll.Radius);
+			const JPH::Shape* shape = new JPH::SphereShape(coll.Radius);
 			if (coll.Offset != glm::vec3(0.0f))
 			{
-				shape = new JPH::OffsetCenterOfMassShape(JPH::Vec3(sphere->offset.x, sphere->offset.y, sphere->offset.z), shape);
+				shape = new JPH::OffsetCenterOfMassShape(shape, JPH::Vec3(coll.Offset.x, coll.Offset.y, coll.Offset.z));
 			}
 			shapes.push_back(shape);
+		}
+
+		if (entity.HasComponent<CapsuleCollider3DComponent>())
+		{
+			const auto& coll = entity.GetComponent<CapsuleCollider3DComponent>();
+			const JPH::Shape* shape = new JPH::CapsuleShape(coll.Height / 2, coll.Radius);
+			if (coll.Offset != glm::vec3(0.0f))
+			{
+				shape = new JPH::OffsetCenterOfMassShape(shape, JPH::Vec3(coll.Offset.x, coll.Offset.y, coll.Offset.z));
+			}
+			shapes.push_back(shape);
+		}
+
+		if (entity.HasComponent<MeshCollider3DComponent>())
+		{
+			const StaticMeshComponent mesh = entity.GetComponent<StaticMeshComponent>();
+			if (mesh.StaticMesh)
+			{
+				if (const JPH::RefConst<JPH::Shape> shape = Physics::Utils::CreateJoltMeshShape(mesh.StaticMesh, entity.GetName()))
+				{
+					shapes.push_back(shape);
+				}
+			}
 		}
 
 		if (shapes.empty()) return nullptr;
@@ -249,6 +336,13 @@ namespace Kerberos
 	void PhysicsSystem::Cleanup() 
 	{
 		KBR_PROFILE_FUNCTION();
+
+		const auto view = m_Scene->m_Registry.view<RigidBody3DComponent>();
+		for (const auto e : view)
+		{
+			auto& rigidbody = view.get<RigidBody3DComponent>(e);
+			rigidbody.RuntimeBody = nullptr;
+		}
 
 		delete m_ContactListener;
 		m_ContactListener = nullptr;

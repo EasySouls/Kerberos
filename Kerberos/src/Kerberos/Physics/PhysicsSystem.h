@@ -23,11 +23,11 @@ namespace Kerberos
 
 		void Cleanup();
 	private:
-		void UpdatePhysicsBodies();
+		void UpdateAndCreatePhysicsBodies();
 		void CreatePhysicsBody(const Entity& entity);
 		JPH::RefConst<JPH::Shape> CreateShapeForEntity(const Entity& entity);
 
-		void SyncTransforms();
+		void SyncTransforms() const;
 
 	private:
 		Ref<Scene> m_Scene = nullptr;

@@ -28,6 +28,8 @@ export namespace Kerberos
 		/// Pointer to the physics engine's runtime body
 		void* RuntimeBody = nullptr;
 
+		bool IsDirty = true;
+
 		RigidBody3DComponent() = default;
 		explicit RigidBody3DComponent(const BodyType type)
 			: Type(type)

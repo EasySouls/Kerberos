@@ -12,23 +12,13 @@ import Components.PhysicsComponents;
 #include "Kerberos/Physics/Utils.h"
 
 #include <Jolt/Jolt.h>
-#include <Jolt/RegisterTypes.h>
-#include <Jolt/Core/Factory.h>
-#include <Jolt/Core/TempAllocator.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
-#include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
-#include "Jolt/Physics/Collision/Shape/BoxShape.h"
 
 #include <glm/gtx/matrix_decompose.hpp>
 
-#include "Jolt/Physics/Collision/Shape/CapsuleShape.h"
-#include "Jolt/Physics/Collision/Shape/SphereShape.h"
 #include "Kerberos/Assets/AssetManager.h"
-#include "Kerberos/Physics/BodyActivationListener.h"
-#include "Kerberos/Physics/ContactListener.h"
-#include "Kerberos/Physics/JoltImpl.h"
 #include "Kerberos/Renderer/RenderCommand.h"
 
 #define USE_MAP_FOR_UUID 1
@@ -64,34 +54,6 @@ namespace Kerberos
 	{
 		/// Destroy all entities in the scene
 		m_Registry.clear<entt::entity>();
-	}
-
-	static void ApplyJoltTransformToEntity(glm::mat4& worldTransform, const JPH::Body& body)
-	{
-		KBR_PROFILE_FUNCTION();
-
-		/// TODO: Update the transform, rotation and scale of the entity, not its world transform
-
-		const JPH::RVec3 joltPosition = body.GetPosition();
-		const JPH::Quat joltRotation = body.GetRotation();
-
-		glm::vec3 position = Physics::Utils::ToGlmVec3(joltPosition);
-		glm::quat rotation = Physics::Utils::ToGlmQuat(joltRotation);
-
-		// Decompose the current transform to get the scale
-		glm::vec3 scale, skew;
-		glm::vec4 perspective;
-		glm::quat oldRotation;
-		glm::vec3 oldPosition;
-
-		glm::decompose(worldTransform, scale, oldRotation, oldPosition, skew, perspective);
-
-		// Rebuild world transform using physics position & rotation but keep original scale
-		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), position);
-		glm::mat4 rotationMatrix = glm::toMat4(rotation);
-		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scale);
-
-		worldTransform = translationMatrix * rotationMatrix * scaleMatrix;
 	}
 
 	void Scene::OnRuntimeStart()
@@ -133,23 +95,6 @@ namespace Kerberos
 		}
 
 		m_PhysicsSystem.Update(ts);
-
-		/// Physics
-		{
-			const auto view = m_Registry.view<RigidBody3DComponent, TransformComponent>();
-			for (const auto e : view)
-			{
-				auto& transform = view.get<TransformComponent>(e);
-				const auto& rigidBody = view.get<RigidBody3DComponent>(e);
-
-				if (rigidBody.RuntimeBody)
-				{
-					const JPH::Body* body = static_cast<JPH::Body*>(rigidBody.RuntimeBody);
-
-					ApplyJoltTransformToEntity(transform.WorldTransform, *body);
-				}
-			}
-		}
 
 		/// Render the scene
 

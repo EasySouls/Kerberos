@@ -15,6 +15,7 @@ import Components.PhysicsComponents;
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
 
 namespace Kerberos::Physics
@@ -64,7 +65,35 @@ namespace Kerberos::Physics
             return Layers::NON_MOVING;
         }
 
-        static JPH::Ref<JPH::Shape> CreateJoltMeshShape(const Ref<Mesh>& mesh, const std::string& debugName)
+        static void ApplyJoltTransformToEntity(glm::mat4& worldTransform, const JPH::Body& body)
+        {
+            KBR_PROFILE_FUNCTION();
+
+            /// TODO: Update the transform, rotation and scale of the entity, not its world transform
+
+            const JPH::RVec3 joltPosition = body.GetPosition();
+            const JPH::Quat joltRotation = body.GetRotation();
+
+            glm::vec3 position = Physics::Utils::ToGlmVec3(joltPosition);
+            glm::quat rotation = Physics::Utils::ToGlmQuat(joltRotation);
+
+            /// Decompose the current transform to get the scale
+            glm::vec3 scale, skew;
+            glm::vec4 perspective;
+            glm::quat oldRotation;
+            glm::vec3 oldPosition;
+
+            glm::decompose(worldTransform, scale, oldRotation, oldPosition, skew, perspective);
+
+            /// Rebuild world transform using physics position & rotation but keep original scale
+            glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), position);
+            glm::mat4 rotationMatrix = glm::toMat4(rotation);
+            glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scale);
+
+            worldTransform = translationMatrix * rotationMatrix * scaleMatrix;
+        }
+
+        static JPH::Ref<JPH::Shape> CreateJoltMeshShape(const Ref<Mesh>& mesh, const std::string_view debugName)
         {
             const std::vector<Vertex>& kerberosVertices = mesh->GetVertices();
             const std::vector<uint32_t>& kerberosIndices = mesh->GetIndices();
