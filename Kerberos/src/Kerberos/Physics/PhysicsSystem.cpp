@@ -34,9 +34,11 @@ namespace Kerberos
 		Cleanup();
 	}
 
-	void PhysicsSystem::Initialize() 
+	void PhysicsSystem::Initialize(const Ref<Scene>& scene) 
 	{
 		KBR_PROFILE_FUNCTION();
+
+		m_Scene = scene;
 
 		/// Register allocation hook. In this example we'll just let Jolt use malloc / free but you can override these if you want (see Memory.h).
 		/// This needs to be done before any other Jolt function is called.
@@ -133,8 +135,13 @@ namespace Kerberos
 
 	void PhysicsSystem::UpdateAndCreatePhysicsBodies() 
 	{
+		KBR_PROFILE_FUNCTION();
+
+		KBR_CORE_ASSERT(!m_Scene.expired(), "Scene is not initialized!");
+		KBR_CORE_ASSERT(m_JoltSystem, "Jolt Physics System is not initialized!");
+
 		// Handle entities with rigidbodies but no physics body created yet
-		const auto newBodies = m_Scene->m_Registry.view<RigidBody3DComponent, TransformComponent>(/*entt::exclude<>*/ );
+		const auto newBodies = m_Scene.lock()->m_Registry.view<RigidBody3DComponent, TransformComponent>(/*entt::exclude<>*/ );
 		for (const entt::entity id : newBodies)
 		{
 			const Entity entity(id, m_Scene);
@@ -155,7 +162,7 @@ namespace Kerberos
 		}
 
 		/// Update existing bodies that are marked dirty
-		const auto existingBodies = m_Scene->m_Registry.view<RigidBody3DComponent, TransformComponent>();
+		const auto existingBodies = m_Scene.lock()->m_Registry.view<RigidBody3DComponent, TransformComponent>();
 		for (const entt::entity id : existingBodies)
 		{
 			const Entity entity(id, m_Scene);
@@ -180,7 +187,10 @@ namespace Kerberos
 
 	void PhysicsSystem::SyncTransforms() const 
 	{
-		const auto view = m_Scene->m_Registry.view<RigidBody3DComponent, TransformComponent>();
+		KBR_CORE_ASSERT(!m_Scene.expired(), "Scene is not initialized!");
+		KBR_CORE_ASSERT(m_JoltSystem, "Jolt Physics System is not initialized!");
+
+		const auto view = m_Scene.lock()->m_Registry.view<RigidBody3DComponent, TransformComponent>();
 		for (const auto e : view)
 		{
 			auto& transform = view.get<TransformComponent>(e);
@@ -190,7 +200,10 @@ namespace Kerberos
 			{
 				const JPH::Body* body = static_cast<JPH::Body*>(rigidBody.RuntimeBody);
 
-				Physics::Utils::ApplyJoltTransformToEntity(transform.WorldTransform, *body);
+				const Entity entity(e, m_Scene);
+				const JPH::Vec3 offset = m_ColliderOffsets.at(entity.GetUUID());
+
+				Physics::Utils::ApplyJoltTransformToEntity(transform.WorldTransform, *body, offset);
 			}
 		}
 
@@ -238,7 +251,8 @@ namespace Kerberos
 		const float posY = worldPos.y; //+ collider.Offset.y;
 		const float posZ = worldPos.z; //+ collider.Offset.z;
 
-		const JPH::Vec3 position = JPH::Vec3(posX, posY, posZ);
+		const JPH::Vec3 offset = m_ColliderOffsets[entity.GetUUID()];
+		const JPH::Vec3 position = JPH::Vec3(posX + offset.GetX(), posY + offset.GetY(), posZ + offset.GetZ());
 
 		/// Extract rotation quaternion from the transform matrix
 		glm::quat glmRotation = glm::quat_cast(glm::mat3(transform.WorldTransform));
@@ -284,11 +298,11 @@ namespace Kerberos
 		if (entity.HasComponent<BoxCollider3DComponent>())
 		{
 			const auto& coll = entity.GetComponent<BoxCollider3DComponent>();
-			const JPH::Shape* shape = new JPH::BoxShape(JPH::Vec3(coll.Size.x / 2, coll.Size.y / 2, coll.Size.z / 2));
-			if (coll.Offset != glm::vec3(0.0f))
-			{
-				shape = new JPH::OffsetCenterOfMassShape(shape, JPH::Vec3(coll.Offset.x, coll.Offset.y, coll.Offset.z));
-			}
+			const JPH::Shape* shape = new JPH::BoxShape(JPH::Vec3(coll.Size.x, coll.Size.y, coll.Size.z));
+
+			const JPH::Vec3 offset(coll.Offset.x, coll.Offset.y, coll.Offset.z);
+			m_ColliderOffsets[entity.GetUUID()] = offset;
+
 			shapes.push_back(shape);
 		}
 
@@ -296,10 +310,10 @@ namespace Kerberos
 		{
 			const auto& coll = entity.GetComponent<SphereCollider3DComponent>();
 			const JPH::Shape* shape = new JPH::SphereShape(coll.Radius);
-			if (coll.Offset != glm::vec3(0.0f))
-			{
-				shape = new JPH::OffsetCenterOfMassShape(shape, JPH::Vec3(coll.Offset.x, coll.Offset.y, coll.Offset.z));
-			}
+			
+			const JPH::Vec3 offset(coll.Offset.x, coll.Offset.y, coll.Offset.z);
+			m_ColliderOffsets[entity.GetUUID()] = offset;
+
 			shapes.push_back(shape);
 		}
 
@@ -307,20 +321,24 @@ namespace Kerberos
 		{
 			const auto& coll = entity.GetComponent<CapsuleCollider3DComponent>();
 			const JPH::Shape* shape = new JPH::CapsuleShape(coll.Height / 2, coll.Radius);
-			if (coll.Offset != glm::vec3(0.0f))
-			{
-				shape = new JPH::OffsetCenterOfMassShape(shape, JPH::Vec3(coll.Offset.x, coll.Offset.y, coll.Offset.z));
-			}
+			
+			const JPH::Vec3 offset(coll.Offset.x, coll.Offset.y, coll.Offset.z);
+			m_ColliderOffsets[entity.GetUUID()] = offset;
+
 			shapes.push_back(shape);
 		}
 
 		if (entity.HasComponent<MeshCollider3DComponent>())
 		{
 			const StaticMeshComponent mesh = entity.GetComponent<StaticMeshComponent>();
+			const auto& coll = entity.GetComponent<MeshCollider3DComponent>();
 			if (mesh.StaticMesh)
 			{
 				if (const JPH::RefConst<JPH::Shape> shape = Physics::Utils::CreateJoltMeshShape(mesh.StaticMesh, entity.GetName()))
 				{
+					const JPH::Vec3 offset(coll.Offset.x, coll.Offset.y, coll.Offset.z);
+					m_ColliderOffsets[entity.GetUUID()] = offset;
+
 					shapes.push_back(shape);
 				}
 			}

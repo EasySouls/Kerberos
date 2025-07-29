@@ -55,7 +55,7 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		m_PhysicsSystem.Initialize();
+		m_PhysicsSystem.Initialize(shared_from_this());
 	}
 
 	void Scene::OnRuntimeStop()

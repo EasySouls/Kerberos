@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Kerberos/Core.h"
+#include "Kerberos/Core/UUID.h"
 
 namespace JPH
 {
@@ -18,6 +19,8 @@ namespace JPH
 	class ContactListener;
 	class BodyActivationListener;
 	class ObjectLayerPairFilter;
+
+	class Vec3;
 }
 
 namespace Kerberos
@@ -25,14 +28,13 @@ namespace Kerberos
 	class Entity;
 	class Scene;
 
-
 	class PhysicsSystem
 	{
 	public:
 		PhysicsSystem() = default;
 		~PhysicsSystem();
 
-		void Initialize();
+		void Initialize(const Ref<Scene>& scene);
 		void Update(float deltaTime);
 
 		void Cleanup();
@@ -46,7 +48,9 @@ namespace Kerberos
 		static bool IsColliderTrigger(const Entity& entity);
 
 	private:
-		Ref<Scene> m_Scene = nullptr;
+		std::weak_ptr<Scene> m_Scene;
+
+		std::unordered_map<UUID, JPH::Vec3> m_ColliderOffsets;
 
 		JPH::PhysicsSystem* m_JoltSystem = nullptr;
 		JPH::TempAllocator* m_PhysicsTempAllocator = nullptr;

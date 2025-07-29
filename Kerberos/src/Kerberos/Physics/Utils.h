@@ -71,7 +71,15 @@ namespace Kerberos::Physics
             return Layers::NON_MOVING;
         }
 
-        static void ApplyJoltTransformToEntity(glm::mat4& worldTransform, const JPH::Body& body)
+
+        /**
+		 * Applies the Jolt physics transform to the entity's world transform, and takes the offset of
+		 * the collider into account.
+		 * @param worldTransform The world transform of the entity to update.
+		 * @param body The Jolt body to get the position and rotation from.
+		 * @param offset The offset of the collider in the entity's local space.
+         */
+        static void ApplyJoltTransformToEntity(glm::mat4& worldTransform, const JPH::Body& body, const JPH::Vec3& offset)
         {
             KBR_PROFILE_FUNCTION();
 
@@ -82,6 +90,9 @@ namespace Kerberos::Physics
 
             glm::vec3 position = ToGlmVec3(joltPosition);
             glm::quat rotation = ToGlmQuat(joltRotation);
+
+			/// Subtract the offset from the position to get the correct world position
+			position -= ToGlmVec3(offset);
 
             /// Decompose the current transform to get the scale
             glm::vec3 scale, skew;
