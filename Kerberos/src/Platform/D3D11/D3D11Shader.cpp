@@ -23,7 +23,11 @@ namespace Kerberos
 
 	void D3D11Shader::SetDebugName(const std::string& name) const 
 	{
-		throw std::runtime_error("SetDebugName is not implemented for D3D11Shader!");
+		const HRESULT res = D3D11Context::Get().GetDevice()->SetPrivateData(WKPDID_D3DDebugObjectName, static_cast<UINT>(name.size()), name.data());
+		if (FAILED(res))
+		{
+			KBR_CORE_WARN("Failed to set shader debug name: {0}", name);
+		}
 	}
 
 	bool D3D11Shader::CompileShaderFromFile(const std::wstring& fileName, const std::string& entryPoint,

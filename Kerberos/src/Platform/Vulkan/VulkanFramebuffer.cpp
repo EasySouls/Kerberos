@@ -15,7 +15,8 @@ namespace Kerberos
 			switch (format)
 			{
 			case FramebufferTextureFormat::RGBA8:           return VK_FORMAT_R8G8B8A8_UNORM;
-			case FramebufferTextureFormat::DEPTH24STENCIL8: return VK_FORMAT_D24_UNORM_S8_UINT;
+			case FramebufferTextureFormat::DEPTH24STENCIL8:
+			case FramebufferTextureFormat::DEPTH24:         return VK_FORMAT_D24_UNORM_S8_UINT; // Vulkan doesn't have a separate format for DEPTH24
 			case FramebufferTextureFormat::RED_INTEGER:     return VK_FORMAT_R32_SINT;
 			case FramebufferTextureFormat::None:            return VK_FORMAT_UNDEFINED;
 			}
@@ -25,7 +26,7 @@ namespace Kerberos
 
 		static bool IsDepthFormat(const FramebufferTextureFormat format)
 		{
-			return format == FramebufferTextureFormat::DEPTH24STENCIL8;
+			return format == FramebufferTextureFormat::DEPTH24STENCIL8 || format == FramebufferTextureFormat::DEPTH24;
 		}
 	}
 
@@ -46,13 +47,11 @@ namespace Kerberos
 			}
 		}
 
-		KBR_CORE_ASSERT(!m_ColorAttachmentSpecs.empty(), "Framebuffer must have at least one color attachment!");
 		KBR_CORE_ASSERT(m_DepthAttachmentSpec.TextureFormat != FramebufferTextureFormat::None, "Framebuffer must have a depth attachment!");
 		KBR_CORE_ASSERT(m_Specification.Width > 0 && m_Specification.Height > 0, "Framebuffer dimensions must be greater than zero!");
 		KBR_CORE_ASSERT(m_Specification.Samples > 0, "Framebuffer samples must be greater than zero!");
 
 		KBR_CORE_ASSERT(m_Specification.Samples == 1, "Vulkan currently doesn't support multisampling!");
-		KBR_CORE_ASSERT(m_ColorAttachmentSpecs.size() == 1, "VulkanFramebuffer currently only supports one color attachment!");
 
 		Invalidate();
 	}
@@ -84,24 +83,23 @@ namespace Kerberos
 			m_ColorAttachmentViews.resize(colorAttachmentCount);
 		}
 
-
-		const VkFormat colorFormat = Utils::FramebufferTextureFormatToVulkanFormat(m_ColorAttachmentSpecs[0].TextureFormat);
-
-		CreateImage(
-			m_Specification.Width, 
-			m_Specification.Height, 
-			colorFormat, 
-			VK_IMAGE_TILING_OPTIMAL,
-			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			m_ColorAttachments[0], m_ColorAttachmentMemories[0]);
-
-		CreateImageView(m_ColorAttachments[0], colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, m_ColorAttachmentViews[0]);
-
 		std::vector<VkAttachmentDescription> attachmentDescriptions;
 		attachmentDescriptions.resize(m_ColorAttachmentSpecs.size());
 		for (size_t i = 0; i < m_ColorAttachmentSpecs.size(); ++i)
 		{
-			attachmentDescriptions[i].format = Utils::FramebufferTextureFormatToVulkanFormat(m_ColorAttachmentSpecs[i].TextureFormat);
+			const VkFormat colorFormat = Utils::FramebufferTextureFormatToVulkanFormat(m_ColorAttachmentSpecs[i].TextureFormat);
+
+			CreateImage(
+				m_Specification.Width,
+				m_Specification.Height,
+				colorFormat,
+				VK_IMAGE_TILING_OPTIMAL,
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				m_ColorAttachments[i], m_ColorAttachmentMemories[i]);
+
+			CreateImageView(m_ColorAttachments[i], colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, m_ColorAttachmentViews[i]);
+
+			attachmentDescriptions[i].format = colorFormat;
 			attachmentDescriptions[i].samples = VK_SAMPLE_COUNT_1_BIT; /// Make this customizable when supporting multisampling
 			attachmentDescriptions[i].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			attachmentDescriptions[i].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -151,10 +149,12 @@ namespace Kerberos
 			depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		}
 
+		const uint32_t colorAttachmentCount = static_cast<uint32_t>(m_ColorAttachmentSpecs.size());
+
 		/// Subpass creation
 		VkSubpassDescription subpass{};
 		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass.colorAttachmentCount = 1;
+		subpass.colorAttachmentCount = colorAttachmentCount;
 		subpass.pColorAttachments = &colorAttachmentRef;
 		if (m_DepthAttachmentSpec.TextureFormat != FramebufferTextureFormat::None)
 		{
@@ -280,8 +280,18 @@ namespace Kerberos
 			return;
 		}
 
-		/// Create descriptor set for color attachment
-		m_ColorAttachmentDescriptorSet = ImGui_ImplVulkan_AddTexture(m_ColorAttachmentSampler, m_ColorAttachmentViews[0], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		/// Create descriptor sets for color attachments
+		m_ColorAttachmentDescriptorSets.resize(m_ColorAttachmentSpecs.size());
+		for (size_t i = 0; i < m_ColorAttachmentSpecs.size(); ++i)
+		{
+			m_ColorAttachmentDescriptorSets[i] = ImGui_ImplVulkan_AddTexture(m_ColorAttachmentSampler, m_ColorAttachmentViews[0], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		}
+
+		/// Create descriptor set for depth attachment, if there is one
+		if (m_DepthAttachmentSpec.TextureFormat != FramebufferTextureFormat::None)
+		{
+			m_DepthAttachmentDescriptorSet = ImGui_ImplVulkan_AddTexture(m_ColorAttachmentSampler, m_DepthAttachmentView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		}
 	}
 
 	void VulkanFramebuffer::Bind()
@@ -406,14 +416,14 @@ namespace Kerberos
 	{
 	}
 
-	uint64_t VulkanFramebuffer::GetColorAttachmentRendererID(uint32_t index) const
+	uint64_t VulkanFramebuffer::GetColorAttachmentRendererID(const uint32_t index) const
 	{
-		return reinterpret_cast<ImTextureID>(m_ColorAttachmentDescriptorSet);
+		return reinterpret_cast<ImTextureID>(m_ColorAttachmentDescriptorSets[index]);
 	}
 
 	uint64_t VulkanFramebuffer::GetDepthAttachmentRendererID() const 
 	{
-		throw std::runtime_error("GetDepthAttachmentRendererID is not implemented for VulkanFramebuffer!");
+		return reinterpret_cast<ImTextureID>(m_DepthAttachmentDescriptorSet);
 	}
 
 	void VulkanFramebuffer::SetDebugName(const std::string& name) const 
@@ -497,7 +507,17 @@ namespace Kerberos
 		m_ColorAttachmentMemories.clear();
 		m_ColorAttachmentViews.clear();
 
-		ImGui_ImplVulkan_RemoveTexture(m_ColorAttachmentDescriptorSet);
+		for (const auto& descriptorSet : m_ColorAttachmentDescriptorSets)
+		{
+			ImGui_ImplVulkan_RemoveTexture(descriptorSet);
+		}
+		m_ColorAttachmentDescriptorSets.clear();
+
+		if (m_DepthAttachmentDescriptorSet != VK_NULL_HANDLE)
+		{
+			ImGui_ImplVulkan_RemoveTexture(m_DepthAttachmentDescriptorSet);
+			m_DepthAttachmentDescriptorSet = VK_NULL_HANDLE;
+		}
 	}
 
 	void VulkanFramebuffer::CreateImage(const uint32_t width, const uint32_t height, const VkFormat format, const VkImageTiling tiling,
