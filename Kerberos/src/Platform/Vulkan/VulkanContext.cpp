@@ -475,7 +475,9 @@ namespace Kerberos
 			queueCreateInfos.push_back(queueCreateInfo);
 		}
 
+		/// Query the device features
 		VkPhysicalDeviceFeatures deviceFeatures{};
+		vkGetPhysicalDeviceFeatures(m_PhysicalDevice, &deviceFeatures);
 
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

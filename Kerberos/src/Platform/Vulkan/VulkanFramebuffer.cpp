@@ -94,8 +94,10 @@ namespace Kerberos
 				m_Specification.Height,
 				colorFormat,
 				VK_IMAGE_TILING_OPTIMAL,
-				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-				m_ColorAttachments[i], m_ColorAttachmentMemories[i]);
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, 
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				m_ColorAttachments[i], 
+				m_ColorAttachmentMemories[i]);
 
 			CreateImageView(m_ColorAttachments[i], colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, m_ColorAttachmentViews[i]);
 
@@ -119,10 +121,22 @@ namespace Kerberos
 				m_Specification.Height, 
 				depthFormat, 
 				VK_IMAGE_TILING_OPTIMAL,
-				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-				m_DepthAttachment, m_DepthAttachmentMemory);
+				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				m_DepthAttachment, 
+				m_DepthAttachmentMemory);
 
-			CreateImageView(m_DepthAttachment, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT, m_DepthAttachmentView);
+			VkImageAspectFlags imageAspectFlags = VK_IMAGE_ASPECT_NONE;
+			if (m_DepthAttachmentSpec.TextureFormat == FramebufferTextureFormat::DEPTH24STENCIL8)
+			{
+				imageAspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
+			}
+			else if (m_DepthAttachmentSpec.TextureFormat == FramebufferTextureFormat::DEPTH24)
+			{
+				imageAspectFlags |= VK_IMAGE_ASPECT_DEPTH_BIT;
+			}
+
+			CreateImageView(m_DepthAttachment, depthFormat, imageAspectFlags, m_DepthAttachmentView);
 
 			VkAttachmentDescription depthAttachmentDescription{};
 			depthAttachmentDescription.format = depthFormat;
@@ -149,13 +163,23 @@ namespace Kerberos
 			depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		}
 
-		const uint32_t colorAttachmentCount = static_cast<uint32_t>(m_ColorAttachmentSpecs.size());
-
 		/// Subpass creation
 		VkSubpassDescription subpass{};
 		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass.colorAttachmentCount = colorAttachmentCount;
-		subpass.pColorAttachments = &colorAttachmentRef;
+
+		if (m_ColorAttachments.empty())
+		{
+			subpass.colorAttachmentCount = 0;
+			subpass.pColorAttachments = nullptr;
+
+		}
+		else
+		{
+			subpass.colorAttachmentCount = 1;
+			subpass.pColorAttachments = &colorAttachmentRef;
+		}
+
+		
 		if (m_DepthAttachmentSpec.TextureFormat != FramebufferTextureFormat::None)
 		{
 			subpass.pDepthStencilAttachment = &depthAttachmentRef;
@@ -165,27 +189,7 @@ namespace Kerberos
 			subpass.pDepthStencilAttachment = nullptr;
 		}
 
-		std::vector<VkSubpassDependency> dependencies(2);
-
-		/// Dependency for transitioning color attachment into the rendes pass
-		dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
-		dependencies[0].dstSubpass = 0;
-		/// Wait for previous operations to finish before starting this subpass
-		dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-		/// Transition before starting the subpass
-		dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependencies[0].srcAccessMask = 0;
-		dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-		/// Dependency for transitioning color attachment after the render pass
-		dependencies[1].srcSubpass = 0;
-		dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
-		dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT; /// Available for sampling in fragment shader
-		dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+		std::vector<VkSubpassDependency> dependencies = CreateSubpassDependencies();
 
 		/// Create render pass
 		VkRenderPassCreateInfo renderPassInfo{};
@@ -566,7 +570,7 @@ namespace Kerberos
 		}
 	}
 
-	void VulkanFramebuffer::CreateImageView(const VkImage image, const VkFormat format, const VkImageAspectFlags flags,
+	void VulkanFramebuffer::CreateImageView(const VkImage image, const VkFormat format, const VkImageAspectFlags imageAspectFlags,
 		VkImageView& imageView) 
 	{
 		VkImageViewCreateInfo viewInfo{};
@@ -574,7 +578,7 @@ namespace Kerberos
 		viewInfo.image = image;
 		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 		viewInfo.format = format;
-		viewInfo.subresourceRange.aspectMask = flags;
+		viewInfo.subresourceRange.aspectMask = imageAspectFlags;
 		viewInfo.subresourceRange.baseMipLevel = 0;
 		viewInfo.subresourceRange.levelCount = 1;
 		viewInfo.subresourceRange.baseArrayLayer = 0;
@@ -584,5 +588,30 @@ namespace Kerberos
 		{
 			KBR_CORE_ASSERT(false, "Failed to create image view!");
 		}
+	}
+
+	std::vector<VkSubpassDependency> VulkanFramebuffer::CreateSubpassDependencies() const 
+	{
+		std::vector<VkSubpassDependency> dependencies(2);
+
+		/// Dependency for transitioning color attachment into the render pass
+		dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+		dependencies[0].dstSubpass = 0;
+		dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+		dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependencies[0].srcAccessMask = 0;
+		dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+		/// Dependency for transitioning color attachment after the render pass
+		dependencies[1].srcSubpass = 0;
+		dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+		dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT; /// Available for sampling in fragment shader
+		dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+		return dependencies;
 	}
 }
