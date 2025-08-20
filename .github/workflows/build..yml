@@ -1,0 +1,52 @@
+name: C++ Project Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild and Visual Studio
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Run setup scripts
+        env:
+          PYTHONIOENCODING: utf-8
+        run: |
+          ./scripts/Setup.bat
+        shell: powershell
+
+      - name: Find Solution File
+        id: find_solution
+        run: |
+          $solutionFile = Get-ChildItem -Path . -Filter "*.sln" -Recurse | Select-Object -First 1
+          if ($null -ne $solutionFile) {
+            Write-Host "Found solution file: $($solutionFile.FullName)"
+            echo "solution_path=$($solutionFile.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          } else {
+            Write-Host "No .sln file found. Please check your Premake5 script output."
+            exit 1
+          }
+        shell: powershell
+
+      - name: Build Project with MSBuild
+        run: |
+          $solutionPath = "${{ steps.find_solution.outputs.solution_path }}"
+          if ([string]::IsNullOrWhiteSpace($solutionPath)) {
+            Write-Host "Solution path not found. Cannot build."
+            exit 1
+          }
+          Write-Host "Attempting to build solution: $solutionPath"
+          msbuild $solutionPath /p:Configuration=Release /p:Platform=x64 /maxcpucount
+
+        shell: powershell

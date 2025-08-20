@@ -64,6 +64,7 @@ namespace Kerberos
 
 		VkFence m_Fence = VK_NULL_HANDLE;
 
-		VkDescriptorSet m_ColorAttachmentDescriptorSet = VK_NULL_HANDLE;
+		std::vector<VkDescriptorSet> m_ColorAttachmentDescriptorSets;
+		VkDescriptorSet m_DepthAttachmentDescriptorSet = VK_NULL_HANDLE;
 	};
 }

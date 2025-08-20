@@ -31,6 +31,7 @@ namespace Kerberos
 
 	private:
 		void DrawEntityNode(const Entity& entity);
+		void AddComponentPopup(Entity entity);
 
 		bool OnKeyPressed(const KeyPressedEvent& event);
 

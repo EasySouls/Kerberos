@@ -1,36 +1,24 @@
 #pragma once
 
-#include "Kerberos/Core/Timestep.h"
+#include "Components.h"
 #include "EditorCamera.h"
 #include "Kerberos/Renderer/Camera.h"
+#include "Kerberos/Renderer/Framebuffer.h"
+#include "Kerberos/Core/Timestep.h"
 #include "Kerberos/Core/UUID.h"
+#include "Kerberos/Physics/PhysicsSystem.h"
 
 #include <entt.hpp>
 #include <set>
 
-#include "Components.h"
-#include "Kerberos/Renderer/Framebuffer.h"
 
-namespace JPH
-{
-	class PhysicsSystem;
-	class TempAllocator;
-	class JobSystem;
-	class ObjectVsBroadPhaseLayerFilter;
-	class BroadPhaseLayerInterface;
-	class ObjectLayerPairFilter;
-
-	/// Optional listeners for physics events
-	class ContactListener;
-	class BodyActivationListener;
-}
 
 namespace Kerberos
 {
 	class Entity;
 	class HierarchyPanel;
 
-	class Scene
+	class Scene : public std::enable_shared_from_this<Scene>
 	{
 	public:
 		Scene();
@@ -131,20 +119,10 @@ namespace Kerberos
 
 		std::set<entt::entity> m_RootEntities;
 
-		/// Physics related members
-		/// These are pointers, since i do not want to include Jolt headers in the Scene.h file,
-		/// and non-complete types are not allowed in the class definition
-		
-		JPH::PhysicsSystem* m_PhysicsSystem = nullptr;
-		JPH::TempAllocator* m_PhysicsTempAllocator = nullptr;
-		JPH::JobSystem* m_PhysicsJobSystem = nullptr;
-		JPH::ObjectVsBroadPhaseLayerFilter* m_ObjectVsBroadPhaseLayerFilter = nullptr;
-		JPH::BroadPhaseLayerInterface* m_BroadPhaseLayerInterface = nullptr;
-		JPH::ObjectLayerPairFilter* m_ObjectVsObjectLayerFilter = nullptr;
-		JPH::ContactListener* m_ContactListener = nullptr;
-		JPH::BodyActivationListener* m_BodyActivationListener = nullptr;
+		PhysicsSystem m_PhysicsSystem;
 
 		friend class Entity;
+		friend class PhysicsSystem;
 		friend class HierarchyPanel;
 		friend class SceneSerializer;
 	};

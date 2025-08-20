@@ -183,6 +183,12 @@
     <ClInclude Include="src\Kerberos\LayerStack.h" />
     <ClInclude Include="src\Kerberos\Log.h" />
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h" />
+    <ClInclude Include="src\Kerberos\Physics\BodyActivationListener.h" />
+    <ClInclude Include="src\Kerberos\Physics\ContactListener.h" />
+    <ClInclude Include="src\Kerberos\Physics\JoltImpl.h" />
+    <ClInclude Include="src\Kerberos\Physics\Layers.h" />
+    <ClInclude Include="src\Kerberos\Physics\PhysicsSystem.h" />
+    <ClInclude Include="src\Kerberos\Physics\Utils.h" />
     <ClInclude Include="src\Kerberos\Project\Project.h" />
     <ClInclude Include="src\Kerberos\Project\ProjectSerializer.h" />
     <ClInclude Include="src\Kerberos\Renderer\Buffer.h" />
@@ -267,6 +273,7 @@
     <ClCompile Include="src\Kerberos\LayerStack.cpp" />
     <ClCompile Include="src\Kerberos\Log.cpp" />
     <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp" />
+    <ClCompile Include="src\Kerberos\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="src\Kerberos\Project\Project.cpp" />
     <ClCompile Include="src\Kerberos\Project\ProjectSerializer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Buffer.cpp" />
@@ -284,6 +291,7 @@
     <ClCompile Include="src\Kerberos\Renderer\TextureCube.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\UniformBuffer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp" />
+    <ClCompile Include="src\Kerberos\Scene\Components\PhysicsComponents.ixx" />
     <ClCompile Include="src\Kerberos\Scene\EditorCamera.cpp" />
     <ClCompile Include="src\Kerberos\Scene\Scene.cpp" />
     <ClCompile Include="src\Kerberos\Scene\SceneCamera.cpp" />

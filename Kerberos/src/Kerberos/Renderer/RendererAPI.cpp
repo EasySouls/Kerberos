@@ -3,5 +3,5 @@
 
 namespace Kerberos
 {
-	RendererAPI::API RendererAPI::s_API = API::OpenGL;
+	RendererAPI::API RendererAPI::s_API = API::Vulkan;
 }
