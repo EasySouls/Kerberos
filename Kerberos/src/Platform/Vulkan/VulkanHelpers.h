@@ -27,6 +27,8 @@ namespace Kerberos
 
         static void SetObjectDebugName(VkDevice device, VkObjectType objectType, uint64_t objectHandle, const std::string& name);
 
+        static bool IsFormatSupported(VkPhysicalDevice physicalDevice, VkFormat format, VkImageTiling tiling, VkFormatFeatureFlags features);
+
 		static const char* VkResultToString(const VkResult result)
 		{
             switch (result)

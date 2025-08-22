@@ -373,8 +373,9 @@ namespace Kerberos
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &m_CommandBuffer;
-		if (vkQueueSubmit(VulkanContext::Get().GetGraphicsQueue(), 1, &submitInfo, m_Fence) != VK_SUCCESS)
+		if (const VkResult result = vkQueueSubmit(VulkanContext::Get().GetGraphicsQueue(), 1, &submitInfo, m_Fence); result != VK_SUCCESS)
 		{
+			KBR_CORE_ERROR("Failed to submit queue in VulkanFramebuffer::Unbind. Result: {}", VulkanHelpers::VkResultToString(result));
 			KBR_CORE_ASSERT(false, "Failed to submit command buffer!");
 			return;
 		}

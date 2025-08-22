@@ -992,11 +992,9 @@ namespace Kerberos
 
 	VkCommandBuffer VulkanContext::GetOneTimeCommandBuffer() const 
 	{
-		const VkCommandPool commandPool = m_CommandPool;
-
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		allocInfo.commandPool = commandPool;
+		allocInfo.commandPool = m_CommandPool;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		allocInfo.commandBufferCount = 1;
 

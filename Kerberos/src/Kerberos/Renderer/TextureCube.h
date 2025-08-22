@@ -20,8 +20,6 @@ namespace Kerberos
 	class TextureCube : public Texture
 	{
 	public:
-		~TextureCube() override = default;
-
 		virtual const std::string& GetName() const = 0;
 
 		AssetType GetType() override { return AssetType::TextureCube; }

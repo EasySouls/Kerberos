@@ -60,4 +60,22 @@ namespace Kerberos
 
 		func(device, &nameInfo);
 	}
+
+	bool VulkanHelpers::IsFormatSupported(const VkPhysicalDevice physicalDevice, const VkFormat format, const VkImageTiling tiling,
+		const VkFormatFeatureFlags features) 
+	{
+		VkFormatProperties props;
+		vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+
+		if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
+		{
+			return true;
+		}
+		if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
+		{
+			return true;
+		}
+
+		return false;
+	}
 }
