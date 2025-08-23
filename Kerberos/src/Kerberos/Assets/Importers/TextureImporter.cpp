@@ -44,12 +44,13 @@ namespace Kerberos
 			return std::make_pair(TextureSpecification{}, Buffer{});
 		}
 
-		data.Size = static_cast<uint64_t>(width) * height * channels;
+		const int actualChannels = desiredChannels == 0 ? channels : desiredChannels;
+		data.Size = static_cast<uint64_t>(width) * height * actualChannels;
 
 		TextureSpecification spec;
 		spec.Width = width;
 		spec.Height = height;
-		switch (channels)
+		switch (actualChannels)
 		{
 		case 1:
 			spec.Format = ImageFormat::R8;
@@ -61,7 +62,7 @@ namespace Kerberos
 			spec.Format = ImageFormat::RGBA8;
 			break;
 		default:
-			KBR_CORE_ASSERT(false, "TextureImporter::ImportTexture - unsupported number of image channels: {}", channels);
+			KBR_CORE_ASSERT(false, "TextureImporter::ImportTexture - unsupported number of image channels: {}", actualChannels);
 			break;
 		}
 

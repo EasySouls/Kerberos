@@ -288,7 +288,7 @@ namespace Kerberos
 		m_ColorAttachmentDescriptorSets.resize(m_ColorAttachmentSpecs.size());
 		for (size_t i = 0; i < m_ColorAttachmentSpecs.size(); ++i)
 		{
-			m_ColorAttachmentDescriptorSets[i] = ImGui_ImplVulkan_AddTexture(m_ColorAttachmentSampler, m_ColorAttachmentViews[0], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+			m_ColorAttachmentDescriptorSets[i] = ImGui_ImplVulkan_AddTexture(m_ColorAttachmentSampler, m_ColorAttachmentViews[i], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		}
 
 		/// Create descriptor set for depth attachment, if there is one

@@ -158,7 +158,10 @@ namespace Kerberos
 		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-		samplerInfo.anisotropyEnable = VK_TRUE;
+
+		VkPhysicalDeviceFeatures deviceFeatures{};
+		vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
+		samplerInfo.anisotropyEnable = deviceFeatures.samplerAnisotropy;
 
 		VkPhysicalDeviceProperties properties{};
 		vkGetPhysicalDeviceProperties(physicalDevice, &properties);
@@ -171,7 +174,7 @@ namespace Kerberos
 		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 		samplerInfo.mipLodBias = 0.0f;
 		samplerInfo.minLod = 0.0f;
-		samplerInfo.maxLod = static_cast<float>(mipLevels);
+		samplerInfo.maxLod = mipLevels > 1 ? static_cast<float>(mipLevels - 1) : 0.0f;
 
 		if (vkCreateSampler(device, &samplerInfo, nullptr, &sampler) != VK_SUCCESS)
 		{
@@ -338,6 +341,12 @@ namespace Kerberos
 		{
 			vkFreeMemory(device, m_ImageMemory, nullptr);
 			m_ImageMemory = VK_NULL_HANDLE;
+		}
+
+		if (m_DescriptorSet != VK_NULL_HANDLE)
+		{
+			ImGui_ImplVulkan_RemoveTexture(m_DescriptorSet);
+			m_DescriptorSet = VK_NULL_HANDLE;
 		}
 	}
 

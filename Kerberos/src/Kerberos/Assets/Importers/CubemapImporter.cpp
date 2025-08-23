@@ -59,13 +59,17 @@ namespace Kerberos
 			{
 				FaceData faceData;
 
+				const auto& rendererApi = RendererAPI::GetAPI();
+
 				int desiredChannels = 0; /// Load as-is
-				if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+				if (rendererApi == RendererAPI::API::Vulkan)
 				{
 					desiredChannels = 4; /// Vulkan doesn't support 3-channel formats well, so we force 4 channels (RGBA)
 				}
 
-				const auto [spec, buffer] = TextureImporter::LoadTextureData(facePath, false, desiredChannels);
+				const bool flip = rendererApi != RendererAPI::API::Vulkan; /// Vulkan expects images to be loaded with the origin at the top-left corner.
+
+				const auto [spec, buffer] = TextureImporter::LoadTextureData(facePath, flip, desiredChannels);
 				faceData.Specification = spec;
 				faceData.Buffer = buffer;
 				return faceData;
