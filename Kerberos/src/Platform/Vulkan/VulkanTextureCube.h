@@ -4,6 +4,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include "imgui.h"
+
 namespace Kerberos
 {
 	class VulkanTextureCube final : public TextureCube
@@ -16,7 +18,7 @@ namespace Kerberos
 
 		void Bind(uint32_t slot = 0) const override;
 
-		RendererID GetRendererID() const override { return m_RendererID; }
+		RendererID GetRendererID() const override;
 		const std::string& GetName() const override { return m_Name; }
 		uint32_t GetWidth() const override;
 		uint32_t GetHeight() const override;
@@ -26,24 +28,27 @@ namespace Kerberos
 
 		bool operator==(const Texture& other) const override
 		{
-			return m_RendererID == dynamic_cast<const VulkanTextureCube&>(other).m_RendererID;
+			return m_DescriptorSet == dynamic_cast<const VulkanTextureCube&>(other).m_DescriptorSet;
 		}
 
 		void SetDebugName(const std::string& name) const override;
 
 	private:
-		static void AllocateAndBindMemory(VkDevice device, VkPhysicalDevice physicalDevice, VkImage image, VkDeviceMemory& imageMemory);
+		/**
+		 * @return The allocated size.
+		 */
+		static VkDeviceSize AllocateAndBindMemory(VkDevice device, VkPhysicalDevice physicalDevice, VkImage image, VkDeviceMemory& imageMemory);
 		static void CreateImage(uint32_t width, uint32_t height, uint8_t mipLevels, VkFormat format, VkImage& image, VkDevice device);
 		static void CreateImageView(VkDevice device, VkImageView& imageView, VkImage image, VkFormat format, uint8_t mipLevels);
 		static void CreateSampler(VkDevice device, VkPhysicalDevice physicalDevice, uint8_t mipLevels, VkSampler& sampler);
 		static void TransitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels);
-		static void CopyBufferToImage(VkCommandBuffer commandBuffer, VkBuffer buffer, VkImage image, const CubemapData& cubemapData);
+		static void CopyBufferToImage(VkCommandBuffer commandBuffer, VkBuffer buffer, VkImage image, VkExtent3D imageExtent);
 		static void GenerateMipmaps(VkPhysicalDevice physicalDevice, VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels, uint32_t layerCount);
 
 		void ReleaseResources();
 
 		/// Todo: move this to VulkanHelpers
-		static void CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+		static VkDeviceSize CreateBufferAndGetSize(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize requestedSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
 		static VkFormat ToVulkanFormat(const ImageFormat format, const bool isSRGB)
 		{
@@ -62,15 +67,14 @@ namespace Kerberos
 		}
 
 	private:
-		RendererID m_RendererID;
 		std::string m_Name;
 		uint8_t m_MipLevels;
-		bool m_SRGB;
 		TextureSpecification m_Spec;
 
 		VkImage m_Image = VK_NULL_HANDLE;
 		VkImageView m_ImageView = VK_NULL_HANDLE;
 		VkSampler m_Sampler = VK_NULL_HANDLE;
+		VkDescriptorSet m_DescriptorSet = VK_NULL_HANDLE;
 		VkDeviceMemory m_ImageMemory = VK_NULL_HANDLE;
 		VkFormat m_Format = VK_FORMAT_UNDEFINED;
 	};

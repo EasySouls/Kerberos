@@ -4,7 +4,11 @@
 #include "VulkanContext.h"
 #include "VulkanHelpers.h"
 
+#include <backends/imgui_impl_vulkan.h>
+
 #include <algorithm>
+#include <cmath>
+#include <utility>
 
 namespace Kerberos
 {
@@ -14,6 +18,9 @@ namespace Kerberos
 		const uint32_t width = firstFace.Width;
 		const uint32_t height = firstFace.Height;
 		const ImageFormat format = firstFace.Format;
+
+		KBR_CORE_ASSERT(cubemapData.Faces.size() == 6, "Cubemap must have 6 faces!");
+		KBR_CORE_ASSERT(format != ImageFormat::None, "Cubemap faces must have a valid format!");
 
 		for (size_t i = 1; i < 6; ++i)
 		{
@@ -38,28 +45,39 @@ namespace Kerberos
 		const VkDevice& device = VulkanContext::Get().GetDevice();
 		const VkPhysicalDevice& physicalDevice = VulkanContext::Get().GetPhysicalDevice();
 
+		/// Usually we create the staging buffer first, then create the image and allocate memory for it.
+		/// But here we need the image to get the memory requirements for the image, so we create it first.
+		/// This is needed for the case where the image format is RGB8, but we convert it to RGBA8 for Vulkan,
+		/// but if we allocate memory only based on the buffer size, we might not allocate enough memory for the image.
+
+		CreateImage(width, height, m_MipLevels, m_Format, m_Image, device);
+
+		const VkDeviceSize allocatedSize = AllocateAndBindMemory(device, physicalDevice, m_Image, m_ImageMemory);
+
+		KBR_CORE_ASSERT(allocatedSize >= totalSize, "Allocated image memory size ({0}) is less than total data size ({1})", allocatedSize, totalSize);
+
 		VkBuffer stagingBuffer;
 		VkDeviceMemory stagingBufferMemory;
-		CreateBuffer(device, physicalDevice, totalSize,
+		VkDeviceSize stagingBufferSize = CreateBufferAndGetSize(device, physicalDevice, allocatedSize,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			stagingBuffer, stagingBufferMemory);
 
+		KBR_CORE_ASSERT(totalSize <= stagingBufferSize, "Data size ({0}) exceeds allocated buffer size ({1})", totalSize, stagingBufferSize);
+
 		/// Map and copy all face data into the staging buffer
 		void* data;
-		vkMapMemory(device, stagingBufferMemory, 0, totalSize, 0, &data);
-		char* pData = static_cast<char*>(data);
-		VkDeviceSize currentOffset = 0;
-		for (const auto& [Specification, Buffer] : cubemapData.Faces)
 		{
-			memcpy(pData + currentOffset, Buffer.Data, Buffer.Size);
-			currentOffset += Buffer.Size;
+			vkMapMemory(device, stagingBufferMemory, 0, totalSize, 0, &data);
+			char* pData = static_cast<char*>(data);
+			VkDeviceSize currentOffset = 0;
+			for (const auto& [Specification, Buffer] : cubemapData.Faces)
+			{
+				memcpy(pData + currentOffset, Buffer.Data, Buffer.Size);
+				currentOffset += Buffer.Size;
+			}
+			vkUnmapMemory(device, stagingBufferMemory);
 		}
-		vkUnmapMemory(device, stagingBufferMemory);
-
-		CreateImage(width, height, m_MipLevels, m_Format, m_Image, device);
-
-		AllocateAndBindMemory(device, physicalDevice, m_Image, m_ImageMemory);
 
 		const VkCommandBuffer cmdBuffer = VulkanContext::Get().GetOneTimeCommandBuffer();
 
@@ -67,7 +85,7 @@ namespace Kerberos
 		TransitionImageLayout(cmdBuffer, m_Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_MipLevels);
 
 		/// Copy data from staging buffer to image
-		CopyBufferToImage(cmdBuffer, stagingBuffer, m_Image, cubemapData);
+		CopyBufferToImage(cmdBuffer, stagingBuffer, m_Image, { .width = width, .height = height, .depth = 1 });
 
 		if (!firstFace.GenerateMips)
 		{
@@ -78,7 +96,7 @@ namespace Kerberos
 
 		if (firstFace.GenerateMips)
 		{
-			GenerateMipmaps(physicalDevice, m_Image, m_Format, width, height, m_MipLevels, 6);
+			GenerateMipmaps(physicalDevice, m_Image, m_Format, static_cast<int32_t>(width), static_cast<int32_t>(height), m_MipLevels, 6);
 		}
 
 		/// Cleanup staging buffer
@@ -88,6 +106,8 @@ namespace Kerberos
 		CreateImageView(device, m_ImageView, m_Image, m_Format, m_MipLevels);
 
 		CreateSampler(device, physicalDevice, m_MipLevels, m_Sampler);
+
+		m_DescriptorSet = ImGui_ImplVulkan_AddTexture(m_Sampler, m_ImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 	}
 
 	VulkanTextureCube::~VulkanTextureCube()
@@ -100,19 +120,24 @@ namespace Kerberos
 
 	}
 
+	VulkanTextureCube::RendererID VulkanTextureCube::GetRendererID() const 
+	{
+		return reinterpret_cast<ImTextureID>(m_DescriptorSet);
+	}
+
 	uint32_t VulkanTextureCube::GetWidth() const
 	{
-		throw std::runtime_error("VulkanTextureCube::GetWidth() is not yet implemented.");
+		return m_Spec.Width;
 	}
 
 	uint32_t VulkanTextureCube::GetHeight() const
 	{
-		throw std::runtime_error("VulkanTextureCube::GetWidth() is not yet implemented.");
+		return m_Spec.Height;
 	}
 
 	void VulkanTextureCube::SetData(void* data, uint32_t size)
 	{
-		
+		// TODO: Implement data upload for cubemap faces
 	}
 
 	void VulkanTextureCube::SetDebugName(const std::string& name) const 
@@ -121,7 +146,7 @@ namespace Kerberos
 		VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_IMAGE, reinterpret_cast<uint64_t>(m_Image), name + " Image");
 		VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_IMAGE_VIEW, reinterpret_cast<uint64_t>(m_ImageView), name + " Image View");
 		VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_SAMPLER, reinterpret_cast<uint64_t>(m_Sampler), name + " Sampler");
-		//VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_DESCRIPTOR_SET, m_RendererID, name + " Descriptor Set");
+		VulkanHelpers::SetObjectDebugName(device, VK_OBJECT_TYPE_DESCRIPTOR_SET, reinterpret_cast<uint64_t>(m_DescriptorSet), name + " Descriptor Set");
 	}
 
 	void VulkanTextureCube::CreateSampler(const VkDevice device, const VkPhysicalDevice physicalDevice, const uint8_t mipLevels, VkSampler& sampler) 
@@ -249,39 +274,23 @@ namespace Kerberos
 		vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 	}
 
-	void VulkanTextureCube::CopyBufferToImage(const VkCommandBuffer commandBuffer, const VkBuffer buffer, const VkImage image,
-		const CubemapData& cubemapData) 
+	void VulkanTextureCube::CopyBufferToImage(const VkCommandBuffer commandBuffer, const VkBuffer buffer, const VkImage image, const VkExtent3D imageExtent) 
 	{
-		std::vector<VkBufferImageCopy> bufferCopyRegions;
-		VkDeviceSize offset = 0;
+		VkBufferImageCopy region;
+		region.bufferOffset = 0;
+		region.bufferRowLength = 0;
+		region.bufferImageHeight = 0;
+		region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		region.imageSubresource.mipLevel = 0;
+		region.imageSubresource.baseArrayLayer = 0;
+		region.imageSubresource.layerCount = 6;
+		region.imageOffset = {.x = 0, .y = 0, .z = 0 };
+		region.imageExtent = imageExtent;
 
-		for (uint32_t idx = 0; idx < 6; ++idx)
-		{
-			const auto& [Specification, Buffer] = cubemapData.Faces[idx];
-
-			VkBufferImageCopy region{};
-			region.bufferOffset = offset;
-			region.bufferRowLength = 0;
-			region.bufferImageHeight = 0;
-			region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			region.imageSubresource.mipLevel = 0;
-			region.imageSubresource.baseArrayLayer = idx;
-			region.imageSubresource.layerCount = 1;
-			region.imageOffset = {.x = 0, .y = 0, .z = 0 };
-			region.imageExtent = {
-				.width = Specification.Width, 
-				.height = Specification.Height, 
-				.depth = 1 
-			};
-			bufferCopyRegions.push_back(region);
-
-			offset += Buffer.Size;
-		}
-
-		vkCmdCopyBufferToImage(commandBuffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
+		vkCmdCopyBufferToImage(commandBuffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 	}
 
-	void VulkanTextureCube::AllocateAndBindMemory(const VkDevice device, const VkPhysicalDevice physicalDevice, const VkImage image, VkDeviceMemory& imageMemory) 
+	VkDeviceSize VulkanTextureCube::AllocateAndBindMemory(const VkDevice device, const VkPhysicalDevice physicalDevice, const VkImage image, VkDeviceMemory& imageMemory) 
 	{
 		VkMemoryRequirements memRequirements;
 		vkGetImageMemoryRequirements(device, image, &memRequirements);
@@ -291,12 +300,14 @@ namespace Kerberos
 		allocInfo.allocationSize = memRequirements.size;
 		allocInfo.memoryTypeIndex = VulkanHelpers::FindMemoryType(physicalDevice, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-		if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
+		if (const VkResult result = vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory); result != VK_SUCCESS)
 		{
-			throw std::runtime_error("Failed to allocate image memory!");
+			KBR_CORE_ASSERT(false, "Failed to allocate image memory: {}", VulkanHelpers::VkResultToString(result));
 		}
 
 		vkBindImageMemory(device, image, imageMemory, 0);
+
+		return memRequirements.size;
 	}
 
 	void VulkanTextureCube::ReleaseResources() 
@@ -421,17 +432,17 @@ namespace Kerberos
 		VulkanContext::Get().SubmitCommandBuffer(commandBuffer);
 	}
 
-	void VulkanTextureCube::CreateBuffer(const VkDevice device, const VkPhysicalDevice physicalDevice, const VkDeviceSize size, const VkBufferUsageFlags usage, const VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
+	VkDeviceSize VulkanTextureCube::CreateBufferAndGetSize(const VkDevice device, const VkPhysicalDevice physicalDevice, const VkDeviceSize requestedSize, const VkBufferUsageFlags usage, const VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
 	{
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		bufferInfo.size = size;
+		bufferInfo.size = requestedSize;
 		bufferInfo.usage = usage;
 		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
+		if (const VkResult result = vkCreateBuffer(device, &bufferInfo, nullptr, &buffer); result != VK_SUCCESS)
 		{
-			throw std::runtime_error("Failed to create buffer!");
+			KBR_CORE_ASSERT(false, "Failed to create buffer: {}", VulkanHelpers::VkResultToString(result));
 		}
 
 		VkMemoryRequirements memRequirements;
@@ -442,11 +453,13 @@ namespace Kerberos
 		allocInfo.allocationSize = memRequirements.size;
 		allocInfo.memoryTypeIndex = VulkanHelpers::FindMemoryType(physicalDevice, memRequirements.memoryTypeBits, properties);
 
-		if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
+		if (const VkResult result = vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory); result != VK_SUCCESS)
 		{
-			throw std::runtime_error("Failed to allocate buffer memory!");
+			KBR_CORE_ASSERT(false, "Failed to allocate buffer memory: {}", VulkanHelpers::VkResultToString(result));
 		}
 
 		vkBindBufferMemory(device, buffer, bufferMemory, 0);
+
+		return memRequirements.size;
 	}
 }

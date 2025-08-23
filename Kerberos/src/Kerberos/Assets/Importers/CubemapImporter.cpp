@@ -2,6 +2,7 @@
 #include "CubemapImporter.h"
 
 #include "Kerberos/Renderer/TextureCube.h"
+#include "Kerberos/Renderer/RendererAPI.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"
 
 #include <yaml-cpp/yaml.h>
@@ -57,7 +58,14 @@ namespace Kerberos
 		const auto loadFace = [](const std::filesystem::path& facePath) -> FaceData
 			{
 				FaceData faceData;
-				const auto [spec, buffer] = TextureImporter::LoadTextureData(facePath, false);
+
+				int desiredChannels = 0; /// Load as-is
+				if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+				{
+					desiredChannels = 4; /// Vulkan doesn't support 3-channel formats well, so we force 4 channels (RGBA)
+				}
+
+				const auto [spec, buffer] = TextureImporter::LoadTextureData(facePath, false, desiredChannels);
 				faceData.Specification = spec;
 				faceData.Buffer = buffer;
 				return faceData;

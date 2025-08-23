@@ -26,7 +26,7 @@ namespace Kerberos
 		return texture;
 	}
 
-	std::pair<TextureSpecification, Buffer> TextureImporter::LoadTextureData(const std::filesystem::path& filepath, const bool flip) 
+	std::pair<TextureSpecification, Buffer> TextureImporter::LoadTextureData(const std::filesystem::path& filepath, const bool flip, const int desiredChannels) 
 	{
 		int width, height, channels;
 
@@ -35,7 +35,7 @@ namespace Kerberos
 
 		{
 			KBR_PROFILE_SCOPE("TextureImporter::ImportTexture - stbi_load");
-			data.Data = stbi_load(filepath.string().c_str(), &width, &height, &channels, 0);
+			data.Data = stbi_load(filepath.string().c_str(), &width, &height, &channels, desiredChannels);
 		}
 
 		if (data.Data == nullptr)

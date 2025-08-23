@@ -129,7 +129,7 @@ namespace Kerberos
 			VkImageAspectFlags imageAspectFlags = VK_IMAGE_ASPECT_NONE;
 			if (m_DepthAttachmentSpec.TextureFormat == FramebufferTextureFormat::DEPTH24STENCIL8)
 			{
-				imageAspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
+				imageAspectFlags = /*VK_IMAGE_ASPECT_DEPTH_BIT |*/ VK_IMAGE_ASPECT_STENCIL_BIT;
 			}
 			else if (m_DepthAttachmentSpec.TextureFormat == FramebufferTextureFormat::DEPTH24)
 			{
@@ -325,7 +325,11 @@ namespace Kerberos
 		}
 
 		std::vector<VkClearValue> clearValues;
-		clearValues.push_back({{{0.0f, 0.0f, 0.0f, 1.0f}}});
+		clearValues.reserve(m_ColorAttachmentSpecs.size());
+		for (const auto& _ : m_ColorAttachmentSpecs)
+		{
+			clearValues.push_back({ {{0.0f, 0.0f, 0.0f, 1.0f}} });
+		}
 		if (m_DepthAttachmentSpec.TextureFormat != FramebufferTextureFormat::None)
 		{
 			clearValues.push_back({{{1.0f, 0}}});
@@ -591,8 +595,7 @@ namespace Kerberos
 		}
 	}
 
-	std::vector<VkSubpassDependency> VulkanFramebuffer::CreateSubpassDependencies() const 
-	{
+	std::vector<VkSubpassDependency> VulkanFramebuffer::CreateSubpassDependencies() {
 		std::vector<VkSubpassDependency> dependencies(2);
 
 		/// Dependency for transitioning color attachment into the render pass
