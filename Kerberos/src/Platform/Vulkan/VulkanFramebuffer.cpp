@@ -347,16 +347,16 @@ namespace Kerberos
 
 		vkCmdBeginRenderPass(m_CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-		VkViewport viewport{};
+		VkViewport viewport;
 		viewport.x = 0.0f;
 		viewport.y = static_cast<float>(m_Specification.Height);
 		viewport.width = static_cast<float>(m_Specification.Width);
-		viewport.height = -static_cast<float>(m_Specification.Height); // Invert Y-axis for Vulkan
+		viewport.height = -static_cast<float>(m_Specification.Height); /// Invert Y-axis for Vulkan
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 		vkCmdSetViewport(m_CommandBuffer, 0, 1, &viewport);
 
-		VkRect2D scissor{};
+		VkRect2D scissor;
 		scissor.offset = { .x = 0, .y = 0 };
 		scissor.extent.width = m_Specification.Width;
 		scissor.extent.height = m_Specification.Height;

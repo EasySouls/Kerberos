@@ -168,6 +168,21 @@
     <ClInclude Include="src\Kerberos\OrthographicCameraController.h">
       <Filter>src\Kerberos</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Physics\BodyActivationListener.h">
+      <Filter>src\Kerberos\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Physics\ContactListener.h">
+      <Filter>src\Kerberos\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Physics\JoltImpl.h">
+      <Filter>src\Kerberos\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Physics\Layers.h">
+      <Filter>src\Kerberos\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Physics\PhysicsSystem.h">
+      <Filter>src\Kerberos\Physics</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Physics\Utils.h">
       <Filter>src\Kerberos\Physics</Filter>
     </ClInclude>
@@ -363,11 +378,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Physics\PhysicsSystem.h" />
-    <ClInclude Include="src\Kerberos\Physics\Layers.h" />
-    <ClInclude Include="src\Kerberos\Physics\ContactListener.h" />
-    <ClInclude Include="src\Kerberos\Physics\BodyActivationListener.h" />
-    <ClInclude Include="src\Kerberos\Physics\JoltImpl.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -423,6 +433,9 @@
     </ClCompile>
     <ClCompile Include="src\Kerberos\OrthographicCameraController.cpp">
       <Filter>src\Kerberos</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Physics\PhysicsSystem.cpp">
+      <Filter>src\Kerberos\Physics</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Project\Project.cpp">
       <Filter>src\Kerberos\Project</Filter>
@@ -586,6 +599,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Physics\PhysicsSystem.cpp" />
   </ItemGroup>
 </Project>

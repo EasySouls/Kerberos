@@ -107,7 +107,6 @@ namespace Kerberos
 	private:
 		GLFWwindow* m_WindowHandle;
 
-
 		VkInstance m_Instance = VK_NULL_HANDLE;
 		VkDebugUtilsMessengerEXT m_DebugMessenger = VK_NULL_HANDLE;
 		VkSurfaceKHR m_Surface = VK_NULL_HANDLE;
@@ -134,9 +133,9 @@ namespace Kerberos
 
 		VkDescriptorPool m_ImGuiDescriptorPool = VK_NULL_HANDLE;
 
-		std::vector<VkSemaphore> m_ImageAvailableSemaphore;
-		std::vector<VkSemaphore> m_RenderFinishedSemaphore;
-		std::vector<VkFence> m_InFlightFence;
+		std::vector<VkSemaphore> m_ImageAvailableSemaphores;
+		std::vector<VkSemaphore> m_RenderFinishedSemaphores;
+		std::vector<VkFence> m_InFlightFences;
 
 		uint32_t m_CurrentFrame = 0;
 
