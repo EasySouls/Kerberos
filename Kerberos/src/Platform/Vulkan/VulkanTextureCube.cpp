@@ -32,8 +32,7 @@ namespace Kerberos
 			}
 		}
 
-		/// Todo: use std::max
-		m_MipLevels = firstFace.GenerateMips ? static_cast<uint32_t>(std::floor(std::log2(max(width, height)))) + 1 : 1;
+		m_MipLevels = firstFace.GenerateMips ? static_cast<uint32_t>(std::floor(std::log2(std::max(width, height)))) + 1 : 1;
 		m_Format = ToVulkanFormat(format, cubemapData.IsSRGB);
 
 		VkDeviceSize totalSize = 0;

@@ -3,6 +3,7 @@
 #define GLFW_INCLUDE_VULKAN
 
 #include "Kerberos/Renderer/GraphicsContext.h"
+#include "VMA/vma.h"
 #include "VulkanHelpers.h"
 
 #include <GLFW/glfw3.h>
@@ -48,6 +49,7 @@ namespace Kerberos
 		std::vector<VkFramebuffer> GetSwapChainFramebuffers() const { return m_SwapChainFramebuffers; }
 		uint32_t GetCurrentFrameIndex() const { return m_CurrentFrame; }
 		VkCommandPool GetCommandPool() const { return m_CommandPool; }
+		const vma::Allocator& GetAllocator() const { return m_Allocator; }
 
 		VkDescriptorPool GetImGuiDescriptorPool() const { return m_ImGuiDescriptorPool; }
 
@@ -73,6 +75,7 @@ namespace Kerberos
 		void CreateSurface();
 		void PickPhysicalDevice();
 		void CreateLogicalDevice();
+		void CreateVmaAllocator();
 		void CreateSwapChain();
 		void CreateImageViews();
 		void CreateRenderPass();
@@ -112,6 +115,8 @@ namespace Kerberos
 		VkSurfaceKHR m_Surface = VK_NULL_HANDLE;
 		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 		VkDevice m_Device = VK_NULL_HANDLE;
+
+		vma::Allocator m_Allocator{};
 
 		VkQueue m_GraphicsQueue = VK_NULL_HANDLE;
 		VkQueue m_PresentQueue = VK_NULL_HANDLE;

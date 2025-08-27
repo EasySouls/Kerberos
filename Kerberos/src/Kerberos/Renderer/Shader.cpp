@@ -12,10 +12,6 @@ namespace Kerberos
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::API::None:
-			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!")
-				return nullptr;
-
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLShader>(filepath);
 
@@ -38,10 +34,6 @@ namespace Kerberos
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::API::None:
-			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
 

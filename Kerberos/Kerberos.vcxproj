@@ -169,6 +169,7 @@
     <ClInclude Include="src\Kerberos\Core\Input.h" />
     <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
     <ClInclude Include="src\Kerberos\Core\MouseButtonCodes.h" />
+    <ClInclude Include="src\Kerberos\Core\Scoped.h" />
     <ClInclude Include="src\Kerberos\Core\Timer.h" />
     <ClInclude Include="src\Kerberos\Core\Timestep.h" />
     <ClInclude Include="src\Kerberos\Core\UUID.h" />
@@ -241,6 +242,7 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
     <ClInclude Include="src\Platform\OpenGL\TextureUtils.h" />
+    <ClInclude Include="src\Platform\Vulkan\VMA\vma.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanBuffer.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanContext.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanFramebuffer.h" />
@@ -319,6 +321,8 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLTextureCube.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLUniformBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
+    <ClCompile Include="src\Platform\Vulkan\VMA\vma.cpp" />
+    <ClCompile Include="src\Platform\Vulkan\VMA\vma_mem_alloc.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanBuffer.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanContext.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanFramebuffer.cpp" />

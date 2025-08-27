@@ -103,6 +103,7 @@ namespace Kerberos
 		CreateSurface();
 		PickPhysicalDevice();
 		CreateLogicalDevice();
+		CreateVmaAllocator();
 		CreateSwapChain();
 		CreateImageViews();
 		CreateRenderPass();
@@ -523,6 +524,15 @@ namespace Kerberos
 
 		vkGetDeviceQueue(m_Device, graphicsFamily.value(), 0, &m_GraphicsQueue);
 		vkGetDeviceQueue(m_Device, presentFamily.value(), 0, &m_PresentQueue);
+	}
+
+	void VulkanContext::CreateVmaAllocator() 
+	{
+		KBR_CORE_ASSERT(m_Instance != VK_NULL_HANDLE, "VkInstance has to be initialized to create allocator!");
+		KBR_CORE_ASSERT(m_PhysicalDevice != VK_NULL_HANDLE, "VkPhysicalDevice has to be initialized to create allocator!");
+		KBR_CORE_ASSERT(m_Device != VK_NULL_HANDLE, "VkDevice has to be initialized to create allocator!");
+
+		m_Allocator = vma::CreateAllocator(m_Instance, m_PhysicalDevice, m_Device);
 	}
 
 	void VulkanContext::CreateSwapChain()

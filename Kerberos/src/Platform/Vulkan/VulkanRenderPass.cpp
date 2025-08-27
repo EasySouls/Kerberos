@@ -17,7 +17,7 @@ namespace Kerberos
 		const VkDevice& device = VulkanContext::Get().GetDevice();
 
 		VkAttachmentDescription colorAttachment{};
-		colorAttachment.format = swapChainImageFormat;
+		colorAttachment.format = VK_FORMAT_R8G8B8_SRGB; // TODO: swapChainImageFormat or other format based on attachments;
 		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; /// TODO: Customize with the spec
 		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;

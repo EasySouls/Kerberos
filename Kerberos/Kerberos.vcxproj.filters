@@ -384,6 +384,8 @@
     <ClInclude Include="src\Platform\Vulkan\VulkanPipeline.h">
       <Filter>src\Platform\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Core\Scoped.h" />
+    <ClInclude Include="src\Platform\Vulkan\VMA\vma.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -609,5 +611,7 @@
     <ClCompile Include="src\Platform\Vulkan\VulkanRenderPass.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Pipeline.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanPipeline.cpp" />
+    <ClCompile Include="src\Platform\Vulkan\VMA\vma_mem_alloc.cpp" />
+    <ClCompile Include="src\Platform\Vulkan\VMA\vma.cpp" />
   </ItemGroup>
 </Project>
