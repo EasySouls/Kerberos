@@ -3,6 +3,9 @@
 #include <vulkan/vulkan.h>
 #include <optional>
 
+#include "VulkanPipeline.h"
+#include "Kerberos/Renderer/Buffer.h"
+
 namespace Kerberos
 {
     struct QueueFamilyIndices
@@ -28,6 +31,14 @@ namespace Kerberos
         static void SetObjectDebugName(VkDevice device, VkObjectType objectType, uint64_t objectHandle, const std::string& name);
 
         static bool IsFormatSupported(VkPhysicalDevice physicalDevice, VkFormat format, VkImageTiling tiling, VkFormatFeatureFlags features);
+
+        static VkFormat ShaderDataTypeToVulkanFormat(ShaderDataType type);
+
+        static VkPrimitiveTopology GetVulkanPrimitiveTopology(Pipeline::Topology topology);
+        static VkCullModeFlagBits GetVulkanCullMode(Pipeline::CullMode cullMode);
+        static VkFrontFace GetVulkanFrontFace(Pipeline::WindingOrder frontFace);
+        static VkCompareOp GetVulkanDepthCompareOp(Pipeline::DepthTest depthTest);
+
 
 		static const char* VkResultToString(const VkResult result)
 		{
@@ -145,5 +156,6 @@ namespace Kerberos
             KBR_CORE_ERROR("ImGui Vulkan Error: {0}", VulkanHelpers::VkResultToString(err));
             KBR_CORE_ASSERT(false, "ImGui Vulkan Error: {0}", VulkanHelpers::VkResultToString(err));
         }
+
 	};
 }

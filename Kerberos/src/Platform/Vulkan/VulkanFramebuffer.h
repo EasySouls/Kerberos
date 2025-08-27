@@ -44,6 +44,8 @@ namespace Kerberos
 
 	private:
 		FramebufferSpecification m_Specification;
+		glm::vec4 m_ClearColor;
+		glm::vec4 m_DepthClearValue;
 
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecs;
 		FramebufferTextureSpecification m_DepthAttachmentSpec = FramebufferTextureFormat::None;

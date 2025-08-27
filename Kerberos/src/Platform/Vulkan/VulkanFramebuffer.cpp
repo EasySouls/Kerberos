@@ -31,7 +31,7 @@ namespace Kerberos
 	}
 
 	VulkanFramebuffer::VulkanFramebuffer(FramebufferSpecification spec)
-		: m_Specification(std::move(spec))
+		: m_Specification(std::move(spec)), m_ClearColor(m_Specification.ClearColor), m_DepthClearValue(m_Specification.DepthClearValue)
 	{
 		KBR_PROFILE_FUNCTION();
 

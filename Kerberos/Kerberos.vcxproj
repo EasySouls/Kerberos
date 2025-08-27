@@ -199,11 +199,13 @@
     <ClInclude Include="src\Kerberos\Renderer\Material.h" />
     <ClInclude Include="src\Kerberos\Renderer\Mesh.h" />
     <ClInclude Include="src\Kerberos\Renderer\OrthographicCamera.h" />
+    <ClInclude Include="src\Kerberos\Renderer\Pipeline.h" />
     <ClInclude Include="src\Kerberos\Renderer\RenderCommand.h" />
     <ClInclude Include="src\Kerberos\Renderer\Renderer.h" />
     <ClInclude Include="src\Kerberos\Renderer\Renderer2D.h" />
     <ClInclude Include="src\Kerberos\Renderer\Renderer3D.h" />
     <ClInclude Include="src\Kerberos\Renderer\RendererAPI.h" />
+    <ClInclude Include="src\Kerberos\Renderer\RenderPass.h" />
     <ClInclude Include="src\Kerberos\Renderer\Shader.h" />
     <ClInclude Include="src\Kerberos\Renderer\SubTexture2D.h" />
     <ClInclude Include="src\Kerberos\Renderer\Texture.h" />
@@ -243,7 +245,9 @@
     <ClInclude Include="src\Platform\Vulkan\VulkanContext.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanFramebuffer.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanHelpers.h" />
+    <ClInclude Include="src\Platform\Vulkan\VulkanPipeline.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanRendererAPI.h" />
+    <ClInclude Include="src\Platform\Vulkan\VulkanRenderPass.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanShader.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanTexture.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanTextureCube.h" />
@@ -280,11 +284,13 @@
     <ClCompile Include="src\Kerberos\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\OrthographicCamera.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\Pipeline.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Renderer2D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Renderer3D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\RendererAPI.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\RenderPass.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Shader.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\SubTexture2D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Texture.cpp" />
@@ -317,7 +323,9 @@
     <ClCompile Include="src\Platform\Vulkan\VulkanContext.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanFramebuffer.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanHelpers.cpp" />
+    <ClCompile Include="src\Platform\Vulkan\VulkanPipeline.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanRendererAPI.cpp" />
+    <ClCompile Include="src\Platform\Vulkan\VulkanRenderPass.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanShader.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanTexture.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanTextureCube.cpp" />

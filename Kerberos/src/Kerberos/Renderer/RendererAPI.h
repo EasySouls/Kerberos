@@ -24,11 +24,10 @@ namespace Kerberos
 	public:
 		enum class API : uint8_t
 		{
-			None = 0, 
-			OpenGL = 1, 
-			D3D11 = 2,
-			D3D12 = 3,
-			Vulkan = 4,
+			OpenGL = 0, 
+			D3D11 = 1,
+			D3D12 = 2,
+			Vulkan = 3,
 		};
 
 		virtual ~RendererAPI() = default;
