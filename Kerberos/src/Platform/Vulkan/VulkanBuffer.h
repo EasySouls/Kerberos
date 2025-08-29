@@ -3,6 +3,7 @@
 #include "Kerberos/Renderer/Buffer.h"
 
 #include <vulkan/vulkan.h>
+#include <vma/vk_mem_alloc.h>
 
 namespace Kerberos
 {
@@ -25,8 +26,15 @@ namespace Kerberos
 		uint32_t GetCount() const override { return 0; }
 
 	private:
+		void CreateBufferAndAllocateMemory(uint32_t size);
+
+	private:
 		VkBuffer m_Buffer = VK_NULL_HANDLE;
-		VkDeviceMemory m_BufferMemory = VK_NULL_HANDLE;
+		VkDeviceSize m_BufferSize = 0;
+		//VkDeviceMemory m_BufferMemory = VK_NULL_HANDLE;
+		VmaAllocation m_BufferAllocation = VK_NULL_HANDLE;
+		VmaAllocationInfo m_AllocationInfo{};
+		void* m_MappedData = nullptr;
 
 		BufferLayout m_Layout;
 	};	

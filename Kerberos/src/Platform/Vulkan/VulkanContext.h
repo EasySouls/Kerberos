@@ -50,6 +50,7 @@ namespace Kerberos
 		uint32_t GetCurrentFrameIndex() const { return m_CurrentFrame; }
 		VkCommandPool GetCommandPool() const { return m_CommandPool; }
 		const vma::Allocator& GetAllocator() const { return m_Allocator; }
+		VkCommandBuffer GetCurrentCommandBuffer() const { return m_CommandBuffers[m_CurrentFrame]; }
 
 		VkDescriptorPool GetImGuiDescriptorPool() const { return m_ImGuiDescriptorPool; }
 

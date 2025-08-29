@@ -2,6 +2,7 @@
 #include "VulkanPipeline.h"
 
 #include "VulkanContext.h"
+#include "VulkanFramebuffer.h"
 #include "VulkanShader.h"
 
 namespace Kerberos
@@ -21,6 +22,23 @@ namespace Kerberos
 	void VulkanPipeline::CreateGraphicsPipeline() 
 	{
 		const VulkanShader& shader = m_Specification.Shader->As<VulkanShader>();
+
+		const std::vector<VkDescriptorSetLayout>& descriptorSetLayouts = shader.GetDescriptorSetLayouts();
+
+		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+		pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
+		pipelineLayoutInfo.pushConstantRangeCount = 0;
+		pipelineLayoutInfo.pPushConstantRanges = nullptr; /// TODO
+
+		const VkDevice& device = VulkanContext::Get().GetDevice();
+
+		if (const VkResult result = vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout); result != VK_SUCCESS)
+		{
+			KBR_CORE_ERROR("Failed to create pipeline layout! {0}", VulkanHelpers::VkResultToString(result));
+			KBR_CORE_ASSERT(false, "Failed to create pipeline layout! {0}", VulkanHelpers::VkResultToString(result));
+		}
 
 		const auto& shaderModules = shader.GetShaderModules();
 		const VkShaderModule vertShaderModule = shaderModules.at(VK_SHADER_STAGE_VERTEX_BIT);
@@ -92,7 +110,7 @@ namespace Kerberos
 		rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		rasterizer.depthClampEnable = VK_FALSE;
 		rasterizer.rasterizerDiscardEnable = VK_FALSE;
-		rasterizer.polygonMode = VK_POLYGON_MODE_FILL; /// TODO: Try this out if it works for wireframing
+		rasterizer.polygonMode = m_Specification.Wireframe ? VK_POLYGON_MODE_LINE : VK_POLYGON_MODE_FILL;
 		rasterizer.lineWidth = 1.0f;
 		rasterizer.cullMode = VulkanHelpers::GetVulkanCullMode(m_Specification.CullMode);
 		rasterizer.frontFace = VulkanHelpers::GetVulkanFrontFace(m_Specification.FrontFace);
@@ -140,20 +158,7 @@ namespace Kerberos
 		colorBlending.blendConstants[2] = 0.0f; // Optional
 		colorBlending.blendConstants[3] = 0.0f; // Optional
 
-		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = 0; // Optional
-		pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
-		pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
-		pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
-
-		const VkDevice& device = VulkanContext::Get().GetDevice();
-
-		if (const VkResult result = vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout); result != VK_SUCCESS)
-		{
-			KBR_CORE_ERROR("Failed to create pipeline layout! {0}", VulkanHelpers::VkResultToString(result));
-			KBR_CORE_ASSERT(false, "Failed to create pipeline layout! {0}", VulkanHelpers::VkResultToString(result));
-		}
+		const VulkanFramebuffer& framebuffer = m_Specification.TargetFramebuffer->As<VulkanFramebuffer>();
 
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
 		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -168,7 +173,7 @@ namespace Kerberos
 		pipelineInfo.pColorBlendState = &colorBlending;
 		pipelineInfo.pDynamicState = &dynamicState;
 		pipelineInfo.layout = m_PipelineLayout;
-		//pipelineInfo.renderPass = renderPass; /// TODO: Get the information about the renderpass
+		pipelineInfo.renderPass = framebuffer.GetRenderPass(); /// TODO: Get the information about the renderpass
 		pipelineInfo.subpass = 0;
 
 		if (const VkResult result = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_Pipeline); result != VK_SUCCESS)

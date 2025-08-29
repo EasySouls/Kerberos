@@ -34,6 +34,8 @@ namespace Kerberos
 
 		void SetDebugName(const std::string& name) const override;
 
+		VkRenderPass GetRenderPass() const { return m_RenderPass; }
+
 	private:
 		void ReleaseResources();
 

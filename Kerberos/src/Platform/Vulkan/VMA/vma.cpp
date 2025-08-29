@@ -12,14 +12,9 @@ namespace Kerberos::vma
 
 	Allocator CreateAllocator(const VkInstance instance, const VkPhysicalDevice physicalDevice, const VkDevice device) 
 	{
-		VmaVulkanFunctions vmaVkFuncs = VmaVulkanFunctions{};
-		vmaVkFuncs.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
-		vmaVkFuncs.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
-
 		VmaAllocatorCreateInfo allocatorCi = VmaAllocatorCreateInfo{};
 		allocatorCi.physicalDevice = physicalDevice;
 		allocatorCi.device = device;
-		allocatorCi.pVulkanFunctions = &vmaVkFuncs;
 		allocatorCi.instance = instance;
 
 		VmaAllocator allocator;

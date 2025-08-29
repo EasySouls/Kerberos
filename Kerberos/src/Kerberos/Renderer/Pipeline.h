@@ -39,6 +39,8 @@ namespace Kerberos
 
 			BufferLayout Layout;
 
+			bool Wireframe = false;
+
 			Topology PrimitiveTopology = Topology::Triangles;
 
 			CullMode CullMode = CullMode::Back;
@@ -51,6 +53,9 @@ namespace Kerberos
 		virtual ~Pipeline() = default;
 
 		virtual const PipelineSpecification& GetSpecification() const = 0;
+
+		virtual Ref<Shader> GetShader() const { return GetSpecification().Shader; }
+		virtual Ref<Framebuffer> GetTargetFramebuffer() const { return GetSpecification().TargetFramebuffer; }
 
 		static Ref<Pipeline> Create(const PipelineSpecification& spec);
 	};

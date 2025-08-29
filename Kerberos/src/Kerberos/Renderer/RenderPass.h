@@ -2,8 +2,6 @@
 
 #include "Pipeline.h"
 
-namespace Kerberos { class Image; }
-
 namespace Kerberos
 {
 	class RenderPass
@@ -17,9 +15,9 @@ namespace Kerberos
 
 		virtual ~RenderPass() = default;
 
-		virtual void SetInput(std::string_view name, const Ref<Image>& image) = 0;
+		virtual void SetInput(std::string_view name, const Ref<Texture2D>& texture) = 0;
 
-		virtual Ref<Image> GetOutputImage(uint32_t index) const = 0;
+		virtual Ref<Texture2D> GetOutputImage(uint32_t index) const = 0;
 
 		/**
 		 * @brief Checks whether the current renderpass is in a valid state.
