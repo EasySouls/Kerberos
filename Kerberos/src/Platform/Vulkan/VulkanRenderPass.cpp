@@ -70,8 +70,23 @@ namespace Kerberos
 		VulkanHelpers::SetObjectDebugName(VulkanContext::Get().GetDevice(), VK_OBJECT_TYPE_RENDER_PASS, reinterpret_cast<uint64_t>(m_RenderPass), name);
 	}
 
-	void VulkanRenderPass::SetInput(std::string_view name, const Ref<Texture2D>& image) {}
-	Ref<Texture2D> VulkanRenderPass::GetOutputImage(uint32_t index) const {}
-	bool VulkanRenderPass::Validate() const {}
-	void VulkanRenderPass::Bake() {}
+	void VulkanRenderPass::SetInput(std::string_view name, const Ref<Texture2D>& image) 
+	{
+		throw std::runtime_error("VulkanRenderPass::SetInput() not implemented yet!");
+	}
+
+	Ref<Texture2D> VulkanRenderPass::GetOutputImage(uint32_t index) const 
+	{
+		throw std::runtime_error("VulkanRenderPass::GetOutputImage() not implemented yet!");
+	}
+
+	bool VulkanRenderPass::Validate() const 
+	{
+		throw std::runtime_error("VulkanRenderPass::Validate() not implemented yet!");
+	}
+
+	void VulkanRenderPass::Bake() 
+	{
+		throw std::runtime_error("VulkanRenderPass::Bake() not implemented yet!");
+	}
 }

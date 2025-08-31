@@ -54,7 +54,7 @@ namespace Kerberos
 		KBR_CORE_ASSERT(m_AllocationInfo.pMappedData, "Buffer memory is not mapped!");
 
 		/// TODO: This only works if we use the VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE with HOST_VISIBLE and HOST_COHERENT bits
-		std::memcpy(m_AllocationInfo.pMappedData, data, sizeof(float) * size);
+		std::memcpy(m_AllocationInfo.pMappedData, data, size);
 
 		/*void* data;
 		vmaMapMemory(VulkanContext::Get().GetAllocator().get(), m_BufferAllocation, &data);
@@ -87,7 +87,7 @@ namespace Kerberos
 
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		bufferInfo.size = sizeof(float) * size;
+		bufferInfo.size = size;
 		bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 

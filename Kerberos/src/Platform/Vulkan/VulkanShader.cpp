@@ -55,8 +55,9 @@ namespace Kerberos
 				return GL_FRAGMENT_SHADER;
 			if (type == "geometry")
 				return GL_GEOMETRY_SHADER;
-			KBR_CORE_ASSERT(false, "Unknown shader type!")
-				return 0;
+
+			KBR_CORE_ASSERT(false, "Unknown shader type!");
+			return 0;
 		}
 
 		static const char* GetCacheDirectory() {

@@ -59,9 +59,9 @@ namespace Kerberos
 	VulkanContext::VulkanContext(GLFWwindow* windowHandle)
 		: m_WindowHandle(windowHandle)
 	{
-		KBR_CORE_ASSERT(m_WindowHandle, "Window handle is null!")
+		KBR_CORE_ASSERT(m_WindowHandle, "Window handle is null!");
 
-			KBR_CORE_ASSERT(!s_Instance, "VulkanContext already exists!");
+		KBR_CORE_ASSERT(!s_Instance, "VulkanContext already exists!");
 		s_Instance = this;
 	}
 

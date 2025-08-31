@@ -33,7 +33,7 @@ namespace Kerberos
 			}
 		}
 
-		KBR_CORE_ASSERT(false, "Unknown RendererAPI in RenderCommand::SetupRendererAPI")
+		KBR_CORE_ASSERT(false, "Unknown RendererAPI in RenderCommand::SetupRendererAPI");
 	}
 
 }

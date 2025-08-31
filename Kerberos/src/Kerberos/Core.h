@@ -31,15 +31,41 @@
 #endif
 
 #ifdef KBR_ENABLE_ASSERTS
-	#define KBR_ASSERT(x, ...) { if(!(x)) { KBR_ERROR("Assertion Failed: {0}", __VA_ARGS__); KBR_DEBUGBREAK(); } }
-	#define KBR_CORE_ASSERT(x, ...) { if(!(x)) { KBR_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); KBR_DEBUGBREAK(); } }
+#define KBR_ASSERT(x, ...) \
+        do { \
+            if (!(x)) { \
+                KBR_ERROR("Assertion Failed: {0}", __VA_ARGS__); \
+                KBR_DEBUGBREAK(); \
+            } \
+        } while (0)
+
+#define KBR_CORE_ASSERT(x, ...) \
+        do { \
+            if (!(x)) { \
+                KBR_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); \
+                KBR_DEBUGBREAK(); \
+            } \
+        } while (0)
 #else
-	#define KBR_ASSERT(x, ...)
-	#define KBR_CORE_ASSERT(x, ...)
+	#define KBR_ASSERT(x, ...) do {} while (0)
+	#define KBR_CORE_ASSERT(x, ...) do {} while (0)
 #endif
 
-#define KBR_VERIFY(x, ...) { if(!(x)) { KBR_ERROR("Verify Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-#define KBR_CORE_VERIFY(x, ...) { if(!(x)) { KBR_CORE_ERROR("Verify Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#define KBR_VERIFY(x, ...) \
+    do { \
+        if (!(x)) { \
+            KBR_ERROR("Verify Failed: {0}", __VA_ARGS__); \
+            __debugbreak(); \
+        } \
+    } while (0)
+
+#define KBR_CORE_VERIFY(x, ...) \
+    do { \
+        if (!(x)) { \
+            KBR_CORE_ERROR("Verify Failed: {0}", __VA_ARGS__); \
+            __debugbreak(); \
+        } \
+    } while (0)
 
 #define KBR_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return fn(std::forward<decltype(args)>(args)...); }
 #define KBR_BIND_FN(fn) [this]<typename T>(T&& PH1) { return fn(std::forward<T>(PH1)); }
