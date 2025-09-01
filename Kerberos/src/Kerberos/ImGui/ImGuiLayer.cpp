@@ -94,9 +94,6 @@ namespace Kerberos
 			initInfo.CheckVkResultFn = VulkanHelpers::ImGuiVulkanCheckResult;
 
 			ImGui_ImplVulkan_Init(&initInfo);
-
-			// Upload Fonts
-			ImGui_ImplVulkan_CreateFontsTexture();
 		}
 	}
 

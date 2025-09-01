@@ -1,4 +1,4 @@
-#include "kbrpch.h";
+#include "kbrpch.h"
 #include "VulkanUniformBuffer.h"
 
 namespace Kerberos
