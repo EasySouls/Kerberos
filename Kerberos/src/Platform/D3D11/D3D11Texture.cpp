@@ -60,7 +60,7 @@ namespace Kerberos
 			imageData = stbi_load(path.c_str(), &width, &height, &channels, 4);
 		}
 
-		KBR_ASSERT(imageData, "Failed to load image!")
+		KBR_CORE_ASSERT(imageData, "Failed to load image!");
 
 		m_Spec.Width = static_cast<uint32_t>(width);
 		m_Spec.Height = static_cast<uint32_t>(height);

@@ -159,8 +159,8 @@ namespace Kerberos
 		if (!in)
 		{
 			KBR_CORE_ERROR("Could not open file '{0}'", filepath);
-			KBR_CORE_ASSERT(false, "File not found!")
-				return "";
+			KBR_CORE_ASSERT(false, "File not found!");
+			return "";
 		}
 
 		/// Check the size of the file and resize the string

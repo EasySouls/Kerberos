@@ -30,8 +30,8 @@ namespace Kerberos
 
 		void SetDebugName(const std::string& name) const override;
 
-		std::unordered_map<VkShaderStageFlagBits, VkShaderModule>& GetShaderModules() { return m_ShaderModules; }
-		std::unordered_map<VkShaderStageFlagBits, VkPipelineShaderStageCreateInfo>& GetPipelineShaderStageCreateInfos() { return m_PipelineShaderStageCreateInfos; }
+		const std::unordered_map<VkShaderStageFlagBits, VkShaderModule>& GetShaderModules() const { return m_ShaderModules; }
+		const std::unordered_map<VkShaderStageFlagBits, VkPipelineShaderStageCreateInfo>& GetPipelineShaderStageCreateInfos() const { return m_PipelineShaderStageCreateInfos; }
 		const std::vector<VkDescriptorSetLayout>& GetDescriptorSetLayouts() const { return m_DescriptorSetLayouts; }
 		const std::vector<VkPushConstantRange>& GetPushConstantRanges() const { return m_PushConstantRanges; }
 		const std::vector<VkVertexInputBindingDescription>& GetVertexInputBindingDescriptions() const { return m_VertexInputBindingDescriptions; }

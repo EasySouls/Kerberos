@@ -59,7 +59,7 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		KBR_CORE_ASSERT(!vertexBuffer->GetLayout().GetElements().empty(), "Vertex Buffer has no layout!")
+		KBR_CORE_ASSERT(!vertexBuffer->GetLayout().GetElements().empty(), "Vertex Buffer has no layout!");
 
 		glBindVertexArray(m_RendererID);
 		vertexBuffer->Bind();

@@ -82,9 +82,6 @@ namespace Kerberos
 
 		switch (context)
 		{
-		case RendererAPI::API::None:
-			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			break;
 		case RendererAPI::API::OpenGL:
 			m_Context = new OpenGLContext(m_Window);
 			break;

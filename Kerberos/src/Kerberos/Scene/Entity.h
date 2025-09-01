@@ -41,7 +41,7 @@ namespace Kerberos
 		template<typename T>
 		void RemoveComponent() const 
 		{
-			KBR_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!")
+			KBR_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
 				
 			m_Scene->m_Registry.remove<T>(m_EntityHandle);
 		}

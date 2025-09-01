@@ -26,8 +26,9 @@ namespace Kerberos
 				return GL_FRAGMENT_SHADER;
 			if (type == "geometry")
 				return GL_GEOMETRY_SHADER;
-			KBR_CORE_ASSERT(false, "Unknown shader type!")
-				return 0;
+
+			KBR_CORE_ASSERT(false, "Unknown shader type!");
+			return 0;
 		}
 
 		static shaderc_shader_kind GLShaderStageToShaderC(const GLenum stage)
@@ -267,8 +268,8 @@ namespace Kerberos
 		if (!in)
 		{
 			KBR_CORE_ERROR("Could not open file '{0}'", filepath);
-			KBR_CORE_ASSERT(false, "File not found!")
-				return "";
+			KBR_CORE_ASSERT(false, "File not found!");
+			return "";
 		}
 
 		/// Check the size of the file and resize the string
@@ -343,8 +344,8 @@ namespace Kerberos
 				glDeleteShader(shader);
 
 				KBR_CORE_ERROR("{0}", infoLog.data());
-				KBR_CORE_ASSERT(false, "Shader compilation failure!")
-					return;
+				KBR_CORE_ASSERT(false, "Shader compilation failure!");
+				return;
 			}
 
 			// Attach the shader to our program
@@ -372,8 +373,8 @@ namespace Kerberos
 				glDeleteShader(id);
 
 			KBR_CORE_ERROR("{0}", infoLog.data());
-			KBR_CORE_ASSERT(false, "Shader link failure!")
-				return;
+			KBR_CORE_ASSERT(false, "Shader link failure!");
+			return;
 		}
 
 		// Detach shaders after a successful link

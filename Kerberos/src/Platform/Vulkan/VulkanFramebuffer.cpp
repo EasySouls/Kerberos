@@ -31,7 +31,7 @@ namespace Kerberos
 	}
 
 	VulkanFramebuffer::VulkanFramebuffer(FramebufferSpecification spec)
-		: m_Specification(std::move(spec))
+		: m_Specification(std::move(spec)), m_ClearColor(m_Specification.ClearColor), m_DepthClearValue(m_Specification.DepthClearValue)
 	{
 		KBR_PROFILE_FUNCTION();
 
@@ -94,8 +94,10 @@ namespace Kerberos
 				m_Specification.Height,
 				colorFormat,
 				VK_IMAGE_TILING_OPTIMAL,
-				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-				m_ColorAttachments[i], m_ColorAttachmentMemories[i]);
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, 
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				m_ColorAttachments[i], 
+				m_ColorAttachmentMemories[i]);
 
 			CreateImageView(m_ColorAttachments[i], colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, m_ColorAttachmentViews[i]);
 
@@ -119,10 +121,22 @@ namespace Kerberos
 				m_Specification.Height, 
 				depthFormat, 
 				VK_IMAGE_TILING_OPTIMAL,
-				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-				m_DepthAttachment, m_DepthAttachmentMemory);
+				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				m_DepthAttachment, 
+				m_DepthAttachmentMemory);
 
-			CreateImageView(m_DepthAttachment, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT, m_DepthAttachmentView);
+			VkImageAspectFlags imageAspectFlags = VK_IMAGE_ASPECT_NONE;
+			if (m_DepthAttachmentSpec.TextureFormat == FramebufferTextureFormat::DEPTH24STENCIL8)
+			{
+				imageAspectFlags = /*VK_IMAGE_ASPECT_DEPTH_BIT |*/ VK_IMAGE_ASPECT_STENCIL_BIT;
+			}
+			else if (m_DepthAttachmentSpec.TextureFormat == FramebufferTextureFormat::DEPTH24)
+			{
+				imageAspectFlags |= VK_IMAGE_ASPECT_DEPTH_BIT;
+			}
+
+			CreateImageView(m_DepthAttachment, depthFormat, imageAspectFlags, m_DepthAttachmentView);
 
 			VkAttachmentDescription depthAttachmentDescription{};
 			depthAttachmentDescription.format = depthFormat;
@@ -149,13 +163,23 @@ namespace Kerberos
 			depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		}
 
-		const uint32_t colorAttachmentCount = static_cast<uint32_t>(m_ColorAttachmentSpecs.size());
-
 		/// Subpass creation
 		VkSubpassDescription subpass{};
 		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass.colorAttachmentCount = colorAttachmentCount;
-		subpass.pColorAttachments = &colorAttachmentRef;
+
+		if (m_ColorAttachments.empty())
+		{
+			subpass.colorAttachmentCount = 0;
+			subpass.pColorAttachments = nullptr;
+
+		}
+		else
+		{
+			subpass.colorAttachmentCount = 1;
+			subpass.pColorAttachments = &colorAttachmentRef;
+		}
+
+		
 		if (m_DepthAttachmentSpec.TextureFormat != FramebufferTextureFormat::None)
 		{
 			subpass.pDepthStencilAttachment = &depthAttachmentRef;
@@ -165,27 +189,7 @@ namespace Kerberos
 			subpass.pDepthStencilAttachment = nullptr;
 		}
 
-		std::vector<VkSubpassDependency> dependencies(2);
-
-		/// Dependency for transitioning color attachment into the rendes pass
-		dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
-		dependencies[0].dstSubpass = 0;
-		/// Wait for previous operations to finish before starting this subpass
-		dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-		/// Transition before starting the subpass
-		dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependencies[0].srcAccessMask = 0;
-		dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-		/// Dependency for transitioning color attachment after the render pass
-		dependencies[1].srcSubpass = 0;
-		dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
-		dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT; /// Available for sampling in fragment shader
-		dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+		std::vector<VkSubpassDependency> dependencies = CreateSubpassDependencies();
 
 		/// Create render pass
 		VkRenderPassCreateInfo renderPassInfo{};
@@ -284,7 +288,7 @@ namespace Kerberos
 		m_ColorAttachmentDescriptorSets.resize(m_ColorAttachmentSpecs.size());
 		for (size_t i = 0; i < m_ColorAttachmentSpecs.size(); ++i)
 		{
-			m_ColorAttachmentDescriptorSets[i] = ImGui_ImplVulkan_AddTexture(m_ColorAttachmentSampler, m_ColorAttachmentViews[0], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+			m_ColorAttachmentDescriptorSets[i] = ImGui_ImplVulkan_AddTexture(m_ColorAttachmentSampler, m_ColorAttachmentViews[i], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		}
 
 		/// Create descriptor set for depth attachment, if there is one
@@ -321,7 +325,11 @@ namespace Kerberos
 		}
 
 		std::vector<VkClearValue> clearValues;
-		clearValues.push_back({{{0.0f, 0.0f, 0.0f, 1.0f}}});
+		clearValues.reserve(m_ColorAttachmentSpecs.size());
+		for (const auto& _ : m_ColorAttachmentSpecs)
+		{
+			clearValues.push_back({ {{0.0f, 0.0f, 0.0f, 1.0f}} });
+		}
 		if (m_DepthAttachmentSpec.TextureFormat != FramebufferTextureFormat::None)
 		{
 			clearValues.push_back({{{1.0f, 0}}});
@@ -339,16 +347,16 @@ namespace Kerberos
 
 		vkCmdBeginRenderPass(m_CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-		VkViewport viewport{};
+		VkViewport viewport;
 		viewport.x = 0.0f;
 		viewport.y = static_cast<float>(m_Specification.Height);
 		viewport.width = static_cast<float>(m_Specification.Width);
-		viewport.height = -static_cast<float>(m_Specification.Height); // Invert Y-axis for Vulkan
+		viewport.height = -static_cast<float>(m_Specification.Height); /// Invert Y-axis for Vulkan
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 		vkCmdSetViewport(m_CommandBuffer, 0, 1, &viewport);
 
-		VkRect2D scissor{};
+		VkRect2D scissor;
 		scissor.offset = { .x = 0, .y = 0 };
 		scissor.extent.width = m_Specification.Width;
 		scissor.extent.height = m_Specification.Height;
@@ -369,8 +377,9 @@ namespace Kerberos
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &m_CommandBuffer;
-		if (vkQueueSubmit(VulkanContext::Get().GetGraphicsQueue(), 1, &submitInfo, m_Fence) != VK_SUCCESS)
+		if (const VkResult result = vkQueueSubmit(VulkanContext::Get().GetGraphicsQueue(), 1, &submitInfo, m_Fence); result != VK_SUCCESS)
 		{
+			KBR_CORE_ERROR("Failed to submit queue in VulkanFramebuffer::Unbind. Result: {}", VulkanHelpers::VkResultToString(result));
 			KBR_CORE_ASSERT(false, "Failed to submit command buffer!");
 			return;
 		}
@@ -566,7 +575,7 @@ namespace Kerberos
 		}
 	}
 
-	void VulkanFramebuffer::CreateImageView(const VkImage image, const VkFormat format, const VkImageAspectFlags flags,
+	void VulkanFramebuffer::CreateImageView(const VkImage image, const VkFormat format, const VkImageAspectFlags imageAspectFlags,
 		VkImageView& imageView) 
 	{
 		VkImageViewCreateInfo viewInfo{};
@@ -574,7 +583,7 @@ namespace Kerberos
 		viewInfo.image = image;
 		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 		viewInfo.format = format;
-		viewInfo.subresourceRange.aspectMask = flags;
+		viewInfo.subresourceRange.aspectMask = imageAspectFlags;
 		viewInfo.subresourceRange.baseMipLevel = 0;
 		viewInfo.subresourceRange.levelCount = 1;
 		viewInfo.subresourceRange.baseArrayLayer = 0;
@@ -584,5 +593,29 @@ namespace Kerberos
 		{
 			KBR_CORE_ASSERT(false, "Failed to create image view!");
 		}
+	}
+
+	std::vector<VkSubpassDependency> VulkanFramebuffer::CreateSubpassDependencies() {
+		std::vector<VkSubpassDependency> dependencies(2);
+
+		/// Dependency for transitioning color attachment into the render pass
+		dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+		dependencies[0].dstSubpass = 0;
+		dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+		dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependencies[0].srcAccessMask = 0;
+		dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+		/// Dependency for transitioning color attachment after the render pass
+		dependencies[1].srcSubpass = 0;
+		dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+		dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT; /// Available for sampling in fragment shader
+		dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+		return dependencies;
 	}
 }

@@ -34,14 +34,20 @@ namespace Kerberos
 
 		void SetDebugName(const std::string& name) const override;
 
+		VkRenderPass GetRenderPass() const { return m_RenderPass; }
+
 	private:
 		void ReleaseResources();
 
 		static void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& memory);
-		static void CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags flags, VkImageView& imageView);
+		static void CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags imageAspectFlags, VkImageView& imageView);
+
+		static std::vector<VkSubpassDependency> CreateSubpassDependencies();
 
 	private:
 		FramebufferSpecification m_Specification;
+		glm::vec4 m_ClearColor;
+		glm::vec4 m_DepthClearValue;
 
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecs;
 		FramebufferTextureSpecification m_DepthAttachmentSpec = FramebufferTextureFormat::None;

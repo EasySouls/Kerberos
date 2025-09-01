@@ -26,7 +26,7 @@ namespace Kerberos
 		return texture;
 	}
 
-	std::pair<TextureSpecification, Buffer> TextureImporter::LoadTextureData(const std::filesystem::path& filepath, const bool flip) 
+	std::pair<TextureSpecification, Buffer> TextureImporter::LoadTextureData(const std::filesystem::path& filepath, const bool flip, const int desiredChannels) 
 	{
 		int width, height, channels;
 
@@ -35,7 +35,7 @@ namespace Kerberos
 
 		{
 			KBR_PROFILE_SCOPE("TextureImporter::ImportTexture - stbi_load");
-			data.Data = stbi_load(filepath.string().c_str(), &width, &height, &channels, 0);
+			data.Data = stbi_load(filepath.string().c_str(), &width, &height, &channels, desiredChannels);
 		}
 
 		if (data.Data == nullptr)
@@ -44,12 +44,13 @@ namespace Kerberos
 			return std::make_pair(TextureSpecification{}, Buffer{});
 		}
 
-		data.Size = static_cast<uint64_t>(width) * height * channels;
+		const int actualChannels = desiredChannels == 0 ? channels : desiredChannels;
+		data.Size = static_cast<uint64_t>(width) * height * actualChannels;
 
 		TextureSpecification spec;
 		spec.Width = width;
 		spec.Height = height;
-		switch (channels)
+		switch (actualChannels)
 		{
 		case 1:
 			spec.Format = ImageFormat::R8;
@@ -61,7 +62,7 @@ namespace Kerberos
 			spec.Format = ImageFormat::RGBA8;
 			break;
 		default:
-			KBR_CORE_ASSERT(false, "TextureImporter::ImportTexture - unsupported number of image channels: {}", channels);
+			KBR_CORE_ASSERT(false, "TextureImporter::ImportTexture - unsupported number of image channels: {}", actualChannels);
 			break;
 		}
 

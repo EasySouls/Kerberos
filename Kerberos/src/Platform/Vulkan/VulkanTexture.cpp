@@ -509,8 +509,7 @@ namespace Kerberos
         {
 	        const VkDevice device = context.GetDevice();
 	        void* map = nullptr;
-            VkResult err = vkMapMemory(device, m_UploadBufferMemory, 0, size, 0, &map);
-            if (err != VK_SUCCESS)
+            if (const VkResult err = vkMapMemory(device, m_UploadBufferMemory, 0, size, 0, &map); err != VK_SUCCESS)
             {
                 KBR_ERROR("Failed to map Vulkan upload buffer memory for SetData: {}", VulkanHelpers::VkResultToString(err));
                 return;

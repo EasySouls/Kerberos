@@ -21,7 +21,7 @@ namespace Kerberos
 			data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 		}
 	
-		KBR_ASSERT(data, "Failed to load image!")
+		KBR_CORE_ASSERT(data, "Failed to load image!");
 
 		m_Spec.Width = static_cast<unsigned int>(width);
 		m_Spec.Height = static_cast<unsigned int>(height);
@@ -42,7 +42,7 @@ namespace Kerberos
 			dataFormat = GL_RGB;
 		}
 
-		KBR_ASSERT(internalFormat & dataFormat, "Format not supported!")
+		KBR_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
 
 		m_InternalFormat = internalFormat;
 		m_DataFormat = dataFormat;

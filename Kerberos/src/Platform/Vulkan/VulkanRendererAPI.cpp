@@ -91,12 +91,14 @@ namespace Kerberos
 
 	void VulkanRendererAPI::SetDepthTest(bool enabled) 
 	{
-		throw std::runtime_error("Depth test not implemented in VulkanRendererAPI yet!");
+		/// TODO: Implement Pipeline class which has a baked-in depth testing, or maybe set in dynamically 
+		//throw std::runtime_error("Depth test not implemented in VulkanRendererAPI yet!");
 	}
 
 	void VulkanRendererAPI::SetDepthFunc(DepthFunc func) 
 	{
-		throw std::runtime_error("Depth function not implemented in VulkanRendererAPI yet!");
+		/// TODO: Implement Pipeline class which has a baked-in depth func, or maybe set in dynamically 
+		//throw std::runtime_error("Depth function not implemented in VulkanRendererAPI yet!");
 	}
 
 	void VulkanRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)

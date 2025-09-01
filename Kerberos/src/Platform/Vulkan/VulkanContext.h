@@ -3,6 +3,7 @@
 #define GLFW_INCLUDE_VULKAN
 
 #include "Kerberos/Renderer/GraphicsContext.h"
+#include "VMA/vma.h"
 #include "VulkanHelpers.h"
 
 #include <GLFW/glfw3.h>
@@ -48,6 +49,8 @@ namespace Kerberos
 		std::vector<VkFramebuffer> GetSwapChainFramebuffers() const { return m_SwapChainFramebuffers; }
 		uint32_t GetCurrentFrameIndex() const { return m_CurrentFrame; }
 		VkCommandPool GetCommandPool() const { return m_CommandPool; }
+		const vma::Allocator& GetAllocator() const { return m_Allocator; }
+		VkCommandBuffer GetCurrentCommandBuffer() const;
 
 		VkDescriptorPool GetImGuiDescriptorPool() const { return m_ImGuiDescriptorPool; }
 
@@ -55,6 +58,7 @@ namespace Kerberos
 		* @brief Returns a one-time use command buffer that can be used to record commands.
 		* The command buffer must be submitted using SubmitCommandBuffer() after recording.
 		*/
+		[[nodiscard]]
 		VkCommandBuffer GetOneTimeCommandBuffer() const;
 
 		/**
@@ -72,6 +76,7 @@ namespace Kerberos
 		void CreateSurface();
 		void PickPhysicalDevice();
 		void CreateLogicalDevice();
+		void CreateVmaAllocator();
 		void CreateSwapChain();
 		void CreateImageViews();
 		void CreateRenderPass();
@@ -106,12 +111,13 @@ namespace Kerberos
 	private:
 		GLFWwindow* m_WindowHandle;
 
-
 		VkInstance m_Instance = VK_NULL_HANDLE;
 		VkDebugUtilsMessengerEXT m_DebugMessenger = VK_NULL_HANDLE;
 		VkSurfaceKHR m_Surface = VK_NULL_HANDLE;
 		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 		VkDevice m_Device = VK_NULL_HANDLE;
+
+		vma::Allocator m_Allocator{};
 
 		VkQueue m_GraphicsQueue = VK_NULL_HANDLE;
 		VkQueue m_PresentQueue = VK_NULL_HANDLE;
@@ -133,9 +139,9 @@ namespace Kerberos
 
 		VkDescriptorPool m_ImGuiDescriptorPool = VK_NULL_HANDLE;
 
-		std::vector<VkSemaphore> m_ImageAvailableSemaphore;
-		std::vector<VkSemaphore> m_RenderFinishedSemaphore;
-		std::vector<VkFence> m_InFlightFence;
+		std::vector<VkSemaphore> m_ImageAvailableSemaphores;
+		std::vector<VkSemaphore> m_RenderFinishedSemaphores;
+		std::vector<VkFence> m_InFlightFences;
 
 		uint32_t m_CurrentFrame = 0;
 

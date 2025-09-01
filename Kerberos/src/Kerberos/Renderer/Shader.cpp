@@ -12,10 +12,6 @@ namespace Kerberos
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::API::None:
-			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!")
-				return nullptr;
-
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLShader>(filepath);
 
@@ -38,10 +34,6 @@ namespace Kerberos
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::API::None:
-			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
 
@@ -63,14 +55,14 @@ namespace Kerberos
 	void ShaderLibrary::Add(const Ref<Shader>& shader)
 	{
 		auto& name = shader->GetName();
-		KBR_CORE_ASSERT(!Exists(name), "Shader already exists!")
-			m_Shaders[name] = shader;
+		KBR_CORE_ASSERT(!Exists(name), "Shader already exists!");
+		m_Shaders[name] = shader;
 	}
 
 	void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
 	{
-		KBR_CORE_ASSERT(!Exists(name), "Shader already exists!")
-			m_Shaders[name] = shader;
+		KBR_CORE_ASSERT(!Exists(name), "Shader already exists!");
+		m_Shaders[name] = shader;
 	}
 
 	Ref<Shader> ShaderLibrary::Load(const std::string& filepath)
@@ -89,8 +81,8 @@ namespace Kerberos
 
 	Ref<Shader> ShaderLibrary::Get(const std::string& name)
 	{
-		KBR_CORE_ASSERT(Exists(name), "Shader not found!")
-			return m_Shaders[name];
+		KBR_CORE_ASSERT(Exists(name), "Shader not found!");
+		return m_Shaders[name];
 	}
 
 	bool ShaderLibrary::Exists(const std::string& name) const

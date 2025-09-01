@@ -77,7 +77,7 @@
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;YAML_CPP_STATIC_DEFINE;KBR_PLATFORM_WINDOWS;KBR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.313.2\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;vendor\JoltPhysics;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.321.1\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;vendor\JoltPhysics;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -91,8 +91,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.313.2\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;C:\VulkanSDK\1.4.313.2\Lib\shaderc_sharedd.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-cored.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-glsld.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.313.2\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.321.1\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;C:\VulkanSDK\1.4.321.1\Lib\shaderc_sharedd.lib;C:\VulkanSDK\1.4.321.1\Lib\spirv-cross-cored.lib;C:\VulkanSDK\1.4.321.1\Lib\spirv-cross-glsld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.321.1\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -101,7 +101,7 @@
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;YAML_CPP_STATIC_DEFINE;KBR_PLATFORM_WINDOWS;KBR_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.313.2\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;vendor\JoltPhysics;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.321.1\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;vendor\JoltPhysics;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -118,8 +118,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.313.2\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;C:\VulkanSDK\1.4.313.2\Lib\shaderc_shared.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.313.2\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.321.1\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;C:\VulkanSDK\1.4.321.1\Lib\shaderc_shared.lib;C:\VulkanSDK\1.4.321.1\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.4.321.1\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.321.1\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
@@ -128,7 +128,7 @@
       <PrecompiledHeaderFile>kbrpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;IMGUI_DOCKING_BRANCH;YAML_CPP_STATIC_DEFINE;KBR_PLATFORM_WINDOWS;KBR_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.313.2\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;vendor\JoltPhysics;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor;vendor\GLFW\include;vendor\glad\include;vendor\imgui;vendor\glm;vendor\stb_image;C:\VulkanSDK\1.4.321.1\Include;vendor\entt\Include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Assimp\include;vendor\JoltPhysics;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -145,8 +145,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.313.2\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;C:\VulkanSDK\1.4.313.2\Lib\shaderc_shared.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.4.313.2\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.313.2\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;C:\VulkanSDK\1.4.321.1\Lib\vulkan-1.lib;d3d11.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;dxguid.lib;C:\VulkanSDK\1.4.321.1\Lib\shaderc_shared.lib;C:\VulkanSDK\1.4.321.1\Lib\spirv-cross-core.lib;C:\VulkanSDK\1.4.321.1\Lib\spirv-cross-glsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.4.321.1\Lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -169,6 +169,7 @@
     <ClInclude Include="src\Kerberos\Core\Input.h" />
     <ClInclude Include="src\Kerberos\Core\KeyCodes.h" />
     <ClInclude Include="src\Kerberos\Core\MouseButtonCodes.h" />
+    <ClInclude Include="src\Kerberos\Core\Scoped.h" />
     <ClInclude Include="src\Kerberos\Core\Timer.h" />
     <ClInclude Include="src\Kerberos\Core\Timestep.h" />
     <ClInclude Include="src\Kerberos\Core\UUID.h" />
@@ -199,11 +200,13 @@
     <ClInclude Include="src\Kerberos\Renderer\Material.h" />
     <ClInclude Include="src\Kerberos\Renderer\Mesh.h" />
     <ClInclude Include="src\Kerberos\Renderer\OrthographicCamera.h" />
+    <ClInclude Include="src\Kerberos\Renderer\Pipeline.h" />
     <ClInclude Include="src\Kerberos\Renderer\RenderCommand.h" />
     <ClInclude Include="src\Kerberos\Renderer\Renderer.h" />
     <ClInclude Include="src\Kerberos\Renderer\Renderer2D.h" />
     <ClInclude Include="src\Kerberos\Renderer\Renderer3D.h" />
     <ClInclude Include="src\Kerberos\Renderer\RendererAPI.h" />
+    <ClInclude Include="src\Kerberos\Renderer\RenderPass.h" />
     <ClInclude Include="src\Kerberos\Renderer\Shader.h" />
     <ClInclude Include="src\Kerberos\Renderer\SubTexture2D.h" />
     <ClInclude Include="src\Kerberos\Renderer\Texture.h" />
@@ -239,11 +242,14 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
     <ClInclude Include="src\Platform\OpenGL\TextureUtils.h" />
+    <ClInclude Include="src\Platform\Vulkan\VMA\vma.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanBuffer.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanContext.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanFramebuffer.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanHelpers.h" />
+    <ClInclude Include="src\Platform\Vulkan\VulkanPipeline.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanRendererAPI.h" />
+    <ClInclude Include="src\Platform\Vulkan\VulkanRenderPass.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanShader.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanTexture.h" />
     <ClInclude Include="src\Platform\Vulkan\VulkanTextureCube.h" />
@@ -280,11 +286,13 @@
     <ClCompile Include="src\Kerberos\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\OrthographicCamera.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\Pipeline.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Renderer2D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Renderer3D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\RendererAPI.cpp" />
+    <ClCompile Include="src\Kerberos\Renderer\RenderPass.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Shader.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\SubTexture2D.cpp" />
     <ClCompile Include="src\Kerberos\Renderer\Texture.cpp" />
@@ -313,11 +321,15 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLTextureCube.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLUniformBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
+    <ClCompile Include="src\Platform\Vulkan\VMA\vma.cpp" />
+    <ClCompile Include="src\Platform\Vulkan\VMA\vma_mem_alloc.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanBuffer.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanContext.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanFramebuffer.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanHelpers.cpp" />
+    <ClCompile Include="src\Platform\Vulkan\VulkanPipeline.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanRendererAPI.cpp" />
+    <ClCompile Include="src\Platform\Vulkan\VulkanRenderPass.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanShader.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanTexture.cpp" />
     <ClCompile Include="src\Platform\Vulkan\VulkanTextureCube.cpp" />

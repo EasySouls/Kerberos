@@ -50,6 +50,8 @@ namespace Kerberos
 		FramebufferAttachmentSpecification Attachments;
 		uint32_t Samples = 1;
 		bool SwapChainTarget = false;
+		glm::vec4 ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+		glm::vec4 DepthClearValue = { 1.0f, 0.0f, 0.0f, 0.0f };
 	};
 
 	class Framebuffer

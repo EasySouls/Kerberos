@@ -9,7 +9,7 @@
 #include "imgui.h"
 #include "VulkanShader.h"
 
-constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+constexpr int maxFramesInFlight = 2;
 
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -27,12 +27,27 @@ constexpr bool enableValidationLayers = false;
 #endif
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
-	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+	const VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 	VkDebugUtilsMessageTypeFlagsEXT messageType,
 	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 	void* pUserData)
 {
-	KBR_CORE_ERROR("Validation layer: {0}", pCallbackData->pMessage);
+	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+	{
+		KBR_CORE_ERROR("Validation layer: {0} - {1}: {2}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage);
+	}
+	else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+	{
+		KBR_CORE_WARN("Validation layer: {0} - {1}: {2}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage);
+	}
+	else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+	{
+		KBR_CORE_INFO("Validation layer: {0} - {1}: {2}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage);
+	}
+	else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
+	{
+		KBR_CORE_TRACE("Validation layer: {0} - {1}: {2}", pCallbackData->messageIdNumber, pCallbackData->pMessageIdName, pCallbackData->pMessage);
+	}
 
 	return VK_FALSE;
 }
@@ -44,9 +59,9 @@ namespace Kerberos
 	VulkanContext::VulkanContext(GLFWwindow* windowHandle)
 		: m_WindowHandle(windowHandle)
 	{
-		KBR_CORE_ASSERT(m_WindowHandle, "Window handle is null!")
+		KBR_CORE_ASSERT(m_WindowHandle, "Window handle is null!");
 
-			KBR_CORE_ASSERT(!s_Instance, "VulkanContext already exists!");
+		KBR_CORE_ASSERT(!s_Instance, "VulkanContext already exists!");
 		s_Instance = this;
 	}
 
@@ -61,11 +76,11 @@ namespace Kerberos
 
 		vkDestroyRenderPass(m_Device, m_RenderPass, nullptr);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+		for (size_t i = 0; i < maxFramesInFlight; ++i)
 		{
-			vkDestroySemaphore(m_Device, m_ImageAvailableSemaphore[i], nullptr);
-			vkDestroySemaphore(m_Device, m_RenderFinishedSemaphore[i], nullptr);
-			vkDestroyFence(m_Device, m_InFlightFence[i], nullptr);
+			vkDestroySemaphore(m_Device, m_ImageAvailableSemaphores[i], nullptr);
+			vkDestroySemaphore(m_Device, m_RenderFinishedSemaphores[i], nullptr);
+			vkDestroyFence(m_Device, m_InFlightFences[i], nullptr);
 		}
 
 		vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
@@ -88,6 +103,7 @@ namespace Kerberos
 		CreateSurface();
 		PickPhysicalDevice();
 		CreateLogicalDevice();
+		CreateVmaAllocator();
 		CreateSwapChain();
 		CreateImageViews();
 		CreateRenderPass();
@@ -104,10 +120,10 @@ namespace Kerberos
 	void VulkanContext::SwapBuffers()
 	{
 		/// Wait for the fence to be signaled, then reset it
-		vkWaitForFences(m_Device, 1, &m_InFlightFence[m_CurrentFrame], VK_TRUE, UINT64_MAX);
+		vkWaitForFences(m_Device, 1, &m_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
 
 		uint32_t imageIndex;
-		if (const VkResult result = vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphore[m_CurrentFrame], VK_NULL_HANDLE, &imageIndex); result != VK_SUCCESS)
+		if (const VkResult result = vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphores[m_CurrentFrame], VK_NULL_HANDLE, &imageIndex); result != VK_SUCCESS)
 		{
 			if (result == VK_ERROR_OUT_OF_DATE_KHR)
 			{
@@ -124,7 +140,7 @@ namespace Kerberos
 
 		/// We only reset the fence here, because if we return early due to an out of date swap chain,
 		/// and the fence stays signaled, we might get into a deadlock
-		vkResetFences(m_Device, 1, &m_InFlightFence[m_CurrentFrame]);
+		vkResetFences(m_Device, 1, &m_InFlightFences[m_CurrentFrame]);
 
 		vkResetCommandBuffer(m_CommandBuffers[m_CurrentFrame], 0);
 
@@ -133,7 +149,7 @@ namespace Kerberos
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		const VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphore[m_CurrentFrame] };
+		const VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphores[m_CurrentFrame] };
 		constexpr VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
@@ -142,11 +158,11 @@ namespace Kerberos
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &m_CommandBuffers[m_CurrentFrame];
 
-		const VkSemaphore signalSemaphores[] = { m_RenderFinishedSemaphore[m_CurrentFrame] };
+		const VkSemaphore signalSemaphores[] = { m_RenderFinishedSemaphores[m_CurrentFrame] };
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		if (const VkResult result = vkQueueSubmit(m_GraphicsQueue, 1, &submitInfo, m_InFlightFence[m_CurrentFrame]); result != VK_SUCCESS) {
+		if (const VkResult result = vkQueueSubmit(m_GraphicsQueue, 1, &submitInfo, m_InFlightFences[m_CurrentFrame]); result != VK_SUCCESS) {
 			KBR_CORE_ERROR("Failed to submit draw command buffer! Result: {0}", VulkanHelpers::VkResultToString(result));
 			KBR_CORE_ASSERT(false, "Failed to submit draw command buffer!");
 			throw std::runtime_error("failed to submit draw command buffer!");
@@ -185,7 +201,7 @@ namespace Kerberos
 			//glfwMakeContextCurrent(backupCurrentContext);
 		}
 
-		m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+		m_CurrentFrame = (m_CurrentFrame + 1) % maxFramesInFlight;
 	}
 
 	void VulkanContext::CreateImGuiDescriptorPool()
@@ -475,7 +491,9 @@ namespace Kerberos
 			queueCreateInfos.push_back(queueCreateInfo);
 		}
 
+		/// Query the device features
 		VkPhysicalDeviceFeatures deviceFeatures{};
+		vkGetPhysicalDeviceFeatures(m_PhysicalDevice, &deviceFeatures);
 
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -506,6 +524,15 @@ namespace Kerberos
 
 		vkGetDeviceQueue(m_Device, graphicsFamily.value(), 0, &m_GraphicsQueue);
 		vkGetDeviceQueue(m_Device, presentFamily.value(), 0, &m_PresentQueue);
+	}
+
+	void VulkanContext::CreateVmaAllocator() 
+	{
+		KBR_CORE_ASSERT(m_Instance != VK_NULL_HANDLE, "VkInstance has to be initialized to create allocator!");
+		KBR_CORE_ASSERT(m_PhysicalDevice != VK_NULL_HANDLE, "VkPhysicalDevice has to be initialized to create allocator!");
+		KBR_CORE_ASSERT(m_Device != VK_NULL_HANDLE, "VkDevice has to be initialized to create allocator!");
+
+		m_Allocator = vma::CreateAllocator(m_Instance, m_PhysicalDevice, m_Device);
 	}
 
 	void VulkanContext::CreateSwapChain()
@@ -944,7 +971,7 @@ namespace Kerberos
 
 	void VulkanContext::CreateCommandBuffers()
 	{
-		m_CommandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+		m_CommandBuffers.resize(maxFramesInFlight);
 
 		const VkCommandBufferAllocateInfo allocInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -963,9 +990,9 @@ namespace Kerberos
 
 	void VulkanContext::CreateSyncObjects()
 	{
-		m_ImageAvailableSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
-		m_RenderFinishedSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
-		m_InFlightFence.resize(MAX_FRAMES_IN_FLIGHT);
+		m_ImageAvailableSemaphores.resize(maxFramesInFlight);
+		m_RenderFinishedSemaphores.resize(maxFramesInFlight);
+		m_InFlightFences.resize(maxFramesInFlight);
 
 
 		VkSemaphoreCreateInfo semaphoreInfo{};
@@ -977,24 +1004,28 @@ namespace Kerberos
 		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+		for (size_t i = 0; i < maxFramesInFlight; ++i)
 		{
-			if (vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore[i]) != VK_SUCCESS ||
-				vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore[i]) != VK_SUCCESS ||
-				vkCreateFence(m_Device, &fenceInfo, nullptr, &m_InFlightFence[i]) != VK_SUCCESS) {
+			if (vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphores[i]) != VK_SUCCESS ||
+				vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphores[i]) != VK_SUCCESS ||
+				vkCreateFence(m_Device, &fenceInfo, nullptr, &m_InFlightFences[i]) != VK_SUCCESS) {
 				KBR_CORE_ASSERT(false, "Failed to create semaphores or fences!");
 				throw std::runtime_error("failed to create semaphores or fences!");
 			}
 		}
 	}
 
+	VkCommandBuffer VulkanContext::GetCurrentCommandBuffer() const 
+	{
+		KBR_CORE_ASSERT(m_CurrentFrame < m_CommandBuffers.size(), "Current frame index out of range");
+		return m_CommandBuffers[m_CurrentFrame];
+	}
+
 	VkCommandBuffer VulkanContext::GetOneTimeCommandBuffer() const 
 	{
-		const VkCommandPool commandPool = m_CommandPool;
-
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		allocInfo.commandPool = commandPool;
+		allocInfo.commandPool = m_CommandPool;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		allocInfo.commandBufferCount = 1;
 

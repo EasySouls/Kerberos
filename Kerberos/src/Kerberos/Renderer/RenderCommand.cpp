@@ -14,9 +14,6 @@ namespace Kerberos
 	{
 		switch (const auto api = RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
-			KBR_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return;
 		case RendererAPI::API::OpenGL:
 			s_RendererAPI = new OpenGLRendererAPI();
 			return;
@@ -36,7 +33,7 @@ namespace Kerberos
 			}
 		}
 
-		KBR_CORE_ASSERT(false, "Unknown RendererAPI in RenderCommand::SetupRendererAPI")
+		KBR_CORE_ASSERT(false, "Unknown RendererAPI in RenderCommand::SetupRendererAPI");
 	}
 
 }
