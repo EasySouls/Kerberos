@@ -28,11 +28,14 @@ IncludeDir["yaml_cpp"] = "%{wks.location}/Kerberos/vendor/yaml-cpp/include"
 IncludeDir["ImGuizmo"] = "%{wks.location}/Kerberos/vendor/ImGuizmo"
 IncludeDir["Assimp"] = "%{wks.location}/Kerberos/vendor/Assimp/include"
 IncludeDir["JoltPhysics"] = "%{wks.location}/Kerberos/vendor/JoltPhysics"
+IncludeDir["Mono"] = "%{wks.location}/Kerberos/vendor/mono/include"
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
+LibraryDir["Mono"] = "%{wks.location}/Kerberos/vendor/mono/lib/%{cfg.buildcfg}"
 
 Library = {}
+Library["Mono"] = "%{LibraryDir.Mono}/libmono-static-sgen.lib"
 Library["Vulkan"] = "%{LibraryDir.VulkanSDK}/vulkan-1.lib"
 
 Library["ShaderC_Debug"] = "%{LibraryDir.VulkanSDK}/shaderc_sharedd.lib"
@@ -43,6 +46,13 @@ Library["SPIRV_Tools_Debug"] = "%{LibraryDir.VulkanSDK}/SPIRV-Toolsd.lib"
 Library["ShaderC_Release"] = "%{LibraryDir.VulkanSDK}/shaderc_shared.lib"
 Library["SPIRV_Cross_Release"] = "%{LibraryDir.VulkanSDK}/spirv-cross-core.lib"
 Library["SPIRV_Cross_GLSL_Release"] = "%{LibraryDir.VulkanSDK}/spirv-cross-glsl.lib"
+
+-- Windows-only
+Library["WinSock"] = "Ws2_32.lib"
+Library["WinMM"] = "Winmm.lib"
+Library["WinVersion"] = "Version.lib"
+Library["BCrypt"] = "Bcrypt.lib"
+
 
 -- Function to find the latest Windows SDK
 function getLatestWindowsSDK()
@@ -104,6 +114,10 @@ group "Dependencies"
 	include "Kerberos/vendor/JoltPhysics"
 group ""
 
+group "Core"
+	include "KerberosScriptCoreLib"
+group ""
+
 project "Kerberos"
 	location "Kerberos"
 	kind "StaticLib"
@@ -120,6 +134,7 @@ project "Kerberos"
 	files
 	{
 		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.hpp",
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/src/**.ixx",
 
@@ -142,11 +157,13 @@ project "Kerberos"
 		IncludeDir.ImGuizmo,
 		IncludeDir.Assimp,
 		IncludeDir.JoltPhysics,
+		IncludeDir.Mono,
 	}
 
 	libdirs 
 	{
-		LibraryDir.VulkanSDK
+		LibraryDir.VulkanSDK,
+		LibraryDir.Mono
 	}
 
 	links
@@ -161,6 +178,7 @@ project "Kerberos"
 
 		"opengl32.lib",
 		Library.Vulkan,
+		Library.Mono,
 	}
 
 	defines 
@@ -213,8 +231,12 @@ project "Kerberos"
 			"d3d11.lib",
 			"dxgi.lib",
 			"d3dcompiler.lib",
-			"winmm.lib",
-			"dxguid.lib"
+			"dxguid.lib",
+
+			Library.WinSock,
+			Library.WinMM,
+			Library.WinVersion,
+			Library.BCrypt,
 		}
 
 	filter "system:linux"

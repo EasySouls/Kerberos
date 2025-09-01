@@ -43,6 +43,9 @@
     <Filter Include="src\Kerberos\Scene\Components">
       <UniqueIdentifier>{4BCD37F5-B7E5-1E1F-8092-AEB8EC69B3B8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Kerberos\Scripting">
+      <UniqueIdentifier>{5B1A0FF6-4714-3848-3081-CE581C1A9EB4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Kerberos\Utils">
       <UniqueIdentifier>{39E2E6E0-25C6-A736-8E26-A2897A2992B8}</UniqueIdentifier>
     </Filter>
@@ -57,6 +60,9 @@
     </Filter>
     <Filter Include="src\Platform\Vulkan">
       <UniqueIdentifier>{81084748-ED69-2456-76D7-6A08E2375B15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Platform\Vulkan\VMA">
+      <UniqueIdentifier>{D49EC4AD-40D6-0C45-49E0-7068B596333E}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Platform\Windows">
       <UniqueIdentifier>{5B054582-4794-CE4B-F0B2-E246DC20DFF1}</UniqueIdentifier>
@@ -124,6 +130,9 @@
       <Filter>src\Kerberos\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Core\MouseButtonCodes.h">
+      <Filter>src\Kerberos\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Core\Scoped.h">
       <Filter>src\Kerberos\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Core\Timer.h">
@@ -216,7 +225,13 @@
     <ClInclude Include="src\Kerberos\Renderer\OrthographicCamera.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\Pipeline.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\RenderCommand.h">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Renderer\RenderPass.h">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Renderer\Renderer.h">
@@ -272,6 +287,12 @@
     </ClInclude>
     <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h">
       <Filter>src\Kerberos\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Scripting\ScriptEngine.h">
+      <Filter>src\Kerberos\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Scripting\ScriptEngine.hpp">
+      <Filter>src\Kerberos\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Utils\PlatformUtils.h">
       <Filter>src\Kerberos\Utils</Filter>
@@ -336,6 +357,9 @@
     <ClInclude Include="src\Platform\OpenGL\TextureUtils.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\Vulkan\VMA\vma.h">
+      <Filter>src\Platform\Vulkan\VMA</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\Vulkan\VulkanBuffer.h">
       <Filter>src\Platform\Vulkan</Filter>
     </ClInclude>
@@ -346,6 +370,12 @@
       <Filter>src\Platform\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Vulkan\VulkanHelpers.h">
+      <Filter>src\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\Vulkan\VulkanPipeline.h">
+      <Filter>src\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\Vulkan\VulkanRenderPass.h">
       <Filter>src\Platform\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Vulkan\VulkanRendererAPI.h">
@@ -378,14 +408,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Renderer\RenderPass.h" />
-    <ClInclude Include="src\Platform\Vulkan\VulkanRenderPass.h" />
-    <ClInclude Include="src\Kerberos\Renderer\Pipeline.h" />
-    <ClInclude Include="src\Platform\Vulkan\VulkanPipeline.h">
-      <Filter>src\Platform\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Kerberos\Core\Scoped.h" />
-    <ClInclude Include="src\Platform\Vulkan\VMA\vma.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -463,7 +485,13 @@
     <ClCompile Include="src\Kerberos\Renderer\OrthographicCamera.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Renderer\Pipeline.cpp">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\RenderCommand.cpp">
+      <Filter>src\Kerberos\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Renderer\RenderPass.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\Renderer.cpp">
@@ -510,6 +538,9 @@
     </ClCompile>
     <ClCompile Include="src\Kerberos\Scene\SceneSerializer.cpp">
       <Filter>src\Kerberos\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Scripting\ScriptEngine.cpp">
+      <Filter>src\Kerberos\Scripting</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\D3D11\D3D11Buffer.cpp">
       <Filter>src\Platform\D3D11</Filter>
@@ -562,6 +593,12 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\Vulkan\VMA\vma.cpp">
+      <Filter>src\Platform\Vulkan\VMA</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Vulkan\VMA\vma_mem_alloc.cpp">
+      <Filter>src\Platform\Vulkan\VMA</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\Vulkan\VulkanBuffer.cpp">
       <Filter>src\Platform\Vulkan</Filter>
     </ClCompile>
@@ -572,6 +609,12 @@
       <Filter>src\Platform\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\Vulkan\VulkanHelpers.cpp">
+      <Filter>src\Platform\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Vulkan\VulkanPipeline.cpp">
+      <Filter>src\Platform\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Vulkan\VulkanRenderPass.cpp">
       <Filter>src\Platform\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\Vulkan\VulkanRendererAPI.cpp">
@@ -607,11 +650,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Renderer\RenderPass.cpp" />
-    <ClCompile Include="src\Platform\Vulkan\VulkanRenderPass.cpp" />
-    <ClCompile Include="src\Kerberos\Renderer\Pipeline.cpp" />
-    <ClCompile Include="src\Platform\Vulkan\VulkanPipeline.cpp" />
-    <ClCompile Include="src\Platform\Vulkan\VMA\vma_mem_alloc.cpp" />
-    <ClCompile Include="src\Platform\Vulkan\VMA\vma.cpp" />
   </ItemGroup>
 </Project>

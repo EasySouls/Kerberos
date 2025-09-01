@@ -14,4 +14,7 @@ KerberosEditor/*.json
 # Log files
 KerberosEditor/*.log
 
+# KerberosScriptCoreLib intermediates
+KerberosEditor/Resources/Scripts/Intermediates
+
 scripts/__pycache__

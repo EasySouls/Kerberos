@@ -4,6 +4,7 @@
 #include "Events/KeyEvent.h"
 #include "Kerberos/Core.h"
 #include "Kerberos/Renderer/Renderer.h"
+#include "Kerberos/Scripting/ScriptEngine.h"
 
 #include <GLFW/glfw3.h>
 
@@ -39,9 +40,14 @@ namespace Kerberos
 		PushOverlay(m_ImGuiLayer);
 
 		Renderer::Init();
+		ScriptEngine::Init();
 	}
 
-	Application::~Application() = default;
+	Application::~Application() 
+	{
+		//Renderer::Shutdown();
+		ScriptEngine::Shutdown();
+	};
 
 	void Application::Run()
 	{
