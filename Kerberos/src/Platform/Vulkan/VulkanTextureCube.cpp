@@ -13,14 +13,15 @@
 namespace Kerberos
 {
 	VulkanTextureCube::VulkanTextureCube(const CubemapData& cubemapData) 
+		: m_Spec(cubemapData.Faces[0].Specification)
 	{
+		KBR_CORE_ASSERT(cubemapData.Faces.size() == 6, "Cubemap must have 6 faces!");
+
 		const auto& firstFace = cubemapData.Faces[0].Specification;
 		const uint32_t width = firstFace.Width;
 		const uint32_t height = firstFace.Height;
 		const ImageFormat format = firstFace.Format;
 
-		KBR_CORE_ASSERT(cubemapData.Faces.size() == 6, "Cubemap must have 6 faces!");
-		KBR_CORE_ASSERT(format != ImageFormat::None, "Cubemap faces must have a valid format!");
 
 		for (size_t i = 1; i < 6; ++i)
 		{
