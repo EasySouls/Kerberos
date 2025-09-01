@@ -1015,6 +1015,12 @@ namespace Kerberos
 		}
 	}
 
+	VkCommandBuffer VulkanContext::GetCurrentCommandBuffer() const 
+	{
+		KBR_CORE_ASSERT(m_CurrentFrame < m_CommandBuffers.size(), "Current frame index out of range");
+		return m_CommandBuffers[m_CurrentFrame];
+	}
+
 	VkCommandBuffer VulkanContext::GetOneTimeCommandBuffer() const 
 	{
 		VkCommandBufferAllocateInfo allocInfo{};

@@ -25,6 +25,6 @@ namespace Kerberos::vma
 			return {};
 		}
 		
-		return allocator;
+		return Allocator{ allocator };
 	}
 }
