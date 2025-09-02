@@ -223,7 +223,7 @@
     <ClInclude Include="src\Kerberos\Scene\SceneSerializer.h" />
     <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Kerberos\Scripting\ScriptEngine.h" />
-    <ClInclude Include="src\Kerberos\Scripting\ScriptEngine.hpp" />
+    <ClInclude Include="src\Kerberos\Scripting\ScriptInterface.h" />
     <ClInclude Include="src\Kerberos\Utils\PlatformUtils.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11Buffer.h" />
@@ -309,6 +309,7 @@
     <ClCompile Include="src\Kerberos\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Kerberos\Scene\SceneSerializer.cpp" />
     <ClCompile Include="src\Kerberos\Scripting\ScriptEngine.cpp" />
+    <ClCompile Include="src\Kerberos\Scripting\ScriptInterface.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11Buffer.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11Framebuffer.cpp" />

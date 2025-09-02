@@ -26,5 +26,8 @@ namespace Kerberos
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         extern static void CppFunc();
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern static void NativeLog(string message);
     }
 }

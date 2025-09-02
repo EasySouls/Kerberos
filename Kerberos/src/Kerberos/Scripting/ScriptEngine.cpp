@@ -40,12 +40,11 @@ namespace Kerberos
 		mono_add_internal_call("Kerberos.ScriptCoreLib::CppFunc", reinterpret_cast<const void*>(CppFunc));
 
 		MonoClass* klass = mono_class_from_name(s_Data->CoreAssemblyImage, "Kerberos", "ScriptCoreLib");
-		MonoObject* obj = mono_object_new(s_Data->AppDomain, klass);
-		mono_runtime_object_init(obj);
+		MonoObject* instance = InstantiateClass(klass);
 
 		{
 			MonoMethod* printCurrentTimeMethod = mono_class_get_method_from_name(klass, "PrintCurrentTime", 0);
-			mono_runtime_invoke(printCurrentTimeMethod, obj, nullptr, nullptr);
+			mono_runtime_invoke(printCurrentTimeMethod, instance, nullptr, nullptr);
 		}
 
 		{
@@ -53,7 +52,7 @@ namespace Kerberos
 			void* params[1]{
 				mono_string_new(s_Data->AppDomain, "Hello from C++!")
 			};
-			mono_runtime_invoke(printCustomMessageMethod, obj, params, nullptr);
+			mono_runtime_invoke(printCustomMessageMethod, instance, params, nullptr);
 		}
 	}
 
@@ -86,6 +85,14 @@ namespace Kerberos
 			mono_jit_cleanup(s_Data->RootDomain);
 			s_Data->RootDomain = nullptr;
 		}
+	}
+
+	MonoObject* ScriptEngine::InstantiateClass(MonoClass* klass) 
+	{
+		MonoObject* instance = mono_object_new(s_Data->AppDomain, klass);
+		mono_runtime_object_init(instance);
+
+		return instance;
 	}
 
 	void ScriptEngine::LoadAssembly(const std::filesystem::path& assemblyPath) 

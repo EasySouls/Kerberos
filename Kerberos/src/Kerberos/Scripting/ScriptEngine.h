@@ -21,6 +21,8 @@ namespace Kerberos
 		static void InitMono();
 		static void ShutdownMono();
 
+		static MonoObject* InstantiateClass(MonoClass* klass);
+
 		static void LoadAssembly(const std::filesystem::path& assemblyPath);
 		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath);
 		static void PrintAssemblyTypes(MonoAssembly* assembly);
