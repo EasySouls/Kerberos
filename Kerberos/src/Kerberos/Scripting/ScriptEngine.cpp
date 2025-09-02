@@ -35,6 +35,11 @@ namespace Kerberos
 		s_Data = nullptr;
 	}
 
+	static void CppFunc()
+	{
+		std::cout << "Hello from C++ function called by C#!\n";
+	}
+
 	void ScriptEngine::InitMono() 
 	{
 		mono_set_assemblies_path("mono/lib");
@@ -51,6 +56,8 @@ namespace Kerberos
 		s_Data->AppDomain = mono_domain_create_appdomain(const_cast<char*>("KerberosScriptRuntime"), nullptr);
 		mono_domain_set(s_Data->AppDomain, true);
 
+		mono_add_internal_call("Kerberos.ScriptCoreLib::CppFunc", static_cast<const void*>(CppFunc));
+
 		s_Data->CoreAssembly = LoadCSharpAssembly("Resources/Scripts/KerberosScriptCoreLib.dll");
 		PrintAssemblyTypes(s_Data->CoreAssembly);
 
@@ -60,8 +67,10 @@ namespace Kerberos
 		MonoObject* obj = mono_object_new(s_Data->AppDomain, klass);
 		mono_runtime_object_init(obj);
 
-		MonoMethod* printCurrentTimeMethod = mono_class_get_method_from_name(klass, "PrintCurrentTime", 0);
-		mono_runtime_invoke(printCurrentTimeMethod, obj, nullptr, nullptr);
+		{
+			MonoMethod* printCurrentTimeMethod = mono_class_get_method_from_name(klass, "PrintCurrentTime", 0);
+			mono_runtime_invoke(printCurrentTimeMethod, obj, nullptr, nullptr);
+		}
 		
 		{
 			MonoMethod* printCustomMessageMethod = mono_class_get_method_from_name(klass, "PrintCustomMessage", 1);
@@ -145,7 +154,7 @@ namespace Kerberos
 		stream.read(buffer, size);
 		stream.close();
 
-		*outSize = size;
+		*outSize = static_cast<uint32_t>(size);
 		return buffer;
 	}
 
