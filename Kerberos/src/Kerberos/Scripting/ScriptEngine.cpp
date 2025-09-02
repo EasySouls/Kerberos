@@ -1,12 +1,15 @@
 #include "kbrpch.h"
 #include "ScriptEngine.h"
 
+#include "Kerberos/Core/Filesystem.h"
+
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/image.h>
 #include <mono/metadata/object.h>
 
 #include <print>
+
 
 
 namespace Kerberos
@@ -17,14 +20,41 @@ namespace Kerberos
 		MonoDomain* AppDomain = nullptr;
 
 		MonoAssembly* CoreAssembly = nullptr;
+		MonoImage* CoreAssemblyImage = nullptr;
 	};
 
 	static ScriptEngineData* s_Data = nullptr;
 
+	static void CppFunc()
+	{
+		std::cout << "Hello from C++ function called by C#!\n";
+	}
+
 	void ScriptEngine::Init()
 	{
 		s_Data = new ScriptEngineData();
+
 		InitMono();
+		LoadAssembly("Resources/Scripts/KerberosScriptCoreLib.dll");
+
+		mono_add_internal_call("Kerberos.ScriptCoreLib::CppFunc", reinterpret_cast<const void*>(CppFunc));
+
+		MonoClass* klass = mono_class_from_name(s_Data->CoreAssemblyImage, "Kerberos", "ScriptCoreLib");
+		MonoObject* obj = mono_object_new(s_Data->AppDomain, klass);
+		mono_runtime_object_init(obj);
+
+		{
+			MonoMethod* printCurrentTimeMethod = mono_class_get_method_from_name(klass, "PrintCurrentTime", 0);
+			mono_runtime_invoke(printCurrentTimeMethod, obj, nullptr, nullptr);
+		}
+
+		{
+			MonoMethod* printCustomMessageMethod = mono_class_get_method_from_name(klass, "PrintCustomMessage", 1);
+			void* params[1]{
+				mono_string_new(s_Data->AppDomain, "Hello from C++!")
+			};
+			mono_runtime_invoke(printCustomMessageMethod, obj, params, nullptr);
+		}
 	}
 
 	void ScriptEngine::Shutdown()
@@ -33,11 +63,6 @@ namespace Kerberos
 
 		delete s_Data;
 		s_Data = nullptr;
-	}
-
-	static void CppFunc()
-	{
-		std::cout << "Hello from C++ function called by C#!\n";
 	}
 
 	void ScriptEngine::InitMono() 
@@ -52,33 +77,6 @@ namespace Kerberos
 		}
 
 		s_Data->RootDomain = rootDomain;
-
-		s_Data->AppDomain = mono_domain_create_appdomain(const_cast<char*>("KerberosScriptRuntime"), nullptr);
-		mono_domain_set(s_Data->AppDomain, true);
-
-		mono_add_internal_call("Kerberos.ScriptCoreLib::CppFunc", static_cast<const void*>(CppFunc));
-
-		s_Data->CoreAssembly = LoadCSharpAssembly("Resources/Scripts/KerberosScriptCoreLib.dll");
-		PrintAssemblyTypes(s_Data->CoreAssembly);
-
-
-		MonoImage* image = mono_assembly_get_image(s_Data->CoreAssembly);
-		MonoClass* klass = mono_class_from_name(image, "Kerberos", "ScriptCoreLib");
-		MonoObject* obj = mono_object_new(s_Data->AppDomain, klass);
-		mono_runtime_object_init(obj);
-
-		{
-			MonoMethod* printCurrentTimeMethod = mono_class_get_method_from_name(klass, "PrintCurrentTime", 0);
-			mono_runtime_invoke(printCurrentTimeMethod, obj, nullptr, nullptr);
-		}
-		
-		{
-			MonoMethod* printCustomMessageMethod = mono_class_get_method_from_name(klass, "PrintCustomMessage", 1);
-			void* params[1] {
-				mono_string_new(s_Data->AppDomain, "Hello from C++!")
-			};
-			mono_runtime_invoke(printCustomMessageMethod, obj, params, nullptr);
-		}
 	}
 
 	void ScriptEngine::ShutdownMono() 
@@ -90,10 +88,21 @@ namespace Kerberos
 		}
 	}
 
-	MonoAssembly* ScriptEngine::LoadCSharpAssembly(const std::string& assemblyPath)
+	void ScriptEngine::LoadAssembly(const std::filesystem::path& assemblyPath) 
+	{
+		s_Data->AppDomain = mono_domain_create_appdomain(const_cast<char*>("KerberosScriptRuntime"), nullptr);
+		mono_domain_set(s_Data->AppDomain, true);
+
+		s_Data->CoreAssembly = LoadMonoAssembly(assemblyPath);
+		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
+
+		PrintAssemblyTypes(s_Data->CoreAssembly);
+	}
+
+	MonoAssembly* ScriptEngine::LoadMonoAssembly(const std::filesystem::path& assemblyPath) 
 	{
 		uint32_t fileSize = 0;
-		char* fileData = ReadBytes(assemblyPath, &fileSize);
+		char* fileData = Filesystem::ReadBytes(assemblyPath, &fileSize);
 
 		/// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
 		MonoImageOpenStatus status;
@@ -106,7 +115,7 @@ namespace Kerberos
 			return nullptr;
 		}
 
-		MonoAssembly* assembly = mono_assembly_load_from_full(image, assemblyPath.c_str(), &status, 0);
+		MonoAssembly* assembly = mono_assembly_load_from_full(image, assemblyPath.string().c_str(), &status, 0);
 		mono_image_close(image);
 
 		delete[] fileData;
@@ -130,32 +139,6 @@ namespace Kerberos
 
 			std::println("{}.{}", nameSpace, name);
 		}
-	}
-
-	char* ScriptEngine::ReadBytes(const std::string& filepath, uint32_t* outSize)
-	{
-		std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
-
-		if (!stream)
-		{
-			return nullptr;
-		}
-
-		const std::streampos end = stream.tellg();
-		stream.seekg(0, std::ios::beg);
-		const std::streamoff size = end - stream.tellg();
-
-		if (size == 0)
-		{
-			return nullptr;
-		}
-
-		char* buffer = new char[size];
-		stream.read(buffer, size);
-		stream.close();
-
-		*outSize = static_cast<uint32_t>(size);
-		return buffer;
 	}
 
 }
