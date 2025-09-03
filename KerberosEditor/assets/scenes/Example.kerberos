@@ -1,70 +1,32 @@
 Scene: Unnamed Scene
 Entities:
-  - Entity: 367835149087135195
+  - Entity: 6478274752702688078
     TagComponent:
-      Tag: Square
+      Tag: Camera
     TransformComponent:
-      Translation: [0, 0, 0]
+      Translation: [0, 0, 5]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.2, 0.3, 0.8, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.7853982
+        PerspectiveNear: 0.01
+        PerspectiveFar: 100
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      IsPrimary: true
+      FixedAspectRatio: false
     HierarchyComponent:
       Parent: 0
       Children:
         []
-  - Entity: 11890686740412182855
+    ScriptComponent:
+      ClassName: Kerberos.Player
+  - Entity: 14343862585645102703
     TagComponent:
-      Tag: Cube
-    TransformComponent:
-      Translation: [-2, 2, -2]
-      Rotation: [20, 10, 86]
-      Scale: [1, 1, 1]
-    HierarchyComponent:
-      Parent: 0
-      Children:
-        []
-    RigidBody3DComponent:
-      Mass: 1
-      Type: 1
-      Velocity: [0, 0, 0]
-      AngularVelocity: [0, 0, 0]
-      UseGravity: true
-      Friction: 0.5
-      Restitution: 0.5
-    BoxCollider3DComponent:
-      Size: [1, 1, 1]
-      Offset: [0, 0, 0]
-    StaticMeshComponent:
-      Mesh: 17235766386814756524
-      Material:
-        Ambient: [0.1, 0.1, 0.1]
-        Diffuse: [1, 1, 1]
-        Specular: [0.1, 0.1, 0.1]
-        Shininess: 10
-      Texture: 4851784203174410810
-  - Entity: 11117842162214646657
-    TagComponent:
-      Tag: Sphere
-    TransformComponent:
-      Translation: [2, 1.2, -2]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    HierarchyComponent:
-      Parent: 0
-      Children:
-        []
-    StaticMeshComponent:
-      Mesh: 12370507570964552446
-      Material:
-        Ambient: [0.1, 0.1, 0.1]
-        Diffuse: [1, 1, 1]
-        Specular: [0.1, 0.1, 0.1]
-        Shininess: 10
-      Texture: 664406726921668484
-  - Entity: 15195257989876009334
-    TagComponent:
-      Tag: Backpack
+      Tag: Point Light
     TransformComponent:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
@@ -73,14 +35,42 @@ Entities:
       Parent: 0
       Children:
         []
-    StaticMeshComponent:
-      Mesh: 792555746016710845
-      Material:
-        Ambient: [0.1, 0.1, 0.1]
-        Diffuse: [1, 1, 1]
-        Specular: [0.1, 0.1, 0.1]
-        Shininess: 10
-      Texture: 8187673179035048105
+    PointLightComponent:
+      Color: [0.8, 0.2, 0.2]
+      Position: [0.9, 4.1, 3.9]
+      Intensity: 1
+      Constant: 1
+      Linear: 0.09
+      Quadratic: 0.032
+  - Entity: 1571696977287924202
+    TagComponent:
+      Tag: Sun
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+    DirectionalLightComponent:
+      Color: [1, 1, 0.8]
+      Direction: [123, -230, 130]
+      Intensity: 1
+  - Entity: 16018021014797836393
+    TagComponent:
+      Tag: Environment
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    HierarchyComponent:
+      Parent: 0
+      Children:
+        []
+    EnvironmentComponent:
+      SkyboxTexture: 1482023877409938326
+      IsSkyboxEnabled: true
   - Entity: 12382899318910796128
     TagComponent:
       Tag: Ground
@@ -111,9 +101,9 @@ Entities:
         Specular: [0.1, 0.1, 0.1]
         Shininess: 10
       Texture: 0
-  - Entity: 16018021014797836393
+  - Entity: 15195257989876009334
     TagComponent:
-      Tag: Environment
+      Tag: Backpack
     TransformComponent:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
@@ -122,60 +112,72 @@ Entities:
       Parent: 0
       Children:
         []
-    EnvironmentComponent:
-      SkyboxTexture: 1482023877409938326
-      IsSkyboxEnabled: true
-  - Entity: 1571696977287924202
+    StaticMeshComponent:
+      Mesh: 792555746016710845
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 8187673179035048105
+  - Entity: 11117842162214646657
     TagComponent:
-      Tag: Sun
+      Tag: Sphere
     TransformComponent:
-      Translation: [0, 0, 0]
+      Translation: [2, 1.2, -2]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     HierarchyComponent:
       Parent: 0
       Children:
         []
-    DirectionalLightComponent:
-      Color: [1, 1, 0.8]
-      Direction: [123, -230, 130]
-      Intensity: 1
-  - Entity: 14343862585645102703
+    StaticMeshComponent:
+      Mesh: 12370507570964552446
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 664406726921668484
+  - Entity: 11890686740412182855
     TagComponent:
-      Tag: Point Light
+      Tag: Cube
     TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
+      Translation: [-2, 2, -2]
+      Rotation: [20, 10, 86]
       Scale: [1, 1, 1]
     HierarchyComponent:
       Parent: 0
       Children:
         []
-    PointLightComponent:
-      Color: [0.8, 0.2, 0.2]
-      Position: [0.9, 4.1, 3.9]
-      Intensity: 1
-      Constant: 1
-      Linear: 0.09
-      Quadratic: 0.032
-  - Entity: 6478274752702688078
+    RigidBody3DComponent:
+      Mass: 1
+      Type: 1
+      Velocity: [0, 0, 0]
+      AngularVelocity: [0, 0, 0]
+      UseGravity: true
+      Friction: 0.5
+      Restitution: 0.5
+    BoxCollider3DComponent:
+      Size: [1, 1, 1]
+      Offset: [0, 0, 0]
+    StaticMeshComponent:
+      Mesh: 17235766386814756524
+      Material:
+        Ambient: [0.1, 0.1, 0.1]
+        Diffuse: [1, 1, 1]
+        Specular: [0.1, 0.1, 0.1]
+        Shininess: 10
+      Texture: 4851784203174410810
+  - Entity: 367835149087135195
     TagComponent:
-      Tag: Camera
+      Tag: Square
     TransformComponent:
-      Translation: [0, 0, 5]
+      Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    CameraComponent:
-      Camera:
-        ProjectionType: 0
-        PerspectiveFOV: 0.7853982
-        PerspectiveNear: 0.01
-        PerspectiveFar: 100
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
-      IsPrimary: true
-      FixedAspectRatio: false
+    SpriteRendererComponent:
+      Color: [0.2, 0.3, 0.8, 1]
     HierarchyComponent:
       Parent: 0
       Children:

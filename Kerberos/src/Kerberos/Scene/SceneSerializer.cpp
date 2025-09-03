@@ -155,6 +155,15 @@ namespace Kerberos
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<ScriptComponent>())
+		{
+			out << YAML::Key << "ScriptComponent";
+			out << YAML::BeginMap;
+			const auto& script = entity.GetComponent<ScriptComponent>();
+			out << YAML::Key << "ClassName" << YAML::Value << script.Name;
+			out << YAML::EndMap;
+		}
+
 		if (entity.HasComponent<NativeScriptComponent>())
 		{
 
@@ -423,6 +432,12 @@ namespace Kerberos
 						const uint64_t childUUID = child.as<uint64_t>();
 						hierarchy.Children.emplace_back(childUUID);
 					}
+				}
+
+				if (auto scriptComponent = entity["ScriptComponent"])
+				{
+					auto& script = deserializedEntity.AddComponent<ScriptComponent>();
+					script.Name = scriptComponent["ClassName"].as<std::string>();
 				}
 
 				if (auto nativeScriptComponent = entity["NativeScriptComponent"])

@@ -1,17 +1,19 @@
 #include "HierarchyPanel.h"
+
+import Components.PhysicsComponents;
+
 #include "Kerberos/Scene/Components.h"
 #include "Kerberos/Assets/AssetManager.h"
+#include "Kerberos/Core/Input.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"
+#include "Kerberos/Events/KeyEvent.h"
+#include "Kerberos/Scripting/ScriptEngine.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui/imgui.h>
 #include "imgui/imgui_internal.h"
+
 #include <filesystem>
-
-#include "Kerberos/Core/Input.h"
-#include "Kerberos/Events/KeyEvent.h"
-
-import Components.PhysicsComponents;
 
 namespace Kerberos
 {
@@ -183,6 +185,12 @@ namespace Kerberos
 			if (ImGui::MenuItem("Camera"))
 			{
 				entity.AddComponent<CameraComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Script"))
+			{
+				entity.AddComponent<ScriptComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -522,6 +530,70 @@ namespace Kerberos
 				entity.RemoveComponent<CameraComponent>();
 			}
 		}
+
+		if (entity.HasComponent<ScriptComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(ScriptComponent).hash_code()), treeNodeFlags, "Script");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Script Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			if (opened)
+			{
+				auto& component = entity.GetComponent<ScriptComponent>();
+
+				bool scriptClassExists = false;
+				const auto& entityClasses = ScriptEngine::GetEntityClasses();
+
+				if (entityClasses.contains(component.Name))
+				{
+					scriptClassExists = true;
+				}
+				
+				static char buffer[64];
+				strcpy_s(buffer, component.Name.c_str());
+
+				if (!scriptClassExists)
+				{
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
+				}
+
+				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+				{
+					component.Name = buffer;
+				}
+
+				if (!scriptClassExists)
+				{
+					ImGui::PopStyleColor();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<ScriptComponent>();
+			}
+		}
+
 		if (entity.HasComponent<SpriteRendererComponent>())
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));

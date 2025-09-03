@@ -737,7 +737,7 @@ namespace Kerberos
 	template <typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{
-		static_assert(false, "No template specialization found for this type");
+		static_assert(sizeof(T) == 0, "No template specialization found for this type");
 	}
 
 	template <>
@@ -760,6 +760,10 @@ namespace Kerberos
 
 	template <>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{}
+
+	template <>
+	void Scene::OnComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component)
 	{}
 
 	template <>

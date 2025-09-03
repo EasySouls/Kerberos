@@ -9,10 +9,6 @@
 #include <mono/metadata/image.h>
 #include <mono/metadata/object.h>
 
-#include <unordered_map>
-
-
-
 namespace Kerberos
 {
 	ScriptClass::ScriptClass(MonoImage* image, std::string classNamespace, std::string className)
@@ -127,6 +123,11 @@ namespace Kerberos
 
 		delete s_Data;
 		s_Data = nullptr;
+	}
+
+	const std::unordered_map<std::string, Ref<ScriptClass>>& ScriptEngine::GetEntityClasses() 
+	{
+		return s_Data->EntityClasses;
 	}
 
 	void ScriptEngine::InitMono() 

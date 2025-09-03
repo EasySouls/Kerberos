@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <unordered_map>
 
 extern "C" {
 	typedef struct _MonoAssembly	MonoAssembly;
@@ -53,6 +54,8 @@ namespace Kerberos
 	public:
 		static void Init();
 		static void Shutdown();
+
+		static const std::unordered_map <std::string, Ref<ScriptClass>>& GetEntityClasses();
 
 	private:
 		static void InitMono();

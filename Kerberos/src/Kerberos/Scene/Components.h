@@ -132,6 +132,14 @@ namespace Kerberos
 		~CameraComponent() = default;
 	};
 
+	struct ScriptComponent
+	{
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent&) = default;
+
+		std::string Name;
+	};
+
 	struct NativeScriptComponent
 	{
 		ScriptableEntity* Instance = nullptr;
