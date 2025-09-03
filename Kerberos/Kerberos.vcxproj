@@ -371,6 +371,9 @@
     <ProjectReference Include="vendor\JoltPhysics\JoltPhysics.vcxproj">
       <Project>{812AB974-EDDF-316A-76D4-2B41E288286E}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\KerberosScriptCoreLib\KerberosScriptCoreLib.csproj">
+      <Project>{D7EC7043-4359-2C3E-0C4D-C49B78784EA6}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

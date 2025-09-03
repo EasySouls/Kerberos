@@ -1,6 +1,7 @@
 #include "kbrpch.h"
 #include "ScriptEngine.h"
 
+#include "Kerberos/Scripting/ScriptInterface.h"
 #include "Kerberos/Core/Filesystem.h"
 
 #include <mono/jit/jit.h>
@@ -8,12 +9,67 @@
 #include <mono/metadata/image.h>
 #include <mono/metadata/object.h>
 
-#include <print>
+#include <unordered_map>
 
 
 
 namespace Kerberos
 {
+	ScriptClass::ScriptClass(MonoImage* image, std::string classNamespace, std::string className)
+		: m_ClassNamespace(std::move(classNamespace)), m_ClassName(std::move(className))
+	{
+		m_MonoClass = mono_class_from_name(image, m_ClassNamespace.c_str(), m_ClassName.c_str());
+		KBR_CORE_ASSERT(m_MonoClass, "Failed to find class {0}.{1}", m_ClassNamespace, m_ClassName);
+	}
+
+	MonoObject* ScriptClass::Instantiate() const
+	{
+		return ScriptEngine::InstantiateClass(m_MonoClass);
+	}
+
+	MonoMethod* ScriptClass::GetMethod(const std::string& name, const int paramCount) const 
+	{
+		MonoMethod* method = mono_class_get_method_from_name(m_MonoClass, name.c_str(), paramCount);
+		KBR_CORE_ASSERT(method, "Failed to find method {0} in class {1}.{2}", name, m_ClassNamespace, m_ClassName);
+		return method;
+	}
+
+	MonoObject* ScriptClass::InvokeMethod(MonoMethod* method, MonoObject* instance, void** params) const 
+	{
+		MonoObject* exception = nullptr;
+		MonoObject* result = mono_runtime_invoke(method, instance, params, &exception);
+		if (exception)
+		{
+			MonoString* exceptionMessage = mono_object_to_string(exception, nullptr);
+			char* exceptionCStr = mono_string_to_utf8(exceptionMessage);
+			std::string exceptionStr(exceptionCStr);
+			mono_free(exceptionCStr);
+			KBR_CORE_ERROR("Exception thrown when invoking method {0} in class {1}.{2}: {3}", mono_method_get_name(method), m_ClassNamespace, m_ClassName, exceptionStr);
+		}
+		return result;
+	}
+
+	ScriptInstance::ScriptInstance(const Ref<ScriptClass>& scriptClass)
+		: m_ScriptClass(scriptClass)
+	{
+		m_Instance = m_ScriptClass->Instantiate();
+
+		m_OnCreateMethod = m_ScriptClass->GetMethod("OnCreate", 0);
+		m_OnUpdateMethod = m_ScriptClass->GetMethod("OnUpdate", 1);
+	}
+
+
+	void ScriptInstance::InvokeOnCreate() const 
+	{
+		m_ScriptClass->InvokeMethod(m_OnCreateMethod, m_Instance);
+	}
+
+	void ScriptInstance::InvokeOnUpdate(float deltaTime) const
+	{
+		void* params = &deltaTime;
+		m_ScriptClass->InvokeMethod(m_OnUpdateMethod, m_Instance, &params);
+	}
+
 	struct ScriptEngineData
 	{
 		MonoDomain* RootDomain = nullptr;
@@ -21,6 +77,10 @@ namespace Kerberos
 
 		MonoAssembly* CoreAssembly = nullptr;
 		MonoImage* CoreAssemblyImage = nullptr;
+
+		ScriptClass EntityClass;
+
+		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
 	};
 
 	static ScriptEngineData* s_Data = nullptr;
@@ -36,23 +96,28 @@ namespace Kerberos
 
 		InitMono();
 		LoadAssembly("Resources/Scripts/KerberosScriptCoreLib.dll");
+		LoadAssemblyClasses(s_Data->CoreAssembly, s_Data->CoreAssemblyImage);
+		auto& classes = s_Data->EntityClasses;
+
+		ScriptInterface::RegisterComponentTypes();
+		ScriptInterface::RegisterFunctions();
 
 		mono_add_internal_call("Kerberos.ScriptCoreLib::CppFunc", reinterpret_cast<const void*>(CppFunc));
 
-		MonoClass* klass = mono_class_from_name(s_Data->CoreAssemblyImage, "Kerberos", "ScriptCoreLib");
-		MonoObject* instance = InstantiateClass(klass);
+		s_Data->EntityClass = ScriptClass(s_Data->CoreAssemblyImage, "Kerberos", "ScriptCoreLib");
+		MonoObject* instance = s_Data->EntityClass.Instantiate();
 
 		{
-			MonoMethod* printCurrentTimeMethod = mono_class_get_method_from_name(klass, "PrintCurrentTime", 0);
-			mono_runtime_invoke(printCurrentTimeMethod, instance, nullptr, nullptr);
+			MonoMethod* printCurrentTimeMethod = s_Data->EntityClass.GetMethod("PrintCurrentTime", 0);
+			s_Data->EntityClass.InvokeMethod(printCurrentTimeMethod, instance, nullptr);
 		}
 
 		{
-			MonoMethod* printCustomMessageMethod = mono_class_get_method_from_name(klass, "PrintCustomMessage", 1);
+			MonoMethod* printCustomMessageMethod = s_Data->EntityClass.GetMethod("PrintCustomMessage", 1);
 			void* params[1]{
 				mono_string_new(s_Data->AppDomain, "Hello from C++!")
 			};
-			mono_runtime_invoke(printCustomMessageMethod, instance, params, nullptr);
+			s_Data->EntityClass.InvokeMethod(printCustomMessageMethod, instance, params);
 		}
 	}
 
@@ -102,8 +167,6 @@ namespace Kerberos
 
 		s_Data->CoreAssembly = LoadMonoAssembly(assemblyPath);
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
-
-		PrintAssemblyTypes(s_Data->CoreAssembly);
 	}
 
 	MonoAssembly* ScriptEngine::LoadMonoAssembly(const std::filesystem::path& assemblyPath) 
@@ -130,11 +193,15 @@ namespace Kerberos
 		return assembly;
 	}
 
-	void ScriptEngine::PrintAssemblyTypes(MonoAssembly* assembly)
+	void ScriptEngine::LoadAssemblyClasses(const MonoAssembly* assembly, MonoImage* image)
 	{
-		MonoImage* image = mono_assembly_get_image(assembly);
+		KBR_CORE_ASSERT(assembly, "Assembly is null!");
+		KBR_CORE_ASSERT(image, "Image is null!");
+
 		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
 		const int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
+
+		MonoClass* entityClass = mono_class_from_name(image, "Kerberos", "Entity");
 
 		for (int32_t i = 0; i < numTypes; i++)
 		{
@@ -143,8 +210,24 @@ namespace Kerberos
 
 			const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
 			const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
+			const std::string fullname = fmt::format("{}.{}", nameSpace, name);
 
-			std::println("{}.{}", nameSpace, name);
+			KBR_CORE_INFO("Loaded C# class: {}.{}", nameSpace, name);
+
+			if (strcmp(name, "<Module>") == 0)
+				continue;
+
+			MonoClass* klass = mono_class_from_name(image, nameSpace, name);
+
+			if (entityClass == klass)
+				continue;
+
+			/// If the class is a subclass of Entity, store it in the entities map
+			if (mono_class_is_subclass_of(klass, entityClass, false))
+			{
+				s_Data->EntityClasses[fullname] = CreateRef<ScriptClass>(image, nameSpace, name);
+			}
+
 		}
 	}
 

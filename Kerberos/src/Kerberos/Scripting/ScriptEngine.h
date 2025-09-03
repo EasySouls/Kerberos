@@ -7,10 +7,47 @@ extern "C" {
 	typedef struct _MonoClass		MonoClass;
 	typedef struct _MonoObject		MonoObject;
 	typedef struct _MonoMethod		MonoMethod;
+	typedef struct _MonoDomain		MonoDomain;
+	typedef struct _MonoImage		MonoImage;
 }
+
 
 namespace Kerberos
 {
+	class ScriptClass
+	{
+	public:
+		ScriptClass() = default;
+		ScriptClass(MonoImage* image, std::string classNamespace, std::string className);
+
+		MonoObject* Instantiate() const;
+
+		MonoMethod* GetMethod(const std::string& name, int paramCount) const;
+		MonoObject* InvokeMethod(MonoMethod* method, MonoObject* instance, void** params = nullptr) const;
+
+	private:
+		std::string m_ClassNamespace;
+		std::string m_ClassName;
+
+		MonoClass* m_MonoClass = nullptr;
+	};
+
+	class ScriptInstance
+	{
+	public:
+		explicit ScriptInstance(const Ref<ScriptClass>& scriptClass);
+
+		void InvokeOnCreate() const;
+		void InvokeOnUpdate(float deltaTime) const;
+
+	private:
+		Ref<ScriptClass> m_ScriptClass = nullptr;
+
+		MonoObject* m_Instance = nullptr;
+		MonoMethod* m_OnCreateMethod = nullptr;
+		MonoMethod* m_OnUpdateMethod = nullptr;
+	};
+
 	class ScriptEngine
 	{
 	public:
@@ -25,6 +62,8 @@ namespace Kerberos
 
 		static void LoadAssembly(const std::filesystem::path& assemblyPath);
 		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath);
-		static void PrintAssemblyTypes(MonoAssembly* assembly);
+		static void LoadAssemblyClasses(const MonoAssembly* assembly, MonoImage* image);
+
+		friend class ScriptClass;
 	};
 }

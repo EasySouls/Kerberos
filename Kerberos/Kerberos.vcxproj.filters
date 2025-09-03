@@ -123,6 +123,9 @@
     <ClInclude Include="src\Kerberos\Core\Buffer.h">
       <Filter>src\Kerberos\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Core\Filesystem.h">
+      <Filter>src\Kerberos\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Core\Input.h">
       <Filter>src\Kerberos\Core</Filter>
     </ClInclude>
@@ -291,6 +294,9 @@
     <ClInclude Include="src\Kerberos\Scripting\ScriptEngine.h">
       <Filter>src\Kerberos\Scripting</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Scripting\ScriptInterface.h">
+      <Filter>src\Kerberos\Scripting</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Utils\PlatformUtils.h">
       <Filter>src\Kerberos\Utils</Filter>
     </ClInclude>
@@ -405,8 +411,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Core\Filesystem.h" />
-    <ClInclude Include="src\Kerberos\Scripting\ScriptInterface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -438,6 +442,9 @@
     </ClCompile>
     <ClCompile Include="src\Kerberos\Assets\RuntimeAssetManager.cpp">
       <Filter>src\Kerberos\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Core\Filesystem.cpp">
+      <Filter>src\Kerberos\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Core\UUID.cpp">
       <Filter>src\Kerberos\Core</Filter>
@@ -539,6 +546,9 @@
       <Filter>src\Kerberos\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Scripting\ScriptEngine.cpp">
+      <Filter>src\Kerberos\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Scripting\ScriptInterface.cpp">
       <Filter>src\Kerberos\Scripting</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\D3D11\D3D11Buffer.cpp">
@@ -649,7 +659,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Core\Filesystem.cpp" />
-    <ClCompile Include="src\Kerberos\Scripting\ScriptInterface.cpp" />
   </ItemGroup>
 </Project>

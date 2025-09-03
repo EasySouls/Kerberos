@@ -176,6 +176,8 @@ project "Kerberos"
 		"Assimp",
 		"JoltPhysics",
 
+		"KerberosScriptCoreLib",
+
 		"opengl32.lib",
 		Library.Vulkan,
 		Library.Mono,
