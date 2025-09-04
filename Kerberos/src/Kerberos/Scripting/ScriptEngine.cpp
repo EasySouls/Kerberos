@@ -3,11 +3,15 @@
 
 #include "Kerberos/Scripting/ScriptInterface.h"
 #include "Kerberos/Core/Filesystem.h"
+#include "Kerberos/Scene/Scene.h"
+#include "Kerberos/Scene/Entity.h"
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/image.h>
 #include <mono/metadata/object.h>
+
+#include <memory>
 
 namespace Kerberos
 {
@@ -77,6 +81,11 @@ namespace Kerberos
 		ScriptClass EntityClass;
 
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
+
+		/// Runtime data
+
+		std::weak_ptr<Scene> SceneContext;
+		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 	};
 
 	static ScriptEngineData* s_Data = nullptr;
@@ -123,6 +132,38 @@ namespace Kerberos
 
 		delete s_Data;
 		s_Data = nullptr;
+	}
+
+	void ScriptEngine::OnRuntimeStart(const Ref<Scene>& scene)
+	{
+		s_Data->SceneContext = scene;
+	}
+
+	void ScriptEngine::OnRuntimeStop() 
+	{
+		s_Data->SceneContext.reset();
+		s_Data->EntityInstances.clear();
+	}
+
+	void ScriptEngine::OnCreateEntity(const Entity entity) 
+	{
+		auto& scriptComponent = entity.GetComponent<ScriptComponent>();
+		
+		if (!ClassExists(scriptComponent.ClassName))
+		{
+			KBR_CORE_ERROR("Script class '{0}' does not exist!", scriptComponent.ClassName);
+			return;
+		}
+
+		Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[scriptComponent.ClassName]);
+		s_Data->EntityInstances[entity.GetUUID()] = instance;
+
+		instance->InvokeOnCreate();
+	}
+
+	bool ScriptEngine::ClassExists(const std::string& className) 
+	{
+		return s_Data->EntityClasses.contains(className);
 	}
 
 	const std::unordered_map<std::string, Ref<ScriptClass>>& ScriptEngine::GetEntityClasses() 

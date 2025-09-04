@@ -562,13 +562,13 @@ namespace Kerberos
 				bool scriptClassExists = false;
 				const auto& entityClasses = ScriptEngine::GetEntityClasses();
 
-				if (entityClasses.contains(component.Name))
+				if (entityClasses.contains(component.ClassName))
 				{
 					scriptClassExists = true;
 				}
 				
 				static char buffer[64];
-				strcpy_s(buffer, component.Name.c_str());
+				strcpy_s(buffer, component.ClassName.c_str());
 
 				if (!scriptClassExists)
 				{
@@ -577,7 +577,7 @@ namespace Kerberos
 
 				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
 				{
-					component.Name = buffer;
+					component.ClassName = buffer;
 				}
 
 				if (!scriptClassExists)

@@ -12,9 +12,12 @@ extern "C" {
 	typedef struct _MonoImage		MonoImage;
 }
 
+namespace Kerberos { class Scene; }
+namespace Kerberos { class Entity; }
 
 namespace Kerberos
 {
+
 	class ScriptClass
 	{
 	public:
@@ -55,6 +58,12 @@ namespace Kerberos
 		static void Init();
 		static void Shutdown();
 
+		static void OnRuntimeStart(const Ref<Scene>& scene);
+		static void OnRuntimeStop();
+
+		static void OnCreateEntity(Entity entity);
+
+		static bool ClassExists(const std::string& className);
 		static const std::unordered_map <std::string, Ref<ScriptClass>>& GetEntityClasses();
 
 	private:

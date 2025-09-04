@@ -15,6 +15,7 @@ import Components.PhysicsComponents;
 
 #include "Kerberos/Assets/AssetManager.h"
 #include "Kerberos/Renderer/RenderCommand.h"
+#include "Kerberos/Scripting/ScriptEngine.h"
 
 #define USE_MAP_FOR_UUID 1
 
@@ -56,11 +57,22 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		m_PhysicsSystem.Initialize(shared_from_this());
+
+		ScriptEngine::OnRuntimeStart(shared_from_this());
+
+		/// Instantiate all scripts
+
+		m_Registry.view<ScriptComponent>().each([this](auto enttId, ScriptComponent& script) {
+			Entity entity{ enttId, this };
+			ScriptEngine::OnCreateEntity(entity);
+		});
 	}
 
 	void Scene::OnRuntimeStop()
 	{
 		m_PhysicsSystem.Cleanup();
+
+		ScriptEngine::OnRuntimeStop();
 	}
 
 	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera)
@@ -404,6 +416,10 @@ namespace Kerberos
 				auto& cameraComp = sourceRegistry.get<CameraComponent>(entity);
 				newEntity.AddComponent<CameraComponent>(cameraComp);
 				newEntity.GetComponent<CameraComponent>().Camera.SetViewportSize(newScene->m_ViewportWidth, newScene->m_ViewportHeight);
+			}
+			if (sourceRegistry.all_of<ScriptComponent>(entity))
+			{
+				newEntity.AddComponent<ScriptComponent>(sourceRegistry.get<ScriptComponent>(entity));
 			}
 			if (sourceRegistry.all_of<NativeScriptComponent>(entity))
 			{

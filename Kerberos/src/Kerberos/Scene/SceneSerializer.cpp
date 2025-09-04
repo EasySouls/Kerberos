@@ -160,7 +160,7 @@ namespace Kerberos
 			out << YAML::Key << "ScriptComponent";
 			out << YAML::BeginMap;
 			const auto& script = entity.GetComponent<ScriptComponent>();
-			out << YAML::Key << "ClassName" << YAML::Value << script.Name;
+			out << YAML::Key << "ClassName" << YAML::Value << script.ClassName;
 			out << YAML::EndMap;
 		}
 
@@ -437,7 +437,7 @@ namespace Kerberos
 				if (auto scriptComponent = entity["ScriptComponent"])
 				{
 					auto& script = deserializedEntity.AddComponent<ScriptComponent>();
-					script.Name = scriptComponent["ClassName"].as<std::string>();
+					script.ClassName = scriptComponent["ClassName"].as<std::string>();
 				}
 
 				if (auto nativeScriptComponent = entity["NativeScriptComponent"])

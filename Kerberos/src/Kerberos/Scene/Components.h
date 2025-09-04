@@ -137,7 +137,7 @@ namespace Kerberos
 		ScriptComponent() = default;
 		ScriptComponent(const ScriptComponent&) = default;
 
-		std::string Name;
+		std::string ClassName;
 	};
 
 	struct NativeScriptComponent
