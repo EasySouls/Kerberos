@@ -10,8 +10,7 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/image.h>
 #include <mono/metadata/object.h>
-
-#include <memory>
+#include <mono/metadata/class.h>
 
 namespace Kerberos
 {
@@ -49,13 +48,18 @@ namespace Kerberos
 		return result;
 	}
 
-	ScriptInstance::ScriptInstance(const Ref<ScriptClass>& scriptClass)
-		: m_ScriptClass(scriptClass)
+	ScriptInstance::ScriptInstance(const Ref<ScriptClass>& scriptClass, const Entity entity)
+		: m_Entity(entity), m_ScriptClass(scriptClass)
 	{
 		m_Instance = m_ScriptClass->Instantiate();
 
 		m_OnCreateMethod = m_ScriptClass->GetMethod("OnCreate", 0);
 		m_OnUpdateMethod = m_ScriptClass->GetMethod("OnUpdate", 1);
+		m_Constructor = m_ScriptClass->GetMethod(".ctor", 1);
+
+		UUID entityID = m_Entity.GetUUID();
+		void* params[1] = { &entityID };
+		m_ScriptClass->InvokeMethod(m_Constructor, m_Instance, params);
 	}
 
 
@@ -155,10 +159,19 @@ namespace Kerberos
 			return;
 		}
 
-		Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[scriptComponent.ClassName]);
-		s_Data->EntityInstances[entity.GetUUID()] = instance;
+		const Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[scriptComponent.ClassName], entity);
+		const UUID entityID = entity.GetUUID();
+		s_Data->EntityInstances[entityID] = instance;
 
 		instance->InvokeOnCreate();
+	}
+
+	void ScriptEngine::OnUpdateEntity(const Entity entity, const float deltaTime)
+	{
+		KBR_CORE_ASSERT(entity.HasComponent<ScriptComponent>(), "Entity does not have a ScriptComponent!");
+		KBR_CORE_ASSERT(s_Data->EntityInstances.contains(entity.GetUUID()), "No script instance found for entity!");
+
+		s_Data->EntityInstances[entity.GetUUID()]->InvokeOnUpdate(deltaTime);
 	}
 
 	bool ScriptEngine::ClassExists(const std::string& className) 
@@ -169,6 +182,11 @@ namespace Kerberos
 	const std::unordered_map<std::string, Ref<ScriptClass>>& ScriptEngine::GetEntityClasses() 
 	{
 		return s_Data->EntityClasses;
+	}
+
+	std::weak_ptr<Scene> ScriptEngine::GetSceneContext()
+	{
+		return s_Data->SceneContext;
 	}
 
 	void ScriptEngine::InitMono() 
@@ -252,6 +270,7 @@ namespace Kerberos
 
 			const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
 			const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
+
 			const std::string fullname = fmt::format("{}.{}", nameSpace, name);
 
 			KBR_CORE_INFO("Loaded C# class: {}.{}", nameSpace, name);
@@ -260,6 +279,14 @@ namespace Kerberos
 				continue;
 
 			MonoClass* klass = mono_class_from_name(image, nameSpace, name);
+
+			void* iter = nullptr;
+			MonoMethod* method = mono_class_get_methods(klass, &iter);
+			while (method != nullptr)
+			{
+				KBR_CORE_INFO("\t{}", mono_method_get_name(method));
+				method = mono_class_get_methods(klass, &iter);
+			}
 
 			if (entityClass == klass)
 				continue;

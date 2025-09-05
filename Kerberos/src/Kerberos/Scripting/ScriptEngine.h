@@ -1,7 +1,11 @@
 #pragma once
 
+#include "Kerberos/Core/UUID.h"
+#include "Kerberos/Scene/Entity.h"
 #include <filesystem>
 #include <unordered_map>
+#include <memory>
+
 
 extern "C" {
 	typedef struct _MonoAssembly	MonoAssembly;
@@ -39,17 +43,20 @@ namespace Kerberos
 	class ScriptInstance
 	{
 	public:
-		explicit ScriptInstance(const Ref<ScriptClass>& scriptClass);
+		explicit ScriptInstance(const Ref<ScriptClass>& scriptClass, Entity entity);
 
 		void InvokeOnCreate() const;
 		void InvokeOnUpdate(float deltaTime) const;
 
 	private:
+		Entity m_Entity;
 		Ref<ScriptClass> m_ScriptClass = nullptr;
 
 		MonoObject* m_Instance = nullptr;
 		MonoMethod* m_OnCreateMethod = nullptr;
 		MonoMethod* m_OnUpdateMethod = nullptr;
+		/// Constructor with the UUID parameter
+		MonoMethod* m_Constructor = nullptr;
 	};
 
 	class ScriptEngine
@@ -62,9 +69,12 @@ namespace Kerberos
 		static void OnRuntimeStop();
 
 		static void OnCreateEntity(Entity entity);
+		static void OnUpdateEntity(Entity entity, float deltaTime);
 
 		static bool ClassExists(const std::string& className);
+
 		static const std::unordered_map <std::string, Ref<ScriptClass>>& GetEntityClasses();
+		static std::weak_ptr<Scene> GetSceneContext();
 
 	private:
 		static void InitMono();

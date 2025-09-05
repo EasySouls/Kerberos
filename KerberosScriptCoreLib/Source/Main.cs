@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 
 namespace Kerberos
 {
@@ -10,8 +9,6 @@ namespace Kerberos
         public ScriptCoreLib()
         {
             Console.WriteLine("Hello, World!");
-
-            CppFunc();
         }
 
         public void PrintCurrentTime()
@@ -23,11 +20,5 @@ namespace Kerberos
         {
             Console.WriteLine(message);
         }
-
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern static void CppFunc();
-
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern static void NativeLog(string message);
     }
 }

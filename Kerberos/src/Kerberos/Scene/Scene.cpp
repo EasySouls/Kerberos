@@ -84,9 +84,9 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		/// Update the scripts
+		/// Update the native scripts
 		{
-			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - Scripts update");
+			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - Native scripts update");
 
 			m_Registry.view<NativeScriptComponent>().each([this, ts](auto entity, const NativeScriptComponent& script)
 				{
@@ -99,6 +99,16 @@ namespace Kerberos
 
 					script.Instance->OnUpdate(ts);
 				});
+		}
+
+		{
+			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - C# scripts update");
+
+			m_Registry.view<ScriptComponent>().each([this, ts](auto id, const ScriptComponent& script)
+			{		
+				Entity entity{ id, this };
+				ScriptEngine::OnUpdateEntity(entity, ts);
+			});
 		}
 
 		m_PhysicsSystem.Update(ts);
@@ -215,6 +225,10 @@ namespace Kerberos
 			newEntity.AddComponent<CameraComponent>(entity.GetComponent<CameraComponent>());
 			auto& camera = newEntity.GetComponent<CameraComponent>();
 			camera.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+		}
+		if (entity.HasComponent<ScriptComponent>())
+		{
+			newEntity.AddComponent<ScriptComponent>(entity.GetComponent<ScriptComponent>());
 		}
 		if (entity.HasComponent<NativeScriptComponent>())
 		{

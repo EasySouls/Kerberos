@@ -8,14 +8,37 @@ namespace Kerberos
 {
     public abstract class Entity
     {
+        protected Entity() 
+        {
+            ID = 0;
+        }
+
+        internal Entity(ulong id)
+        {
+            ID = id;
+        }
+
+        public readonly ulong ID;
+
         void OnCreate()
         {
-            Console.WriteLine("Entity::OnCreate");
         }
 
         void OnUpdate(float deltaTime)
         {
-            Console.WriteLine($"Entity::OnUpdate - {deltaTime}");
+        }
+
+        public Vector3 Translation 
+        { 
+            get 
+            {
+                InternalCalls.Entity_GetTranslation(ID, out Vector3 translation);
+                return translation;
+            }
+            set
+            {
+                InternalCalls.Entity_SetTranslation(ID, ref value);
+            }
         }
     }
 }
