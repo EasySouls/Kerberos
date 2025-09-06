@@ -15,6 +15,15 @@ namespace Kerberos
             X = x;
             Y = y;
         }
+
+        public Vector2(float scalar)
+        {
+            X = scalar;
+            Y = scalar;
+        }
+
+        public static Vector2 Zero => new Vector2(0.0f);
+
         public static Vector2 operator +(Vector2 a, Vector2 b)
         {
             return new Vector2(a.X + b.X, a.Y + b.Y);
@@ -42,12 +51,23 @@ namespace Kerberos
         public float X;
         public float Y;
         public float Z;
+        
         public Vector3(float x, float y, float z)
         {
             X = x;
             Y = y;
             Z = z;
         }
+
+        public Vector3(float scalar)
+        {
+            X = scalar;
+            Y = scalar;
+            Z = scalar;
+        }
+
+        public static Vector3 Zero => new Vector3(0.0f);
+
         public static Vector3 operator +(Vector3 a, Vector3 b)
         {
             return new Vector3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);

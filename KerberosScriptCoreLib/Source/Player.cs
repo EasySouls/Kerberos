@@ -8,6 +8,8 @@ namespace Kerberos
 {
     public class Player : Entity
     {
+        private float Speed { get; set; } = 5.0f;
+
         internal Player() : base()
         {
         }
@@ -16,17 +18,30 @@ namespace Kerberos
         {
         }
 
-        void OnCreate()
+        private void OnCreate()
         {
             Console.WriteLine($"Player::OnCreate - {ID}");
         }
 
-        void OnUpdate(float deltaTime)
+        private void OnUpdate(float deltaTime)
         {
-            float speed = 5.0f;
+            Vector3 velocity = Vector3.Zero;
+
+            if (Input.IsKeyDown(KeyCode.A))
+                velocity.X -= 1.0f;
+            if (Input.IsKeyDown(KeyCode.D))
+                velocity.X += 1.0f;
+            if (Input.IsKeyDown(KeyCode.W))
+                velocity.Z += 1.0f;
+            if (Input.IsKeyDown(KeyCode.S))
+                velocity.Z -= 1.0f;
+            if (Input.IsKeyDown(KeyCode.Space))
+                velocity.Y += 1.0f;
+
+            velocity *= Speed;
 
             Vector3 translation = Translation;
-            translation.X += speed * deltaTime;
+            translation += velocity * deltaTime;
             Translation = translation;
         }
     }

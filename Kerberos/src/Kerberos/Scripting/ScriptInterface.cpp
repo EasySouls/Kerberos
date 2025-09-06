@@ -2,6 +2,8 @@
 #include "ScriptInterface.h"
 
 #include "Kerberos/Log.h"
+#include "Kerberos/Core/Input.h"
+#include "Kerberos/Core/KeyCodes.h"
 #include "Kerberos/Scene/Scene.h"
 #include "Kerberos/Scripting/ScriptEngine.h"
 
@@ -9,6 +11,7 @@
 #include <glm/glm.hpp>
 
 #include <memory>
+
 
 
 namespace Kerberos
@@ -50,11 +53,18 @@ namespace Kerberos
 		}
 	}
 
+	static bool Input_IsKeyDown(const KeyCode key)
+	{
+		return Input::IsKeyPressed(key);
+	}
+
 	void ScriptInterface::RegisterFunctions() 
 	{
 		KBR_ADD_INTERNAL_CALL(NativeLog);
 
 		KBR_ADD_INTERNAL_CALL(Entity_GetTranslation);
 		KBR_ADD_INTERNAL_CALL(Entity_SetTranslation);
+
+		KBR_ADD_INTERNAL_CALL(Input_IsKeyDown);
 	}
 }
