@@ -2,6 +2,7 @@ project "KerberosScriptCoreLib"
 	kind "SharedLib"
 	language "C#"
 	dotnetframework "4.7.2"
+	namespace "Kerberos"
 
 	targetdir ("%{wks.location}/KerberosEditor/Resources/Scripts")
 	objdir ("%{wks.location}/KerberosEditor/Resources/Scripts/Intermediates")

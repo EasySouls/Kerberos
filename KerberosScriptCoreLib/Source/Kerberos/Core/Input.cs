@@ -1,4 +1,4 @@
-﻿namespace Kerberos
+﻿namespace Kerberos.Source.Kerberos.Core
 {
     public static class Input
     {

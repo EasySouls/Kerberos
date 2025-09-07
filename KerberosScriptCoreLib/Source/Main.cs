@@ -1,6 +1,6 @@
 using System;
 
-namespace Kerberos
+namespace Kerberos.Source
 {
     public class ScriptCoreLib
     {

@@ -17,7 +17,7 @@
 namespace Kerberos
 {
 
-#define KBR_ADD_INTERNAL_CALL(name) mono_add_internal_call("Kerberos.InternalCalls::" #name, reinterpret_cast<const void*>(name))
+#define KBR_ADD_INTERNAL_CALL(name) mono_add_internal_call("Kerberos.Source.InternalCalls::" #name, reinterpret_cast<const void*>(name))
 
 	void ScriptInterface::RegisterComponentTypes()
 	{
@@ -32,7 +32,7 @@ namespace Kerberos
 		KBR_CORE_INFO("C# Log: {0}", messageStr);
 	}
 
-	static void Entity_GetTranslation(const UUID entityID, glm::vec3* outTranslation)
+	static void TransformComponent_GetTranslation(const UUID entityID, glm::vec3* outTranslation)
 	{
 		const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
 		if (outTranslation)
@@ -42,14 +42,53 @@ namespace Kerberos
 		}
 	}
 
-	static void Entity_SetTranslation(const UUID entityID, const glm::vec3* translation)
+	static void TransformComponent_SetTranslation(const UUID entityID, const glm::vec3* translation)
 	{
 		if (translation)
 		{
 			const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
 			glm::vec3& currentTranslation = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Translation;
-			KBR_CORE_INFO("Setting entity translation to: ({0}, {1}, {2})", translation->x, translation->y, translation->z);
 			currentTranslation = *translation;
+		}
+	}
+
+	static void TransformComponent_GetRotation(const UUID entityID, glm::vec3* outRotation)
+	{
+		const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+		if (outRotation)
+		{
+			const glm::vec3 rotation = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Rotation;
+			*outRotation = rotation;
+		}
+	}
+
+	static void TransformComponent_SetRotation(const UUID entityID, const glm::vec3* rotation)
+	{
+		if (rotation)
+		{
+			const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+			glm::vec3& currentRotation = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Rotation;
+			currentRotation = *rotation;
+		}
+	}
+
+	static void TransformComponent_GetScale(const UUID entityID, glm::vec3* outScale)
+	{
+		const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+		if (outScale)
+		{
+			const glm::vec3 scale = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Scale;
+			*outScale = scale;
+		}
+	}
+
+	static void TransformComponent_SetScale(const UUID entityID, const glm::vec3* scale)
+	{
+		if (scale)
+		{
+			const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+			glm::vec3& currentScale = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Scale;
+			currentScale = *scale;
 		}
 	}
 
@@ -62,8 +101,12 @@ namespace Kerberos
 	{
 		KBR_ADD_INTERNAL_CALL(NativeLog);
 
-		KBR_ADD_INTERNAL_CALL(Entity_GetTranslation);
-		KBR_ADD_INTERNAL_CALL(Entity_SetTranslation);
+		KBR_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
+		KBR_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
+		KBR_ADD_INTERNAL_CALL(TransformComponent_GetRotation);
+		KBR_ADD_INTERNAL_CALL(TransformComponent_SetRotation);
+		KBR_ADD_INTERNAL_CALL(TransformComponent_GetScale);
+		KBR_ADD_INTERNAL_CALL(TransformComponent_SetScale);
 
 		KBR_ADD_INTERNAL_CALL(Input_IsKeyDown);
 	}

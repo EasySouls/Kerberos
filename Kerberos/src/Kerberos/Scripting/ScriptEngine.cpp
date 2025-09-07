@@ -113,21 +113,21 @@ namespace Kerberos
 
 		mono_add_internal_call("Kerberos.ScriptCoreLib::CppFunc", reinterpret_cast<const void*>(CppFunc));
 
-		s_Data->EntityClass = ScriptClass(s_Data->CoreAssemblyImage, "Kerberos", "ScriptCoreLib");
-		MonoObject* instance = s_Data->EntityClass.Instantiate();
+		s_Data->EntityClass = ScriptClass(s_Data->CoreAssemblyImage, "Kerberos.Source.Kerberos.Scene", "Entity");
+		//MonoObject* instance = s_Data->EntityClass.Instantiate();
 
-		{
-			MonoMethod* printCurrentTimeMethod = s_Data->EntityClass.GetMethod("PrintCurrentTime", 0);
-			s_Data->EntityClass.InvokeMethod(printCurrentTimeMethod, instance, nullptr);
-		}
+		//{
+		//	MonoMethod* printCurrentTimeMethod = s_Data->EntityClass.GetMethod("PrintCurrentTime", 0);
+		//	s_Data->EntityClass.InvokeMethod(printCurrentTimeMethod, instance, nullptr);
+		//}
 
-		{
-			MonoMethod* printCustomMessageMethod = s_Data->EntityClass.GetMethod("PrintCustomMessage", 1);
-			void* params[1]{
-				mono_string_new(s_Data->AppDomain, "Hello from C++!")
-			};
-			s_Data->EntityClass.InvokeMethod(printCustomMessageMethod, instance, params);
-		}
+		//{
+		//	MonoMethod* printCustomMessageMethod = s_Data->EntityClass.GetMethod("PrintCustomMessage", 1);
+		//	void* params[1]{
+		//		mono_string_new(s_Data->AppDomain, "Hello from C++!")
+		//	};
+		//	s_Data->EntityClass.InvokeMethod(printCustomMessageMethod, instance, params);
+		//}
 	}
 
 	void ScriptEngine::Shutdown()
@@ -261,12 +261,12 @@ namespace Kerberos
 		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
 		const int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 
-		MonoClass* entityClass = mono_class_from_name(image, "Kerberos", "Entity");
+		MonoClass* entityClass = mono_class_from_name(image, "Kerberos.Source.Kerberos.Scene", "Entity");
 
 		for (int32_t i = 0; i < numTypes; i++)
 		{
 			uint32_t cols[MONO_TYPEDEF_SIZE];
-			mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
+			mono_metadata_decode_row(typeDefinitionsTable, (int)i, cols, MONO_TYPEDEF_SIZE);
 
 			const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
 			const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);

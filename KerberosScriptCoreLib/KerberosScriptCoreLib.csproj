@@ -7,7 +7,7 @@
     <ProjectGuid>{D7EC7043-4359-2C3E-0C4D-C49B78784EA6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KerberosScriptCoreLib</RootNamespace>
+    <RootNamespace>Kerberos</RootNamespace>
     <AssemblyName>KerberosScriptCoreLib</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -59,16 +59,16 @@
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Dist|x64' ">
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Source\Entity.cs" />
-    <Compile Include="Source\Input.cs" />
     <Compile Include="Source\InternalCalls.cs" />
-    <Compile Include="Source\KeyCode.cs" />
+    <Compile Include="Source\Kerberos\Core\Input.cs" />
+    <Compile Include="Source\Kerberos\Core\KeyCode.cs" />
+    <Compile Include="Source\Kerberos\Core\Math.cs" />
+    <Compile Include="Source\Kerberos\Scene\Components.cs" />
+    <Compile Include="Source\Kerberos\Scene\Entity.cs" />
+    <Compile Include="Source\Kerberos\Player.cs" />
     <Compile Include="Source\Main.cs" />
-    <Compile Include="Source\Math.cs" />
-    <Compile Include="Source\Player.cs" />
   </ItemGroup>
-  <ItemGroup>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Kerberos
+﻿namespace Kerberos.Source.Kerberos.Core
 {
     public struct Vector2
     {
         public float X;
         public float Y;
+
         public Vector2(float x, float y)
         {
             X = x;
@@ -67,6 +62,7 @@ namespace Kerberos
         }
 
         public static Vector3 Zero => new Vector3(0.0f);
+        public static Vector3 Identity => new Vector3(1.0f);
 
         public static Vector3 operator +(Vector3 a, Vector3 b)
         {

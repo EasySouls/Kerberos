@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Kerberos.Source.Kerberos.Core;
+using Kerberos.Source.Kerberos.Scene;
 
-namespace Kerberos
+namespace Kerberos.Source.Kerberos
 {
     public class Player : Entity
     {
@@ -18,12 +16,12 @@ namespace Kerberos
         {
         }
 
-        private void OnCreate()
+        protected override void OnCreate()
         {
             Console.WriteLine($"Player::OnCreate - {ID}");
         }
 
-        private void OnUpdate(float deltaTime)
+        protected override void OnUpdate(float deltaTime)
         {
             Vector3 velocity = Vector3.Zero;
 
