@@ -1,10 +1,12 @@
-#include "kbrpch.h"
+#pragma once
 
-#include "Kerberos/Renderer/Mesh.h"
+#include "Kerberos/Core.h"
 
-export module Components.PhysicsComponents;
+#include <glm/glm.hpp>
 
-export namespace Kerberos
+namespace Kerberos { class Mesh; }
+
+namespace Kerberos
 {
 	struct RigidBody3DComponent
 	{

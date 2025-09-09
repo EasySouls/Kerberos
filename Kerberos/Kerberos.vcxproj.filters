@@ -273,6 +273,9 @@
     <ClInclude Include="src\Kerberos\Scene\Components.h">
       <Filter>src\Kerberos\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Scene\Components\PhysicsComponents.h">
+      <Filter>src\Kerberos\Scene\Components</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Scene\EditorCamera.h">
       <Filter>src\Kerberos\Scene</Filter>
     </ClInclude>
@@ -529,9 +532,6 @@
     </ClCompile>
     <ClCompile Include="src\Kerberos\Renderer\VertexArray.cpp">
       <Filter>src\Kerberos\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Kerberos\Scene\Components\PhysicsComponents.ixx">
-      <Filter>src\Kerberos\Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="src\Kerberos\Scene\EditorCamera.cpp">
       <Filter>src\Kerberos\Scene</Filter>

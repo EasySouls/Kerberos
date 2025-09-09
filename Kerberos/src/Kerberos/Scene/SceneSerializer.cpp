@@ -3,14 +3,13 @@
 
 #include "Kerberos/Scene/Entity.h"
 #include "Kerberos/Scene/Components.h"
+#include "Kerberos/Scene/Components/PhysicsComponents.h"
+#include "Kerberos/Assets/AssetManager.h"
 
 #include <yaml-cpp/yaml.h>
 
 #include <fstream>
 
-#include "Kerberos/Assets/AssetManager.h"
-
-import Components.PhysicsComponents;
 
 namespace YAML
 {

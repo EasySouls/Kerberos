@@ -1,7 +1,5 @@
 #include "kbrpch.h"
 
-import Components.PhysicsComponents;
-
 #include "PhysicsSystem.h"
 #include "BodyActivationListener.h"
 #include "ContactListener.h"
@@ -10,6 +8,7 @@ import Components.PhysicsComponents;
 #include "Utils.h"
 #include "Kerberos/Scene/Entity.h"
 #include "Kerberos/Scene/Scene.h"
+#include "Kerberos/Scene/Components/PhysicsComponents.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/TempAllocator.h>

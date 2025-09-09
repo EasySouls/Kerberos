@@ -1,12 +1,11 @@
 #include "kbrpch.h"
 
-import Components.PhysicsComponents;
-
 #include "Scene.h"
 #include "Kerberos/Scene/Entity.h"
 #include "Kerberos/Scene/ScriptableEntity.h"
 
-#include "Components.h"
+#include "Kerberos/Scene/Components.h"
+#include "Kerberos/Scene/Components/PhysicsComponents.h"
 #include "Kerberos/Renderer/Renderer2D.h"
 #include "Kerberos/Renderer/Renderer3D.h"
 #include "Kerberos/Physics/Utils.h"

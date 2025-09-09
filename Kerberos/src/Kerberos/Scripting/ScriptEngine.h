@@ -86,6 +86,9 @@ namespace Kerberos
 		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath);
 		static void LoadAssemblyClasses(const MonoAssembly* assembly, MonoImage* image);
 
+		static MonoImage* GetCoreAssemblyImage();
+
 		friend class ScriptClass;
+		friend class ScriptInterface;
 	};
 }

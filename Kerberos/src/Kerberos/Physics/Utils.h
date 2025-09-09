@@ -1,10 +1,9 @@
 #pragma once
 
-import Components.PhysicsComponents;
-
 #include "Layers.h"
 #include "Kerberos/Renderer/Mesh.h"
 #include "Kerberos/Renderer/Vertex.h"
+#include "Kerberos/Scene/Components/PhysicsComponents.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Array.h>

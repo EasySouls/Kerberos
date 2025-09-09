@@ -30,9 +30,18 @@ namespace Kerberos.Source.Kerberos.Scene
             set => InternalCalls.TransformComponent_SetTranslation(ID, ref value);
         }
 
-        //protected T GetComponent<T>() where T : Component, new()
-        //{
-            
-        //}
+        protected bool HasComponent<T>() where T : Component, new()
+        {
+            return InternalCalls.Entity_HasComponent(ID, typeof(T));
+        }
+
+        protected T GetComponent<T>() where T : Component, new()
+        {
+            if (!HasComponent<T>())
+                return null;
+
+            T component = new T() { Entity = this };
+            return component;
+        }
     }
 }

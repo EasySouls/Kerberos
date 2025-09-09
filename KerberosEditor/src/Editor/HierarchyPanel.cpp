@@ -1,8 +1,7 @@
 #include "HierarchyPanel.h"
 
-import Components.PhysicsComponents;
-
 #include "Kerberos/Scene/Components.h"
+#include "Kerberos/Scene/Components/PhysicsComponents.h"
 #include "Kerberos/Assets/AssetManager.h"
 #include "Kerberos/Core/Input.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"

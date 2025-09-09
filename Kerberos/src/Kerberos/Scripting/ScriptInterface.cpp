@@ -1,4 +1,5 @@
 #include "kbrpch.h"
+
 #include "ScriptInterface.h"
 
 #include "Kerberos/Log.h"
@@ -6,23 +7,20 @@
 #include "Kerberos/Core/KeyCodes.h"
 #include "Kerberos/Scene/Scene.h"
 #include "Kerberos/Scripting/ScriptEngine.h"
+#include "Kerberos/Scene/Components.h"
+#include "Kerberos/Scene/Components/PhysicsComponents.h"
 
 #include <mono/jit/jit.h>
+#include <mono/metadata/reflection.h>
 #include <glm/glm.hpp>
 
 #include <memory>
 
-
-
 namespace Kerberos
 {
-
 #define KBR_ADD_INTERNAL_CALL(name) mono_add_internal_call("Kerberos.Source.InternalCalls::" #name, reinterpret_cast<const void*>(name))
 
-	void ScriptInterface::RegisterComponentTypes()
-	{
-		
-	}
+	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFunctions;
 
 	static void NativeLog(MonoString* message)
 	{
@@ -30,6 +28,22 @@ namespace Kerberos
 		std::string messageStr(messageCStr);
 		mono_free(messageCStr);
 		KBR_CORE_INFO("C# Log: {0}", messageStr);
+	}
+
+	static bool Entity_HasComponent(const UUID entityID, MonoReflectionType* componentType)
+	{
+
+		if (const std::shared_ptr<Scene> scene = ScriptEngine::GetSceneContext().lock())
+		{
+			const Entity entity = scene->GetEntityByUUID(entityID);
+
+			MonoType* monoType = mono_reflection_type_get_type(componentType);
+			KBR_CORE_ASSERT(monoType && s_EntityHasComponentFunctions.contains(monoType), "Component doesn't exist or hasn't been registered!");
+
+			const auto& hasComponentFunc = s_EntityHasComponentFunctions.at(monoType);
+			return hasComponentFunc(entity);
+		}
+		return false;
 	}
 
 	static void TransformComponent_GetTranslation(const UUID entityID, glm::vec3* outTranslation)
@@ -101,6 +115,8 @@ namespace Kerberos
 	{
 		KBR_ADD_INTERNAL_CALL(NativeLog);
 
+		KBR_ADD_INTERNAL_CALL(Entity_HasComponent);
+
 		KBR_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		KBR_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
 		KBR_ADD_INTERNAL_CALL(TransformComponent_GetRotation);
@@ -109,5 +125,46 @@ namespace Kerberos
 		KBR_ADD_INTERNAL_CALL(TransformComponent_SetScale);
 
 		KBR_ADD_INTERNAL_CALL(Input_IsKeyDown);
+	}
+
+	template<typename Component>
+	static void RegisterComponent(MonoImage* coreImage)
+	{
+		std::string componentName = typeid(Component).name();
+		/// TODO: Will only work with MSVC
+		componentName = componentName.substr(componentName.find_last_of("::") + 1);
+		const std::string componentNamespace = "Kerberos.Source.Kerberos.Scene";
+		KBR_CORE_WARN("Registering component: {0}", componentName);
+
+		const std::string fullName = componentNamespace + "." + componentName;
+		MonoType* managedType = mono_reflection_type_from_name(const_cast<char*>(fullName.c_str()), coreImage);
+		KBR_CORE_ASSERT(managedType, "Failed to get managed type for {0}", componentName);
+
+		s_EntityHasComponentFunctions[managedType] = [](const Entity entity) { return entity.HasComponent<Component>(); };
+	}
+
+	void ScriptInterface::RegisterComponentTypes()
+	{
+		MonoImage* coreImage = ScriptEngine::GetCoreAssemblyImage();
+		KBR_CORE_ASSERT(coreImage, "Core assembly image is null!");
+
+		RegisterComponent<TransformComponent>(coreImage);
+		//RegisterComponent<IDComponent>(coreImage);
+		//RegisterComponent<SpriteRendererComponent>(coreImage);
+		RegisterComponent<TagComponent>(coreImage);
+		//RegisterComponent<CameraComponent>(coreImage);
+		//RegisterComponent<NativeScriptComponent>(coreImage);
+		//RegisterComponent<StaticMeshComponent>(coreImage);
+		//RegisterComponent<DirectionalLightComponent>(coreImage);
+		//RegisterComponent<PointLightComponent>(coreImage);
+		//RegisterComponent<SpotLightComponent>(coreImage);
+		//RegisterComponent<HierarchyComponent>(coreImage);
+		//RegisterComponent<EnvironmentComponent>(coreImage);
+		//RegisterComponent<RigidBody3DComponent>(coreImage);
+		//RegisterComponent<BoxCollider3DComponent>(coreImage);
+		//RegisterComponent<SphereCollider3DComponent>(coreImage);
+		//RegisterComponent<CapsuleCollider3DComponent>(coreImage);
+		//RegisterComponent<MeshCollider3DComponent>(coreImage);
+
 	}
 }

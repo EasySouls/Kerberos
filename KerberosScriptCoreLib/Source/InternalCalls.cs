@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Kerberos.Source.Kerberos.Core;
 
 namespace Kerberos.Source
@@ -9,6 +10,8 @@ namespace Kerberos.Source
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void NativeLog(string message);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern bool Entity_HasComponent(ulong id, Type componentType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void TransformComponent_GetTranslation(ulong entityID, out Vector3 translation);
@@ -30,5 +33,6 @@ namespace Kerberos.Source
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern bool Input_IsKeyDown(KeyCode key);
+
     }
 }

@@ -300,4 +300,8 @@ namespace Kerberos
 		}
 	}
 
+	MonoImage* ScriptEngine::GetCoreAssemblyImage() 
+	{
+		return s_Data->CoreAssemblyImage;
+	}
 }
