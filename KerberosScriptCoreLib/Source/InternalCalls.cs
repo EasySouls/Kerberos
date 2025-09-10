@@ -31,6 +31,16 @@ namespace Kerberos.Source
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void TransformComponent_SetScale(ulong entityID, ref Vector3 scale);
 
+        // ----------------------------- Rigidbody3DComponent -----------------------------
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Rigidbody3DComponent_ApplyImpulse(ulong entityID, ref Vector3 impulse);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Rigidbody3DComponent_ApplyImpulseAtPoint(ulong entityID, ref Vector3 impulse, ref Vector3 point);
+
+        // ----------------------------- Input -----------------------------
+
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern bool Input_IsKeyDown(KeyCode key);
 

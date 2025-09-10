@@ -6,6 +6,7 @@
 namespace JPH
 {
 	class PhysicsSystem;
+	class BodyInterface;
 	class TempAllocator;
 	class JobSystem;
 	class Shape;
@@ -36,6 +37,9 @@ namespace Kerberos
 
 		void Initialize(const Ref<Scene>& scene);
 		void Update(float deltaTime);
+
+		/// TODO: Might not be a good idea to expose this
+		JPH::BodyInterface& GetBodyInterface();
 
 		void Cleanup();
 	private:

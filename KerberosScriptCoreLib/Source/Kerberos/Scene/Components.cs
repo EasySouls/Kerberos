@@ -14,8 +14,8 @@ namespace Kerberos.Source.Kerberos.Scene
 
     public class TransformComponent : Component
     {
-        public Vector3 Translation 
-        { 
+        public Vector3 Translation
+        {
             get
             {
                 InternalCalls.TransformComponent_GetTranslation(Entity.ID, out Vector3 translation);
@@ -28,7 +28,7 @@ namespace Kerberos.Source.Kerberos.Scene
         {
             get
             {
-                 InternalCalls.TransformComponent_GetRotation(Entity.ID, out Vector3 rotation);
+                InternalCalls.TransformComponent_GetRotation(Entity.ID, out Vector3 rotation);
                 return rotation;
             }
             set => InternalCalls.TransformComponent_SetRotation(Entity.ID, ref value);
@@ -38,10 +38,17 @@ namespace Kerberos.Source.Kerberos.Scene
         {
             get
             {
-                 InternalCalls.TransformComponent_GetScale(Entity.ID, out Vector3 scale);
+                InternalCalls.TransformComponent_GetScale(Entity.ID, out Vector3 scale);
                 return scale;
             }
             set => InternalCalls.TransformComponent_SetScale(Entity.ID, ref value);
         }
+    }
+
+    public class RigidBody3DComponent : Component
+    {
+        public void ApplyImpulse(Vector3 impulse) => InternalCalls.Rigidbody3DComponent_ApplyImpulse(Entity.ID, ref impulse);
+
+        public void ApplyImpulse(Vector3 impulse, Vector3 point) => InternalCalls.Rigidbody3DComponent_ApplyImpulseAtPoint(Entity.ID, ref impulse, ref point);
     }
 }

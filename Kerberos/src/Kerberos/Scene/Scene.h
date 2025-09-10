@@ -81,6 +81,9 @@ namespace Kerberos
 		Ref<Framebuffer> GetEditorFramebuffer() const { return m_EditorFramebuffer; }
 		bool& GetOnlyRenderShadowMapIfLightHasChanged() { return m_OnlyRenderShadowMapIfLightHasChanged; }
 
+		const PhysicsSystem& GetPhysicsSystem() const { return m_PhysicsSystem; }
+		PhysicsSystem& GetPhysicsSystem() { return m_PhysicsSystem; }
+
 		static Ref<Scene> Copy(const Ref<Scene>& other);
 
 	private:

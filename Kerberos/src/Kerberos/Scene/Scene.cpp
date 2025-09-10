@@ -62,7 +62,7 @@ namespace Kerberos
 		/// Instantiate all scripts
 
 		m_Registry.view<ScriptComponent>().each([this](auto enttId, ScriptComponent& script) {
-			Entity entity{ enttId, this };
+			const Entity entity{ enttId, this };
 			ScriptEngine::OnCreateEntity(entity);
 		});
 	}
@@ -103,9 +103,9 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - C# scripts update");
 
-			m_Registry.view<ScriptComponent>().each([this, ts](auto id, const ScriptComponent& script)
-			{		
-				Entity entity{ id, this };
+			m_Registry.view<ScriptComponent>().each([this, ts](auto id, [[maybe_unused]] const ScriptComponent& script)
+			{
+				const Entity entity{ id, this };
 				ScriptEngine::OnUpdateEntity(entity, ts);
 			});
 		}

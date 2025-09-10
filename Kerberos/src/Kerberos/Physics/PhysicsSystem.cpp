@@ -132,6 +132,11 @@ namespace Kerberos
 		SyncTransforms();
 	}
 
+	JPH::BodyInterface& PhysicsSystem::GetBodyInterface() 
+	{
+		return m_JoltSystem->GetBodyInterface();
+	}
+
 	void PhysicsSystem::UpdateAndCreatePhysicsBodies() 
 	{
 		KBR_PROFILE_FUNCTION();

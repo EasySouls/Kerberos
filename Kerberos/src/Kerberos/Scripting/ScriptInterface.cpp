@@ -14,7 +14,12 @@
 #include <mono/metadata/reflection.h>
 #include <glm/glm.hpp>
 
+#include <Jolt/Jolt.h>
+#include <Jolt/Physics/Body/Body.h>
+
 #include <memory>
+
+#include "Jolt/Physics/Body/BodyInterface.h"
 
 namespace Kerberos
 {
@@ -106,6 +111,55 @@ namespace Kerberos
 		}
 	}
 
+	static void Rigidbody3DComponent_ApplyImpulse(const UUID entityID, const glm::vec3* force)
+	{
+		if (force)
+		{
+			const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+			const Ref<Scene> currentScene = scene.lock();
+			const Entity entity = currentScene->GetEntityByUUID(entityID);
+
+			KBR_CORE_ASSERT(entity.HasComponent<RigidBody3DComponent>(), "Entity doesn't have a Rigidbody3DComponent.");
+
+
+			RigidBody3DComponent& rb3d = entity.GetComponent<RigidBody3DComponent>();
+			KBR_CORE_ASSERT(rb3d.RuntimeBody, "Rigidbody3DComponent doesn't have a runtime body.");
+
+			const JPH::Body* body = static_cast<JPH::Body*>(rb3d.RuntimeBody);
+			const JPH::BodyID& bodyId = body->GetID();
+
+			PhysicsSystem& physicsSystem = currentScene->GetPhysicsSystem();
+			JPH::BodyInterface& bodyInterface = physicsSystem.GetBodyInterface();
+			const JPH::Vec3Arg joltForce(force->x, force->y, force->z);
+			bodyInterface.AddImpulse(bodyId, joltForce);
+		}
+	}
+
+	static void Rigidbody3DComponent_ApplyImpulseAtPoint(const UUID entityID, const glm::vec3* force, const glm::vec3 inPoint)
+	{
+		if (force)
+		{
+			const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+			const Ref<Scene> currentScene = scene.lock();
+			const Entity entity = currentScene->GetEntityByUUID(entityID);
+
+			KBR_CORE_ASSERT(entity.HasComponent<RigidBody3DComponent>(), "Entity doesn't have a Rigidbody3DComponent.");
+
+
+			RigidBody3DComponent& rb3d = entity.GetComponent<RigidBody3DComponent>();
+			KBR_CORE_ASSERT(rb3d.RuntimeBody, "Rigidbody3DComponent doesn't have a runtime body.");
+
+			const JPH::Body* body = static_cast<JPH::Body*>(rb3d.RuntimeBody);
+			const JPH::BodyID& bodyId = body->GetID();
+
+			PhysicsSystem& physicsSystem = currentScene->GetPhysicsSystem();
+			JPH::BodyInterface& bodyInterface = physicsSystem.GetBodyInterface();
+			const JPH::Vec3Arg joltForce(force->x, force->y, force->z);
+			const JPH::Vec3Arg joltPoint(inPoint.x, inPoint.y, inPoint.z);
+			bodyInterface.AddImpulse(bodyId, joltForce, joltPoint);
+		}
+	}
+
 	static bool Input_IsKeyDown(const KeyCode key)
 	{
 		return Input::IsKeyPressed(key);
@@ -123,6 +177,9 @@ namespace Kerberos
 		KBR_ADD_INTERNAL_CALL(TransformComponent_SetRotation);
 		KBR_ADD_INTERNAL_CALL(TransformComponent_GetScale);
 		KBR_ADD_INTERNAL_CALL(TransformComponent_SetScale);
+
+		KBR_ADD_INTERNAL_CALL(Rigidbody3DComponent_ApplyImpulse);
+		KBR_ADD_INTERNAL_CALL(Rigidbody3DComponent_ApplyImpulseAtPoint);
 
 		KBR_ADD_INTERNAL_CALL(Input_IsKeyDown);
 	}
@@ -160,7 +217,7 @@ namespace Kerberos
 		//RegisterComponent<SpotLightComponent>(coreImage);
 		//RegisterComponent<HierarchyComponent>(coreImage);
 		//RegisterComponent<EnvironmentComponent>(coreImage);
-		//RegisterComponent<RigidBody3DComponent>(coreImage);
+		RegisterComponent<RigidBody3DComponent>(coreImage);
 		//RegisterComponent<BoxCollider3DComponent>(coreImage);
 		//RegisterComponent<SphereCollider3DComponent>(coreImage);
 		//RegisterComponent<CapsuleCollider3DComponent>(coreImage);
