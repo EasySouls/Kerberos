@@ -65,13 +65,19 @@ namespace Kerberos
 
 	void ScriptInstance::InvokeOnCreate() const 
 	{
-		m_ScriptClass->InvokeMethod(m_OnCreateMethod, m_Instance);
+		/// The OnCreate method is not necesserily overrided
+		if (m_OnCreateMethod)
+			m_ScriptClass->InvokeMethod(m_OnCreateMethod, m_Instance);
 	}
 
 	void ScriptInstance::InvokeOnUpdate(float deltaTime) const
 	{
-		void* params = &deltaTime;
-		m_ScriptClass->InvokeMethod(m_OnUpdateMethod, m_Instance, &params);
+		/// The OnUpdate method is not necesserily overrided
+		if (m_OnUpdateMethod)
+		{
+			void* params = &deltaTime;
+			m_ScriptClass->InvokeMethod(m_OnUpdateMethod, m_Instance, &params);
+		}
 	}
 
 	struct ScriptEngineData
@@ -106,7 +112,6 @@ namespace Kerberos
 		InitMono();
 		LoadAssembly("Resources/Scripts/KerberosScriptCoreLib.dll");
 		LoadAssemblyClasses(s_Data->CoreAssembly, s_Data->CoreAssemblyImage);
-		auto& classes = s_Data->EntityClasses;
 
 		ScriptInterface::RegisterComponentTypes();
 		ScriptInterface::RegisterFunctions();
