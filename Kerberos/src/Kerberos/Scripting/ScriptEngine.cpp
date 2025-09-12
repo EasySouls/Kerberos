@@ -2,6 +2,9 @@
 #include "ScriptEngine.h"
 
 #include "Kerberos/Scripting/ScriptInterface.h"
+#include "Kerberos/Scripting/ScriptClass.h"
+#include "Kerberos/Scripting/ScriptInstance.h"
+#include "Kerberos/Scripting/ScriptUtils.h"
 #include "Kerberos/Core/Filesystem.h"
 #include "Kerberos/Scene/Scene.h"
 #include "Kerberos/Scene/Entity.h"
@@ -11,75 +14,10 @@
 #include <mono/metadata/image.h>
 #include <mono/metadata/object.h>
 #include <mono/metadata/class.h>
+#include <mono/metadata/attrdefs.h>
 
 namespace Kerberos
 {
-	ScriptClass::ScriptClass(MonoImage* image, std::string classNamespace, std::string className)
-		: m_ClassNamespace(std::move(classNamespace)), m_ClassName(std::move(className))
-	{
-		m_MonoClass = mono_class_from_name(image, m_ClassNamespace.c_str(), m_ClassName.c_str());
-		KBR_CORE_ASSERT(m_MonoClass, "Failed to find class {0}.{1}", m_ClassNamespace, m_ClassName);
-	}
-
-	MonoObject* ScriptClass::Instantiate() const
-	{
-		return ScriptEngine::InstantiateClass(m_MonoClass);
-	}
-
-	MonoMethod* ScriptClass::GetMethod(const std::string& name, const int paramCount) const 
-	{
-		MonoMethod* method = mono_class_get_method_from_name(m_MonoClass, name.c_str(), paramCount);
-		KBR_CORE_ASSERT(method, "Failed to find method {0} in class {1}.{2}", name, m_ClassNamespace, m_ClassName);
-		return method;
-	}
-
-	MonoObject* ScriptClass::InvokeMethod(MonoMethod* method, MonoObject* instance, void** params) const 
-	{
-		MonoObject* exception = nullptr;
-		MonoObject* result = mono_runtime_invoke(method, instance, params, &exception);
-		if (exception)
-		{
-			MonoString* exceptionMessage = mono_object_to_string(exception, nullptr);
-			char* exceptionCStr = mono_string_to_utf8(exceptionMessage);
-			std::string exceptionStr(exceptionCStr);
-			mono_free(exceptionCStr);
-			KBR_CORE_ERROR("Exception thrown when invoking method {0} in class {1}.{2}: {3}", mono_method_get_name(method), m_ClassNamespace, m_ClassName, exceptionStr);
-		}
-		return result;
-	}
-
-	ScriptInstance::ScriptInstance(const Ref<ScriptClass>& scriptClass, const Entity entity)
-		: m_Entity(entity), m_ScriptClass(scriptClass)
-	{
-		m_Instance = m_ScriptClass->Instantiate();
-
-		m_OnCreateMethod = m_ScriptClass->GetMethod("OnCreate", 0);
-		m_OnUpdateMethod = m_ScriptClass->GetMethod("OnUpdate", 1);
-		m_Constructor = m_ScriptClass->GetMethod(".ctor", 1);
-
-		UUID entityID = m_Entity.GetUUID();
-		void* params[1] = { &entityID };
-		m_ScriptClass->InvokeMethod(m_Constructor, m_Instance, params);
-	}
-
-
-	void ScriptInstance::InvokeOnCreate() const 
-	{
-		/// The OnCreate method is not necesserily overrided
-		if (m_OnCreateMethod)
-			m_ScriptClass->InvokeMethod(m_OnCreateMethod, m_Instance);
-	}
-
-	void ScriptInstance::InvokeOnUpdate(float deltaTime) const
-	{
-		/// The OnUpdate method is not necesserily overrided
-		if (m_OnUpdateMethod)
-		{
-			void* params = &deltaTime;
-			m_ScriptClass->InvokeMethod(m_OnUpdateMethod, m_Instance, &params);
-		}
-	}
-
 	struct ScriptEngineData
 	{
 		MonoDomain* RootDomain = nullptr;
@@ -302,6 +240,24 @@ namespace Kerberos
 				s_Data->EntityClasses[fullname] = CreateRef<ScriptClass>(image, nameSpace, name);
 			}
 
+			void* fieldIterator = nullptr;
+			MonoClassField* field = nullptr;
+			while ((field = mono_class_get_fields(klass, &fieldIterator)) != nullptr)
+			{
+				uint32_t flags = mono_field_get_flags(field);
+				if (flags == MONO_FIELD_ATTR_PUBLIC)
+				{
+					/// TODO: Filter by custom C# attribute [ShowInEditor]
+
+					const char* name = mono_field_get_name(field);
+					MonoType* type = mono_field_get_type(field);
+					const char* typeName = mono_type_get_name(type);
+
+					std::cout << "Public field: " << name << " (type: " << typeName << ")\n";
+
+					ScriptFieldType fieldType = ScriptUtils::MonoTypeToScriptFieldType(type);
+				}
+			}
 		}
 	}
 

@@ -6,7 +6,7 @@ namespace Kerberos.Source.Kerberos
 {
     public class Player : Entity
     {
-        private float Speed { get; set; } = 5.0f;
+        public float Speed = 5.0f;
 
         private TransformComponent _transformComponent;
         private RigidBody3DComponent _rigidbody3DComponent;

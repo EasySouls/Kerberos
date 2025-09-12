@@ -16,49 +16,11 @@ extern "C" {
 	typedef struct _MonoImage		MonoImage;
 }
 
-namespace Kerberos { class Scene; }
-namespace Kerberos { class Entity; }
+namespace Kerberos { class ScriptClass;		}
+namespace Kerberos { class ScriptInterface; }
 
 namespace Kerberos
 {
-
-	class ScriptClass
-	{
-	public:
-		ScriptClass() = default;
-		ScriptClass(MonoImage* image, std::string classNamespace, std::string className);
-
-		MonoObject* Instantiate() const;
-
-		MonoMethod* GetMethod(const std::string& name, int paramCount) const;
-		MonoObject* InvokeMethod(MonoMethod* method, MonoObject* instance, void** params = nullptr) const;
-
-	private:
-		std::string m_ClassNamespace;
-		std::string m_ClassName;
-
-		MonoClass* m_MonoClass = nullptr;
-	};
-
-	class ScriptInstance
-	{
-	public:
-		explicit ScriptInstance(const Ref<ScriptClass>& scriptClass, Entity entity);
-
-		void InvokeOnCreate() const;
-		void InvokeOnUpdate(float deltaTime) const;
-
-	private:
-		Entity m_Entity;
-		Ref<ScriptClass> m_ScriptClass = nullptr;
-
-		MonoObject* m_Instance = nullptr;
-		MonoMethod* m_OnCreateMethod = nullptr;
-		MonoMethod* m_OnUpdateMethod = nullptr;
-		/// Constructor with the UUID parameter
-		MonoMethod* m_Constructor = nullptr;
-	};
-
 	class ScriptEngine
 	{
 	public:

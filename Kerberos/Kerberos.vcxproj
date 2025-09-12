@@ -26,19 +26,19 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -223,8 +223,11 @@
     <ClInclude Include="src\Kerberos\Scene\SceneCamera.h" />
     <ClInclude Include="src\Kerberos\Scene\SceneSerializer.h" />
     <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h" />
+    <ClInclude Include="src\Kerberos\Scripting\ScriptClass.h" />
     <ClInclude Include="src\Kerberos\Scripting\ScriptEngine.h" />
+    <ClInclude Include="src\Kerberos\Scripting\ScriptInstance.h" />
     <ClInclude Include="src\Kerberos\Scripting\ScriptInterface.h" />
+    <ClInclude Include="src\Kerberos\Scripting\ScriptUtils.h" />
     <ClInclude Include="src\Kerberos\Utils\PlatformUtils.h" />
     <ClInclude Include="src\Kerberos\Window.h" />
     <ClInclude Include="src\Platform\D3D11\D3D11Buffer.h" />
@@ -308,8 +311,11 @@
     <ClCompile Include="src\Kerberos\Scene\Scene.cpp" />
     <ClCompile Include="src\Kerberos\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Kerberos\Scene\SceneSerializer.cpp" />
+    <ClCompile Include="src\Kerberos\Scripting\ScriptClass.cpp" />
     <ClCompile Include="src\Kerberos\Scripting\ScriptEngine.cpp" />
+    <ClCompile Include="src\Kerberos\Scripting\ScriptInstance.cpp" />
     <ClCompile Include="src\Kerberos\Scripting\ScriptInterface.cpp" />
+    <ClCompile Include="src\Kerberos\Scripting\ScriptUtils.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11Buffer.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11Context.cpp" />
     <ClCompile Include="src\Platform\D3D11\D3D11Framebuffer.cpp" />
