@@ -7,6 +7,7 @@
 #include "Kerberos/Assets/Importers/TextureImporter.h"
 #include "Kerberos/Events/KeyEvent.h"
 #include "Kerberos/Scripting/ScriptEngine.h"
+#include "Kerberos/Scripting/ScriptInstance.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui/imgui.h>
@@ -565,7 +566,7 @@ namespace Kerberos
 				{
 					scriptClassExists = true;
 				}
-				
+
 				static char buffer[64];
 				strcpy_s(buffer, component.ClassName.c_str());
 
@@ -577,6 +578,83 @@ namespace Kerberos
 				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
 				{
 					component.ClassName = buffer;
+				}
+
+				if (scriptClassExists)
+				{
+					const Ref<ScriptInstance>& scriptInstance = ScriptEngine::GetEntityInstance(entity.GetUUID());
+
+					/// When the game is not running, the script instance doesn't exist
+					if (scriptInstance)
+					{
+						/// Fields
+						const auto& fields = scriptInstance->GetScriptClass()->GetSerializedFields();
+						for (const auto& [name, scriptField] : fields)
+						{
+							if (scriptField.Type == ScriptFieldType::Int)
+							{
+								int value = scriptInstance->GetFieldValue<int>(name);
+								if (ImGui::InputInt(name.c_str(), &value))
+								{
+									scriptInstance->SetFieldValue<int>(name, value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Float)
+							{
+								float value = scriptInstance->GetFieldValue<float>(name);
+								if (ImGui::DragFloat(name.c_str(), &value, 0.1f))
+								{
+									scriptInstance->SetFieldValue<float>(name, value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Bool)
+							{
+								bool value = scriptInstance->GetFieldValue<bool>(name);
+								if (ImGui::Checkbox(name.c_str(), &value))
+								{
+									scriptInstance->SetFieldValue<bool>(name, value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::String)
+							{
+								std::string value = scriptInstance->GetFieldValue<std::string>(name);
+								char buffer[256];
+								strcpy_s(buffer, sizeof(buffer), value.c_str());
+								if (ImGui::InputText(name.c_str(), buffer, sizeof(buffer)))
+								{
+									scriptInstance->SetFieldValue<std::string>(name, std::string(buffer));
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec2)
+							{
+								glm::vec2 value = scriptInstance->GetFieldValue<glm::vec2>(name);
+								if (ImGui::DragFloat2(name.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									scriptInstance->SetFieldValue<glm::vec2>(name, value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec3)
+							{
+								glm::vec3 value = scriptInstance->GetFieldValue<glm::vec3>(name);
+								if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									scriptInstance->SetFieldValue<glm::vec3>(name, value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec4)
+							{
+								glm::vec4 value = scriptInstance->GetFieldValue<glm::vec4>(name);
+								if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									scriptInstance->SetFieldValue<glm::vec4>(name, value);
+								}
+							}
+							else
+							{
+								ImGui::Text("Unsupported field type");
+							}
+						}
+					}
 				}
 
 				if (!scriptClassExists)

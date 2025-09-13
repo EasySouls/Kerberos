@@ -12,13 +12,23 @@
 namespace Kerberos
 {
 	static std::unordered_map<std::string, ScriptFieldType> s_ScriptFieldTypeMap = {
-		{ "System.Int32",								ScriptFieldType::Int},
-		{ "System.Single",								ScriptFieldType::Float},
-		{ "System.Double",								ScriptFieldType::Bool},
-		{ "System.String",								ScriptFieldType::String},
+		{ "System.Int16",								ScriptFieldType::Short },
+		{ "System.Int32",								ScriptFieldType::Int },
+		{ "System.Int64",								ScriptFieldType::Long },
+		{ "System.UInt16",								ScriptFieldType::UShort },
+		{ "System.UInt32",								ScriptFieldType::UInt },
+		{ "System.UInt64",								ScriptFieldType::ULong },
+		{ "System.Single",								ScriptFieldType::Float },
+		{ "System.Double",								ScriptFieldType::Double },
+		{ "System.Boolean",								ScriptFieldType::Bool },
+		{ "System.Char",								ScriptFieldType::Char },
+		{ "System.Byte",								ScriptFieldType::Byte },
+		{ "System.String",								ScriptFieldType::String },
+
 		{ "Kerberos.Source.Kerberos.Core.Vector2",		ScriptFieldType::Vec2 },
 		{ "Kerberos.Source.Kerberos.Core.Vector3",		ScriptFieldType::Vec3 },
 		{ "Kerberos.Source.Kerberos.Core.Vector4",		ScriptFieldType::Vec4 },
+
 		{ "Kerberos.Source.Kerberos.Core.AssetHandle",	ScriptFieldType::AssetHandle }
 	};
 

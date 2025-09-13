@@ -12,6 +12,10 @@ extern "C" {
 
 namespace Kerberos 
 {
+	/*
+	* A runtime instance of a ScriptClass.
+	* Two instances of the same ScriptClass will have different field values.
+	*/
 	class ScriptInstance
 	{
 	public:
@@ -19,6 +23,27 @@ namespace Kerberos
 
 		void InvokeOnCreate() const;
 		void InvokeOnUpdate(float deltaTime) const;
+
+		template<typename T>
+		T GetFieldValue(const std::string& name) const
+		{
+			if (!GetFieldValueInternal(name, s_FieldValueBuffer)) {
+				return T();
+			}
+			return *(T*)s_FieldValueBuffer;
+		}
+
+		template<typename T>
+		void SetFieldValue(const std::string& name, const T& value) const
+		{
+			SetFieldValueInternal(name, &value);
+		}
+
+		const Ref<ScriptClass>& GetScriptClass() const { return m_ScriptClass; }
+
+	private:
+		bool	GetFieldValueInternal(const std::string& name, void* buffer) const;
+		void	SetFieldValueInternal(const std::string& name, const void* value) const;
 
 	private:
 		Entity m_Entity;
@@ -29,5 +54,9 @@ namespace Kerberos
 		MonoMethod* m_OnUpdateMethod = nullptr;
 		/// Constructor with the UUID parameter
 		MonoMethod* m_Constructor = nullptr;
+
+		/// 16 is the size of the largest supported field type (double, long, ulong, vec4)
+		/// When lists are supported, this will need to be changed
+		inline static char s_FieldValueBuffer[16];
 	};
 }

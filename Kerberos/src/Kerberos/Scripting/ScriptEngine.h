@@ -17,6 +17,7 @@ extern "C" {
 }
 
 namespace Kerberos { class ScriptClass;		}
+namespace Kerberos { class ScriptInstance;	}
 namespace Kerberos { class ScriptInterface; }
 
 namespace Kerberos
@@ -36,6 +37,7 @@ namespace Kerberos
 		static bool ClassExists(const std::string& className);
 
 		static const std::unordered_map <std::string, Ref<ScriptClass>>& GetEntityClasses();
+		static Ref<ScriptInstance> GetEntityInstance(UUID entityID);
 		static std::weak_ptr<Scene> GetSceneContext();
 
 	private:

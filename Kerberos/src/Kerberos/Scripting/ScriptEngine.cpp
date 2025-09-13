@@ -127,6 +127,22 @@ namespace Kerberos
 		return s_Data->EntityClasses;
 	}
 
+	Ref<ScriptInstance> ScriptEngine::GetEntityInstance(UUID entityID)
+	{
+		if (s_Data->EntityInstances.contains(entityID) == false)
+		{
+			/// We return nullptr instaed of asserting, since this can be called when the game isn't running,
+			/// thus no instance exist
+			
+			/// TODO: Design a more robust system, where the user can still see and set the available fields of the script in the editor,
+			/// and those are applied when the game starts.
+			return nullptr;
+			//KBR_CORE_ASSERT(s_Data->EntityInstances.contains(entityID), "No script instance found for entity!");
+		}
+
+		return s_Data->EntityInstances.at(entityID);
+	}
+
 	std::weak_ptr<Scene> ScriptEngine::GetSceneContext()
 	{
 		return s_Data->SceneContext;
@@ -234,11 +250,12 @@ namespace Kerberos
 			if (entityClass == klass)
 				continue;
 
+			if (!mono_class_is_subclass_of(klass, entityClass, false))
+				continue;
+
 			/// If the class is a subclass of Entity, store it in the entities map
-			if (mono_class_is_subclass_of(klass, entityClass, false))
-			{
-				s_Data->EntityClasses[fullname] = CreateRef<ScriptClass>(image, nameSpace, name);
-			}
+			Ref<ScriptClass> scriptClass = CreateRef<ScriptClass>(image, nameSpace, name);
+			s_Data->EntityClasses[fullname] = scriptClass;
 
 			void* fieldIterator = nullptr;
 			MonoClassField* field = nullptr;
@@ -249,13 +266,15 @@ namespace Kerberos
 				{
 					/// TODO: Filter by custom C# attribute [ShowInEditor]
 
-					const char* name = mono_field_get_name(field);
+					const std::string name = mono_field_get_name(field);
 					MonoType* type = mono_field_get_type(field);
 					const char* typeName = mono_type_get_name(type);
 
 					std::cout << "Public field: " << name << " (type: " << typeName << ")\n";
 
 					ScriptFieldType fieldType = ScriptUtils::MonoTypeToScriptFieldType(type);
+
+					scriptClass->m_SerializedFields[name] = { name, fieldType, field };
 				}
 			}
 		}
