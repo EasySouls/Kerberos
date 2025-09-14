@@ -30,6 +30,10 @@ namespace Kerberos
 
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
 
+		using FieldInitializerMap = std::unordered_map<std::string, ScriptFieldInitializer>;
+		/// Holds the data for the initial values of the fields of each entity
+		std::unordered_map<UUID, FieldInitializerMap> EntityFieldInitializers;
+
 		/// Runtime data
 
 		std::weak_ptr<Scene> SceneContext;
@@ -127,9 +131,21 @@ namespace Kerberos
 		return s_Data->EntityClasses;
 	}
 
-	Ref<ScriptInstance> ScriptEngine::GetEntityInstance(UUID entityID)
+	const std::unordered_map<std::string, ScriptFieldInitializer>& ScriptEngine::GetScriptFieldInitializerMap(const Entity entity) 
 	{
-		if (s_Data->EntityInstances.contains(entityID) == false)
+		const UUID entityID = entity.GetUUID();
+		if (!s_Data->EntityFieldInitializers.contains(entityID))
+		{
+			KBR_CORE_ASSERT(s_Data->EntityFieldInitializers.contains(entityID), "No field initializers found for entity!");
+			return {};
+		}
+
+		return s_Data->EntityFieldInitializers.at(entityID);
+	}
+
+	Ref<ScriptInstance> ScriptEngine::GetEntityInstance(const UUID entityID)
+	{
+		if (!s_Data->EntityInstances.contains(entityID))
 		{
 			/// We return nullptr instaed of asserting, since this can be called when the game isn't running,
 			/// thus no instance exist

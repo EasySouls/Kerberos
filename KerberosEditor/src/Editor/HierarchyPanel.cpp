@@ -582,11 +582,13 @@ namespace Kerberos
 
 				if (scriptClassExists)
 				{
-					const Ref<ScriptInstance>& scriptInstance = ScriptEngine::GetEntityInstance(entity.GetUUID());
-
-					/// When the game is not running, the script instance doesn't exist
-					if (scriptInstance)
+					/// We decide whether to show the initializer fields based on whether the script instance exists
+					/// This is basically just a check if the scene is running or not,
+					/// since script instances are only created when the scene is running
+					if (const Ref<ScriptInstance>& scriptInstance = ScriptEngine::GetEntityInstance(entity.GetUUID()))
 					{
+						/// The scene is running, show the live fields for the script instance
+
 						/// Fields
 						const auto& fields = scriptInstance->GetScriptClass()->GetSerializedFields();
 						for (const auto& [name, scriptField] : fields)
@@ -618,11 +620,11 @@ namespace Kerberos
 							else if (scriptField.Type == ScriptFieldType::String)
 							{
 								std::string value = scriptInstance->GetFieldValue<std::string>(name);
-								char buffer[256];
-								strcpy_s(buffer, sizeof(buffer), value.c_str());
-								if (ImGui::InputText(name.c_str(), buffer, sizeof(buffer)))
+								char strBuffer[256];
+								strcpy_s(strBuffer, sizeof(strBuffer), value.c_str());
+								if (ImGui::InputText(name.c_str(), strBuffer, sizeof(strBuffer)))
 								{
-									scriptInstance->SetFieldValue<std::string>(name, std::string(buffer));
+									scriptInstance->SetFieldValue<std::string>(name, std::string(strBuffer));
 								}
 							}
 							else if (scriptField.Type == ScriptFieldType::Vec2)
@@ -647,6 +649,80 @@ namespace Kerberos
 								if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(value), 0.1f))
 								{
 									scriptInstance->SetFieldValue<glm::vec4>(name, value);
+								}
+							}
+							else
+							{
+								ImGui::Text("Unsupported field type");
+							}
+						}
+					}
+					else
+					{
+						/// The scene is not running, show the initializer fields for the script,
+						/// which then will be applied to the script when the scene starts.
+						
+						const auto& fields = ScriptEngine::GetScriptFieldInitializerMap(entity);
+						for (const auto& [fieldName, fieldInitializer] : fields)
+						{
+							const auto& scriptField = fieldInitializer.Field;
+
+							if (scriptField.Type == ScriptFieldType::Int)
+							{
+								int value = fieldInitializer.GetValue<int>();
+								if (ImGui::InputInt(fieldName.c_str(), &value))
+								{
+									fieldInitializer.SetValue<int>(value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Float)
+							{
+								float value = fieldInitializer.GetValue<float>();
+								if (ImGui::DragFloat(fieldName.c_str(), &value, 0.1f))
+								{
+									fieldInitializer.SetValue<float>(value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Bool)
+							{
+								bool value = fieldInitializer.GetValue<bool>();
+								if (ImGui::Checkbox(fieldName.c_str(), &value))
+								{
+									fieldInitializer.SetValue<bool>(value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::String)
+							{
+								std::string value = fieldInitializer.GetValue<std::string>();
+								char strBuffer[256];
+								strcpy_s(strBuffer, sizeof(strBuffer), value.c_str());
+								if (ImGui::InputText(fieldName.c_str(), strBuffer, sizeof(strBuffer)))
+								{
+									fieldInitializer.SetValue<std::string>(std::string(strBuffer));
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec2)
+							{
+								glm::vec2 value = fieldInitializer.GetValue<glm::vec2>();
+								if (ImGui::DragFloat2(fieldName.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									fieldInitializer.SetValue<glm::vec2>(value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec3)
+							{
+								glm::vec3 value = fieldInitializer.GetValue<glm::vec3>();
+								if (ImGui::DragFloat3(fieldName.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									fieldInitializer.SetValue<glm::vec3>(value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec4)
+							{
+								glm::vec4 value = fieldInitializer.GetValue<glm::vec4>();
+								if (ImGui::DragFloat4(fieldName.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									fieldInitializer.SetValue<glm::vec4>(value);
 								}
 							}
 							else

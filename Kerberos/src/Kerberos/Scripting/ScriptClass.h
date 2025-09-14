@@ -17,7 +17,7 @@ namespace Kerberos
 {
 
 	/// Usable field types in the editor for script components
-	enum class ScriptFieldType
+	enum class ScriptFieldType : std::uint8_t
 	{
 		Short,
 		Int,
@@ -42,8 +42,34 @@ namespace Kerberos
 	struct ScriptField
 	{
 		std::string Name;
-		ScriptFieldType Type;
-		MonoClassField* ClassField;
+		ScriptFieldType Type = ScriptFieldType::Char;
+		MonoClassField* ClassField = nullptr;
+	};
+
+	struct ScriptFieldInitializer
+	{
+	public:
+		ScriptField Field;
+
+		template<typename T>
+		T GetValue() const
+		{
+			static_assert(sizeof(T) <= maxFieldSize, "ScriptFieldInitializer can only hold types of size 16 or smaller");
+			return *reinterpret_cast<const T*>(m_Data.data());
+		}
+
+		template<typename T>
+		void SetValue(const T& value) const
+		{
+			static_assert(sizeof(T) <= maxFieldSize, "ScriptFieldInitializer can only hold types of size 16 or smaller");
+			std::memcpy(m_Data.data(), &value, sizeof(T));
+		}
+
+	private:
+		/// 40 is the size of std::string on MSVC
+		constexpr static size_t maxFieldSize = 40;
+
+		mutable	std::array<std::byte, maxFieldSize> m_Data = { static_cast<std::byte>('0') };
 	};
 
 	/*

@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <memory>
 
-
 extern "C" {
 	typedef struct _MonoAssembly	MonoAssembly;
 	typedef struct _MonoClass		MonoClass;
@@ -16,9 +15,10 @@ extern "C" {
 	typedef struct _MonoImage		MonoImage;
 }
 
-namespace Kerberos { class ScriptClass;		}
-namespace Kerberos { class ScriptInstance;	}
-namespace Kerberos { class ScriptInterface; }
+namespace Kerberos { class ScriptClass;				}
+namespace Kerberos { class ScriptInstance;			}
+namespace Kerberos { class ScriptInterface;			}
+namespace Kerberos { struct ScriptFieldInitializer;	}
 
 namespace Kerberos
 {
@@ -36,7 +36,8 @@ namespace Kerberos
 
 		static bool ClassExists(const std::string& className);
 
-		static const std::unordered_map <std::string, Ref<ScriptClass>>& GetEntityClasses();
+		static const std::unordered_map<std::string, Ref<ScriptClass>>& GetEntityClasses();
+		static const std::unordered_map<std::string, ScriptFieldInitializer>& GetScriptFieldInitializerMap(Entity entity);
 		static Ref<ScriptInstance> GetEntityInstance(UUID entityID);
 		static std::weak_ptr<Scene> GetSceneContext();
 

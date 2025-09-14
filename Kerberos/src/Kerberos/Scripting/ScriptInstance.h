@@ -10,6 +10,8 @@ extern "C" {
 	typedef struct _MonoMethod		MonoMethod;
 }
 
+constexpr int maxFieldSize = 16;
+
 namespace Kerberos 
 {
 	/*
@@ -27,6 +29,8 @@ namespace Kerberos
 		template<typename T>
 		T GetFieldValue(const std::string& name) const
 		{
+			static_assert(sizeof(T) <= maxFieldSize, "ScriptInstance can only get field types of size 16 or smaller");
+
 			if (!GetFieldValueInternal(name, s_FieldValueBuffer)) {
 				return T();
 			}
@@ -36,6 +40,8 @@ namespace Kerberos
 		template<typename T>
 		void SetFieldValue(const std::string& name, const T& value) const
 		{
+			static_assert(sizeof(T) <= maxFieldSize, "ScriptInstance can only set field types of size 16 or smaller");
+
 			SetFieldValueInternal(name, &value);
 		}
 
@@ -57,6 +63,6 @@ namespace Kerberos
 
 		/// 16 is the size of the largest supported field type (double, long, ulong, vec4)
 		/// When lists are supported, this will need to be changed
-		inline static char s_FieldValueBuffer[16];
+		inline static char s_FieldValueBuffer[maxFieldSize];
 	};
 }
