@@ -3,8 +3,8 @@
 
 #include "ScriptClass.h"
 
-#include <mono/metadata/metadata.h>
-#include <mono/metadata/blob.h>
+//#include <mono/metadata/metadata.h>
+//#include <mono/metadata/blob.h>
 #include <mono/metadata/class.h>
 
 #include <unordered_map>

@@ -30,7 +30,7 @@ namespace Kerberos
 			if (!GetFieldValueInternal(name, s_FieldValueBuffer)) {
 				return T();
 			}
-			return *(T*)s_FieldValueBuffer;
+			return *reinterpret_cast<T*>(s_FieldValueBuffer);
 		}
 
 		template<typename T>

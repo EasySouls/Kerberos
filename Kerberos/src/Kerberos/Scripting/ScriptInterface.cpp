@@ -10,7 +10,6 @@
 #include "Kerberos/Scene/Components.h"
 #include "Kerberos/Scene/Components/PhysicsComponents.h"
 
-#include <mono/jit/jit.h>
 #include <mono/metadata/reflection.h>
 #include <glm/glm.hpp>
 

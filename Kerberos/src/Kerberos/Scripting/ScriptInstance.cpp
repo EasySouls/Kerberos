@@ -63,6 +63,6 @@ namespace Kerberos
 		const ScriptField& fieldInfo = m_ScriptClass->m_SerializedFields.at(name);
 		KBR_CORE_ASSERT(fieldInfo.ClassField, "Field {0} not found in class {1}.{2}", name, m_ScriptClass->m_ClassNamespace, m_ScriptClass->m_ClassName);
 
-		mono_field_set_value(m_Instance, fieldInfo.ClassField, (void*)value);
+		mono_field_set_value(m_Instance, fieldInfo.ClassField, const_cast<void*>(value));
 	}
 }

@@ -294,10 +294,19 @@
     <ClInclude Include="src\Kerberos\Scene\ScriptableEntity.h">
       <Filter>src\Kerberos\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Scripting\ScriptClass.h">
+      <Filter>src\Kerberos\Scripting</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Scripting\ScriptEngine.h">
       <Filter>src\Kerberos\Scripting</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerberos\Scripting\ScriptInstance.h">
+      <Filter>src\Kerberos\Scripting</Filter>
+    </ClInclude>
     <ClInclude Include="src\Kerberos\Scripting\ScriptInterface.h">
+      <Filter>src\Kerberos\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kerberos\Scripting\ScriptUtils.h">
       <Filter>src\Kerberos\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="src\Kerberos\Utils\PlatformUtils.h">
@@ -414,9 +423,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerberos\Scripting\ScriptClass.h" />
-    <ClInclude Include="src\Kerberos\Scripting\ScriptInstance.h" />
-    <ClInclude Include="src\Kerberos\Scripting\ScriptUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kerberos\Application.cpp">
@@ -548,10 +554,19 @@
     <ClCompile Include="src\Kerberos\Scene\SceneSerializer.cpp">
       <Filter>src\Kerberos\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Scripting\ScriptClass.cpp">
+      <Filter>src\Kerberos\Scripting</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Scripting\ScriptEngine.cpp">
       <Filter>src\Kerberos\Scripting</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kerberos\Scripting\ScriptInstance.cpp">
+      <Filter>src\Kerberos\Scripting</Filter>
+    </ClCompile>
     <ClCompile Include="src\Kerberos\Scripting\ScriptInterface.cpp">
+      <Filter>src\Kerberos\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kerberos\Scripting\ScriptUtils.cpp">
       <Filter>src\Kerberos\Scripting</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\D3D11\D3D11Buffer.cpp">
@@ -662,8 +677,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kerberos\Scripting\ScriptClass.cpp" />
-    <ClCompile Include="src\Kerberos\Scripting\ScriptInstance.cpp" />
-    <ClCompile Include="src\Kerberos\Scripting\ScriptUtils.cpp" />
   </ItemGroup>
 </Project>

@@ -254,27 +254,27 @@ namespace Kerberos
 				continue;
 
 			/// If the class is a subclass of Entity, store it in the entities map
-			Ref<ScriptClass> scriptClass = CreateRef<ScriptClass>(image, nameSpace, name);
+			const Ref<ScriptClass> scriptClass = CreateRef<ScriptClass>(image, nameSpace, name);
 			s_Data->EntityClasses[fullname] = scriptClass;
 
 			void* fieldIterator = nullptr;
-			MonoClassField* field = nullptr;
+			MonoClassField* field;
 			while ((field = mono_class_get_fields(klass, &fieldIterator)) != nullptr)
 			{
-				uint32_t flags = mono_field_get_flags(field);
+				const uint32_t flags = mono_field_get_flags(field);
 				if (flags == MONO_FIELD_ATTR_PUBLIC)
 				{
 					/// TODO: Filter by custom C# attribute [ShowInEditor]
 
-					const std::string name = mono_field_get_name(field);
+					const std::string fieldName = mono_field_get_name(field);
 					MonoType* type = mono_field_get_type(field);
 					const char* typeName = mono_type_get_name(type);
 
-					std::cout << "Public field: " << name << " (type: " << typeName << ")\n";
+					std::cout << "Public field: " << fieldName << " (type: " << typeName << ")\n";
 
-					ScriptFieldType fieldType = ScriptUtils::MonoTypeToScriptFieldType(type);
+					const ScriptFieldType fieldType = ScriptUtils::MonoTypeToScriptFieldType(type);
 
-					scriptClass->m_SerializedFields[name] = { name, fieldType, field };
+					scriptClass->m_SerializedFields[fieldName] = { .Name = fieldName, .Type = fieldType, .ClassField = field };
 				}
 			}
 		}
