@@ -46,6 +46,9 @@ namespace Kerberos
 		MonoClassField* ClassField = nullptr;
 	};
 
+	/// 40 is the size of std::string on MSVC
+	constexpr static size_t maxFieldSize = 40;
+
 	struct ScriptFieldInitializer
 	{
 	public:
@@ -53,23 +56,22 @@ namespace Kerberos
 
 		template<typename T>
 		T GetValue() const
+			requires (sizeof(T) <= maxFieldSize)
 		{
-			static_assert(sizeof(T) <= maxFieldSize, "ScriptFieldInitializer can only hold types of size 16 or smaller");
 			return *reinterpret_cast<const T*>(m_Data.data());
 		}
 
 		template<typename T>
 		void SetValue(const T& value) const
+			requires (sizeof(T) <= maxFieldSize)
 		{
-			static_assert(sizeof(T) <= maxFieldSize, "ScriptFieldInitializer can only hold types of size 16 or smaller");
 			std::memcpy(m_Data.data(), &value, sizeof(T));
 		}
 
 	private:
-		/// 40 is the size of std::string on MSVC
-		constexpr static size_t maxFieldSize = 40;
-
 		mutable	std::array<std::byte, maxFieldSize> m_Data = { static_cast<std::byte>('0') };
+
+		friend class ScriptInstance;
 	};
 
 	/*

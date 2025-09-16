@@ -8,6 +8,7 @@
 #include "Kerberos/Events/KeyEvent.h"
 #include "Kerberos/Scripting/ScriptEngine.h"
 #include "Kerberos/Scripting/ScriptInstance.h"
+#include "Kerberos/Scripting/ScriptClass.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui/imgui.h>
@@ -565,6 +566,7 @@ namespace Kerberos
 				if (entityClasses.contains(component.ClassName))
 				{
 					scriptClassExists = true;
+					ScriptEngine::CreateScriptFieldInitializers(entity, component.ClassName);
 				}
 
 				static char buffer[64];
@@ -578,6 +580,10 @@ namespace Kerberos
 				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
 				{
 					component.ClassName = buffer;
+					if (entityClasses.contains(component.ClassName))
+					{
+						ScriptEngine::CreateScriptFieldInitializers(entity, component.ClassName);
+					}
 				}
 
 				if (scriptClassExists)

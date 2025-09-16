@@ -35,6 +35,7 @@ namespace Kerberos
 		static void OnUpdateEntity(Entity entity, float deltaTime);
 
 		static bool ClassExists(const std::string& className);
+		static void CreateScriptFieldInitializers(Entity entity, const std::string& className);
 
 		static const std::unordered_map<std::string, Ref<ScriptClass>>& GetEntityClasses();
 		static const std::unordered_map<std::string, ScriptFieldInitializer>& GetScriptFieldInitializerMap(Entity entity);

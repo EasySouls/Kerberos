@@ -116,14 +116,14 @@ namespace Kerberos
 
 		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
 			{
-				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+				const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 				WindowCloseEvent event;
 				data.EventCallback(event);
 			});
 
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, const int key, const int scancode, const int action, const int mods)
 			{
-				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+				const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 
 				switch (action)
 				{
@@ -156,7 +156,7 @@ namespace Kerberos
 		glfwSetCharCallback(m_Window, [](GLFWwindow* window, const unsigned int keycode)
 			{
 				const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-				KeyTypedEvent event(keycode);
+				KeyTypedEvent event(static_cast<int>(keycode));
 				data.EventCallback(event);
 			});
 

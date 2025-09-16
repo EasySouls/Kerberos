@@ -16,6 +16,10 @@
 #include <mono/metadata/class.h>
 #include <mono/metadata/attrdefs.h>
 
+#include <string_view>
+
+using namespace std::literals;
+
 namespace Kerberos
 {
 	struct ScriptEngineData
@@ -40,7 +44,7 @@ namespace Kerberos
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 	};
 
-	static ScriptEngineData* s_Data = nullptr;
+	static ScriptEngineData* s_ScriptData = nullptr;
 
 	static void CppFunc()
 	{
@@ -49,31 +53,31 @@ namespace Kerberos
 
 	void ScriptEngine::Init()
 	{
-		s_Data = new ScriptEngineData();
+		s_ScriptData = new ScriptEngineData();
 
 		InitMono();
 		LoadAssembly("Resources/Scripts/KerberosScriptCoreLib.dll");
-		LoadAssemblyClasses(s_Data->CoreAssembly, s_Data->CoreAssemblyImage);
+		LoadAssemblyClasses(s_ScriptData->CoreAssembly, s_ScriptData->CoreAssemblyImage);
 
 		ScriptInterface::RegisterComponentTypes();
 		ScriptInterface::RegisterFunctions();
 
 		mono_add_internal_call("Kerberos.ScriptCoreLib::CppFunc", reinterpret_cast<const void*>(CppFunc));
 
-		s_Data->EntityClass = ScriptClass(s_Data->CoreAssemblyImage, "Kerberos.Source.Kerberos.Scene", "Entity");
-		//MonoObject* instance = s_Data->EntityClass.Instantiate();
+		s_ScriptData->EntityClass = ScriptClass(s_ScriptData->CoreAssemblyImage, "Kerberos.Source.Kerberos.Scene", "Entity");
+		//MonoObject* instance = s_ScriptData->EntityClass.Instantiate();
 
 		//{
-		//	MonoMethod* printCurrentTimeMethod = s_Data->EntityClass.GetMethod("PrintCurrentTime", 0);
-		//	s_Data->EntityClass.InvokeMethod(printCurrentTimeMethod, instance, nullptr);
+		//	MonoMethod* printCurrentTimeMethod = s_ScriptData->EntityClass.GetMethod("PrintCurrentTime", 0);
+		//	s_ScriptData->EntityClass.InvokeMethod(printCurrentTimeMethod, instance, nullptr);
 		//}
 
 		//{
-		//	MonoMethod* printCustomMessageMethod = s_Data->EntityClass.GetMethod("PrintCustomMessage", 1);
+		//	MonoMethod* printCustomMessageMethod = s_ScriptData->EntityClass.GetMethod("PrintCustomMessage", 1);
 		//	void* params[1]{
-		//		mono_string_new(s_Data->AppDomain, "Hello from C++!")
+		//		mono_string_new(s_ScriptData->AppDomain, "Hello from C++!")
 		//	};
-		//	s_Data->EntityClass.InvokeMethod(printCustomMessageMethod, instance, params);
+		//	s_ScriptData->EntityClass.InvokeMethod(printCustomMessageMethod, instance, params);
 		//}
 	}
 
@@ -81,19 +85,19 @@ namespace Kerberos
 	{
 		ShutdownMono();
 
-		delete s_Data;
-		s_Data = nullptr;
+		delete s_ScriptData;
+		s_ScriptData = nullptr;
 	}
 
 	void ScriptEngine::OnRuntimeStart(const Ref<Scene>& scene)
 	{
-		s_Data->SceneContext = scene;
+		s_ScriptData->SceneContext = scene;		
 	}
 
 	void ScriptEngine::OnRuntimeStop() 
 	{
-		s_Data->SceneContext.reset();
-		s_Data->EntityInstances.clear();
+		s_ScriptData->SceneContext.reset();
+		s_ScriptData->EntityInstances.clear();
 	}
 
 	void ScriptEngine::OnCreateEntity(const Entity entity) 
@@ -106,9 +110,20 @@ namespace Kerberos
 			return;
 		}
 
-		const Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[scriptComponent.ClassName], entity);
+		Ref<ScriptInstance> instance = nullptr;
+
+		/// Apply initial field values when instantiating the script, if there are any
+		if (const auto& fieldInitializers = GetScriptFieldInitializerMap(entity); !fieldInitializers.empty())
+		{
+			instance = CreateRef<ScriptInstance>(s_ScriptData->EntityClasses[scriptComponent.ClassName], entity, fieldInitializers);
+		}
+		else
+		{
+			instance = CreateRef<ScriptInstance>(s_ScriptData->EntityClasses[scriptComponent.ClassName], entity, std::unordered_map<std::string, ScriptFieldInitializer>());
+		}
+
 		const UUID entityID = entity.GetUUID();
-		s_Data->EntityInstances[entityID] = instance;
+		s_ScriptData->EntityInstances[entityID] = instance;
 
 		instance->InvokeOnCreate();
 	}
@@ -116,36 +131,63 @@ namespace Kerberos
 	void ScriptEngine::OnUpdateEntity(const Entity entity, const float deltaTime)
 	{
 		KBR_CORE_ASSERT(entity.HasComponent<ScriptComponent>(), "Entity does not have a ScriptComponent!");
-		KBR_CORE_ASSERT(s_Data->EntityInstances.contains(entity.GetUUID()), "No script instance found for entity!");
+		KBR_CORE_ASSERT(s_ScriptData->EntityInstances.contains(entity.GetUUID()), "No script instance found for entity!");
 
-		s_Data->EntityInstances[entity.GetUUID()]->InvokeOnUpdate(deltaTime);
+		s_ScriptData->EntityInstances[entity.GetUUID()]->InvokeOnUpdate(deltaTime);
 	}
 
 	bool ScriptEngine::ClassExists(const std::string& className) 
 	{
-		return s_Data->EntityClasses.contains(className);
+		return s_ScriptData->EntityClasses.contains(className);
+	}
+
+	void ScriptEngine::CreateScriptFieldInitializers(const Entity entity, const std::string& className) 
+	{
+		KBR_CORE_ASSERT(ClassExists(className), "Script class doesn't exist!");
+
+		const UUID entityID = entity.GetUUID();
+		if (s_ScriptData->EntityFieldInitializers.contains(entityID))
+		{
+			/// Initializers already exist for this entity, don't overwrite them
+			return;
+		}
+
+		const Ref<ScriptClass>& scriptClass = s_ScriptData->EntityClasses.at(className);
+		const auto& serializedFields = scriptClass->GetSerializedFields();
+
+		ScriptEngineData::FieldInitializerMap fieldInitializers;
+		for (const auto& [name, field] : serializedFields)
+		{
+			ScriptFieldInitializer fieldInitializer;
+			fieldInitializer.Field = field;
+
+			fieldInitializers[name] = fieldInitializer;
+		}
+
+		s_ScriptData->EntityFieldInitializers[entityID] = fieldInitializers;
 	}
 
 	const std::unordered_map<std::string, Ref<ScriptClass>>& ScriptEngine::GetEntityClasses() 
 	{
-		return s_Data->EntityClasses;
+		return s_ScriptData->EntityClasses;
 	}
 
 	const std::unordered_map<std::string, ScriptFieldInitializer>& ScriptEngine::GetScriptFieldInitializerMap(const Entity entity) 
 	{
 		const UUID entityID = entity.GetUUID();
-		if (!s_Data->EntityFieldInitializers.contains(entityID))
+		if (!s_ScriptData->EntityFieldInitializers.contains(entityID))
 		{
-			KBR_CORE_ASSERT(s_Data->EntityFieldInitializers.contains(entityID), "No field initializers found for entity!");
+			const std::string_view entityName = entity.GetName();
+			KBR_CORE_TRACE("No field initializers found for entity {}"sv, entityName);
 			return {};
 		}
 
-		return s_Data->EntityFieldInitializers.at(entityID);
+		return s_ScriptData->EntityFieldInitializers.at(entityID);
 	}
 
 	Ref<ScriptInstance> ScriptEngine::GetEntityInstance(const UUID entityID)
 	{
-		if (!s_Data->EntityInstances.contains(entityID))
+		if (!s_ScriptData->EntityInstances.contains(entityID))
 		{
 			/// We return nullptr instaed of asserting, since this can be called when the game isn't running,
 			/// thus no instance exist
@@ -153,15 +195,15 @@ namespace Kerberos
 			/// TODO: Design a more robust system, where the user can still see and set the available fields of the script in the editor,
 			/// and those are applied when the game starts.
 			return nullptr;
-			//KBR_CORE_ASSERT(s_Data->EntityInstances.contains(entityID), "No script instance found for entity!");
+			//KBR_CORE_ASSERT(s_ScriptData->EntityInstances.contains(entityID), "No script instance found for entity!");
 		}
 
-		return s_Data->EntityInstances.at(entityID);
+		return s_ScriptData->EntityInstances.at(entityID);
 	}
 
 	std::weak_ptr<Scene> ScriptEngine::GetSceneContext()
 	{
-		return s_Data->SceneContext;
+		return s_ScriptData->SceneContext;
 	}
 
 	void ScriptEngine::InitMono() 
@@ -175,21 +217,21 @@ namespace Kerberos
 			return;
 		}
 
-		s_Data->RootDomain = rootDomain;
+		s_ScriptData->RootDomain = rootDomain;
 	}
 
 	void ScriptEngine::ShutdownMono() 
 	{
-		if (s_Data->RootDomain)
+		if (s_ScriptData->RootDomain)
 		{
-			mono_jit_cleanup(s_Data->RootDomain);
-			s_Data->RootDomain = nullptr;
+			mono_jit_cleanup(s_ScriptData->RootDomain);
+			s_ScriptData->RootDomain = nullptr;
 		}
 	}
 
 	MonoObject* ScriptEngine::InstantiateClass(MonoClass* klass) 
 	{
-		MonoObject* instance = mono_object_new(s_Data->AppDomain, klass);
+		MonoObject* instance = mono_object_new(s_ScriptData->AppDomain, klass);
 		mono_runtime_object_init(instance);
 
 		return instance;
@@ -197,11 +239,11 @@ namespace Kerberos
 
 	void ScriptEngine::LoadAssembly(const std::filesystem::path& assemblyPath) 
 	{
-		s_Data->AppDomain = mono_domain_create_appdomain(const_cast<char*>("KerberosScriptRuntime"), nullptr);
-		mono_domain_set(s_Data->AppDomain, true);
+		s_ScriptData->AppDomain = mono_domain_create_appdomain(const_cast<char*>("KerberosScriptRuntime"), nullptr);
+		mono_domain_set(s_ScriptData->AppDomain, true);
 
-		s_Data->CoreAssembly = LoadMonoAssembly(assemblyPath);
-		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
+		s_ScriptData->CoreAssembly = LoadMonoAssembly(assemblyPath);
+		s_ScriptData->CoreAssemblyImage = mono_assembly_get_image(s_ScriptData->CoreAssembly);
 	}
 
 	MonoAssembly* ScriptEngine::LoadMonoAssembly(const std::filesystem::path& assemblyPath) 
@@ -271,7 +313,7 @@ namespace Kerberos
 
 			/// If the class is a subclass of Entity, store it in the entities map
 			const Ref<ScriptClass> scriptClass = CreateRef<ScriptClass>(image, nameSpace, name);
-			s_Data->EntityClasses[fullname] = scriptClass;
+			s_ScriptData->EntityClasses[fullname] = scriptClass;
 
 			void* fieldIterator = nullptr;
 			MonoClassField* field;
@@ -289,8 +331,11 @@ namespace Kerberos
 					std::cout << "Public field: " << fieldName << " (type: " << typeName << ")\n";
 
 					const ScriptFieldType fieldType = ScriptUtils::MonoTypeToScriptFieldType(type);
+					const ScriptField fieldInfo = { .Name = fieldName, .Type = fieldType, .ClassField = field };
 
-					scriptClass->m_SerializedFields[fieldName] = { .Name = fieldName, .Type = fieldType, .ClassField = field };
+					scriptClass->m_SerializedFields[fieldName] = fieldInfo;
+					
+					/// TODO: Handle default values from C# attributes
 				}
 			}
 		}
@@ -298,6 +343,6 @@ namespace Kerberos
 
 	MonoImage* ScriptEngine::GetCoreAssemblyImage() 
 	{
-		return s_Data->CoreAssemblyImage;
+		return s_ScriptData->CoreAssemblyImage;
 	}
 }

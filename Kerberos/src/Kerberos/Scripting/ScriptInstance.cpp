@@ -7,7 +7,7 @@
 
 namespace Kerberos
 {
-	ScriptInstance::ScriptInstance(const Ref<ScriptClass>& scriptClass, const Entity entity)
+	ScriptInstance::ScriptInstance(const Ref<ScriptClass>& scriptClass, const Entity entity, const std::unordered_map<std::string, ScriptFieldInitializer>& initialFieldValues)
 		: m_Entity(entity), m_ScriptClass(scriptClass)
 	{
 		m_Instance = m_ScriptClass->Instantiate();
@@ -19,6 +19,9 @@ namespace Kerberos
 		UUID entityID = m_Entity.GetUUID();
 		void* params[1] = { &entityID };
 		m_ScriptClass->InvokeMethod(m_Constructor, m_Instance, params);
+
+		/// Set initial field values after calling the constructor
+		InitializeValues(initialFieldValues);
 	}
 
 
@@ -36,6 +39,14 @@ namespace Kerberos
 		{
 			void* params = &deltaTime;
 			m_ScriptClass->InvokeMethod(m_OnUpdateMethod, m_Instance, &params);
+		}
+	}
+
+	void ScriptInstance::InitializeValues(const std::unordered_map<std::string, ScriptFieldInitializer>& values) const 
+	{
+		for (const auto& [name, initializer] : values)
+		{
+			SetFieldValueInternal(name, initializer.m_Data.data());
 		}
 	}
 
@@ -58,7 +69,7 @@ namespace Kerberos
 		return true;
 	}
 
-	void	ScriptInstance::SetFieldValueInternal(const std::string& name, const void* value) const
+	void ScriptInstance::SetFieldValueInternal(const std::string& name, const void* value) const
 	{
 		const ScriptField& fieldInfo = m_ScriptClass->m_SerializedFields.at(name);
 		KBR_CORE_ASSERT(fieldInfo.ClassField, "Field {0} not found in class {1}.{2}", name, m_ScriptClass->m_ClassNamespace, m_ScriptClass->m_ClassName);

@@ -21,10 +21,11 @@ namespace Kerberos
 	class ScriptInstance
 	{
 	public:
-		explicit ScriptInstance(const Ref<ScriptClass>& scriptClass, Entity entity);
+		explicit ScriptInstance(const Ref<ScriptClass>& scriptClass, Entity entity, const std::unordered_map<std::string, ScriptFieldInitializer>& initialFieldValues);
 
 		void InvokeOnCreate() const;
 		void InvokeOnUpdate(float deltaTime) const;
+
 
 		template<typename T>
 		T GetFieldValue(const std::string& name) const
@@ -48,6 +49,8 @@ namespace Kerberos
 		const Ref<ScriptClass>& GetScriptClass() const { return m_ScriptClass; }
 
 	private:
+		void InitializeValues(const std::unordered_map<std::string, ScriptFieldInitializer>& values) const;
+
 		bool	GetFieldValueInternal(const std::string& name, void* buffer) const;
 		void	SetFieldValueInternal(const std::string& name, const void* value) const;
 
