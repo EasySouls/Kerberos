@@ -2,9 +2,9 @@
 
 namespace Kerberos.Source.Kerberos.Scene
 {
-    public abstract class Entity
+    public class Entity
     {
-        protected Entity() 
+        protected Entity()
         {
             ID = 0;
         }
@@ -16,18 +16,18 @@ namespace Kerberos.Source.Kerberos.Scene
 
         public readonly ulong ID;
 
-        protected abstract void OnCreate();
+        protected virtual void OnCreate() {}
 
-        protected abstract void OnUpdate(float deltaTime);
+        protected virtual void OnUpdate(float deltaTime) {}
 
-        protected Vector3 Translation 
-        { 
-            get 
+        public Vector3 Translation
+        {
+            get
             {
                 InternalCalls.TransformComponent_GetTranslation(ID, out Vector3 translation);
                 return translation;
             }
-            set => InternalCalls.TransformComponent_SetTranslation(ID, ref value);
+            protected set => InternalCalls.TransformComponent_SetTranslation(ID, ref value);
         }
 
         protected bool HasComponent<T>() where T : Component, new()
@@ -42,6 +42,12 @@ namespace Kerberos.Source.Kerberos.Scene
 
             T component = new T() { Entity = this };
             return component;
+        }
+
+        protected static Entity FindEntityByName(string name)
+        {
+            ulong entityID = InternalCalls.Entity_FindEntityByName(name);
+            return entityID == 0 ? null : new Entity(entityID);
         }
     }
 }

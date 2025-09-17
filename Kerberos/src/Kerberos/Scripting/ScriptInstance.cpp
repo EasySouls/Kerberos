@@ -12,6 +12,8 @@ namespace Kerberos
 	{
 		m_Instance = m_ScriptClass->Instantiate();
 
+		KBR_CORE_ASSERT(m_Instance, "Failed to instantiate ScriptInstance!");
+
 		m_OnCreateMethod = m_ScriptClass->GetMethod("OnCreate", 0);
 		m_OnUpdateMethod = m_ScriptClass->GetMethod("OnUpdate", 1);
 		m_Constructor = m_ScriptClass->GetMethod(".ctor", 1);

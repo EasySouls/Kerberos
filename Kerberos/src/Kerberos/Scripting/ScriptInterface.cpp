@@ -50,6 +50,22 @@ namespace Kerberos
 		return false;
 	}
 
+	static uint64_t Entity_FindEntityByName(MonoString* name)
+	{
+		char* nameCStr = mono_string_to_utf8(name);
+		const std::string nameStr(nameCStr);
+		mono_free(nameCStr);
+
+		if (const std::shared_ptr<Scene> scene = ScriptEngine::GetSceneContext().lock())
+		{
+			if (const Entity entity = scene->FindEntityByName(nameStr))
+			{
+				return entity.GetUUID();
+			}
+		}
+		return UUID::Invalid();
+	}
+
 	static void TransformComponent_GetTranslation(const UUID entityID, glm::vec3* outTranslation)
 	{
 		const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
@@ -169,6 +185,7 @@ namespace Kerberos
 		KBR_ADD_INTERNAL_CALL(NativeLog);
 
 		KBR_ADD_INTERNAL_CALL(Entity_HasComponent);
+		KBR_ADD_INTERNAL_CALL(Entity_FindEntityByName);
 
 		KBR_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		KBR_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);

@@ -763,6 +763,20 @@ namespace Kerberos
 		UpdateChildTransforms(entity, glm::mat4(1.0f));
 	}
 
+	Entity Scene::FindEntityByName(const std::string_view name) 
+	{
+		const auto view = m_Registry.view<TagComponent>();
+		for (const auto entity : view)
+		{
+			const auto& tag = view.get<TagComponent>(entity);
+			if (tag.Tag == name)
+			{
+				return Entity{ entity, this };
+			}
+		}
+		return {};
+	}
+
 	template <typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{

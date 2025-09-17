@@ -146,7 +146,8 @@ namespace Kerberos
 		KBR_CORE_ASSERT(ClassExists(className), "Script class doesn't exist!");
 
 		const UUID entityID = entity.GetUUID();
-		if (s_ScriptData->EntityFieldInitializers.contains(entityID))
+		const std::string_view currentClassName = entity.GetComponent<ScriptComponent>().ClassName;
+		if (s_ScriptData->EntityFieldInitializers.contains(entityID) && currentClassName == className)
 		{
 			/// Initializers already exist for this entity, don't overwrite them
 			return;

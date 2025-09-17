@@ -1,4 +1,6 @@
 ﻿using Kerberos.Source.Kerberos.Core;
+using System;
+using System.IO;
 
 namespace Kerberos.Source.Kerberos.Scene
 {
@@ -42,6 +44,24 @@ namespace Kerberos.Source.Kerberos.Scene
                 return scale;
             }
             set => InternalCalls.TransformComponent_SetScale(Entity.ID, ref value);
+        }
+
+        public void LookAt(Vector3 targetPosition)
+        {
+            Vector3 direction = targetPosition - Translation;
+
+            const float epsilon = 0.000000f;
+            if (direction.Magnitude < epsilon) 
+            {
+                Rotation = Vector3.Zero;
+            }
+
+            double yaw = Math.Atan2(direction.X, direction.Y) * Constants.Rad2Deg;
+            float horizontalDistance = new Vector2(direction.X, direction.Z).Magnitude;
+            double pitch = -Math.Atan2(direction.Y, horizontalDistance) * Constants.Rad2Deg;
+            const double roll = 0;
+
+            Rotation = new Vector3((float)pitch, (float)yaw, (float)roll);
         }
     }
 

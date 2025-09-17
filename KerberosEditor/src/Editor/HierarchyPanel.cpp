@@ -535,7 +535,7 @@ namespace Kerberos
 		if (entity.HasComponent<ScriptComponent>())
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
-			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(ScriptComponent).hash_code()), treeNodeFlags, "Script");
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<const void*>(typeid(ScriptComponent).hash_code()), treeNodeFlags, "Script");
 			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
 			if (ImGui::Button("+", ImVec2{ 20, 20 }))
 			{
@@ -579,11 +579,11 @@ namespace Kerberos
 
 				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
 				{
-					component.ClassName = buffer;
-					if (entityClasses.contains(component.ClassName))
+					if (entityClasses.contains(buffer))
 					{
-						ScriptEngine::CreateScriptFieldInitializers(entity, component.ClassName);
+						ScriptEngine::CreateScriptFieldInitializers(entity, buffer);
 					}
+					component.ClassName = buffer;
 				}
 
 				if (scriptClassExists)

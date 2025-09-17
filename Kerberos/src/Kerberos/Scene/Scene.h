@@ -10,6 +10,7 @@
 
 #include <entt.hpp>
 #include <set>
+#include <string_view>
 
 
 
@@ -75,6 +76,8 @@ namespace Kerberos
 		Entity GetPrimaryCameraEntity();
 		void CalculateEntityTransforms();
 		void CalculateEntityTransform(const Entity& entity);
+
+		Entity FindEntityByName(std::string_view name);
 
 		Ref<Framebuffer> GetOmniShadowMapFramebuffer() const { return m_OmniShadowMapFramebuffer; }
 		Ref<Framebuffer> GetShadowMapFramebuffer() const { return m_ShadowMapFramebuffer; }

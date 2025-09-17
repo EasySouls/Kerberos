@@ -23,11 +23,11 @@ Entities:
       Children:
         []
     ScriptComponent:
-      ClassName: Kerberos.Source.Kerberos.Player
+      ClassName: Kerberos.Source.Kerberos.Camera
       ScriptFields:
-        - Name: Speed
+        - Name: DistanceFromPlayer
           Type: Float
-          Data: 2
+          Data: 3
   - Entity: 14343862585645102703
     TagComponent:
       Tag: Point Light
@@ -145,7 +145,7 @@ Entities:
       Texture: 664406726921668484
   - Entity: 11890686740412182855
     TagComponent:
-      Tag: Cube
+      Tag: Player
     TransformComponent:
       Translation: [-2, 2, -2]
       Rotation: [20, 10, 86]

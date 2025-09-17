@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Kerberos.Source.Kerberos.Core;
+using Kerberos.Source.Kerberos.Scene;
 
 namespace Kerberos.Source
 {
@@ -10,8 +11,15 @@ namespace Kerberos.Source
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void NativeLog(string message);
 
+        // ----------------------------- Entity -----------------------------
+
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern bool Entity_HasComponent(ulong id, Type componentType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern ulong Entity_FindEntityByName(string name);
+
+        // ----------------------------- TransformComponent -----------------------------
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void TransformComponent_GetTranslation(ulong entityID, out Vector3 translation);

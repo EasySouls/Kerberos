@@ -1,5 +1,15 @@
-﻿namespace Kerberos.Source.Kerberos.Core
+﻿using System;
+using System.IO;
+
+namespace Kerberos.Source.Kerberos.Core
 {
+    public static class Constants
+    {
+        public const double Rad2Deg = 360 / (Math.PI * 2);
+        public const double Deg2Rad = (Math.PI * 2) / 360;
+    }
+    
+
     public struct Vector2
     {
         public float X;
@@ -16,6 +26,9 @@
             X = scalar;
             Y = scalar;
         }
+
+        public float Magnitude => (float)Math.Sqrt(X * X + Y * Y);
+        public float SqrMagnitude => X * X + Y * Y;
 
         public static Vector2 Zero => new Vector2(0.0f);
 
@@ -61,8 +74,28 @@
             Z = scalar;
         }
 
+        public float Magnitude => (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+        public float SqrMagnitude => X * X + Y * Y + Z * Z;
+
+        //public static Vector3 Normalize(Vector3 vector)
+        //{
+
+        //}
+
+        //public void Normalize()
+        //{
+        //    this = Normalize(this);
+        //}
+
         public static Vector3 Zero => new Vector3(0.0f);
         public static Vector3 Identity => new Vector3(1.0f);
+        public static Vector3 Up => new Vector3(0.0f, 1.0f, 0.0f);
+        public static Vector3 Down => new Vector3(0.0f, -1.0f, 0.0f);
+        public static Vector3 Forward => new Vector3(0.0f, 0.0f, 1.0f);
+        public static Vector3 Back => new Vector3(0.0f, 0.0f, -1.0f);
+        public static Vector3 Right => new Vector3(1.0f, 0.0f, 0.0f);
+        public static Vector3 Left => new Vector3(-1.0f, 0.0f, 0.0f);
+
 
         public static Vector3 operator +(Vector3 a, Vector3 b)
         {
