@@ -5,14 +5,38 @@
 #include "Kerberos/Scene/Components.h"
 #include "Kerberos/Scene/Components/PhysicsComponents.h"
 #include "Kerberos/Assets/AssetManager.h"
+#include "Kerberos/Scripting/ScriptEngine.h"
+#include "Kerberos/Scripting/ScriptUtils.h"
+#include "Kerberos/Scripting/ScriptClass.h"
 
 #include <yaml-cpp/yaml.h>
+#include <glm/glm.hpp>
 
 #include <fstream>
 
 
 namespace YAML
 {
+	template<>
+	struct convert<glm::vec2>
+	{
+		static Node encode(const glm::vec2& vec)
+		{
+			Node node;
+			node.push_back(vec.x);
+			node.push_back(vec.y);
+			return node;
+		}
+		static bool decode(const Node& node, glm::vec2& vec)
+		{
+			if (!node.IsSequence() || node.size() != 2)
+				return false;
+			vec.x = node[0].as<float>();
+			vec.y = node[1].as<float>();
+			return true;
+		}
+	};
+
 	template<>
 	struct convert<glm::vec3>
 	{
@@ -62,6 +86,12 @@ namespace YAML
 
 namespace Kerberos
 {
+	static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& vec)
+	{
+		out << YAML::Flow << YAML::BeginSeq << vec.x << vec.y << YAML::EndSeq;
+		return out;
+	}
+
 	static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& vec)
 	{
 		out << YAML::Flow << YAML::BeginSeq << vec.x << vec.y << vec.z << YAML::EndSeq;
@@ -160,6 +190,77 @@ namespace Kerberos
 			out << YAML::BeginMap;
 			const auto& script = entity.GetComponent<ScriptComponent>();
 			out << YAML::Key << "ClassName" << YAML::Value << script.ClassName;
+
+			out << YAML::Key << "ScriptFields" << YAML::Key;
+			out << YAML::BeginSeq;
+			{
+				const auto& fieldInitializers = ScriptEngine::GetScriptFieldInitializerMap(entity);
+
+				if (!fieldInitializers.empty())
+				{
+					for (const auto& [name, field] : fieldInitializers)
+					{
+						out << YAML::BeginMap;
+						out << YAML::Key << "Name" << YAML::Value << name;
+						out << YAML::Key << "Type" << YAML::Value << ScriptUtils::ScriptFieldTypeToString(field.Field.Type);
+						switch (field.Field.Type)
+						{
+						case ScriptFieldType::Short:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<short>();
+							break;
+						case ScriptFieldType::Long:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<long>();
+							break;
+						case ScriptFieldType::UShort:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<uint16_t>();
+							break;
+						case ScriptFieldType::UInt:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<uint32_t>();
+							break;
+						case ScriptFieldType::ULong:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<uint64_t>();
+							break;
+						case ScriptFieldType::Double:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<double>();
+							break;
+						case ScriptFieldType::Char:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<char>();
+							break;
+						case ScriptFieldType::Byte:
+							out << YAML::Key << "Data" << YAML::Value << static_cast<int>(field.GetValue<uint8_t>());
+							break;
+						case ScriptFieldType::String:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<std::string>();
+							break;
+						case ScriptFieldType::Bool:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<bool>();
+							break;
+						case ScriptFieldType::Int:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<int>();
+							break;
+						case ScriptFieldType::Float:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<float>();
+							break;
+						case ScriptFieldType::Vec2:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<glm::vec2>();
+							break;
+						case ScriptFieldType::Vec3:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<glm::vec3>();
+							break;
+						case ScriptFieldType::Vec4:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<glm::vec4>();
+							break;
+						case ScriptFieldType::AssetHandle:
+							out << YAML::Key << "Data" << YAML::Value << field.GetValue<uint8_t>();
+							break;
+						}
+						out << YAML::EndMap;
+					}
+				}
+
+			}
+			out << YAML::EndSeq;
+
 			out << YAML::EndMap;
 		}
 
@@ -329,10 +430,12 @@ namespace Kerberos
 		out << YAML::EndMap;
 
 		/// Check if there's a parent directory
-		if (const std::filesystem::path parentDir = filepath.parent_path(); !parentDir.empty()) {
+		if (const std::filesystem::path parentDir = filepath.parent_path(); !parentDir.empty())
+		{
 			std::error_code ec;
 			std::filesystem::create_directories(parentDir, ec);
-			if (ec) {
+			if (ec)
+			{
 				KBR_CORE_ERROR("Could not create directory {0}: {1}", parentDir.string(), ec.message());
 			}
 		}
@@ -418,7 +521,7 @@ namespace Kerberos
 					/// The entity must have a HierarchyComponent already when created
 					auto& hierarchy = deserializedEntity.GetComponent<HierarchyComponent>();
 					const UUID parentId = static_cast<UUID>(hierarchyComponent["Parent"].as<uint64_t>());
-					
+
 					hierarchy.Parent = parentId;
 					if (parentId.IsValid())
 					{
@@ -437,6 +540,71 @@ namespace Kerberos
 				{
 					auto& script = deserializedEntity.AddComponent<ScriptComponent>();
 					script.ClassName = scriptComponent["ClassName"].as<std::string>();
+					std::unordered_map<std::string, ScriptFieldInitializer>& scriptFieldInitializers = ScriptEngine::GetScriptFieldInitializerMap(deserializedEntity);
+					if (auto scriptFields = scriptComponent["ScriptFields"])
+					{
+						for (const auto& field : scriptFields)
+						{
+							const std::string name = field["Name"].as<std::string>();
+							const ScriptFieldType type = ScriptUtils::StringToScriptFieldType(field["Type"].as<std::string>());
+							ScriptFieldInitializer initializer;
+							initializer.Field.Name = name;
+							initializer.Field.Type = type;
+							switch (type)
+							{
+							case ScriptFieldType::Short:
+								initializer.SetValue<short>(field["Data"].as<short>());
+								break;
+							case ScriptFieldType::Long:
+								initializer.SetValue<long>(field["Data"].as<long>());
+								break;
+							case ScriptFieldType::UShort:
+								initializer.SetValue<uint16_t>(field["Data"].as<uint16_t>());
+								break;
+							case ScriptFieldType::UInt:
+								initializer.SetValue<uint32_t>(field["Data"].as<uint32_t>());
+								break;
+							case ScriptFieldType::ULong:
+								initializer.SetValue<uint64_t>(field["Data"].as<uint64_t>());
+								break;
+							case ScriptFieldType::Double:
+								initializer.SetValue<double>(field["Data"].as<double>());
+								break;
+							case ScriptFieldType::Char:
+								initializer.SetValue<char>(field["Data"].as<char>());
+								break;
+							case ScriptFieldType::Byte:
+								initializer.SetValue<uint8_t>(static_cast<uint8_t>(field["Data"].as<int>()));
+								break;
+							case ScriptFieldType::String:
+								initializer.SetValue<std::string>(field["Data"].as<std::string>());
+								break;
+							case ScriptFieldType::Bool:
+								initializer.SetValue<bool>(field["Data"].as<bool>());
+								break;
+							case ScriptFieldType::Int:
+								initializer.SetValue<int>(field["Data"].as<int>());
+								break;
+							case ScriptFieldType::Float:
+								initializer.SetValue<float>(field["Data"].as<float>());
+								break;
+							case ScriptFieldType::Vec2:
+								initializer.SetValue<glm::vec2>(field["Data"].as<glm::vec2>());
+								break;
+							case ScriptFieldType::Vec3:
+								initializer.SetValue<glm::vec3>(field["Data"].as<glm::vec3>());
+								break;
+							case ScriptFieldType::Vec4:
+								initializer.SetValue<glm::vec4>(field["Data"].as<glm::vec4>());
+								break;
+							case ScriptFieldType::AssetHandle:
+								initializer.SetValue<uint8_t>(field["Data"].as<uint8_t>());
+								break;
+							}
+
+							scriptFieldInitializers[name] = initializer;
+						}
+					}
 				}
 
 				if (auto nativeScriptComponent = entity["NativeScriptComponent"])

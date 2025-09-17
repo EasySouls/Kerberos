@@ -172,14 +172,16 @@ namespace Kerberos
 		return s_ScriptData->EntityClasses;
 	}
 
-	const std::unordered_map<std::string, ScriptFieldInitializer>& ScriptEngine::GetScriptFieldInitializerMap(const Entity entity) 
+	std::unordered_map<std::string, ScriptFieldInitializer>& ScriptEngine::GetScriptFieldInitializerMap(const Entity entity)
 	{
 		const UUID entityID = entity.GetUUID();
 		if (!s_ScriptData->EntityFieldInitializers.contains(entityID))
 		{
 			const std::string_view entityName = entity.GetName();
 			KBR_CORE_TRACE("No field initializers found for entity {}"sv, entityName);
-			return {};
+
+			/// Create an empty map for this entity if it doesn't exist
+			return s_ScriptData->EntityFieldInitializers[entityID];
 		}
 
 		return s_ScriptData->EntityFieldInitializers.at(entityID);

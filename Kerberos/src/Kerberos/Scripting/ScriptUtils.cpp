@@ -39,8 +39,57 @@ namespace Kerberos
 		std::string typeName = mono_type_get_name(type);
 
 		KBR_CORE_ASSERT(s_ScriptFieldTypeMap.contains(typeName), "Unsupported field type: {0}", typeName);
-		
+
 		return s_ScriptFieldTypeMap.at(typeName);
+	}
+
+	std::string_view ScriptUtils::ScriptFieldTypeToString(const ScriptFieldType type)
+	{
+		switch (type)
+		{
+		case ScriptFieldType::Short:		return "Short";
+		case ScriptFieldType::Int:			return "Int";
+		case ScriptFieldType::Long:			return "Long";
+		case ScriptFieldType::UShort:		return "UShort";
+		case ScriptFieldType::UInt:			return "UInt";
+		case ScriptFieldType::ULong:		return "ULong";
+		case ScriptFieldType::Float:		return "Float";
+		case ScriptFieldType::Double:		return "Double";
+		case ScriptFieldType::Bool:			return "Bool";
+		case ScriptFieldType::Char:			return "Char";
+		case ScriptFieldType::Byte:			return "Byte";
+		case ScriptFieldType::String:		return "String";
+		case ScriptFieldType::Vec2:			return "Vector2";
+		case ScriptFieldType::Vec3:			return "Vector3";
+		case ScriptFieldType::Vec4:			return "Vector4";
+		case ScriptFieldType::AssetHandle:	return "AssetHandle";
+		}
+
+		KBR_CORE_ASSERT(false, "Unknown script field type!");
+		return "";
+	}
+
+	ScriptFieldType ScriptUtils::StringToScriptFieldType(const std::string_view type) 
+	{
+		if (type == "Short")			return ScriptFieldType::Short;
+		if (type == "Int")				return ScriptFieldType::Int;
+		if (type == "Long")				return ScriptFieldType::Long;
+		if (type == "UShort")			return ScriptFieldType::UShort;
+		if (type == "UInt")				return ScriptFieldType::UInt;
+		if (type == "ULong")			return ScriptFieldType::ULong;
+		if (type == "Float")			return ScriptFieldType::Float;
+		if (type == "Double")			return ScriptFieldType::Double;
+		if (type == "Bool")				return ScriptFieldType::Bool;
+		if (type == "Char")				return ScriptFieldType::Char;
+		if (type == "Byte")				return ScriptFieldType::Byte;
+		if (type == "String")			return ScriptFieldType::String;
+		if (type == "Vector2")			return ScriptFieldType::Vec2;
+		if (type == "Vector3")			return ScriptFieldType::Vec3;
+		if (type == "Vector4")			return ScriptFieldType::Vec4;
+		if (type == "AssetHandle")		return ScriptFieldType::AssetHandle;
+
+		KBR_CORE_ASSERT(false, "Unknown script field type!");
+		return ScriptFieldType::Int;
 	}
 
 
