@@ -10,6 +10,7 @@ namespace Kerberos.Source.Kerberos
 
         private TransformComponent _transformComponent;
         private RigidBody3DComponent _rigidbody3DComponent;
+        private Camera _mainCamera;
 
         internal Player() : base()
         {
@@ -27,6 +28,11 @@ namespace Kerberos.Source.Kerberos
 
             if (HasComponent<RigidBody3DComponent>())
                 _rigidbody3DComponent = GetComponent<RigidBody3DComponent>();
+
+            Entity cameraEntity = FindEntityByName("Camera");
+            if (cameraEntity != null)
+                _mainCamera = cameraEntity.As<Camera>();
+
         }
 
         protected override void OnUpdate(float deltaTime)
@@ -55,6 +61,13 @@ namespace Kerberos.Source.Kerberos
             Vector3 translation = Translation;
             translation += velocity * deltaTime;
             Translation = translation;
+
+            // Zoom camera in and out with Q and E
+            if (_mainCamera == null) return;
+            if (Input.IsKeyDown(KeyCode.Q))
+                _mainCamera.DistanceFromPlayer += 1.0f * deltaTime;
+            if (Input.IsKeyDown(KeyCode.E))
+                _mainCamera.DistanceFromPlayer -= 1.0f * deltaTime;
         }
     }
 }

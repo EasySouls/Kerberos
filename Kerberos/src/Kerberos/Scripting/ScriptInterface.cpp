@@ -7,6 +7,7 @@
 #include "Kerberos/Core/KeyCodes.h"
 #include "Kerberos/Scene/Scene.h"
 #include "Kerberos/Scripting/ScriptEngine.h"
+#include "Kerberos/Scripting/ScriptInstance.h"
 #include "Kerberos/Scene/Components.h"
 #include "Kerberos/Scene/Components/PhysicsComponents.h"
 
@@ -64,6 +65,14 @@ namespace Kerberos
 			}
 		}
 		return UUID::Invalid();
+	}
+
+	static MonoObject* Entity_GetScriptInstance(const UUID entityID)
+	{
+		const Ref<ScriptInstance> instance = ScriptEngine::GetEntityInstance(entityID);
+		KBR_CORE_ASSERT(instance, "No script instance found for entity!");
+
+		return const_cast<MonoObject*>(instance->GetManagedObject());
 	}
 
 	static void TransformComponent_GetTranslation(const UUID entityID, glm::vec3* outTranslation)
@@ -186,6 +195,7 @@ namespace Kerberos
 
 		KBR_ADD_INTERNAL_CALL(Entity_HasComponent);
 		KBR_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+		KBR_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
 
 		KBR_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		KBR_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);

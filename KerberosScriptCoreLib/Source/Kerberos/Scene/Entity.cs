@@ -49,5 +49,11 @@ namespace Kerberos.Source.Kerberos.Scene
             ulong entityID = InternalCalls.Entity_FindEntityByName(name);
             return entityID == 0 ? null : new Entity(entityID);
         }
+
+        protected internal T As<T>() where T : Entity, new()
+        {
+            object instance = InternalCalls.Entity_GetScriptInstance(ID);
+            return instance as T;
+        }
     }
 }

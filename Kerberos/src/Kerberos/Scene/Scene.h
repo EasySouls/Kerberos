@@ -7,6 +7,7 @@
 #include "Kerberos/Core/Timestep.h"
 #include "Kerberos/Core/UUID.h"
 #include "Kerberos/Physics/PhysicsSystem.h"
+#include "Kerberos/Assets/Asset.h"
 
 #include <entt.hpp>
 #include <set>
@@ -19,11 +20,11 @@ namespace Kerberos
 	class Entity;
 	class HierarchyPanel;
 
-	class Scene : public std::enable_shared_from_this<Scene>
+	class Scene : public std::enable_shared_from_this<Scene>, public Asset
 	{
 	public:
 		Scene();
-		virtual ~Scene();
+		~Scene() override;
 
 		void OnRuntimeStart();
 		void OnRuntimeStop();
@@ -88,6 +89,8 @@ namespace Kerberos
 		PhysicsSystem& GetPhysicsSystem() { return m_PhysicsSystem; }
 
 		static Ref<Scene> Copy(const Ref<Scene>& other);
+
+		AssetType GetType() override;
 
 	private:
 		template<typename T>

@@ -496,6 +496,11 @@ namespace Kerberos
 		return newScene;
 	}
 
+	AssetType Scene::GetType() 
+	{
+		return AssetType::Scene;
+	}
+
 
 	void Scene::Render2DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform)
 	{
@@ -708,6 +713,8 @@ namespace Kerberos
 		auto& tsc = parent.GetComponent<TransformComponent>();
 		const glm::mat4 localTransform = tsc.GetTransform();
 		tsc.WorldTransform = parentTransform * localTransform;
+
+		//tsc.Translation = Physics::ExtractTranslationFromMatrix(tsc.WorldTransform);
 
 		for (const auto& child : GetChildren(parent))
 		{

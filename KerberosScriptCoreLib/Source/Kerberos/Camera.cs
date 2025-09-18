@@ -11,7 +11,7 @@ namespace Kerberos.Source.Kerberos
         private TransformComponent _transform;
         private Entity _target = null;
 
-        internal Camera() : base()
+        public Camera() : base()
         {
         }
 
@@ -30,7 +30,7 @@ namespace Kerberos.Source.Kerberos
             if (_target != null)
             {
                 Vector3 targetTranslation = _target.Translation;
-                //Translation = new Vector3(targetTranslation.X, targetTranslation.Y + 2.0f, targetTranslation.Z - 5.0f);
+                //Translation = new Vector3(targetTranslation.X + 3.0f, targetTranslation.Y + 2.0f, targetTranslation.Z - 5.0f);
                 //Translation = new Vector3(Translation.X, targetTranslation.Y + 2.0f, Translation.Z);
                 //_transform.LookAt(_target.Translation);
             }

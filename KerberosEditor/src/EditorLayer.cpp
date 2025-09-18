@@ -257,6 +257,8 @@ namespace Kerberos
 		{
 			KBR_PROFILE_SCOPE("Scene::OnUpdate");
 
+			m_ActiveScene->CalculateEntityTransforms();
+
 			switch (m_SceneState)
 			{
 			case SceneState::Edit:
@@ -627,6 +629,7 @@ namespace Kerberos
 		m_RuntimeScene->OnRuntimeStart();
 
 		m_ActiveScene = m_RuntimeScene;
+		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnSceneStop()
@@ -637,6 +640,7 @@ namespace Kerberos
 		m_RuntimeScene = nullptr;
 
 		m_ActiveScene = m_EditorScene;
+		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::HandleDragAndDrop()
@@ -651,14 +655,13 @@ namespace Kerberos
 				const std::string message = "Drag and drop payload: " + std::string(path);
 				m_NotificationManager.AddNotification(message, Notification::Type::Info);
 
-				/*const AssetHandle assetHandle = *static_cast<AssetHandle*>(payload->Data);
+				const AssetHandle assetHandle = *static_cast<AssetHandle*>(payload->Data);
 				const AssetType assetType = AssetManager::GetAssetType(assetHandle);
-				if (assetType == AssetType::Texture2D)
+				if (assetType == AssetType::Scene)
 				{
-					const Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(assetHandle);
-					m_SquareColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-					m_Texture = texture;
-				}*/
+					Ref<Scene> scene = AssetManager::GetAsset<Scene>(assetHandle);
+					//OpenScene(scene);
+				}
 			}
 			ImGui::EndDragDropTarget();
 		}

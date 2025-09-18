@@ -4,10 +4,10 @@
 
 namespace Kerberos
 {
-	void NotificationManager::AddNotification(std::string message, Notification::Type type, float duration,
+	void NotificationManager::AddNotification(const std::string& message, Notification::Type type, float duration,
 		const glm::vec4& bgColor, const glm::vec4& textColor) 
 	{
-		m_Notifications.emplace_back(type, std::move(message), duration, m_NextId++, bgColor, textColor);
+		m_Notifications.emplace_back(type, message, duration, m_NextId++, bgColor, textColor);
 	}
 
 	void NotificationManager::RenderNotifications() 

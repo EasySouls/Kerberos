@@ -132,7 +132,7 @@ namespace Kerberos
 		SyncTransforms();
 	}
 
-	JPH::BodyInterface& PhysicsSystem::GetBodyInterface() 
+	JPH::BodyInterface& PhysicsSystem::GetBodyInterface() const 
 	{
 		return m_JoltSystem->GetBodyInterface();
 	}

@@ -47,6 +47,7 @@ namespace Kerberos
 		}
 
 		const Ref<ScriptClass>& GetScriptClass() const { return m_ScriptClass; }
+		const MonoObject* GetManagedObject() const { return m_Instance; }
 
 	private:
 		void InitializeValues(const std::unordered_map<std::string, ScriptFieldInitializer>& values) const;

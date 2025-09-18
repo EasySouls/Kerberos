@@ -39,7 +39,7 @@ namespace Kerberos
 		void Update(float deltaTime);
 
 		/// TODO: Might not be a good idea to expose this
-		JPH::BodyInterface& GetBodyInterface();
+		JPH::BodyInterface& GetBodyInterface() const;
 
 		void Cleanup();
 	private:

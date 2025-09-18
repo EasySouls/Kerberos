@@ -19,6 +19,9 @@ namespace Kerberos.Source
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern ulong Entity_FindEntityByName(string name);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern object Entity_GetScriptInstance(ulong entityID);
+
         // ----------------------------- TransformComponent -----------------------------
 
         [MethodImpl(MethodImplOptions.InternalCall)]
