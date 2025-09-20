@@ -29,6 +29,7 @@ namespace Kerberos
 
 		MonoAssembly* CoreAssembly = nullptr;
 		MonoImage* CoreAssemblyImage = nullptr;
+		std::filesystem::path CoreAssemblyPath;
 
 		ScriptClass EntityClass;
 
@@ -46,10 +47,6 @@ namespace Kerberos
 
 	static ScriptEngineData* s_ScriptData = nullptr;
 
-	static void CppFunc()
-	{
-		std::cout << "Hello from C++ function called by C#!\n";
-	}
 
 	void ScriptEngine::Init()
 	{
@@ -61,8 +58,6 @@ namespace Kerberos
 
 		ScriptInterface::RegisterComponentTypes();
 		ScriptInterface::RegisterFunctions();
-
-		mono_add_internal_call("Kerberos.ScriptCoreLib::CppFunc", reinterpret_cast<const void*>(CppFunc));
 
 		s_ScriptData->EntityClass = ScriptClass(s_ScriptData->CoreAssemblyImage, "Kerberos.Source.Kerberos.Scene", "Entity");
 		//MonoObject* instance = s_ScriptData->EntityClass.Instantiate();
@@ -87,6 +82,19 @@ namespace Kerberos
 
 		delete s_ScriptData;
 		s_ScriptData = nullptr;
+	}
+
+	void ScriptEngine::ReloadAssembly()
+	{
+		mono_domain_set(mono_get_root_domain(), false);
+		mono_domain_unload(s_ScriptData->AppDomain);
+		s_ScriptData->AppDomain = nullptr;
+
+		LoadAssembly(s_ScriptData->CoreAssemblyPath);
+		LoadAssemblyClasses(s_ScriptData->CoreAssembly, s_ScriptData->CoreAssemblyImage);
+
+		/// The registered classes use the MonoImage, so they have to be reloaded with the new image
+		ScriptInterface::RegisterComponentTypes();
 	}
 
 	void ScriptEngine::OnRuntimeStart(const Ref<Scene>& scene)
@@ -204,7 +212,7 @@ namespace Kerberos
 		return s_ScriptData->EntityInstances.at(entityID);
 	}
 
-	std::weak_ptr<Scene> ScriptEngine::GetSceneContext()
+	const std::weak_ptr<Scene>& ScriptEngine::GetSceneContext()
 	{
 		return s_ScriptData->SceneContext;
 	}
@@ -225,6 +233,13 @@ namespace Kerberos
 
 	void ScriptEngine::ShutdownMono() 
 	{
+		if (s_ScriptData->AppDomain)
+		{
+			mono_domain_set(mono_get_root_domain(), false);
+			mono_domain_unload(s_ScriptData->AppDomain);
+			s_ScriptData->AppDomain = nullptr;
+		}
+
 		if (s_ScriptData->RootDomain)
 		{
 			mono_jit_cleanup(s_ScriptData->RootDomain);
@@ -247,6 +262,7 @@ namespace Kerberos
 
 		s_ScriptData->CoreAssembly = LoadMonoAssembly(assemblyPath);
 		s_ScriptData->CoreAssemblyImage = mono_assembly_get_image(s_ScriptData->CoreAssembly);
+		s_ScriptData->CoreAssemblyPath = assemblyPath;
 	}
 
 	MonoAssembly* ScriptEngine::LoadMonoAssembly(const std::filesystem::path& assemblyPath) 

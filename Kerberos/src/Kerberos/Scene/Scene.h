@@ -13,8 +13,6 @@
 #include <set>
 #include <string_view>
 
-
-
 namespace Kerberos
 {
 	class Entity;
@@ -28,8 +26,11 @@ namespace Kerberos
 
 		void OnRuntimeStart();
 		void OnRuntimeStop();
+		void OnSimulationStart();
+		void OnSimulationStop();
 
 		void OnUpdateEditor(Timestep ts, const EditorCamera& camera);
+		void OnUpdateSimulation(Timestep ts, const EditorCamera& camera);
 		void OnUpdateRuntime(Timestep ts);
 
 		/**

@@ -9,6 +9,7 @@
 
 #include "Kerberos/Assets/Importers/MeshImporter.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"
+#include "Kerberos/Scripting/ScriptEngine.h"
 
 #define PROFILE_SCOPE(name) Timer timer##__LINE__(name, 
 
@@ -177,7 +178,7 @@ namespace Kerberos
 		};
 
 		m_CameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
-		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+		//m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 
@@ -262,8 +263,10 @@ namespace Kerberos
 			switch (m_SceneState)
 			{
 			case SceneState::Edit:
-			case SceneState::Simulate:
 				m_ActiveScene->OnUpdateEditor(deltaTime, m_EditorCamera);
+				break;
+			case SceneState::Simulate:
+				m_ActiveScene->OnUpdateSimulation(deltaTime, m_EditorCamera);
 				break;
 			case SceneState::Play:
 				m_ActiveScene->OnUpdateRuntime(deltaTime);
@@ -306,12 +309,11 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		static bool dockspaceOpen = true;
-		static bool optFullscreenPersistent = true;
 		static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 
-		if (optFullscreenPersistent)
+		if (m_IsFullScreenPersistent)
 		{
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGui::SetNextWindowPos(viewport->Pos);
@@ -326,56 +328,24 @@ namespace Kerberos
 		if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
 			windowFlags |= ImGuiWindowFlags_NoBackground;
 
+		//TODO const std::string sceneName = m_ActiveScene ? m_ActiveScene->GetName() : "No Scene Loaded";
+		const std::string sceneName = "Example Scene";
+
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
+		ImGui::Begin(sceneName.c_str(), &dockspaceOpen, windowFlags);
 		ImGui::PopStyleVar();
 
-		if (optFullscreenPersistent)
+		if (m_IsFullScreenPersistent)
 			ImGui::PopStyleVar(2);
 
 		const ImGuiIO& io = ImGui::GetIO();
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
-			const ImGuiID dockspaceId = ImGui::GetID("MyDockSpace");
+			const ImGuiID dockspaceId = ImGui::GetID("MyDockspace");
 			ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
 		}
 
-		if (ImGui::BeginMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				if (ImGui::MenuItem("Exit"))
-				{
-					/// TODO: Show a confirmation dialog and whether to save the scene if there are unsaved changes 
-					Application::Get().Close();
-				}
-
-				ImGui::MenuItem("Fullscreen", nullptr, &optFullscreenPersistent);
-
-				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
-				{
-					NewScene();
-				}
-
-				if (ImGui::MenuItem("Save", "Ctrl+S"))
-				{
-					SaveScene();
-				}
-
-				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
-				{
-					SaveSceneAs();
-				}
-
-				if (ImGui::MenuItem("Load...", "Ctrl+O"))
-				{
-					LoadScene();
-				}
-
-				ImGui::EndMenu();
-			}
-			ImGui::EndMenuBar();
-		}
+		DrawMenuBar();
 
 		m_HierarchyPanel.OnImGuiRender();
 		m_AssetsPanel->OnImGuiRender();
@@ -523,7 +493,7 @@ namespace Kerberos
 
 		ImGui::End();
 
-		UIToolbar();
+		DrawUIToolbar();
 
 		m_NotificationManager.RenderNotifications();
 
@@ -636,10 +606,26 @@ namespace Kerberos
 	{
 		m_SceneState = SceneState::Edit;
 
-		m_ActiveScene->OnRuntimeStop();
+		if (m_SceneState == SceneState::Play)
+			m_ActiveScene->OnRuntimeStop();
+		else if (m_SceneState == SceneState::Simulate)
+			m_ActiveScene->OnSimulationStop();
+
 		m_RuntimeScene = nullptr;
 
 		m_ActiveScene = m_EditorScene;
+		m_HierarchyPanel.SetContext(m_ActiveScene);
+	}
+
+	void EditorLayer::OnSceneSimulate()
+	{
+		m_SceneState = SceneState::Simulate;
+
+		m_RuntimeScene = Scene::Copy(m_EditorScene);
+
+		m_RuntimeScene->OnSimulationStart();
+
+		m_ActiveScene = m_RuntimeScene;
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 
@@ -679,11 +665,9 @@ namespace Kerberos
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 
-	void EditorLayer::UIToolbar()
+	void EditorLayer::DrawUIToolbar()
 	{
 		constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0.0f, 0.0f));
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 2.0f));
 
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 		const auto& colors = ImGui::GetStyle().Colors;
@@ -694,27 +678,135 @@ namespace Kerberos
 
 		ImGui::Begin("Toolbar", nullptr, flags);
 
-		const Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
 		const float size = ImGui::GetWindowHeight() - 4.0f;
 
-		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-
-		if (ImGui::ImageButton("PlayButton", icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
+		if (m_SceneState == SceneState::Edit)
 		{
-			if (m_SceneState == SceneState::Edit)
+			ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f) - 2.0f);
+
+			if (ImGui::ImageButton("PlayButton", m_IconPlay->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
 			{
 				OnScenePlay();
 			}
-			else if (m_SceneState == SceneState::Play)
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("Play (Ctrl + P)");
+			}
+
+			/// TODO: This is not shown, ImGui places this under the previous button
+
+			ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f) + 200.0f);
+
+			if (ImGui::ImageButton("SimulateButton", m_IconPlay->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
+			{
+				OnSceneSimulate();
+			}
+			if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+			{
+				ImGui::SetTooltip("Simulate (Ctrl + L)");
+			}
+		}
+		else 
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0.0f, 0.0f));
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 2.0f));
+
+			ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+			if (ImGui::ImageButton("StopButton", m_IconStop->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
 			{
 				OnSceneStop();
 			}
+
+			if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+			{
+				if (m_SceneState == SceneState::Play)
+					ImGui::SetTooltip("Stop (Ctrl + P)");
+				else if (m_SceneState == SceneState::Simulate)
+					ImGui::SetTooltip("Stop Simulation (Ctrl + L)");
+			}
+
+			ImGui::PopStyleVar(2);
 		}
 
 		ImGui::PopStyleColor(3);
-		ImGui::PopStyleVar(2);
 
 		ImGui::End();
+	}
+
+	void EditorLayer::DrawMenuBar() 
+	{
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Exit"))
+				{
+					/// TODO: Show a confirmation dialog and whether to save the scene if there are unsaved changes 
+					Application::Get().Close();
+				}
+
+				ImGui::MenuItem("Fullscreen", nullptr, &m_IsFullScreenPersistent);
+
+				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+				{
+					NewScene();
+				}
+
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
+				{
+					SaveScene();
+				}
+
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+				{
+					SaveSceneAs();
+				}
+
+				if (ImGui::MenuItem("Load...", "Ctrl+O"))
+				{
+					LoadScene();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Edit"))
+			{
+				/// Todo: Implement undo/redo system
+				if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false)) {}
+				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {}
+				ImGui::Separator();
+				if (ImGui::MenuItem("Cut", "Ctrl+X", false, false)) {}
+				if (ImGui::MenuItem("Copy", "Ctrl+C", false, false)) {}
+				if (ImGui::MenuItem("Paste", "Ctrl+V", false, false)) {}
+				if (ImGui::MenuItem("Duplicate", "Ctrl+D", false, false)) {}
+				ImGui::Separator();
+				if (ImGui::MenuItem("Delete", "Del", false, false)) {}
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("View"))
+			{
+				if (ImGui::MenuItem("Show Wireframe"))
+				{
+					m_ShowWireframe = !m_ShowWireframe;
+					Renderer3D::SetShowWireframe(m_ShowWireframe);
+				}
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Debug")) 
+			{
+				if (ImGui::MenuItem("Reload C# assemblies", "", nullptr, m_SceneState == SceneState::Edit))
+				{
+					ScriptEngine::ReloadAssembly();
+				}
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenuBar();
+		}
 	}
 
 	void EditorLayer::NewProject()

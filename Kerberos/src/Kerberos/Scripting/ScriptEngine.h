@@ -27,6 +27,7 @@ namespace Kerberos
 	public:
 		static void Init();
 		static void Shutdown();
+		static void ReloadAssembly();
 
 		static void OnRuntimeStart(const Ref<Scene>& scene);
 		static void OnRuntimeStop();
@@ -40,7 +41,7 @@ namespace Kerberos
 		static const std::unordered_map<std::string, Ref<ScriptClass>>& GetEntityClasses();
 		static std::unordered_map<std::string, ScriptFieldInitializer>& GetScriptFieldInitializerMap(Entity entity);
 		static Ref<ScriptInstance> GetEntityInstance(UUID entityID);
-		static std::weak_ptr<Scene> GetSceneContext();
+		static const std::weak_ptr<Scene>& GetSceneContext();
 
 	private:
 		static void InitMono();

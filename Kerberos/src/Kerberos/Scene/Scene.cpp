@@ -74,8 +74,25 @@ namespace Kerberos
 		ScriptEngine::OnRuntimeStop();
 	}
 
+	void Scene::OnSimulationStart()
+	{
+		m_PhysicsSystem.Initialize(shared_from_this());
+	}
+
+	void Scene::OnSimulationStop()
+	{
+		m_PhysicsSystem.Cleanup();
+	}
+
 	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera)
 	{
+		Render3DEditor(camera);
+	}
+
+	void Scene::OnUpdateSimulation(const Timestep ts, const EditorCamera& camera) 
+	{
+		m_PhysicsSystem.Update(ts);
+
 		Render3DEditor(camera);
 	}
 
