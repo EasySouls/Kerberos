@@ -18,3 +18,10 @@ KerberosEditor/*.log
 KerberosEditor/Resources/Scripts/Intermediates
 
 scripts/__pycache__
+
+# Solution files
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*Makefile
