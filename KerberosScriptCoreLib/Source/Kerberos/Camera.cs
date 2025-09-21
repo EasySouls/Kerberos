@@ -9,7 +9,7 @@ namespace Kerberos.Source.Kerberos
         public float DistanceFromPlayer;
 
         private TransformComponent _transform;
-        private Entity _target = null;
+        private Entity _target;
 
         public Camera() : base()
         {

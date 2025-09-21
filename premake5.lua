@@ -29,6 +29,7 @@ IncludeDir["ImGuizmo"] = "%{wks.location}/Kerberos/vendor/ImGuizmo"
 IncludeDir["Assimp"] = "%{wks.location}/Kerberos/vendor/Assimp/include"
 IncludeDir["JoltPhysics"] = "%{wks.location}/Kerberos/vendor/JoltPhysics"
 IncludeDir["Mono"] = "%{wks.location}/Kerberos/vendor/mono/include"
+IncludeDir["Filewatch"] = "%{wks.location}/Kerberos/vendor/filewatch"
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
@@ -158,6 +159,7 @@ project "Kerberos"
 		IncludeDir.Assimp,
 		IncludeDir.JoltPhysics,
 		IncludeDir.Mono,
+		IncludeDir.Filewatch,
 	}
 
 	libdirs 

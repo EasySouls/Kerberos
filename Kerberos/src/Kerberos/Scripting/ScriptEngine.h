@@ -15,6 +15,8 @@ extern "C" {
 	typedef struct _MonoImage		MonoImage;
 }
 
+namespace filewatch { template<typename T> class FileWatch; }
+
 namespace Kerberos { class ScriptClass;				}
 namespace Kerberos { class ScriptInstance;			}
 namespace Kerberos { class ScriptInterface;			}

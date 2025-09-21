@@ -16,6 +16,8 @@
 #include <mono/metadata/class.h>
 #include <mono/metadata/attrdefs.h>
 
+#include <filewatch/FileWatch.hpp>
+
 #include <string_view>
 
 using namespace std::literals;
@@ -43,6 +45,8 @@ namespace Kerberos
 
 		std::weak_ptr<Scene> SceneContext;
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
+
+		filewatch::FileWatch<std::string>* Filewatcher = nullptr;
 	};
 
 	static ScriptEngineData* s_ScriptData = nullptr;
@@ -60,6 +64,15 @@ namespace Kerberos
 		ScriptInterface::RegisterFunctions();
 
 		s_ScriptData->EntityClass = ScriptClass(s_ScriptData->CoreAssemblyImage, "Kerberos.Source.Kerberos.Scene", "Entity");
+
+		/// Setup filewatcher to reload assembly on changes
+		/// TODO: Use the relative path from the project directory
+		s_ScriptData->Filewatcher = new filewatch::FileWatch<std::string>(
+			R"(C:\Development\Kerberos\KerberosEditor\Resources\Scripts)"s,
+			[](const std::string& path, const filewatch::Event changeType) {
+				ReloadAssembly();
+			}
+		);
 		//MonoObject* instance = s_ScriptData->EntityClass.Instantiate();
 
 		//{
@@ -79,6 +92,8 @@ namespace Kerberos
 	void ScriptEngine::Shutdown()
 	{
 		ShutdownMono();
+
+		delete s_ScriptData->Filewatcher;
 
 		delete s_ScriptData;
 		s_ScriptData = nullptr;
