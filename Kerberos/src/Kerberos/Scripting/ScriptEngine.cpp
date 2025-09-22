@@ -8,6 +8,8 @@
 #include "Kerberos/Core/Filesystem.h"
 #include "Kerberos/Scene/Scene.h"
 #include "Kerberos/Scene/Entity.h"
+#include "Kerberos/Application.h"
+#include "Kerberos/Project/Project.h"
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
@@ -16,9 +18,9 @@
 #include <mono/metadata/class.h>
 #include <mono/metadata/attrdefs.h>
 
+#include <string_view>
 #include <filewatch/FileWatch.hpp>
 
-#include <string_view>
 
 using namespace std::literals;
 
@@ -45,12 +47,10 @@ namespace Kerberos
 
 		std::weak_ptr<Scene> SceneContext;
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
-
-		filewatch::FileWatch<std::string>* Filewatcher = nullptr;
 	};
 
 	static ScriptEngineData* s_ScriptData = nullptr;
-
+	static Scope<filewatch::FileWatch<std::string>> s_Filewatcher = nullptr;
 
 	void ScriptEngine::Init()
 	{
@@ -67,33 +67,20 @@ namespace Kerberos
 
 		/// Setup filewatcher to reload assembly on changes
 		/// TODO: Use the relative path from the project directory
-		s_ScriptData->Filewatcher = new filewatch::FileWatch<std::string>(
-			R"(C:\Development\Kerberos\KerberosEditor\Resources\Scripts)"s,
-			[](const std::string& path, const filewatch::Event changeType) {
-				ReloadAssembly();
-			}
+
+		/// TODO: FIX Project is not initialized at this point :C
+		//const std::filesystem::path scriptDir = Project::GetAssetDirectory () / ".."sv / "Resources"sv / "Scripts"sv;
+
+		const std::filesystem::path assemblyPath = std::filesystem::current_path() / "Resources"sv / "Scripts"sv;
+		s_Filewatcher = CreateScope<filewatch::FileWatch<std::string>>(
+			assemblyPath.string(),
+			OnAssemblyFileChanged
 		);
-		//MonoObject* instance = s_ScriptData->EntityClass.Instantiate();
-
-		//{
-		//	MonoMethod* printCurrentTimeMethod = s_ScriptData->EntityClass.GetMethod("PrintCurrentTime", 0);
-		//	s_ScriptData->EntityClass.InvokeMethod(printCurrentTimeMethod, instance, nullptr);
-		//}
-
-		//{
-		//	MonoMethod* printCustomMessageMethod = s_ScriptData->EntityClass.GetMethod("PrintCustomMessage", 1);
-		//	void* params[1]{
-		//		mono_string_new(s_ScriptData->AppDomain, "Hello from C++!")
-		//	};
-		//	s_ScriptData->EntityClass.InvokeMethod(printCustomMessageMethod, instance, params);
-		//}
 	}
 
 	void ScriptEngine::Shutdown()
 	{
 		ShutdownMono();
-
-		delete s_ScriptData->Filewatcher;
 
 		delete s_ScriptData;
 		s_ScriptData = nullptr;
@@ -175,6 +162,8 @@ namespace Kerberos
 			/// Initializers already exist for this entity, don't overwrite them
 			return;
 		}
+
+		/// TODO: if the entity has a script class and the name is the same, but the fields are not, it doesn't update the initializers
 
 		const Ref<ScriptClass>& scriptClass = s_ScriptData->EntityClasses.at(className);
 		const auto& serializedFields = scriptClass->GetSerializedFields();
@@ -324,7 +313,7 @@ namespace Kerberos
 
 			const std::string fullname = fmt::format("{}.{}", nameSpace, name);
 
-			KBR_CORE_INFO("Loaded C# class: {}.{}", nameSpace, name);
+			KBR_CORE_TRACE("Loaded C# class: {}.{}", nameSpace, name);
 
 			if (strcmp(name, "<Module>") == 0)
 				continue;
@@ -335,7 +324,7 @@ namespace Kerberos
 			MonoMethod* method = mono_class_get_methods(klass, &iter);
 			while (method != nullptr)
 			{
-				KBR_CORE_INFO("\t{}", mono_method_get_name(method));
+				KBR_CORE_TRACE("\t{}", mono_method_get_name(method));
 				method = mono_class_get_methods(klass, &iter);
 			}
 
@@ -362,7 +351,7 @@ namespace Kerberos
 					MonoType* type = mono_field_get_type(field);
 					const char* typeName = mono_type_get_name(type);
 
-					std::cout << "Public field: " << fieldName << " (type: " << typeName << ")\n";
+					KBR_CORE_TRACE("\n\tPublic field: {0}, type: {1}", fieldName, typeName);
 
 					const ScriptFieldType fieldType = ScriptUtils::MonoTypeToScriptFieldType(type);
 					const ScriptField fieldInfo = { .Name = fieldName, .Type = fieldType, .ClassField = field };
@@ -371,6 +360,35 @@ namespace Kerberos
 					
 					/// TODO: Handle default values from C# attributes
 				}
+			}
+		}
+	}
+
+	static std::string_view FileWatchEventToString(const filewatch::Event event)
+	{
+		switch (event)
+		{
+		case filewatch::Event::added: return "Added"sv;
+		case filewatch::Event::removed: return "Removed"sv;
+		case filewatch::Event::modified: return "Modified"sv;
+		case filewatch::Event::renamed_old: return "Renamed Old"sv;
+		case filewatch::Event::renamed_new: return "Renamed New"sv;
+		}
+
+		KBR_CORE_ASSERT(false, "Unknown filewatch::Event");
+		return "Unknown"sv;
+	}
+
+	void ScriptEngine::OnAssemblyFileChanged(const std::string& path, const filewatch::Event changeType) 
+	{
+		if (changeType == filewatch::Event::modified)
+		{
+			const std::string extension = std::filesystem::path(path).extension().string();
+			if (extension == ".dll") {
+				KBR_CORE_INFO("Assembly file modified: {0}", path);
+				Application::Get().SubmitToMainThread([](){
+					ReloadAssembly();
+				});
 			}
 		}
 	}

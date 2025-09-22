@@ -217,7 +217,7 @@ namespace Kerberos
 		/// TODO: Will only work with MSVC
 		componentName = componentName.substr(componentName.find_last_of("::") + 1);
 		const std::string componentNamespace = "Kerberos.Source.Kerberos.Scene";
-		KBR_CORE_WARN("Registering component: {0}", componentName);
+		KBR_CORE_TRACE("Registering component: {0}", componentName);
 
 		const std::string fullName = componentNamespace + "." + componentName;
 		MonoType* managedType = mono_reflection_type_from_name(const_cast<char*>(fullName.c_str()), coreImage);

@@ -58,6 +58,8 @@ namespace Kerberos
 			const Timestep deltaTime = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
+			ExecuteMainThreadQueue();
+
 			// TODO: Execute this on the render thread
 			if (!m_Minimized)
 			{
@@ -102,6 +104,13 @@ namespace Kerberos
 		m_LayerStack.PushOverlay(overlay);
 	}
 
+	void Application::SubmitToMainThread(const std::function<void()>& function) 
+	{
+		std::scoped_lock lock(m_MainThreadQueueMutex);
+
+		m_MainThreadQueue.emplace_back(function);
+	}
+
 	bool Application::OnWindowClosed(const WindowCloseEvent& e)
 	{
 		m_Running = false;
@@ -120,5 +129,15 @@ namespace Kerberos
 		Renderer::OnWindowResized(e.GetWidth(), e.GetHeight());
 
 		return false;
+	}
+
+	void Application::ExecuteMainThreadQueue() 
+	{
+		std::scoped_lock lock(m_MainThreadQueueMutex);
+
+		for (const auto& func : m_MainThreadQueue)
+			func();
+
+		m_MainThreadQueue.clear();
 	}
 }

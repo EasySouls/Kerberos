@@ -15,6 +15,7 @@ extern "C" {
 	typedef struct _MonoImage		MonoImage;
 }
 
+namespace filewatch { enum class Event; }
 namespace filewatch { template<typename T> class FileWatch; }
 
 namespace Kerberos { class ScriptClass;				}
@@ -54,6 +55,8 @@ namespace Kerberos
 		static void LoadAssembly(const std::filesystem::path& assemblyPath);
 		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath);
 		static void LoadAssemblyClasses(const MonoAssembly* assembly, MonoImage* image);
+
+		static void OnAssemblyFileChanged(const std::string& path, const filewatch::Event changeType);
 
 		static MonoImage* GetCoreAssemblyImage();
 
