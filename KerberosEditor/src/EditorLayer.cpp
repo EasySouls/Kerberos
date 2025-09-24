@@ -187,6 +187,8 @@ namespace Kerberos
 
 		m_IconPlay = TextureImporter::ImportTexture("assets/editor/play_button.png");
 		m_IconStop = TextureImporter::ImportTexture("assets/editor/stop_button.png");
+		m_IconPause = TextureImporter::ImportTexture("assets/editor/pause_button.png");
+		m_IconResume = TextureImporter::ImportTexture("assets/editor/outlined_play_button.png");
 
 		/// Calculate the world transforms of the entities initially
 		m_ActiveScene->CalculateEntityTransforms();
@@ -605,6 +607,7 @@ namespace Kerberos
 	void EditorLayer::OnSceneStop()
 	{
 		m_SceneState = SceneState::Edit;
+		m_IsScenePaused = false;
 
 		if (m_SceneState == SceneState::Play)
 			m_ActiveScene->OnRuntimeStop();
@@ -682,7 +685,14 @@ namespace Kerberos
 
 		if (m_SceneState == SceneState::Edit)
 		{
-			ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f) - 2.0f);
+			constexpr int columns = 2;
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(2.0f, 2.0f));
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 2.0f));
+			constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable;
+			ImGui::BeginTable("##ToolbarButtonTable", columns, tableFlags, ImVec2(ImGui::GetWindowWidth(), size));
+			ImGui::PopStyleVar(2);
+
+			ImGui::TableNextColumn();
 
 			if (ImGui::ImageButton("PlayButton", m_IconPlay->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
 			{
@@ -693,9 +703,7 @@ namespace Kerberos
 				ImGui::SetTooltip("Play (Ctrl + P)");
 			}
 
-			/// TODO: This is not shown, ImGui places this under the previous button
-
-			ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f) + 200.0f);
+			ImGui::TableNextColumn();
 
 			if (ImGui::ImageButton("SimulateButton", m_IconPlay->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
 			{
@@ -705,13 +713,48 @@ namespace Kerberos
 			{
 				ImGui::SetTooltip("Simulate (Ctrl + L)");
 			}
+
+			ImGui::EndTable();
 		}
 		else 
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0.0f, 0.0f));
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 2.0f));
 
-			ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+			constexpr int columns = 2;
+			constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_None;
+			ImGui::BeginTable("##ToolbarButtonTable", columns, tableFlags);
+
+			//ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+			ImGui::TableNextColumn();
+
+			if (m_IsScenePaused)
+			{
+				if (ImGui::ImageButton("ResumeButton", m_IconResume->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
+				{
+					m_IsScenePaused = false;
+					m_ActiveScene->SetScenePaused(m_IsScenePaused);
+				}
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::SetTooltip("Resume");
+				}
+			}
+			else 
+			{
+				if (ImGui::ImageButton("PauseButton", m_IconPause->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
+				{
+					m_IsScenePaused = true;
+					m_ActiveScene->SetScenePaused(m_IsScenePaused);
+				}
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::SetTooltip("Pause");
+				}
+			}
+
+			ImGui::TableNextColumn();
 
 			if (ImGui::ImageButton("StopButton", m_IconStop->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
 			{
@@ -725,6 +768,8 @@ namespace Kerberos
 				else if (m_SceneState == SceneState::Simulate)
 					ImGui::SetTooltip("Stop Simulation (Ctrl + L)");
 			}
+
+			ImGui::EndTable();
 
 			ImGui::PopStyleVar(2);
 		}

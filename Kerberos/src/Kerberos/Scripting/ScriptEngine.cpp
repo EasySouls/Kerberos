@@ -10,6 +10,7 @@
 #include "Kerberos/Scene/Entity.h"
 #include "Kerberos/Application.h"
 #include "Kerberos/Project/Project.h"
+#include "Kerberos/Core/Timer.h"
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
@@ -18,8 +19,9 @@
 #include <mono/metadata/class.h>
 #include <mono/metadata/attrdefs.h>
 
-#include <string_view>
 #include <filewatch/FileWatch.hpp>
+
+#include <string_view>
 
 
 using namespace std::literals;
@@ -88,6 +90,11 @@ namespace Kerberos
 
 	void ScriptEngine::ReloadAssembly()
 	{
+		Timer reloadAssemblyTimer("Reload Assembly",[&](const TimerData& data)
+		{
+			KBR_CORE_INFO("Reloading C# assemblies took {:.2f} ms", data.DurationMs);
+		});
+
 		mono_domain_set(mono_get_root_domain(), false);
 		mono_domain_unload(s_ScriptData->AppDomain);
 		s_ScriptData->AppDomain = nullptr;

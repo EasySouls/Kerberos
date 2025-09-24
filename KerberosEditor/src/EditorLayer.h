@@ -117,7 +117,10 @@ namespace Kerberos
 
 		Ref<Texture2D> m_IconPlay;
 		Ref<Texture2D> m_IconStop;
+		Ref<Texture2D> m_IconPause;
+		Ref<Texture2D> m_IconResume;
 		SceneState m_SceneState = SceneState::Edit;
+		bool m_IsScenePaused = false;
 
 		bool m_IsFullScreenPersistent = true;
 	};

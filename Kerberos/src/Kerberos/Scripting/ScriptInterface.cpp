@@ -146,13 +146,13 @@ namespace Kerberos
 			KBR_CORE_ASSERT(entity.HasComponent<RigidBody3DComponent>(), "Entity doesn't have a Rigidbody3DComponent.");
 
 
-			RigidBody3DComponent& rb3d = entity.GetComponent<RigidBody3DComponent>();
+			const RigidBody3DComponent& rb3d = entity.GetComponent<RigidBody3DComponent>();
 			KBR_CORE_ASSERT(rb3d.RuntimeBody, "Rigidbody3DComponent doesn't have a runtime body.");
 
 			const JPH::Body* body = static_cast<JPH::Body*>(rb3d.RuntimeBody);
 			const JPH::BodyID& bodyId = body->GetID();
 
-			PhysicsSystem& physicsSystem = currentScene->GetPhysicsSystem();
+			const PhysicsSystem& physicsSystem = currentScene->GetPhysicsSystem();
 			JPH::BodyInterface& bodyInterface = physicsSystem.GetBodyInterface();
 			const JPH::Vec3Arg joltForce(force->x, force->y, force->z);
 			bodyInterface.AddImpulse(bodyId, joltForce);
@@ -163,7 +163,7 @@ namespace Kerberos
 	{
 		if (force)
 		{
-			const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+			const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 			const Ref<Scene> currentScene = scene.lock();
 			const Entity entity = currentScene->GetEntityByUUID(entityID);
 
@@ -176,7 +176,7 @@ namespace Kerberos
 			const JPH::Body* body = static_cast<JPH::Body*>(rb3d.RuntimeBody);
 			const JPH::BodyID& bodyId = body->GetID();
 
-			PhysicsSystem& physicsSystem = currentScene->GetPhysicsSystem();
+			const PhysicsSystem& physicsSystem = currentScene->GetPhysicsSystem();
 			JPH::BodyInterface& bodyInterface = physicsSystem.GetBodyInterface();
 			const JPH::Vec3Arg joltForce(force->x, force->y, force->z);
 			const JPH::Vec3Arg joltPoint(inPoint.x, inPoint.y, inPoint.z);

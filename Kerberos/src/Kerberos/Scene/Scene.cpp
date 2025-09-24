@@ -84,6 +84,11 @@ namespace Kerberos
 		m_PhysicsSystem.Cleanup();
 	}
 
+	void Scene::SetScenePaused(const bool isPaused)
+	{
+		m_IsScenePaused = isPaused;
+	}
+
 	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera)
 	{
 		Render3DEditor(camera);
@@ -91,43 +96,25 @@ namespace Kerberos
 
 	void Scene::OnUpdateSimulation(const Timestep ts, const EditorCamera& camera) 
 	{
-		m_PhysicsSystem.Update(ts);
+		/// If the scene is paused, do not update the physics system, but still render the scene
+		if (!m_IsScenePaused)
+		{
+			m_PhysicsSystem.Update(ts);
+		}
 
 		Render3DEditor(camera);
 	}
 
-	void Scene::OnUpdateRuntime(Timestep ts)
+	void Scene::OnUpdateRuntime(const Timestep ts)
 	{
 		KBR_PROFILE_FUNCTION();
 
-		/// Update the native scripts
+		if (!m_IsScenePaused)
 		{
-			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - Native scripts update");
+			UpdateScripts(ts);
 
-			m_Registry.view<NativeScriptComponent>().each([this, ts](auto entity, const NativeScriptComponent& script)
-				{
-					if (!script.Instance)
-					{
-						script.Instantiate();
-						script.Instance->m_Entity = Entity{ entity, this };
-						script.Instance->OnCreate();
-					}
-
-					script.Instance->OnUpdate(ts);
-				});
+			m_PhysicsSystem.Update(ts);
 		}
-
-		{
-			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - C# scripts update");
-
-			m_Registry.view<ScriptComponent>().each([this, ts](auto id, [[maybe_unused]] const ScriptComponent& script)
-			{
-				const Entity entity{ id, this };
-				ScriptEngine::OnUpdateEntity(entity, ts);
-			});
-		}
-
-		m_PhysicsSystem.Update(ts);
 
 		/// Render the scene
 
@@ -723,6 +710,37 @@ namespace Kerberos
 
 		Renderer3D::EndPass();
 		Renderer3D::EndScene();
+	}
+
+	void Scene::UpdateScripts(Timestep ts) 
+	{
+		KBR_PROFILE_FUNCTION();
+
+		{
+			KBR_PROFILE_SCOPE("Scene::UpdateScripts - Native scripts update");
+
+			m_Registry.view<NativeScriptComponent>().each([this, ts](auto entity, const NativeScriptComponent& script)
+				{
+					if (!script.Instance)
+					{
+						script.Instantiate();
+						script.Instance->m_Entity = Entity{ entity, this };
+						script.Instance->OnCreate();
+					}
+
+					script.Instance->OnUpdate(ts);
+				});
+		}
+
+		{
+			KBR_PROFILE_SCOPE("Scene::UpdateScripts - C# scripts update");
+
+			m_Registry.view<ScriptComponent>().each([this, ts](auto id, [[maybe_unused]] const ScriptComponent& script)
+				{
+					const Entity entity{ id, this };
+					ScriptEngine::OnUpdateEntity(entity, ts);
+				});
+		}
 	}
 
 	void Scene::UpdateChildTransforms(const Entity parent, const glm::mat4& parentTransform)

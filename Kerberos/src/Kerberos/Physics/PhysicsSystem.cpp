@@ -30,7 +30,7 @@ namespace Kerberos
 {
 	PhysicsSystem::~PhysicsSystem() 
 	{
-		Cleanup();
+		PhysicsSystem::Cleanup();
 	}
 
 	void PhysicsSystem::Initialize(const Ref<Scene>& scene) 
@@ -130,6 +130,23 @@ namespace Kerberos
 		m_JoltSystem->Update(deltaTime, collisionSteps, m_PhysicsTempAllocator, m_PhysicsJobSystem);
 
 		SyncTransforms();
+	}
+
+	void PhysicsSystem::AddImpulse(const uint32_t bodyId, const glm::vec3& impulse) 
+	{
+		const JPH::BodyID id { bodyId };
+		JPH::BodyInterface& bodyInterface = GetBodyInterface();
+		const JPH::Vec3Arg joltForce(impulse.x, impulse.y, impulse.z);
+		bodyInterface.AddImpulse(id, joltForce);
+	}
+
+	void PhysicsSystem::AddImpulse(const uint32_t bodyId, const glm::vec3& impulse, const glm::vec3& point) 
+	{
+		const JPH::BodyID id{ bodyId };
+		JPH::BodyInterface& bodyInterface = GetBodyInterface();
+		const JPH::Vec3Arg joltForce(impulse.x, impulse.y, impulse.z);
+		const JPH::Vec3Arg joltPoint(point.x, point.y, point.z);
+		bodyInterface.AddImpulse(id, joltForce, joltPoint);
 	}
 
 	JPH::BodyInterface& PhysicsSystem::GetBodyInterface() const 

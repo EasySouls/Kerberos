@@ -28,6 +28,7 @@ namespace Kerberos
 		void OnRuntimeStop();
 		void OnSimulationStart();
 		void OnSimulationStop();
+		void SetScenePaused(bool isPaused);
 
 		void OnUpdateEditor(Timestep ts, const EditorCamera& camera);
 		void OnUpdateSimulation(Timestep ts, const EditorCamera& camera);
@@ -101,6 +102,8 @@ namespace Kerberos
 		void Render3DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
 		void Render3DEditor(const EditorCamera& camera);
 
+		void UpdateScripts(Timestep ts);
+
 		void UpdateChildTransforms(Entity parent, const glm::mat4& parentTransform);
 
 		bool ShouldRenderShadows(const DirectionalLightComponent* dlc) const;
@@ -116,6 +119,8 @@ namespace Kerberos
 
 		uint32_t m_ViewportWidth = 0;
 		uint32_t m_ViewportHeight = 0;
+
+		bool m_IsScenePaused = false;
 
 		bool m_Is3D = true;
 		bool m_EnableShadowMapping = true;
