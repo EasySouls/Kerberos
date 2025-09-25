@@ -25,9 +25,9 @@ namespace Kerberos
 		~Scene() override;
 
 		void OnRuntimeStart();
-		void OnRuntimeStop();
+		void OnRuntimeStop() const;
 		void OnSimulationStart();
-		void OnSimulationStop();
+		void OnSimulationStop() const;
 		void SetScenePaused(bool isPaused);
 
 		void OnUpdateEditor(Timestep ts, const EditorCamera& camera);
@@ -87,8 +87,8 @@ namespace Kerberos
 		Ref<Framebuffer> GetEditorFramebuffer() const { return m_EditorFramebuffer; }
 		bool& GetOnlyRenderShadowMapIfLightHasChanged() { return m_OnlyRenderShadowMapIfLightHasChanged; }
 
-		const PhysicsSystem& GetPhysicsSystem() const { return m_PhysicsSystem; }
-		PhysicsSystem& GetPhysicsSystem() { return m_PhysicsSystem; }
+		const IPhysicsSystem& GetPhysicsSystem() const;
+		IPhysicsSystem& GetPhysicsSystem();
 
 		static Ref<Scene> Copy(const Ref<Scene>& other);
 
@@ -134,7 +134,7 @@ namespace Kerberos
 
 		std::set<entt::entity> m_RootEntities;
 
-		PhysicsSystem m_PhysicsSystem;
+		IPhysicsSystem* m_PhysicsSystem;
 
 		friend class Entity;
 		friend class PhysicsSystem;

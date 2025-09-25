@@ -30,6 +30,8 @@ namespace Kerberos
 		/// Pointer to the physics engine's runtime body
 		void* RuntimeBody = nullptr;
 
+		/// TODO: add a physics body id, so when not interacting directly with the runtime body we can just use the id to send data to the physics engine
+
 		bool IsDirty = true;
 
 		RigidBody3DComponent() = default;

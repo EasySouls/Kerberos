@@ -25,7 +25,7 @@ namespace Kerberos
 
 		virtual void Update(float deltaTime) = 0;
 
-		virtual void AddImpulse(uint32_t bodyId, const glm::vec3& impulse) = 0;
-		virtual void AddImpulse(uint32_t bodyId, const glm::vec3& impulse, const glm::vec3& point) = 0;
+		virtual void AddImpulse(uint32_t bodyId, const glm::vec3& impulse) const = 0;
+		virtual void AddImpulse(uint32_t bodyId, const glm::vec3& impulse, const glm::vec3& point) const = 0;
 	};
 }

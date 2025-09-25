@@ -19,8 +19,6 @@
 
 #include <memory>
 
-#include "Jolt/Physics/Body/BodyInterface.h"
-
 namespace Kerberos
 {
 #define KBR_ADD_INTERNAL_CALL(name) mono_add_internal_call("Kerberos.Source.InternalCalls::" #name, reinterpret_cast<const void*>(name))
@@ -77,7 +75,7 @@ namespace Kerberos
 
 	static void TransformComponent_GetTranslation(const UUID entityID, glm::vec3* outTranslation)
 	{
-		const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		if (outTranslation)
 		{
 			const glm::vec3 translation = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Translation;
@@ -89,7 +87,7 @@ namespace Kerberos
 	{
 		if (translation)
 		{
-			const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+			const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 			glm::vec3& currentTranslation = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Translation;
 			currentTranslation = *translation;
 		}
@@ -97,7 +95,7 @@ namespace Kerberos
 
 	static void TransformComponent_GetRotation(const UUID entityID, glm::vec3* outRotation)
 	{
-		const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		if (outRotation)
 		{
 			const glm::vec3 rotation = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Rotation;
@@ -109,7 +107,7 @@ namespace Kerberos
 	{
 		if (rotation)
 		{
-			const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+			const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 			glm::vec3& currentRotation = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Rotation;
 			currentRotation = *rotation;
 		}
@@ -117,7 +115,7 @@ namespace Kerberos
 
 	static void TransformComponent_GetScale(const UUID entityID, glm::vec3* outScale)
 	{
-		const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		if (outScale)
 		{
 			const glm::vec3 scale = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Scale;
@@ -129,37 +127,13 @@ namespace Kerberos
 	{
 		if (scale)
 		{
-			const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
+			const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 			glm::vec3& currentScale = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Scale;
 			currentScale = *scale;
 		}
 	}
 
 	static void Rigidbody3DComponent_ApplyImpulse(const UUID entityID, const glm::vec3* force)
-	{
-		if (force)
-		{
-			const std::weak_ptr<Scene> scene = ScriptEngine::GetSceneContext();
-			const Ref<Scene> currentScene = scene.lock();
-			const Entity entity = currentScene->GetEntityByUUID(entityID);
-
-			KBR_CORE_ASSERT(entity.HasComponent<RigidBody3DComponent>(), "Entity doesn't have a Rigidbody3DComponent.");
-
-
-			const RigidBody3DComponent& rb3d = entity.GetComponent<RigidBody3DComponent>();
-			KBR_CORE_ASSERT(rb3d.RuntimeBody, "Rigidbody3DComponent doesn't have a runtime body.");
-
-			const JPH::Body* body = static_cast<JPH::Body*>(rb3d.RuntimeBody);
-			const JPH::BodyID& bodyId = body->GetID();
-
-			const PhysicsSystem& physicsSystem = currentScene->GetPhysicsSystem();
-			JPH::BodyInterface& bodyInterface = physicsSystem.GetBodyInterface();
-			const JPH::Vec3Arg joltForce(force->x, force->y, force->z);
-			bodyInterface.AddImpulse(bodyId, joltForce);
-		}
-	}
-
-	static void Rigidbody3DComponent_ApplyImpulseAtPoint(const UUID entityID, const glm::vec3* force, const glm::vec3 inPoint)
 	{
 		if (force)
 		{
@@ -175,12 +149,32 @@ namespace Kerberos
 
 			const JPH::Body* body = static_cast<JPH::Body*>(rb3d.RuntimeBody);
 			const JPH::BodyID& bodyId = body->GetID();
+			const uint32_t bodyIdValue = bodyId.GetIndexAndSequenceNumber();
 
-			const PhysicsSystem& physicsSystem = currentScene->GetPhysicsSystem();
-			JPH::BodyInterface& bodyInterface = physicsSystem.GetBodyInterface();
-			const JPH::Vec3Arg joltForce(force->x, force->y, force->z);
-			const JPH::Vec3Arg joltPoint(inPoint.x, inPoint.y, inPoint.z);
-			bodyInterface.AddImpulse(bodyId, joltForce, joltPoint);
+			const IPhysicsSystem& physicsSystem = currentScene->GetPhysicsSystem();
+			physicsSystem.AddImpulse(bodyIdValue, *force);
+		}
+	}
+
+	static void Rigidbody3DComponent_ApplyImpulseAtPoint(const UUID entityID, const glm::vec3* force, const glm::vec3* inPoint)
+	{
+		if (force)
+		{
+			const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+			const Ref<Scene> currentScene = scene.lock();
+			const Entity entity = currentScene->GetEntityByUUID(entityID);
+
+			KBR_CORE_ASSERT(entity.HasComponent<RigidBody3DComponent>(), "Entity doesn't have a Rigidbody3DComponent.");
+
+			const RigidBody3DComponent& rb3d = entity.GetComponent<RigidBody3DComponent>();
+			KBR_CORE_ASSERT(rb3d.RuntimeBody, "Rigidbody3DComponent doesn't have a runtime body.");
+
+			const JPH::Body* body = static_cast<JPH::Body*>(rb3d.RuntimeBody);
+			const JPH::BodyID& bodyId = body->GetID();
+			const uint32_t bodyIdValue = bodyId.GetIndexAndSequenceNumber();
+
+			const IPhysicsSystem& physicsSystem = currentScene->GetPhysicsSystem();
+			physicsSystem.AddImpulse(bodyIdValue, *force, *inPoint);
 		}
 	}
 

@@ -132,7 +132,7 @@ namespace Kerberos
 		SyncTransforms();
 	}
 
-	void PhysicsSystem::AddImpulse(const uint32_t bodyId, const glm::vec3& impulse) 
+	void PhysicsSystem::AddImpulse(const uint32_t bodyId, const glm::vec3& impulse) const
 	{
 		const JPH::BodyID id { bodyId };
 		JPH::BodyInterface& bodyInterface = GetBodyInterface();
@@ -140,7 +140,7 @@ namespace Kerberos
 		bodyInterface.AddImpulse(id, joltForce);
 	}
 
-	void PhysicsSystem::AddImpulse(const uint32_t bodyId, const glm::vec3& impulse, const glm::vec3& point) 
+	void PhysicsSystem::AddImpulse(const uint32_t bodyId, const glm::vec3& impulse, const glm::vec3& point) const
 	{
 		const JPH::BodyID id{ bodyId };
 		JPH::BodyInterface& bodyInterface = GetBodyInterface();
@@ -224,7 +224,7 @@ namespace Kerberos
 				const Entity entity(e, m_Scene);
 				const JPH::Vec3 offset = m_ColliderOffsets.at(entity.GetUUID());
 
-				Physics::Utils::ApplyJoltTransformToEntity(transform.WorldTransform, *body, offset);
+				Physics::Utils::ApplyJoltTransformToEntity(transform.WorldTransform, *body, offset, entity.GetComponent<TransformComponent>());
 			}
 		}
 

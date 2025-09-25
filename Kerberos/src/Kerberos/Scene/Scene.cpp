@@ -20,7 +20,8 @@
 
 namespace Kerberos
 {
-	Scene::Scene()
+	Scene::Scene() 
+		: m_PhysicsSystem(new PhysicsSystem()) 
 	{
 		m_Registry = entt::basic_registry();
 
@@ -28,20 +29,20 @@ namespace Kerberos
 			.Width = 1024,
 			.Height = 1024,
 			.Attachments = {
-				{ FramebufferTextureFormat::DEPTH24 }
+				{FramebufferTextureFormat::DEPTH24}
 			}
-			});
+		});
 		m_ShadowMapFramebuffer->SetDebugName("ShadowMapFramebuffer");
 
 		m_EditorFramebuffer = Framebuffer::Create(FramebufferSpecification{
 			.Width = 1280,
 			.Height = 720,
 			.Attachments = {
-				{ FramebufferTextureFormat::RGBA8 },
-				{ FramebufferTextureFormat::RED_INTEGER },
-				{ FramebufferTextureFormat::DEPTH24STENCIL8 }
+				{FramebufferTextureFormat::RGBA8},
+				{FramebufferTextureFormat::RED_INTEGER},
+				{FramebufferTextureFormat::DEPTH24STENCIL8}
 			}
-			});
+		});
 		m_EditorFramebuffer->SetDebugName("EditorFramebuffer");
 	}
 
@@ -55,7 +56,7 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		m_PhysicsSystem.Initialize(shared_from_this());
+		m_PhysicsSystem->Initialize(shared_from_this());
 
 		ScriptEngine::OnRuntimeStart(shared_from_this());
 
@@ -67,21 +68,21 @@ namespace Kerberos
 		});
 	}
 
-	void Scene::OnRuntimeStop()
+	void Scene::OnRuntimeStop() const 
 	{
-		m_PhysicsSystem.Cleanup();
+		m_PhysicsSystem->Cleanup();
 
 		ScriptEngine::OnRuntimeStop();
 	}
 
 	void Scene::OnSimulationStart()
 	{
-		m_PhysicsSystem.Initialize(shared_from_this());
+		m_PhysicsSystem->Initialize(shared_from_this());
 	}
 
-	void Scene::OnSimulationStop()
+	void Scene::OnSimulationStop() const 
 	{
-		m_PhysicsSystem.Cleanup();
+		m_PhysicsSystem->Cleanup();
 	}
 
 	void Scene::SetScenePaused(const bool isPaused)
@@ -99,7 +100,7 @@ namespace Kerberos
 		/// If the scene is paused, do not update the physics system, but still render the scene
 		if (!m_IsScenePaused)
 		{
-			m_PhysicsSystem.Update(ts);
+			m_PhysicsSystem->Update(ts);
 		}
 
 		Render3DEditor(camera);
@@ -113,7 +114,7 @@ namespace Kerberos
 		{
 			UpdateScripts(ts);
 
-			m_PhysicsSystem.Update(ts);
+			m_PhysicsSystem->Update(ts);
 		}
 
 		/// Render the scene
@@ -401,6 +402,18 @@ namespace Kerberos
 				cameraComponent.Camera.SetViewportSize(width, height);
 			}
 		}
+	}
+
+	const IPhysicsSystem& Scene::GetPhysicsSystem() const 
+	{
+		KBR_CORE_ASSERT(m_PhysicsSystem, "Physics system is not initialized");
+		return *m_PhysicsSystem;
+	}
+
+	IPhysicsSystem& Scene::GetPhysicsSystem() 
+	{
+		KBR_CORE_ASSERT(m_PhysicsSystem, "Physics system is not initialized");
+		return *m_PhysicsSystem;
 	}
 
 	Ref<Scene> Scene::Copy(const Ref<Scene>& other)

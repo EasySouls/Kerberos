@@ -44,8 +44,8 @@ namespace Kerberos
 		void Initialize(const Ref<Scene>& scene) override;
 		void Update(float deltaTime) override;
 
-		void AddImpulse(uint32_t bodyId, const glm::vec3& impulse) override;
-		void AddImpulse(uint32_t bodyId, const glm::vec3& impulse, const glm::vec3& point) override;
+		void AddImpulse(uint32_t bodyId, const glm::vec3& impulse) const override;
+		void AddImpulse(uint32_t bodyId, const glm::vec3& impulse, const glm::vec3& point) const override;
 
 		/// TODO: Might not be a good idea to expose this
 		JPH::BodyInterface& GetBodyInterface() const;
