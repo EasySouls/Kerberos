@@ -324,7 +324,7 @@ namespace Kerberos
 			const JPH::Vec3 offset(coll.Offset.x, coll.Offset.y, coll.Offset.z);
 			m_ColliderOffsets[entity.GetUUID()] = offset;
 
-			shapes.push_back(shape);
+			shapes.emplace_back(shape);
 		}
 
 		if (entity.HasComponent<SphereCollider3DComponent>())
@@ -335,7 +335,7 @@ namespace Kerberos
 			const JPH::Vec3 offset(coll.Offset.x, coll.Offset.y, coll.Offset.z);
 			m_ColliderOffsets[entity.GetUUID()] = offset;
 
-			shapes.push_back(shape);
+			shapes.emplace_back(shape);
 		}
 
 		if (entity.HasComponent<CapsuleCollider3DComponent>())
@@ -346,12 +346,12 @@ namespace Kerberos
 			const JPH::Vec3 offset(coll.Offset.x, coll.Offset.y, coll.Offset.z);
 			m_ColliderOffsets[entity.GetUUID()] = offset;
 
-			shapes.push_back(shape);
+			shapes.emplace_back(shape);
 		}
 
 		if (entity.HasComponent<MeshCollider3DComponent>())
 		{
-			const StaticMeshComponent mesh = entity.GetComponent<StaticMeshComponent>();
+			const StaticMeshComponent& mesh = entity.GetComponent<StaticMeshComponent>();
 			const auto& coll = entity.GetComponent<MeshCollider3DComponent>();
 			if (mesh.StaticMesh)
 			{

@@ -133,11 +133,13 @@ namespace Kerberos
 
 	void Application::ExecuteMainThreadQueue() 
 	{
-		std::scoped_lock lock(m_MainThreadQueueMutex);
-
-		for (const auto& func : m_MainThreadQueue)
+		std::vector<std::function<void()>> functions;
+		{
+			std::scoped_lock lock(m_MainThreadQueueMutex);
+			functions.swap(m_MainThreadQueue);
+		}
+		
+		for (const auto& func : functions)
 			func();
-
-		m_MainThreadQueue.clear();
 	}
 }
