@@ -18,6 +18,8 @@
 #include <mono/metadata/object.h>
 #include <mono/metadata/class.h>
 #include <mono/metadata/attrdefs.h>
+#include <mono/metadata/mono-debug.h>
+#include <mono/metadata/threads.h>
 
 #include <filewatch/FileWatch.hpp>
 
@@ -49,6 +51,8 @@ namespace Kerberos
 
 		std::weak_ptr<Scene> SceneContext;
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
+
+		bool EnableDebugging = true;
 	};
 
 	static ScriptEngineData* s_ScriptData = nullptr;
@@ -232,6 +236,17 @@ namespace Kerberos
 	{
 		mono_set_assemblies_path("mono/lib");
 
+		if (s_ScriptData->EnableDebugging)
+		{
+			const char* argv[2] = {
+				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.log",
+				"--soft-breakpoints"
+			};
+
+			mono_jit_parse_options(2, const_cast<char**>(argv));
+			mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+		}
+
 		MonoDomain* rootDomain = mono_jit_init("KerberosJITRuntime");
 		if (rootDomain == nullptr)
 		{
@@ -240,6 +255,11 @@ namespace Kerberos
 		}
 
 		s_ScriptData->RootDomain = rootDomain;
+
+		if (s_ScriptData->EnableDebugging)
+			mono_debug_domain_create(s_ScriptData->RootDomain);
+
+		mono_thread_set_main(mono_thread_current());
 	}
 
 	void ScriptEngine::ShutdownMono() 
@@ -271,12 +291,12 @@ namespace Kerberos
 		s_ScriptData->AppDomain = mono_domain_create_appdomain(const_cast<char*>("KerberosScriptRuntime"), nullptr);
 		mono_domain_set(s_ScriptData->AppDomain, true);
 
-		s_ScriptData->CoreAssembly = LoadMonoAssembly(assemblyPath);
+		s_ScriptData->CoreAssembly = LoadMonoAssembly(assemblyPath, s_ScriptData->EnableDebugging);
 		s_ScriptData->CoreAssemblyImage = mono_assembly_get_image(s_ScriptData->CoreAssembly);
 		s_ScriptData->CoreAssemblyPath = assemblyPath;
 	}
 
-	MonoAssembly* ScriptEngine::LoadMonoAssembly(const std::filesystem::path& assemblyPath) 
+	MonoAssembly* ScriptEngine::LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPdb) 
 	{
 		uint32_t fileSize = 0;
 		char* fileData = Filesystem::ReadBytes(assemblyPath, &fileSize);
@@ -290,6 +310,22 @@ namespace Kerberos
 			const char* errorMessage = mono_image_strerror(status);
 			KBR_CORE_ASSERT(false, "Failed to load assembly from file {0}: {1}", assemblyPath, errorMessage);
 			return nullptr;
+		}
+
+		if (loadPdb)
+		{
+			std::filesystem::path pdbPath = assemblyPath;
+
+			pdbPath.replace_extension(".pdb");
+
+			if (std::filesystem::exists(pdbPath))
+			{
+				uint32_t pdbFileSize = 0;
+				const char* pdbFileData = Filesystem::ReadBytes(pdbPath, &pdbFileSize);
+				mono_debug_open_image_from_memory(image, reinterpret_cast<const mono_byte*>(pdbFileData), static_cast<int>(pdbFileSize));
+				KBR_CORE_INFO("Loaded PDB {}", pdbPath);
+				delete[] pdbFileData;
+			}
 		}
 
 		MonoAssembly* assembly = mono_assembly_load_from_full(image, assemblyPath.string().c_str(), &status, 0);

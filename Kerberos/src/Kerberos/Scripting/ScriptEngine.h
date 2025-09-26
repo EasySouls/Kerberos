@@ -53,7 +53,7 @@ namespace Kerberos
 		static MonoObject* InstantiateClass(MonoClass* klass);
 
 		static void LoadAssembly(const std::filesystem::path& assemblyPath);
-		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath);
+		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPdb);
 		static void LoadAssemblyClasses(const MonoAssembly* assembly, MonoImage* image);
 
 		static void OnAssemblyFileChanged(const std::string& path, const filewatch::Event changeType);
