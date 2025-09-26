@@ -30,6 +30,8 @@ IncludeDir["Assimp"] = "%{wks.location}/Kerberos/vendor/Assimp/include"
 IncludeDir["JoltPhysics"] = "%{wks.location}/Kerberos/vendor/JoltPhysics"
 IncludeDir["Mono"] = "%{wks.location}/Kerberos/vendor/mono/include"
 IncludeDir["Filewatch"] = "%{wks.location}/Kerberos/vendor/filewatch"
+IncludeDir["msdfgen"] = "%{wks.location}/Kerberos/vendor/msdf-atlas-gen/msdfgen"
+IncludeDir["msdf_atlas_gen"] = "%{wks.location}/Kerberos/vendor/msdf-atlas-gen/msdf-atlas-gen"
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
@@ -110,6 +112,7 @@ group "Dependencies"
 	include "Kerberos/vendor/glad"
 	include "Kerberos/vendor/imgui"
 	include "Kerberos/vendor/yaml-cpp"
+	include "Kerberos/vendor/msdf-atlas-gen"
 	include "Kerberos/vendor/ImGuizmo"
 	include "Kerberos/vendor/Assimp"
 	include "Kerberos/vendor/JoltPhysics"
@@ -160,6 +163,8 @@ project "Kerberos"
 		IncludeDir.JoltPhysics,
 		IncludeDir.Mono,
 		IncludeDir.Filewatch,
+		IncludeDir.msdfgen,
+		IncludeDir.msdf_atlas_gen,
 	}
 
 	libdirs 
@@ -174,6 +179,7 @@ project "Kerberos"
 		"Glad",
 		"ImGui",
 		"yaml-cpp",
+		"msdf-atlas-gen",
 		"ImGuizmo",
 		"Assimp",
 		"JoltPhysics",
