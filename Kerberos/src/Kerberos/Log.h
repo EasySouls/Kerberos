@@ -1,15 +1,17 @@
 #pragma once
 
 #include "Kerberos/Core.h"
+#include "Kerberos/Core/UUID.h"
+
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
-
-#include <memory>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
-#include "Core/UUID.h"
+#include <memory>
+#include <filesystem>
+
 
 namespace Kerberos
 {
@@ -129,5 +131,14 @@ struct fmt::formatter<Kerberos::UUID> : fmt::formatter<std::string>
 	auto format(const Kerberos::UUID uuid, const format_context& ctx) const -> decltype(ctx.out())
 	{
 		return fmt::format_to(ctx.out(), "{}", static_cast<uint64_t>(uuid));
+	}
+};
+
+template<>
+struct fmt::formatter<std::filesystem::path> : fmt::formatter<std::string>
+{
+	auto format(const std::filesystem::path& path, const format_context& ctx) const -> decltype(ctx.out())
+	{
+		return fmt::format_to(ctx.out(), "{}", path.string());
 	}
 };

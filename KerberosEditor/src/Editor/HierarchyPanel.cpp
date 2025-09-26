@@ -1,17 +1,20 @@
 #include "HierarchyPanel.h"
+
 #include "Kerberos/Scene/Components.h"
+#include "Kerberos/Scene/Components/PhysicsComponents.h"
 #include "Kerberos/Assets/AssetManager.h"
+#include "Kerberos/Core/Input.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"
+#include "Kerberos/Events/KeyEvent.h"
+#include "Kerberos/Scripting/ScriptEngine.h"
+#include "Kerberos/Scripting/ScriptInstance.h"
+#include "Kerberos/Scripting/ScriptClass.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui/imgui.h>
 #include "imgui/imgui_internal.h"
+
 #include <filesystem>
-
-#include "Kerberos/Core/Input.h"
-#include "Kerberos/Events/KeyEvent.h"
-
-import Components.PhysicsComponents;
 
 namespace Kerberos
 {
@@ -183,6 +186,12 @@ namespace Kerberos
 			if (ImGui::MenuItem("Camera"))
 			{
 				entity.AddComponent<CameraComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Script"))
+			{
+				entity.AddComponent<ScriptComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -522,6 +531,228 @@ namespace Kerberos
 				entity.RemoveComponent<CameraComponent>();
 			}
 		}
+
+		if (entity.HasComponent<ScriptComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<const void*>(typeid(ScriptComponent).hash_code()), treeNodeFlags, "Script");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Script Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			if (opened)
+			{
+				auto& component = entity.GetComponent<ScriptComponent>();
+
+				bool scriptClassExists = false;
+				const auto& entityClasses = ScriptEngine::GetEntityClasses();
+
+				if (entityClasses.contains(component.ClassName))
+				{
+					scriptClassExists = true;
+					ScriptEngine::CreateScriptFieldInitializers(entity, component.ClassName);
+				}
+
+				static char buffer[64];
+				strcpy_s(buffer, component.ClassName.c_str());
+
+				if (!scriptClassExists)
+				{
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
+				}
+
+				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+				{
+					if (entityClasses.contains(buffer))
+					{
+						ScriptEngine::CreateScriptFieldInitializers(entity, buffer);
+					}
+					component.ClassName = buffer;
+				}
+
+				if (scriptClassExists)
+				{
+					/// We decide whether to show the initializer fields based on whether the script instance exists
+					/// This is basically just a check if the scene is running or not,
+					/// since script instances are only created when the scene is running
+					if (const Ref<ScriptInstance>& scriptInstance = ScriptEngine::GetEntityInstance(entity.GetUUID()))
+					{
+						/// The scene is running, show the live fields for the script instance
+
+						/// Fields
+						const auto& fields = scriptInstance->GetScriptClass()->GetSerializedFields();
+						for (const auto& [name, scriptField] : fields)
+						{
+							if (scriptField.Type == ScriptFieldType::Int)
+							{
+								int value = scriptInstance->GetFieldValue<int>(name);
+								if (ImGui::InputInt(name.c_str(), &value))
+								{
+									scriptInstance->SetFieldValue<int>(name, value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Float)
+							{
+								float value = scriptInstance->GetFieldValue<float>(name);
+								if (ImGui::DragFloat(name.c_str(), &value, 0.1f))
+								{
+									scriptInstance->SetFieldValue<float>(name, value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Bool)
+							{
+								bool value = scriptInstance->GetFieldValue<bool>(name);
+								if (ImGui::Checkbox(name.c_str(), &value))
+								{
+									scriptInstance->SetFieldValue<bool>(name, value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::String)
+							{
+								std::string value = scriptInstance->GetFieldValue<std::string>(name);
+								char strBuffer[256];
+								strcpy_s(strBuffer, sizeof(strBuffer), value.c_str());
+								if (ImGui::InputText(name.c_str(), strBuffer, sizeof(strBuffer)))
+								{
+									scriptInstance->SetFieldValue<std::string>(name, std::string(strBuffer));
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec2)
+							{
+								glm::vec2 value = scriptInstance->GetFieldValue<glm::vec2>(name);
+								if (ImGui::DragFloat2(name.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									scriptInstance->SetFieldValue<glm::vec2>(name, value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec3)
+							{
+								glm::vec3 value = scriptInstance->GetFieldValue<glm::vec3>(name);
+								if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									scriptInstance->SetFieldValue<glm::vec3>(name, value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec4)
+							{
+								glm::vec4 value = scriptInstance->GetFieldValue<glm::vec4>(name);
+								if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									scriptInstance->SetFieldValue<glm::vec4>(name, value);
+								}
+							}
+							else
+							{
+								ImGui::Text("Unsupported field type");
+							}
+						}
+					}
+					else
+					{
+						/// The scene is not running, show the initializer fields for the script,
+						/// which then will be applied to the script when the scene starts.
+						
+						const auto& fields = ScriptEngine::GetScriptFieldInitializerMap(entity);
+						for (const auto& [fieldName, fieldInitializer] : fields)
+						{
+							const auto& scriptField = fieldInitializer.Field;
+
+							if (scriptField.Type == ScriptFieldType::Int)
+							{
+								int value = fieldInitializer.GetValue<int>();
+								if (ImGui::InputInt(fieldName.c_str(), &value))
+								{
+									fieldInitializer.SetValue<int>(value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Float)
+							{
+								float value = fieldInitializer.GetValue<float>();
+								if (ImGui::DragFloat(fieldName.c_str(), &value, 0.1f))
+								{
+									fieldInitializer.SetValue<float>(value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Bool)
+							{
+								bool value = fieldInitializer.GetValue<bool>();
+								if (ImGui::Checkbox(fieldName.c_str(), &value))
+								{
+									fieldInitializer.SetValue<bool>(value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::String)
+							{
+								std::string value = fieldInitializer.GetValue<std::string>();
+								char strBuffer[256];
+								strcpy_s(strBuffer, sizeof(strBuffer), value.c_str());
+								if (ImGui::InputText(fieldName.c_str(), strBuffer, sizeof(strBuffer)))
+								{
+									fieldInitializer.SetValue<std::string>(std::string(strBuffer));
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec2)
+							{
+								glm::vec2 value = fieldInitializer.GetValue<glm::vec2>();
+								if (ImGui::DragFloat2(fieldName.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									fieldInitializer.SetValue<glm::vec2>(value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec3)
+							{
+								glm::vec3 value = fieldInitializer.GetValue<glm::vec3>();
+								if (ImGui::DragFloat3(fieldName.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									fieldInitializer.SetValue<glm::vec3>(value);
+								}
+							}
+							else if (scriptField.Type == ScriptFieldType::Vec4)
+							{
+								glm::vec4 value = fieldInitializer.GetValue<glm::vec4>();
+								if (ImGui::DragFloat4(fieldName.c_str(), glm::value_ptr(value), 0.1f))
+								{
+									fieldInitializer.SetValue<glm::vec4>(value);
+								}
+							}
+							else
+							{
+								ImGui::Text("Unsupported field type");
+							}
+						}
+					}
+				}
+
+				if (!scriptClassExists)
+				{
+					ImGui::PopStyleColor();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<ScriptComponent>();
+			}
+		}
+
 		if (entity.HasComponent<SpriteRendererComponent>())
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));

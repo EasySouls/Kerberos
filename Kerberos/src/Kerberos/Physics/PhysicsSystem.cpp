@@ -1,7 +1,5 @@
 #include "kbrpch.h"
 
-import Components.PhysicsComponents;
-
 #include "PhysicsSystem.h"
 #include "BodyActivationListener.h"
 #include "ContactListener.h"
@@ -10,6 +8,7 @@ import Components.PhysicsComponents;
 #include "Utils.h"
 #include "Kerberos/Scene/Entity.h"
 #include "Kerberos/Scene/Scene.h"
+#include "Kerberos/Scene/Components/PhysicsComponents.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/TempAllocator.h>
@@ -31,7 +30,7 @@ namespace Kerberos
 {
 	PhysicsSystem::~PhysicsSystem() 
 	{
-		Cleanup();
+		PhysicsSystem::Cleanup();
 	}
 
 	void PhysicsSystem::Initialize(const Ref<Scene>& scene) 
@@ -133,6 +132,28 @@ namespace Kerberos
 		SyncTransforms();
 	}
 
+	void PhysicsSystem::AddImpulse(const uint32_t bodyId, const glm::vec3& impulse) const
+	{
+		const JPH::BodyID id { bodyId };
+		JPH::BodyInterface& bodyInterface = GetBodyInterface();
+		const JPH::Vec3Arg joltForce(impulse.x, impulse.y, impulse.z);
+		bodyInterface.AddImpulse(id, joltForce);
+	}
+
+	void PhysicsSystem::AddImpulse(const uint32_t bodyId, const glm::vec3& impulse, const glm::vec3& point) const
+	{
+		const JPH::BodyID id{ bodyId };
+		JPH::BodyInterface& bodyInterface = GetBodyInterface();
+		const JPH::Vec3Arg joltForce(impulse.x, impulse.y, impulse.z);
+		const JPH::Vec3Arg joltPoint(point.x, point.y, point.z);
+		bodyInterface.AddImpulse(id, joltForce, joltPoint);
+	}
+
+	JPH::BodyInterface& PhysicsSystem::GetBodyInterface() const 
+	{
+		return m_JoltSystem->GetBodyInterface();
+	}
+
 	void PhysicsSystem::UpdateAndCreatePhysicsBodies() 
 	{
 		KBR_PROFILE_FUNCTION();
@@ -203,7 +224,7 @@ namespace Kerberos
 				const Entity entity(e, m_Scene);
 				const JPH::Vec3 offset = m_ColliderOffsets.at(entity.GetUUID());
 
-				Physics::Utils::ApplyJoltTransformToEntity(transform.WorldTransform, *body, offset);
+				Physics::Utils::ApplyJoltTransformToEntity(transform.WorldTransform, *body, offset, entity.GetComponent<TransformComponent>());
 			}
 		}
 

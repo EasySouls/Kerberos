@@ -7,27 +7,31 @@
 #include "Kerberos/Core/Timestep.h"
 #include "Kerberos/Core/UUID.h"
 #include "Kerberos/Physics/PhysicsSystem.h"
+#include "Kerberos/Assets/Asset.h"
 
 #include <entt.hpp>
 #include <set>
-
-
+#include <string_view>
 
 namespace Kerberos
 {
 	class Entity;
 	class HierarchyPanel;
 
-	class Scene : public std::enable_shared_from_this<Scene>
+	class Scene : public std::enable_shared_from_this<Scene>, public Asset
 	{
 	public:
 		Scene();
-		virtual ~Scene();
+		~Scene() override;
 
 		void OnRuntimeStart();
-		void OnRuntimeStop();
+		void OnRuntimeStop() const;
+		void OnSimulationStart();
+		void OnSimulationStop() const;
+		void SetScenePaused(bool isPaused);
 
 		void OnUpdateEditor(Timestep ts, const EditorCamera& camera);
+		void OnUpdateSimulation(Timestep ts, const EditorCamera& camera);
 		void OnUpdateRuntime(Timestep ts);
 
 		/**
@@ -76,12 +80,19 @@ namespace Kerberos
 		void CalculateEntityTransforms();
 		void CalculateEntityTransform(const Entity& entity);
 
+		Entity FindEntityByName(std::string_view name);
+
 		Ref<Framebuffer> GetOmniShadowMapFramebuffer() const { return m_OmniShadowMapFramebuffer; }
 		Ref<Framebuffer> GetShadowMapFramebuffer() const { return m_ShadowMapFramebuffer; }
 		Ref<Framebuffer> GetEditorFramebuffer() const { return m_EditorFramebuffer; }
 		bool& GetOnlyRenderShadowMapIfLightHasChanged() { return m_OnlyRenderShadowMapIfLightHasChanged; }
 
+		const IPhysicsSystem& GetPhysicsSystem() const;
+		IPhysicsSystem& GetPhysicsSystem();
+
 		static Ref<Scene> Copy(const Ref<Scene>& other);
+
+		AssetType GetType() override;
 
 	private:
 		template<typename T>
@@ -90,6 +101,8 @@ namespace Kerberos
 		void Render2DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
 		void Render3DRuntime(const Camera* mainCamera, const glm::mat4& mainCameraTransform);
 		void Render3DEditor(const EditorCamera& camera);
+
+		void UpdateScripts(Timestep ts);
 
 		void UpdateChildTransforms(Entity parent, const glm::mat4& parentTransform);
 
@@ -107,6 +120,8 @@ namespace Kerberos
 		uint32_t m_ViewportWidth = 0;
 		uint32_t m_ViewportHeight = 0;
 
+		bool m_IsScenePaused = false;
+
 		bool m_Is3D = true;
 		bool m_EnableShadowMapping = true;
 		bool m_OnlyRenderShadowMapIfLightHasChanged = false;
@@ -119,7 +134,7 @@ namespace Kerberos
 
 		std::set<entt::entity> m_RootEntities;
 
-		PhysicsSystem m_PhysicsSystem;
+		IPhysicsSystem* m_PhysicsSystem;
 
 		friend class Entity;
 		friend class PhysicsSystem;

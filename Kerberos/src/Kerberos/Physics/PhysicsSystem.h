@@ -2,10 +2,12 @@
 
 #include "Kerberos/Core.h"
 #include "Kerberos/Core/UUID.h"
+#include "Kerberos/Physics/IPhysicsSystem.h"
 
 namespace JPH
 {
 	class PhysicsSystem;
+	class BodyInterface;
 	class TempAllocator;
 	class JobSystem;
 	class Shape;
@@ -28,16 +30,27 @@ namespace Kerberos
 	class Entity;
 	class Scene;
 
-	class PhysicsSystem
+	class PhysicsSystem : public IPhysicsSystem
 	{
 	public:
 		PhysicsSystem() = default;
-		~PhysicsSystem();
+		~PhysicsSystem() override;
 
-		void Initialize(const Ref<Scene>& scene);
-		void Update(float deltaTime);
+		PhysicsSystem(const PhysicsSystem& other) = default;
+		PhysicsSystem(PhysicsSystem&& other) noexcept = delete;
+		PhysicsSystem& operator=(const PhysicsSystem& other) = delete;
+		PhysicsSystem& operator=(PhysicsSystem&& other) noexcept = delete;
 
-		void Cleanup();
+		void Initialize(const Ref<Scene>& scene) override;
+		void Update(float deltaTime) override;
+
+		void AddImpulse(uint32_t bodyId, const glm::vec3& impulse) const override;
+		void AddImpulse(uint32_t bodyId, const glm::vec3& impulse, const glm::vec3& point) const override;
+
+		/// TODO: Might not be a good idea to expose this
+		JPH::BodyInterface& GetBodyInterface() const;
+
+		void Cleanup() override;
 	private:
 		void UpdateAndCreatePhysicsBodies();
 		void CreatePhysicsBody(const Entity& entity);

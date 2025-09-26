@@ -11,6 +11,7 @@ namespace Kerberos
 	{
 	public:
 		template<typename T>
+			requires std::is_base_of_v<Asset, T>
 		static Ref<T> GetAsset(const AssetHandle handle)
 		{
 			const Ref<Asset> asset = Project::GetActive()->GetAssetManager()->GetAsset(handle);

@@ -1,12 +1,11 @@
 #include "kbrpch.h"
 
-import Components.PhysicsComponents;
-
 #include "Scene.h"
 #include "Kerberos/Scene/Entity.h"
 #include "Kerberos/Scene/ScriptableEntity.h"
 
-#include "Components.h"
+#include "Kerberos/Scene/Components.h"
+#include "Kerberos/Scene/Components/PhysicsComponents.h"
 #include "Kerberos/Renderer/Renderer2D.h"
 #include "Kerberos/Renderer/Renderer3D.h"
 #include "Kerberos/Physics/Utils.h"
@@ -15,12 +14,14 @@ import Components.PhysicsComponents;
 
 #include "Kerberos/Assets/AssetManager.h"
 #include "Kerberos/Renderer/RenderCommand.h"
+#include "Kerberos/Scripting/ScriptEngine.h"
 
 #define USE_MAP_FOR_UUID 1
 
 namespace Kerberos
 {
-	Scene::Scene()
+	Scene::Scene() 
+		: m_PhysicsSystem(new PhysicsSystem()) 
 	{
 		m_Registry = entt::basic_registry();
 
@@ -28,20 +29,20 @@ namespace Kerberos
 			.Width = 1024,
 			.Height = 1024,
 			.Attachments = {
-				{ FramebufferTextureFormat::DEPTH24 }
+				{FramebufferTextureFormat::DEPTH24}
 			}
-			});
+		});
 		m_ShadowMapFramebuffer->SetDebugName("ShadowMapFramebuffer");
 
 		m_EditorFramebuffer = Framebuffer::Create(FramebufferSpecification{
 			.Width = 1280,
 			.Height = 720,
 			.Attachments = {
-				{ FramebufferTextureFormat::RGBA8 },
-				{ FramebufferTextureFormat::RED_INTEGER },
-				{ FramebufferTextureFormat::DEPTH24STENCIL8 }
+				{FramebufferTextureFormat::RGBA8},
+				{FramebufferTextureFormat::RED_INTEGER},
+				{FramebufferTextureFormat::DEPTH24STENCIL8}
 			}
-			});
+		});
 		m_EditorFramebuffer->SetDebugName("EditorFramebuffer");
 	}
 
@@ -55,12 +56,38 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		m_PhysicsSystem.Initialize(shared_from_this());
+		m_PhysicsSystem->Initialize(shared_from_this());
+
+		ScriptEngine::OnRuntimeStart(shared_from_this());
+
+		/// Instantiate all scripts
+
+		m_Registry.view<ScriptComponent>().each([this](auto enttId, ScriptComponent& script) {
+			const Entity entity{ enttId, this };
+			ScriptEngine::OnCreateEntity(entity);
+		});
 	}
 
-	void Scene::OnRuntimeStop()
+	void Scene::OnRuntimeStop() const 
 	{
-		m_PhysicsSystem.Cleanup();
+		m_PhysicsSystem->Cleanup();
+
+		ScriptEngine::OnRuntimeStop();
+	}
+
+	void Scene::OnSimulationStart()
+	{
+		m_PhysicsSystem->Initialize(shared_from_this());
+	}
+
+	void Scene::OnSimulationStop() const 
+	{
+		m_PhysicsSystem->Cleanup();
+	}
+
+	void Scene::SetScenePaused(const bool isPaused)
+	{
+		m_IsScenePaused = isPaused;
 	}
 
 	void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera)
@@ -68,28 +95,27 @@ namespace Kerberos
 		Render3DEditor(camera);
 	}
 
-	void Scene::OnUpdateRuntime(Timestep ts)
+	void Scene::OnUpdateSimulation(const Timestep ts, const EditorCamera& camera) 
+	{
+		/// If the scene is paused, do not update the physics system, but still render the scene
+		if (!m_IsScenePaused)
+		{
+			m_PhysicsSystem->Update(ts);
+		}
+
+		Render3DEditor(camera);
+	}
+
+	void Scene::OnUpdateRuntime(const Timestep ts)
 	{
 		KBR_PROFILE_FUNCTION();
 
-		/// Update the scripts
+		if (!m_IsScenePaused)
 		{
-			KBR_PROFILE_SCOPE("Scene::OnUpdateRuntime - Scripts update");
+			UpdateScripts(ts);
 
-			m_Registry.view<NativeScriptComponent>().each([this, ts](auto entity, const NativeScriptComponent& script)
-				{
-					if (!script.Instance)
-					{
-						script.Instantiate();
-						script.Instance->m_Entity = Entity{ entity, this };
-						script.Instance->OnCreate();
-					}
-
-					script.Instance->OnUpdate(ts);
-				});
+			m_PhysicsSystem->Update(ts);
 		}
-
-		m_PhysicsSystem.Update(ts);
 
 		/// Render the scene
 
@@ -203,6 +229,10 @@ namespace Kerberos
 			newEntity.AddComponent<CameraComponent>(entity.GetComponent<CameraComponent>());
 			auto& camera = newEntity.GetComponent<CameraComponent>();
 			camera.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+		}
+		if (entity.HasComponent<ScriptComponent>())
+		{
+			newEntity.AddComponent<ScriptComponent>(entity.GetComponent<ScriptComponent>());
 		}
 		if (entity.HasComponent<NativeScriptComponent>())
 		{
@@ -374,6 +404,18 @@ namespace Kerberos
 		}
 	}
 
+	const IPhysicsSystem& Scene::GetPhysicsSystem() const 
+	{
+		KBR_CORE_ASSERT(m_PhysicsSystem, "Physics system is not initialized");
+		return *m_PhysicsSystem;
+	}
+
+	IPhysicsSystem& Scene::GetPhysicsSystem() 
+	{
+		KBR_CORE_ASSERT(m_PhysicsSystem, "Physics system is not initialized");
+		return *m_PhysicsSystem;
+	}
+
 	Ref<Scene> Scene::Copy(const Ref<Scene>& other)
 	{
 		Ref<Scene> newScene = CreateRef<Scene>();
@@ -404,6 +446,10 @@ namespace Kerberos
 				auto& cameraComp = sourceRegistry.get<CameraComponent>(entity);
 				newEntity.AddComponent<CameraComponent>(cameraComp);
 				newEntity.GetComponent<CameraComponent>().Camera.SetViewportSize(newScene->m_ViewportWidth, newScene->m_ViewportHeight);
+			}
+			if (sourceRegistry.all_of<ScriptComponent>(entity))
+			{
+				newEntity.AddComponent<ScriptComponent>(sourceRegistry.get<ScriptComponent>(entity));
 			}
 			if (sourceRegistry.all_of<NativeScriptComponent>(entity))
 			{
@@ -465,6 +511,11 @@ namespace Kerberos
 		}
 
 		return newScene;
+	}
+
+	AssetType Scene::GetType() 
+	{
+		return AssetType::Scene;
 	}
 
 
@@ -674,11 +725,44 @@ namespace Kerberos
 		Renderer3D::EndScene();
 	}
 
+	void Scene::UpdateScripts(Timestep ts) 
+	{
+		KBR_PROFILE_FUNCTION();
+
+		{
+			KBR_PROFILE_SCOPE("Scene::UpdateScripts - Native scripts update");
+
+			m_Registry.view<NativeScriptComponent>().each([this, ts](auto entity, const NativeScriptComponent& script)
+				{
+					if (!script.Instance)
+					{
+						script.Instantiate();
+						script.Instance->m_Entity = Entity{ entity, this };
+						script.Instance->OnCreate();
+					}
+
+					script.Instance->OnUpdate(ts);
+				});
+		}
+
+		{
+			KBR_PROFILE_SCOPE("Scene::UpdateScripts - C# scripts update");
+
+			m_Registry.view<ScriptComponent>().each([this, ts](auto id, [[maybe_unused]] const ScriptComponent& script)
+				{
+					const Entity entity{ id, this };
+					ScriptEngine::OnUpdateEntity(entity, ts);
+				});
+		}
+	}
+
 	void Scene::UpdateChildTransforms(const Entity parent, const glm::mat4& parentTransform)
 	{
 		auto& tsc = parent.GetComponent<TransformComponent>();
 		const glm::mat4 localTransform = tsc.GetTransform();
 		tsc.WorldTransform = parentTransform * localTransform;
+
+		//tsc.Translation = Physics::ExtractTranslationFromMatrix(tsc.WorldTransform);
 
 		for (const auto& child : GetChildren(parent))
 		{
@@ -734,10 +818,24 @@ namespace Kerberos
 		UpdateChildTransforms(entity, glm::mat4(1.0f));
 	}
 
+	Entity Scene::FindEntityByName(const std::string_view name) 
+	{
+		const auto view = m_Registry.view<TagComponent>();
+		for (const auto entity : view)
+		{
+			const auto& tag = view.get<TagComponent>(entity);
+			if (tag.Tag == name)
+			{
+				return Entity{ entity, this };
+			}
+		}
+		return {};
+	}
+
 	template <typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{
-		static_assert(false, "No template specialization found for this type");
+		static_assert(sizeof(T) == 0, "No template specialization found for this type");
 	}
 
 	template <>
@@ -760,6 +858,10 @@ namespace Kerberos
 
 	template <>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{}
+
+	template <>
+	void Scene::OnComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component)
 	{}
 
 	template <>

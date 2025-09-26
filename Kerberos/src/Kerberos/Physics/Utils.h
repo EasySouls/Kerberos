@@ -1,10 +1,10 @@
 #pragma once
 
-import Components.PhysicsComponents;
-
 #include "Layers.h"
 #include "Kerberos/Renderer/Mesh.h"
 #include "Kerberos/Renderer/Vertex.h"
+#include "Kerberos/Scene/Components.h"
+#include "Kerberos/Scene/Components/PhysicsComponents.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Array.h>
@@ -21,7 +21,6 @@ import Components.PhysicsComponents;
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/quaternion.hpp>
-
 
 
 namespace Kerberos::Physics
@@ -78,8 +77,9 @@ namespace Kerberos::Physics
 		 * @param worldTransform The world transform of the entity to update.
 		 * @param body The Jolt body to get the position and rotation from.
 		 * @param offset The offset of the collider in the entity's local space.
+		 * @param tc The TransformComponent of the entity to update.
          */
-        static void ApplyJoltTransformToEntity(glm::mat4& worldTransform, const JPH::Body& body, const JPH::Vec3& offset)
+        static void ApplyJoltTransformToEntity(glm::mat4& worldTransform, const JPH::Body& body, const JPH::Vec3& offset, TransformComponent& tc)
         {
             KBR_PROFILE_FUNCTION();
 
@@ -108,6 +108,9 @@ namespace Kerberos::Physics
             glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scale);
 
             worldTransform = translationMatrix * rotationMatrix * scaleMatrix;
+			tc.Translation = position;
+			tc.Rotation = glm::eulerAngles(rotation);
+			tc.Scale = scale;
         }
 
         static JPH::Ref<JPH::Shape> CreateJoltMeshShape(const Ref<Mesh>& mesh, const std::string_view debugName)

@@ -67,7 +67,7 @@ namespace Kerberos
 					desiredChannels = 4; /// Vulkan doesn't support 3-channel formats well, so we force 4 channels (RGBA)
 				}
 
-				const bool flip = rendererApi != RendererAPI::API::Vulkan; /// Vulkan expects images to be loaded with the origin at the top-left corner.
+				const bool flip = rendererApi == RendererAPI::API::Vulkan; /// Vulkan expects images to be loaded with the origin at the top-left corner.
 
 				const auto [spec, buffer] = TextureImporter::LoadTextureData(facePath, flip, desiredChannels);
 				faceData.Specification = spec;

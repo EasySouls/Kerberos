@@ -6,6 +6,10 @@
 #include "Kerberos/Events/ApplicationEvent.h"
 #include "Kerberos/Renderer/VertexArray.h"
 
+#include <mutex>
+#include <functional>
+#include <vector>
+
 namespace Kerberos
 {
 	struct ApplicationCommandLineArgs
@@ -45,6 +49,8 @@ namespace Kerberos
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
+		void SubmitToMainThread(const std::function<void()>& function);
+
 		static Application& Get() { return *s_Instance; }
 		Window& GetWindow() const { return *m_Window; }
 		ImGuiLayer* GetImGuiLayer() const { return m_ImGuiLayer; }
@@ -53,6 +59,8 @@ namespace Kerberos
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& e);
 		bool OnWindowResize(const WindowResizeEvent& e);
+
+		void ExecuteMainThreadQueue();
 
 	private:
 		ApplicationSpecification m_Specification;
@@ -63,6 +71,9 @@ namespace Kerberos
 		Scope<Window> m_Window;
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;
+
+		std::vector<std::function<void()>> m_MainThreadQueue;
+		std::mutex m_MainThreadQueueMutex;
 
 		static Application* s_Instance;
 	};

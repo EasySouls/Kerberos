@@ -27,6 +27,7 @@ namespace Kerberos
 		bool OnWindowDrop(const WindowDropEvent& event);
 
 		void OnScenePlay();
+		void OnSceneSimulate();
 		void OnSceneStop();
 
 		void HandleDragAndDrop();
@@ -52,7 +53,8 @@ namespace Kerberos
 		void OpenScene(const std::filesystem::path& filepath);
 		void NewScene();
 
-		void UIToolbar();
+		void DrawUIToolbar();
+		void DrawMenuBar();
 
 	private:
 		OrthographicCameraController m_CameraController;
@@ -115,7 +117,12 @@ namespace Kerberos
 
 		Ref<Texture2D> m_IconPlay;
 		Ref<Texture2D> m_IconStop;
+		Ref<Texture2D> m_IconPause;
+		Ref<Texture2D> m_IconResume;
 		SceneState m_SceneState = SceneState::Edit;
+		bool m_IsScenePaused = false;
+
+		bool m_IsFullScreenPersistent = true;
 	};
 }
 
