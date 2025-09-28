@@ -9,6 +9,7 @@
 
 #include "Kerberos/Assets/Importers/MeshImporter.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"
+#include "Kerberos/Renderer/Font.h"
 #include "Kerberos/Scripting/ScriptEngine.h"
 
 #define PROFILE_SCOPE(name) Timer timer##__LINE__(name, 
@@ -17,7 +18,9 @@ namespace Kerberos
 {
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f)
-	{}
+	{
+		Font font("assets/fonts/Inter/Inter_18pt-Regular.ttf");
+	}
 
 	void EditorLayer::OnAttach()
 	{

@@ -35,6 +35,7 @@
 #include "Kerberos/Renderer/Light.h"
 #include "Kerberos/Renderer/Material.h"
 #include "Kerberos/Renderer/Vertex.h"
+#include "Kerberos/Renderer/Font.h"
 #include "Kerberos/Renderer/Renderer3D.h"
 /// ---------------------------------
 
