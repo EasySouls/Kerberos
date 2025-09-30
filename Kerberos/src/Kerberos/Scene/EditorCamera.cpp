@@ -42,6 +42,13 @@ namespace Kerberos
 		dispatcher.Dispatch<MouseScrolledEvent>(KBR_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
 	}
 
+	void EditorCamera::Focus(const glm::vec3& focusPoint) 
+	{
+		m_FocalPoint = focusPoint;
+		m_Distance = 10.0f;
+		UpdateView();
+	}
+
 	void EditorCamera::SetViewportSize(const float width, const float height) 
 	{
 		m_ViewportWidth = width;

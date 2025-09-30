@@ -578,6 +578,13 @@ namespace Kerberos
 		case Key::R:
 			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
 			break;
+		case Key::F: {
+			if (const Entity& entity = m_HierarchyPanel.GetSelectedEntity())
+			{
+				m_EditorCamera.Focus(entity.GetComponent<TransformComponent>().Translation);
+			}
+			break;
+		}
 		default:
 			break;
 		}
