@@ -172,7 +172,8 @@ namespace Kerberos
 		s_RendererData.SkyboxShader->SetDebugName("Skybox");
 
 		s_RendererData.TextVertexArray = VertexArray::Create();
-		s_RendererData.TextVertexBuffer = VertexBuffer::Create(nullptr, sizeof(float) * 4 * 6);
+		constexpr uint32_t textVertexBufferSize = sizeof(TextVertex) * 4;
+		s_RendererData.TextVertexBuffer = VertexBuffer::Create(textVertexBufferSize);
 		s_RendererData.TextVertexBuffer->SetLayout(TextVertex::GetLayout());
 		s_RendererData.TextVertexArray->AddVertexBuffer(s_RendererData.TextVertexBuffer);
 
@@ -391,7 +392,7 @@ namespace Kerberos
 	}
 
 	void Renderer3D::SubmitText(const std::string& text, const Ref<Font>& font, const glm::mat4& transform,
-		const glm::vec4& color, int entityID) 
+		const glm::vec4& color, const float scale, int entityID)
 	{
 		const Ref<Texture2D> fontAtlas = font->GetAtlasTexture();
 		const FontMetrics& metrics = font->GetMetrics();

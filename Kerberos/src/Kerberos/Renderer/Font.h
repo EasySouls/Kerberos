@@ -30,6 +30,7 @@ namespace Kerberos
 
 		Ref<Texture2D> GetAtlasTexture() const { return m_AtlasTexture; }
 		FontMetrics GetMetrics() const;
+		const std::string& GetName() const { return m_Name; }
 
 		bool HasCharacter(char c) const;
 		void GetQuadAtlasBounds(char character, double& al, double& ab, double& ar, double& at) const;

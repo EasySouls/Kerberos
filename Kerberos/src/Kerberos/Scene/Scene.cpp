@@ -287,6 +287,14 @@ namespace Kerberos
 		{
 			newEntity.AddComponent<SpotLightComponent>(entity.GetComponent<SpotLightComponent>());
 		}
+		if (entity.HasComponent<EnvironmentComponent>())
+		{
+			newEntity.AddComponent<EnvironmentComponent>(entity.GetComponent<EnvironmentComponent>());
+		}
+		if (entity.HasComponent<TextComponent>())
+		{
+			newEntity.AddComponent<TextComponent>(entity.GetComponent<TextComponent>());
+		}
 
 		if (duplicateChildren)
 		{
@@ -627,6 +635,16 @@ namespace Kerberos
 			}
 		}
 
+		Renderer3D::EndPass();
+
+		const auto textView = m_Registry.view<TransformComponent, TextComponent>();
+		for (const auto entity : textView)
+		{
+			auto [transform, text] = textView.get<TransformComponent, TextComponent>(entity);
+
+			Renderer3D::SubmitText(text.Text, text.Font, transform.WorldTransform, text.Color, text.Scale, static_cast<int>(entity));
+		}
+
 		Renderer3D::EndScene();
 	}
 
@@ -723,7 +741,13 @@ namespace Kerberos
 
 		Renderer3D::EndPass();
 
-		//Renderer3D::SubmitText("Kerberos Editor", glm::vec3(-0.98f, 0.93f, 0.0f), 0.04f, glm::vec4(1.0f));
+		const auto textView = m_Registry.view<TransformComponent, TextComponent>();
+		for (const auto entity : textView)
+		{
+			auto [transform, text] = textView.get<TransformComponent, TextComponent>(entity);
+
+			Renderer3D::SubmitText(text.Text, text.Font, transform.WorldTransform, text.Color, text.Scale, static_cast<int>(entity));
+		}
 
 		Renderer3D::EndScene();
 	}
@@ -923,4 +947,9 @@ namespace Kerberos
 	template <>
 	void Scene::OnComponentAdded<EnvironmentComponent>(Entity entity, EnvironmentComponent& component)
 	{}
+
+	template <>
+	void Scene::OnComponentAdded<TextComponent>(Entity entity, TextComponent& component)
+	{
+	}
 }
