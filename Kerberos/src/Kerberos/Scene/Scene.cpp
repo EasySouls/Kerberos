@@ -722,6 +722,9 @@ namespace Kerberos
 		}
 
 		Renderer3D::EndPass();
+
+		//Renderer3D::SubmitText("Kerberos Editor", glm::vec3(-0.98f, 0.93f, 0.0f), 0.04f, glm::vec4(1.0f));
+
 		Renderer3D::EndScene();
 	}
 

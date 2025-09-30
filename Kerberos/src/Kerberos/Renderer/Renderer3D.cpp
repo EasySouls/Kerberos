@@ -28,6 +28,10 @@ namespace Kerberos
 		Ref<Shader> WireframeShader = nullptr;
 		Ref<Shader> ShadowMapShader = nullptr;
 
+		Ref<Shader> TextShader = nullptr;
+		Ref<VertexArray> TextVertexArray = nullptr;
+		Ref<VertexBuffer> TextVertexBuffer = nullptr;
+
 		const DirectionalLight* pSunLight = nullptr;
 
 		Ref<Shader> SkyboxShader = nullptr;
@@ -102,10 +106,12 @@ namespace Kerberos
 		s_RendererData.GeometryShader = Shader::Create("assets/shaders/shader3d.glsl");
 		s_RendererData.WireframeShader = Shader::Create("assets/shaders/wireframe3d.glsl");
 		s_RendererData.ShadowMapShader = Shader::Create("assets/shaders/shadow_map.glsl");
+		s_RendererData.TextShader = Shader::Create("assets/shaders/text.glsl");
 
 		s_RendererData.GeometryShader->SetDebugName("Geometry");
 		s_RendererData.WireframeShader->SetDebugName("Wireframe");
 		s_RendererData.ShadowMapShader->SetDebugName("Shadow Map");
+		s_RendererData.TextShader->SetDebugName("Text");
 
 		/// Set the default shader to the base shader
 		s_RendererData.ActiveShader = s_RendererData.GeometryShader;
@@ -161,9 +167,14 @@ namespace Kerberos
 		const Ref<VertexBuffer> skyboxVertexBuffer = VertexBuffer::Create(skyboxVertices.data(), static_cast<uint32_t>(skyboxVertices.size()) * sizeof(float));
 		skyboxVertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "a_Position" }
-			});
+		});
 		s_RendererData.SkyboxVertexArray->AddVertexBuffer(skyboxVertexBuffer);
 		s_RendererData.SkyboxShader->SetDebugName("Skybox");
+
+		s_RendererData.TextVertexArray = VertexArray::Create();
+		s_RendererData.TextVertexBuffer = VertexBuffer::Create(nullptr, sizeof(float) * 4 * 6);
+		s_RendererData.TextVertexBuffer->SetLayout(TextVertex::GetLayout());
+		s_RendererData.TextVertexArray->AddVertexBuffer(s_RendererData.TextVertexBuffer);
 
 		s_RendererData.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::CameraData), 0);
 		s_RendererData.CameraUniformBuffer->SetDebugName("Camera Uniform Buffer");
@@ -377,6 +388,113 @@ namespace Kerberos
 		s_Stats.DrawnMeshes++;
 		s_Stats.Vertices += mesh->GetVertexCount();
 		s_Stats.Faces += mesh->GetIndexCount() / 3;
+	}
+
+	void Renderer3D::SubmitText(const std::string& text, const Ref<Font>& font, const glm::mat4& transform,
+		const glm::vec4& color, int entityID) 
+	{
+		const Ref<Texture2D> fontAtlas = font->GetAtlasTexture();
+		const FontMetrics& metrics = font->GetMetrics();
+
+		constexpr int fontAtlasTextureSlot = 1;
+		fontAtlas->Bind(fontAtlasTextureSlot);
+		s_RendererData.TextShader->Bind();
+		s_RendererData.TextShader->SetInt("u_FontAtlas", fontAtlasTextureSlot);
+
+		double x = 0.0;
+		const double fsScale = 1.0 / (metrics.Ascender - metrics.Descender);
+		double y = 0.0;
+
+		for (size_t i = 0; i < text.size(); ++i)
+		{
+			char character = text[i];
+			if (character == '\r')
+				continue;
+
+			if (character == '\n')
+			{
+				float lineHeightOffset = 0.0f;
+				x = 0;
+				y -= fsScale * metrics.LineHeight + lineHeightOffset;
+				continue;
+			}
+
+			const bool hasGlyph = font->HasCharacter(character);
+			if (!hasGlyph) 
+			{
+				constexpr char placeholderChar = '?';
+				if (!font->HasCharacter(placeholderChar))
+				{
+					KBR_CORE_WARN("Font does not contain character '{}' and no placeholder character '{}' found!", character, placeholderChar);
+					return;
+				}
+				character = placeholderChar;
+			}
+
+			if (character == '\t') {
+				character = ' ';
+			}
+
+			double al, ab, ar, at;
+			font->GetQuadAtlasBounds(character, al, ab, ar, at);
+			glm::vec2 texCoordMin(static_cast<float>(al), static_cast<float>(ab));
+			glm::vec2 texCoordMax(static_cast<float>(ar), static_cast<float>(at));
+
+			double pl, pb, pr, pt;
+			font->GetQuadPlaneBounds(character, pl, pb, pr, pt);
+			glm::vec2 quadMin(static_cast<float>(pl), static_cast<float>(pb));
+			glm::vec2 quadMax(static_cast<float>(pr), static_cast<float>(pt));
+
+			quadMin *= fsScale;
+			quadMax *= fsScale;
+			quadMin += glm::vec2(x, y);
+			quadMax += glm::vec2(x, y);
+
+			float texelWidth = 1.0f / static_cast<float>(fontAtlas->GetWidth());
+			float texelHeight = 1.0f / static_cast<float>(fontAtlas->GetHeight());
+			texCoordMin *= glm::vec2(texelWidth, texelHeight);
+			texCoordMax *= glm::vec2(texelWidth, texelHeight);
+
+			std::array<TextVertex, 4> vertices;
+			vertices[0].Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
+			vertices[0].Color = color;
+			vertices[0].TexCoord = texCoordMin;
+			vertices[0].EntityID = entityID;
+
+			vertices[1].Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
+			vertices[1].Color = color;
+			vertices[1].TexCoord = { texCoordMin.x, texCoordMax.y };
+			vertices[1].EntityID = entityID;
+
+			vertices[2].Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
+			vertices[2].Color = color;
+			vertices[2].TexCoord = texCoordMax;
+			vertices[2].EntityID = entityID;
+
+			vertices[3].Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
+			vertices[3].Color = color;
+			vertices[3].TexCoord = { texCoordMax.x, texCoordMin.y };
+			vertices[3].EntityID = entityID;
+
+			constexpr uint32_t vbSize = static_cast<uint32_t>(vertices.size()) * sizeof(TextVertex);
+			s_RendererData.TextVertexBuffer->SetData(vertices.data(), vbSize);
+
+			RenderCommand::DrawArray(s_RendererData.TextVertexArray, 4);
+
+			s_Stats.Vertices += 4;
+			s_Stats.Faces += 2;
+			s_Stats.DrawCalls++;
+
+			if (i < text.size() - 1)
+			{
+				double advance = font->GetAdvance(character);
+				char nextCharacter = text[i + 1];
+				font->GetNextAdvance(advance, character, nextCharacter);
+
+				float kerningOffset = 0.0f;
+				x += fsScale * advance + kerningOffset;
+			}
+		}
 	}
 
 	void Renderer3D::SetGlobalAmbientLight(const glm::vec3& color, const float intensity) 

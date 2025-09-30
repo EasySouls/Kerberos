@@ -88,7 +88,7 @@ namespace Kerberos
 
 		NotificationManager m_NotificationManager;
 
-		Font m_BasicFont;
+		Ref<Font> m_BasicFont;
 
 		Ref<Texture2D> m_Texture;
 		Ref<Texture2D> m_SpriteSheet;

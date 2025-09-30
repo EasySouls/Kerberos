@@ -18,7 +18,7 @@ namespace Kerberos
 {
 	EditorLayer::EditorLayer()
 		:	Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f), 
-			m_BasicFont("InterRegular","assets/fonts/Inter/Inter_18pt-Regular.ttf")
+			m_BasicFont(Font::GetDefaultFont())
 	{
 	}
 
@@ -420,7 +420,7 @@ namespace Kerberos
 
 		/// Render the font atlas
 		ImGui::Text("Font Atlas");
-		const uint64_t fontAtlasTextureID = m_BasicFont.GetAtlasTexture()->GetRendererID();
+		const uint64_t fontAtlasTextureID = m_BasicFont->GetAtlasTexture()->GetRendererID();
 		ImGui::Image(fontAtlasTextureID, ImVec2{ 256, 256 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 		ImGui::End();

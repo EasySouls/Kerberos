@@ -10,6 +10,13 @@ namespace Kerberos
 {
 	struct MSDFData;
 
+	struct FontMetrics
+	{
+		float Ascender = 0.0f;
+		float Descender = 0.0f;
+		float LineHeight = 0.0f;
+	};;
+
 	class Font
 	{
 	public:
@@ -22,6 +29,15 @@ namespace Kerberos
 		Font& operator=(Font&& other) noexcept = default;
 
 		Ref<Texture2D> GetAtlasTexture() const { return m_AtlasTexture; }
+		FontMetrics GetMetrics() const;
+
+		bool HasCharacter(char c) const;
+		void GetQuadAtlasBounds(char character, double& al, double& ab, double& ar, double& at) const;
+		void GetQuadPlaneBounds(char character, double& pl, double& pb, double& pr, double& pt) const;
+		double GetAdvance(char character) const;
+		void GetNextAdvance(double& advance, char character, char nextCharacter) const;
+
+		static Ref<Font> GetDefaultFont();
 
 	private:
 		std::string m_Name;
