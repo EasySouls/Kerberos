@@ -1,18 +1,62 @@
 #include "kbrpch.h"
 #include "Font.h"
 
-#include <algorithm>
-
+#include "Kerberos/Renderer/Texture.h"
+#include "Kerberos/Core/Timer.h"
 
 #undef INFINITE
 #include <msdfgen.h>
 #include "ext/import-font.h"
-#include "ext/save-png.h"
+#include <msdf-atlas-gen.h>
+#include <msdf-atlas-gen/msdf-atlas-gen/FontGeometry.h>
+#include <msdf-atlas-gen/msdf-atlas-gen/GlyphGeometry.h>
+
+#include <algorithm>
 
 namespace Kerberos 
 {
-	Font::Font(const std::filesystem::path& filepath) 
+	struct MSDFData 
 	{
+		std::vector<msdf_atlas::GlyphGeometry> m_Glyphs;
+		msdf_atlas::FontGeometry m_FontGeometry;
+	};
+
+	template<typename T, typename S, int N, msdf_atlas::GeneratorFunction<S, N> GenFunc>
+	static Ref<Texture2D> GenerateAtlas(const std::vector<msdf_atlas::GlyphGeometry>& glyphs, int width, int height) 
+	{
+		msdf_atlas::ImmediateAtlasGenerator<S, N, GenFunc, msdf_atlas::BitmapAtlasStorage<T, N>> generator(width, height);
+
+		msdf_atlas::GeneratorAttributes genAttributes;
+		genAttributes.config.overlapSupport = true;
+		genAttributes.scanlinePass = true;
+		generator.setAttributes(genAttributes);
+		generator.setThreadCount(std::max(1u, std::thread::hardware_concurrency() - 1));
+		
+		generator.generate(glyphs.data(), static_cast<int>(glyphs.size()));
+
+		msdfgen::BitmapConstRef<T, N> bitmap = generator.atlasStorage();
+
+		TextureSpecification spec;
+		spec.Width = bitmap.width;
+		spec.Height = bitmap.height;
+		spec.Format = ImageFormat::RGB8;
+		spec.GenerateMips = false;
+
+		const Ref<Texture2D> atlasTexture = Texture2D::Create(spec);
+		atlasTexture->SetData(static_cast<void*>(const_cast<T*>(bitmap.pixels)), bitmap.width * bitmap.height * sizeof(T) * N);
+
+		return atlasTexture;
+	}
+
+	Font::Font(std::string name, const std::filesystem::path& filepath)
+		: m_Name(std::move(name)) ,m_MSDFData(new MSDFData)
+	{
+		KBR_PROFILE_FUNCTION();
+
+		Timer timer("Font::Font", [&](const TimerData& data) {
+			KBR_CORE_INFO("Timer: Loading font {0} from {1} took {2}ms", m_Name, filepath.string(), data.DurationMs);
+		});
+
 		if (!std::filesystem::exists(filepath))
 		{
 			KBR_CORE_ASSERT(false, "Font file does not exist: {0}", filepath.string());
@@ -35,23 +79,56 @@ namespace Kerberos
 			return;
 		}
 
-		//msdfgen::Shape shape;
-		//if (msdfgen::loadGlyph(shape, font, 'C'))
-		//{
-		//	shape.normalize();
-		//	//                      max. angle
-		//	msdfgen::edgeColoringSimple(shape, 3.0);
-		//	//           image width, height
-		//	msdfgen::Bitmap<float, 3> msdf(32, 32);
-		//	//                     range, scale, translation
-		//	msdfgen::generateMSDF(msdf, shape, 4.0, 1.0, msdfgen::Vector2(4.0, 4.0));
-		//	msdfgen::savePng(msdf, "output.png");
-		//}
-		//else 
-		//{
-		//	KBR_CORE_ASSERT(false, "Could not load glyph for character 'C' from font: {0}", filepath.string());
-		//}
+		struct CharsetRange {
+			uint32_t Start;
+			uint32_t End;
+		};
+
+		static constexpr uint32_t ranges[] = { 0x0020, 0x00FF, 0 }; // Basic Latin
+
+		static constexpr CharsetRange charsetRanges[] = {
+			{ .Start = 0x0020, .End = 0x007E }, // Basic Latin
+			{ .Start = 0x00A0, .End = 0x00FF }, // Latin-1 Supplement
+		};
+
+		msdf_atlas::Charset charset;
+		for (const auto& [Start, End] : charsetRanges) 
+		{
+			for (uint32_t c = Start; c <= End; ++c) 
+			{
+				charset.add(c);
+			}
+		}
+
+		constexpr double fontScale = 1.0f;
+
+		m_MSDFData->m_FontGeometry = msdf_atlas::FontGeometry(&m_MSDFData->m_Glyphs);
+		int glyphsLoaded = m_MSDFData->m_FontGeometry.loadCharset(font, fontScale, charset);
+
+		msdf_atlas::TightAtlasPacker atlasPacker;
+		atlasPacker.setPixelRange(2.0);
+		atlasPacker.setMiterLimit(1.0);
+		atlasPacker.setSpacing(1);
+		atlasPacker.setDimensionsConstraint(msdf_atlas::DimensionsConstraint::POWER_OF_TWO_RECTANGLE);
+		atlasPacker.setOriginPixelAlignment(true);
+		double emSize = 40.0;
+		atlasPacker.setScale(emSize);
+
+		int remaining = atlasPacker.pack(m_MSDFData->m_Glyphs.data(), static_cast<int>(m_MSDFData->m_Glyphs.size()));
+		KBR_CORE_ASSERT(remaining == 0, "Could not pack all glyphs into the atlas! {} glyphs remaining", remaining);
+
+		int width, height;
+		atlasPacker.getDimensions(width, height);
+		emSize = atlasPacker.getScale();
+
+		m_AtlasTexture = GenerateAtlas<uint8_t, float, 3, msdf_atlas::msdfGenerator>(m_MSDFData->m_Glyphs, width, height);
+
 		msdfgen::destroyFont(font);
 		msdfgen::deinitializeFreetype(ft);
+	}
+
+	Font::~Font() 
+	{
+		delete m_MSDFData;
 	}
 }
