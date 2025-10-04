@@ -37,7 +37,7 @@ layout (location = 0) in vec4 v_Color;
 layout (location = 1) in vec2 v_TexCoord;
 layout (location = 2) in flat int v_EntityID;
 
-layout (binding = 0) uniform sampler2D u_FontAtlas;
+layout (binding = 1) uniform sampler2D u_FontAtlas;
 
 float screenPxRange() {
 	const float pxRange = 2.0; // set to distance field's pixel range
