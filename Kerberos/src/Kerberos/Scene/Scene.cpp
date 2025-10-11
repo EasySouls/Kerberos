@@ -642,7 +642,7 @@ namespace Kerberos
 		{
 			auto [transform, text] = textView.get<TransformComponent, TextComponent>(entity);
 
-			Renderer3D::SubmitText(text.Text, text.Font, transform.WorldTransform, text.Color, text.Scale, static_cast<int>(entity));
+			Renderer3D::SubmitText(text.Text, text.Font, transform.WorldTransform, text.Color, text.FontSize, static_cast<int>(entity));
 		}
 
 		Renderer3D::EndScene();
@@ -746,7 +746,7 @@ namespace Kerberos
 		{
 			auto [transform, text] = textView.get<TransformComponent, TextComponent>(entity);
 
-			Renderer3D::SubmitText(text.Text, text.Font, transform.WorldTransform, text.Color, text.Scale, static_cast<int>(entity));
+			Renderer3D::SubmitText(text.Text, text.Font, transform.WorldTransform, text.Color, text.FontSize, static_cast<int>(entity));
 		}
 
 		Renderer3D::EndScene();

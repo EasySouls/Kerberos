@@ -249,7 +249,7 @@ namespace Kerberos
 		Ref<Font> Font = Font::GetDefaultFont();
 		std::string Text = "Sample Text";
 		glm::vec4 Color = glm::vec4(1.0f);
-		float Scale = 10.0f;
+		float FontSize = 12.0f;
 
 		TextComponent() = default;
 		explicit TextComponent(const Ref<Kerberos::Font>& font, const std::string& text)

@@ -25,6 +25,8 @@ namespace Kerberos
 			return *static_cast<T*>(this);
 		}
 
+		virtual void SetDebugName(const std::string& name) = 0;
+
 		static Ref<VertexArray> Create();
 	};
 }

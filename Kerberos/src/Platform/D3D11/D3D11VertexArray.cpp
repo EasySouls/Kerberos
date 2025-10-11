@@ -24,3 +24,5 @@ void Kerberos::D3D11VertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertex
 void Kerberos::D3D11VertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 {
 }
+
+void Kerberos::D3D11VertexArray::SetDebugName(const std::string& name) {}

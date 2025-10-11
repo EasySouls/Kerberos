@@ -20,6 +20,8 @@ namespace Kerberos
 		const BufferLayout& GetLayout() const override { return m_Layout; }
 		uint32_t GetCount() const override { return m_Count; }
 
+		void SetDebugName(const std::string& name) override;
+
 	private:
 		uint32_t m_RendererID;
 		BufferLayout m_Layout;
@@ -36,6 +38,8 @@ namespace Kerberos
 		void Unbind() const override;
 
 		uint32_t GetCount() const override { return m_Count; }
+
+		void SetDebugName(const std::string& name) override;
 
 	private:
 		uint32_t m_RendererID;

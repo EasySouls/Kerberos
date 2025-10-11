@@ -63,6 +63,11 @@ namespace Kerberos
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
+	void OpenGLVertexBuffer::SetDebugName(const std::string& name) 
+	{
+		glObjectLabel(GL_BUFFER, m_RendererID, static_cast<GLsizei>(name.size()), name.c_str());
+	}
+
 	/// --------- Index Buffer --------- ///
 
 	OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32_t* indices, const uint32_t count) 
@@ -96,5 +101,10 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+
+	void OpenGLIndexBuffer::SetDebugName(const std::string& name) 
+	{
+		glObjectLabel(GL_BUFFER, m_RendererID, static_cast<GLsizei>(name.size()), name.c_str());
 	}
 }

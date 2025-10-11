@@ -74,6 +74,19 @@ namespace Kerberos
                 1, &barrier
             );
         }
+
+        static constexpr uint32_t BytesPerPixel(const ImageFormat format)
+        {
+            switch (format)
+            {
+            case ImageFormat::RGBA8:   return 4;
+            case ImageFormat::RGB8:    return 3;
+            case ImageFormat::R8:      return 1;
+            default:
+                KBR_CORE_ERROR("Unknown image format!");
+                return 0;
+            }
+        }
     }
 
 	VulkanTexture2D::VulkanTexture2D(const std::string& path)
@@ -495,7 +508,8 @@ namespace Kerberos
 
         KBR_CORE_ASSERT(data, "Data cannot be null when uploading to texture");
 
-        uint32_t expectedSize = m_Spec.Width * m_Spec.Height * 4; // Assuming RGBA8
+        const uint32_t bytesPerPixel = Utils::BytesPerPixel(m_Spec.Format);
+        uint32_t expectedSize = m_Spec.Width * m_Spec.Height * bytesPerPixel;
         KBR_ASSERT(size == expectedSize, "Data size mismatch! Expected {} bytes, got {} bytes.", expectedSize, size);
         if (size != expectedSize || !data)
         {

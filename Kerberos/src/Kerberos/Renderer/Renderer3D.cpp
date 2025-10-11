@@ -28,15 +28,16 @@ namespace Kerberos
 		Ref<Shader> WireframeShader = nullptr;
 		Ref<Shader> ShadowMapShader = nullptr;
 
-		Ref<Shader> TextShader = nullptr;
-		Ref<VertexArray> TextVertexArray = nullptr;
-		Ref<VertexBuffer> TextVertexBuffer = nullptr;
+		Ref<Shader>			TextShader = nullptr;
+		Ref<VertexArray>	TextVertexArray = nullptr;
+		Ref<VertexBuffer>	TextVertexBuffer = nullptr;
+		Ref<IndexBuffer>	TextIndexBuffer = nullptr;
 
 		const DirectionalLight* pSunLight = nullptr;
 
-		Ref<Shader> SkyboxShader = nullptr;
-		Ref<TextureCube> SkyboxTexture = nullptr;
-		Ref<VertexArray> SkyboxVertexArray = nullptr;
+		Ref<Shader>			SkyboxShader = nullptr;
+		Ref<TextureCube>	SkyboxTexture = nullptr;
+		Ref<VertexArray>	SkyboxVertexArray = nullptr;
 
 		Ref<Framebuffer> ShadowMapFramebuffer = nullptr;
 
@@ -44,27 +45,27 @@ namespace Kerberos
 
 		struct ShadowDataUbo
 		{
-			alignas(16) glm::mat4 LightSpaceMatrix;
-			alignas(4) int EnableShadows = 1;
-			alignas(4) float ShadowBias = 0.005f;
+			alignas(16) glm::mat4	LightSpaceMatrix;
+			alignas(4) int			EnableShadows = 1;
+			alignas(4) float		ShadowBias = 0.005f;
 		} ShadowData;
 
 		Ref<UniformBuffer> ShadowUniformBuffer = nullptr;
 
 		struct CameraDataUbo
 		{
-			alignas(16) glm::vec3 Position;
-			alignas(16) glm::mat4 ViewMatrix;
-			glm::mat4 ProjectionMatrix;
-			glm::mat4 ViewProjectionMatrix;
+			alignas(16) glm::vec3	Position;
+			alignas(16) glm::mat4	ViewMatrix;
+			glm::mat4				ProjectionMatrix;
+			glm::mat4				ViewProjectionMatrix;
 		} CameraData;
 
 		Ref<UniformBuffer> CameraUniformBuffer = nullptr;
 
 		struct LightsDataUbo
 		{
-			glm::vec3 GlobalAmbientColor = { 1.0f, 1.0f, 1.0f };
-			alignas(4) float GlobalAmbientIntensity = 2.0f;
+			glm::vec3			GlobalAmbientColor = { 1.0f, 1.0f, 1.0f };
+			alignas(4) float	GlobalAmbientIntensity = 2.0f;
 
 			alignas(4) int NrOfPointLights = 0;
 			DirectionalLight SunLight;
@@ -85,6 +86,10 @@ namespace Kerberos
 		/// The currently active texture, used for binding textures
 		/// This is used to avoid binding the same texture multiple times
 		Ref<Texture2D> ActiveTexture = nullptr;
+
+		constexpr static uint32_t MaterialTextureSlot = 0;
+		constexpr static uint32_t ShadowMapTextureSlot = 1;
+		constexpr static uint32_t FontAtlasTextureSlot = 2;
 	};
 
 	static Renderer3DData s_RendererData;
@@ -172,8 +177,14 @@ namespace Kerberos
 		s_RendererData.SkyboxShader->SetDebugName("Skybox");
 
 		s_RendererData.TextVertexArray = VertexArray::Create();
+		s_RendererData.TextVertexArray->SetDebugName("Text Vertex Array");
+		const std::array<uint32_t, 6> textIndices = { 0, 1, 2, 2, 3, 0 };
+		s_RendererData.TextIndexBuffer = IndexBuffer::Create(textIndices.data(), static_cast<uint32_t>(textIndices.size()));
+		s_RendererData.TextIndexBuffer->SetDebugName("Text Index Buffer");
+		s_RendererData.TextVertexArray->SetIndexBuffer(s_RendererData.TextIndexBuffer);
 		constexpr uint32_t textVertexBufferSize = sizeof(TextVertex) * 4;
 		s_RendererData.TextVertexBuffer = VertexBuffer::Create(textVertexBufferSize);
+		s_RendererData.TextVertexBuffer->SetDebugName("Text Vertex Buffer");
 		s_RendererData.TextVertexBuffer->SetLayout(TextVertex::GetLayout());
 		s_RendererData.TextVertexArray->AddVertexBuffer(s_RendererData.TextVertexBuffer);
 
@@ -373,7 +384,7 @@ namespace Kerberos
 		s_RendererData.PerObjectUniformBuffer->SetData(&s_RendererData.PerObjectData, sizeof(Renderer3DData::PerObjectData), 0);
 
 		const Ref<Texture2D> textureToUse = texture ? texture : s_RendererData.WhiteTexture;
-		constexpr int textureSlot = 0;
+		constexpr int textureSlot = Renderer3DData::MaterialTextureSlot;
 		if (s_RendererData.ActiveTexture != textureToUse)
 		{
 			s_RendererData.ActiveTexture = textureToUse;
@@ -392,15 +403,21 @@ namespace Kerberos
 	}
 
 	void Renderer3D::SubmitText(const std::string& text, const Ref<Font>& font, const glm::mat4& transform,
-		const glm::vec4& color, const float scale, int entityID)
+		const glm::vec4& color, const float fontSize, int entityID)
 	{
 		const Ref<Texture2D> fontAtlas = font->GetAtlasTexture();
 		const FontMetrics& metrics = font->GetMetrics();
 
-		constexpr int fontAtlasTextureSlot = 1;
-		fontAtlas->Bind(fontAtlasTextureSlot);
+		constexpr int fontAtlasTextureSlot = Renderer3DData::FontAtlasTextureSlot;
 		s_RendererData.TextShader->Bind();
 		s_RendererData.TextShader->SetInt("u_FontAtlas", fontAtlasTextureSlot);
+		fontAtlas->Bind(fontAtlasTextureSlot);
+
+		s_RendererData.PerObjectData.ModelMatrix = transform;
+		s_RendererData.PerObjectData.EntityID = entityID; // Currently this is not used, we submit the entity ID per vertex
+
+		constexpr int modelMatrixOffset = offsetof(Renderer3DData::PerObjectDataUbo, ModelMatrix);
+		s_RendererData.PerObjectUniformBuffer->SetData(&s_RendererData.PerObjectData, sizeof(Renderer3DData::PerObjectData.ModelMatrix), modelMatrixOffset);
 
 		double x = 0.0;
 		const double fsScale = 1.0 / (metrics.Ascender - metrics.Descender);
@@ -457,22 +474,22 @@ namespace Kerberos
 			texCoordMax *= glm::vec2(texelWidth, texelHeight);
 
 			std::array<TextVertex, 4> vertices;
-			vertices[0].Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
+			vertices[0].Position = glm::vec3(quadMin, 0.0f);
 			vertices[0].Color = color;
 			vertices[0].TexCoord = texCoordMin;
 			vertices[0].EntityID = entityID;
 
-			vertices[1].Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
+			vertices[1].Position = glm::vec3(quadMin.x, quadMax.y, 0.0f);
 			vertices[1].Color = color;
 			vertices[1].TexCoord = { texCoordMin.x, texCoordMax.y };
 			vertices[1].EntityID = entityID;
 
-			vertices[2].Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
+			vertices[2].Position = glm::vec3(quadMax, 0.0f);
 			vertices[2].Color = color;
 			vertices[2].TexCoord = texCoordMax;
 			vertices[2].EntityID = entityID;
 
-			vertices[3].Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
+			vertices[3].Position = glm::vec3(quadMax.x, quadMin.y, 0.0f);
 			vertices[3].Color = color;
 			vertices[3].TexCoord = { texCoordMax.x, texCoordMin.y };
 			vertices[3].EntityID = entityID;
@@ -480,7 +497,7 @@ namespace Kerberos
 			constexpr uint32_t vbSize = static_cast<uint32_t>(vertices.size()) * sizeof(TextVertex);
 			s_RendererData.TextVertexBuffer->SetData(vertices.data(), vbSize);
 
-			RenderCommand::DrawArray(s_RendererData.TextVertexArray, 4);
+			RenderCommand::DrawIndexed(s_RendererData.TextVertexArray, 6);
 
 			s_Stats.Vertices += 4;
 			s_Stats.Faces += 2;
@@ -559,7 +576,7 @@ namespace Kerberos
 	{
 		/*auto shadowMapTexture = s_RendererData.ShadowMapFramebuffer->GetDepthAttachmentRendererID();*/
 		s_RendererData.ShadowMapFramebuffer->BindDepthTexture(1);
-		constexpr int shadowMapTextureSlot = 1;
+		constexpr int shadowMapTextureSlot = Renderer3DData::ShadowMapTextureSlot;
 		s_RendererData.ActiveShader->SetInt("u_ShadowMap", shadowMapTextureSlot);
 	}
 }

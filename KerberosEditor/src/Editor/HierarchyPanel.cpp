@@ -1397,7 +1397,7 @@ namespace Kerberos
 
 				ImGui::Separator();
 
-				ImGui::DragFloat("Scale", &text.Scale);
+				ImGui::DragFloat("FontSize", &text.FontSize);
 
 				ImGui::Separator();
 

@@ -408,6 +408,17 @@ namespace Kerberos
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<TextComponent>())
+		{
+			out << YAML::Key << "TextComponent";
+			out << YAML::BeginMap;
+			const auto& textComponent = entity.GetComponent<TextComponent>();
+			out << YAML::Key << "Text" << YAML::Value << textComponent.Text;
+			out << YAML::Key << "FontSize" << YAML::Value << textComponent.FontSize;
+			out << YAML::Key << "Color" << YAML::Value << textComponent.Color;
+			out << YAML::EndMap;
+		}
+
 		out << YAML::EndMap;
 
 	}
@@ -733,6 +744,14 @@ namespace Kerberos
 					auto& environment = deserializedEntity.AddComponent<EnvironmentComponent>();
 					environment.SkyboxTexture = AssetHandle(environmentComponent["SkyboxTexture"].as<uint64_t>());
 					environment.IsSkyboxEnabled = environmentComponent["IsSkyboxEnabled"].as<bool>();
+				}
+
+				if (auto textComponent = entity["TextComponent"])
+				{
+					auto& text = deserializedEntity.AddComponent<TextComponent>();
+					text.Text = textComponent["Text"].as<std::string>();
+					text.Color = textComponent["Color"].as<glm::vec4>();
+					text.FontSize = textComponent["FontSize"].as<float>();
 				}
 			}
 		}
