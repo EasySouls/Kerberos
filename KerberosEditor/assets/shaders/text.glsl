@@ -31,13 +31,13 @@ layout(std140, binding = 2) uniform PerObjectData
 
 layout (location = 0) out vec4 v_Color;
 layout (location = 1) out vec2 v_TexCoord;
-layout (location = 2) out flat int v_EntityID;
+layout (location = 2) out int v_EntityID;
 
 void main()
 {
 	v_Color = a_Color;
 	v_TexCoord = a_TexCoord;
-	v_EntityID = a_EntityID;
+	v_EntityID = u_EntityID;
 
 	gl_Position = u_ViewProjection * u_Model * vec4(a_Position, 1.0);
 }
