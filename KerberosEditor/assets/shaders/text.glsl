@@ -8,7 +8,7 @@ layout(location = 3) in int a_EntityID;
 
 layout(std140, binding = 0) uniform Camera
 {
-    vec3 u_ViewPos;
+    vec3 u_CameraPosition;
     mat4 u_ViewMatrix;
     mat4 u_ProjectionMatrix;
     mat4 u_ViewProjection;
@@ -73,14 +73,14 @@ void main()
     float sd = median(msd.r, msd.g, msd.b);
     float screenPxDistance = screenPxRange() * (sd - 0.5);
     float opacity = clamp(screenPxDistance + 0.5, 0.0, 1.0);
-	//if (opacity == 0.0)
-	//	discard;
+	if (opacity == 0.0)
+		discard;
 
     //vec4 bgColor = vec4(0.0);
     vec4 bgColor = vec4(0.7, 0.2, 0.12, 1.0);
     o_Color = mix(bgColor, v_Color, opacity);
-	//if (o_Color.a == 0.0)
-	//	discard;
+	if (o_Color.a == 0.0)
+		discard;
 	
 	o_EntityID = v_EntityID;
 }

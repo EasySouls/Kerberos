@@ -196,14 +196,14 @@ Entities:
     TagComponent:
       Tag: Text
     TransformComponent:
-      Translation: [-2.4203186, 0, 0]
+      Translation: [-1.32, 0, 0]
       Rotation: [0, -0, 0]
-      Scale: [0.001, 1, 1]
+      Scale: [1, 1, 1]
     HierarchyComponent:
       Parent: 0
       Children:
         []
     TextComponent:
       Text: Sample Text
-      FontSize: 12
+      FontSize: 5
       Color: [1, 1, 1, 1]

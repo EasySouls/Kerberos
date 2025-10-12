@@ -413,11 +413,15 @@ namespace Kerberos
 		s_RendererData.TextShader->SetInt("u_FontAtlas", fontAtlasTextureSlot);
 		fontAtlas->Bind(fontAtlasTextureSlot);
 
-		s_RendererData.PerObjectData.ModelMatrix = transform;
+		float textScale = fontSize * 0.001f;
+		glm::mat4 scaledTransform = transform * glm::scale(glm::mat4(1.0f), glm::vec3(textScale));
+
+		s_RendererData.PerObjectData.ModelMatrix = scaledTransform;
 		s_RendererData.PerObjectData.EntityID = entityID; // Currently this is not used, we submit the entity ID per vertex
 
 		constexpr int modelMatrixOffset = offsetof(Renderer3DData::PerObjectDataUbo, ModelMatrix);
-		s_RendererData.PerObjectUniformBuffer->SetData(&s_RendererData.PerObjectData, sizeof(Renderer3DData::PerObjectData.ModelMatrix), modelMatrixOffset);
+		//s_RendererData.PerObjectUniformBuffer->SetData(&s_RendererData.PerObjectData, sizeof(Renderer3DData::PerObjectData.ModelMatrix), modelMatrixOffset);
+		s_RendererData.PerObjectUniformBuffer->SetData(&s_RendererData.PerObjectData, sizeof(Renderer3DData::PerObjectData), 0);
 
 		double x = 0.0;
 		const double fsScale = 1.0 / (metrics.Ascender - metrics.Descender);
@@ -474,22 +478,26 @@ namespace Kerberos
 			texCoordMax *= glm::vec2(texelWidth, texelHeight);
 
 			std::array<TextVertex, 4> vertices;
-			vertices[0].Position = glm::vec3(quadMin, 0.0f);
+			//vertices[0].Position = glm::vec3(quadMin, 0.0f);
+			vertices[0].Position = glm::vec3(quadMin.x, quadMin.y, 1.0f);
 			vertices[0].Color = color;
 			vertices[0].TexCoord = texCoordMin;
 			vertices[0].EntityID = entityID;
 
-			vertices[1].Position = glm::vec3(quadMin.x, quadMax.y, 0.0f);
+			//vertices[1].Position = glm::vec3(quadMin.x, quadMax.y, 0.0f);
+			vertices[1].Position = glm::vec3(quadMax.x, quadMin.y, 1.0f);
 			vertices[1].Color = color;
 			vertices[1].TexCoord = { texCoordMin.x, texCoordMax.y };
 			vertices[1].EntityID = entityID;
 
-			vertices[2].Position = glm::vec3(quadMax, 0.0f);
+			//vertices[2].Position = glm::vec3(quadMax, 0.0f);
+			vertices[2].Position = glm::vec3(quadMax.x, quadMax.y, 1.0f);
 			vertices[2].Color = color;
 			vertices[2].TexCoord = texCoordMax;
 			vertices[2].EntityID = entityID;
 
-			vertices[3].Position = glm::vec3(quadMax.x, quadMin.y, 0.0f);
+			//vertices[3].Position = glm::vec3(quadMax.x, quadMin.y, 0.0f);
+			vertices[3].Position = glm::vec3(quadMin.x, quadMax.y, 1.0f);
 			vertices[3].Color = color;
 			vertices[3].TexCoord = { texCoordMax.x, texCoordMin.y };
 			vertices[3].EntityID = entityID;
