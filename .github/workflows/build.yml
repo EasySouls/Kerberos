@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ main, text-rendering ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
   workflow_dispatch:
 
 env:
@@ -26,7 +26,7 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 0
-    
+
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
@@ -37,30 +37,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests
     
-    - name: Cache Vulkan SDK
-      id: cache-vulkan
-      uses: actions/cache@v4
-      with:
-        path: C:\VulkanSDK\${{ env.VULKAN_SDK_VERSION }}
-        key: vulkan-sdk-${{ env.VULKAN_SDK_VERSION }}-windows
-    
-    - name: Install Vulkan SDK
-      if: steps.cache-vulkan.outputs.cache-hit != 'true'
-      shell: pwsh
-      run: |
-        $vulkanUrl = "https://sdk.lunarg.com/sdk/download/${{ env.VULKAN_SDK_VERSION }}/windows/vulkansdk-windows-X64-${{ env.VULKAN_SDK_VERSION }}.exe"
-        $installerPath = "$env:TEMP\VulkanSDK-Installer.exe"
-        Write-Host "Downloading Vulkan SDK from $vulkanUrl"
-        Invoke-WebRequest -Uri $vulkanUrl -OutFile $installerPath
-        Write-Host "Installing Vulkan SDK..."
-        Start-Process -FilePath $installerPath -ArgumentList @("/S") -Wait
-        Write-Host "Vulkan SDK installed"
-    
-    - name: Set Vulkan SDK environment
-      shell: pwsh
-      run: |
-        echo "VULKAN_SDK=C:\VulkanSDK\${{ env.VULKAN_SDK_VERSION }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-    
     - name: Cache Premake
       id: cache-premake
       uses: actions/cache@v4
@@ -70,11 +46,6 @@ jobs:
     
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
-    
-    - name: Setup .NET Framework 4.7.2
-      uses: microsoft/setup-msbuild@v2
-      with:
-        vs-version: '[17.0,18.0)'
     
     - name: Run Setup Script
       shell: cmd
@@ -141,14 +112,6 @@ jobs:
           libxi-dev \
           libgl1-mesa-dev \
           wget
-    
-    - name: Install Vulkan SDK
-      run: |
-        wget -qO - https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo apt-key add -
-        sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-${{ env.VULKAN_SDK_VERSION }}-jammy.list \
-          https://packages.lunarg.com/vulkan/${{ env.VULKAN_SDK_VERSION }}/lunarg-vulkan-${{ env.VULKAN_SDK_VERSION }}-jammy.list
-        sudo apt-get update
-        sudo apt-get install -y vulkan-sdk
     
     - name: Build
       run: |
