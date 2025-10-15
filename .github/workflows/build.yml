@@ -30,7 +30,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.13'
     
     - name: Install Python dependencies
       run: |
@@ -48,7 +48,7 @@ jobs:
       if: steps.cache-vulkan.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
-        $vulkanUrl = "https://sdk.lunarg.com/sdk/download/${{ env.VULKAN_SDK_VERSION }}/windows/VulkanSDK-${{ env.VULKAN_SDK_VERSION }}-Installer.exe"
+        $vulkanUrl = "https://sdk.lunarg.com/sdk/download/${{ env.VULKAN_SDK_VERSION }}/windows/vulkansdk-windows-X64-${{ env.VULKAN_SDK_VERSION }}.exe"
         $installerPath = "$env:TEMP\VulkanSDK-Installer.exe"
         Write-Host "Downloading Vulkan SDK from $vulkanUrl"
         Invoke-WebRequest -Uri $vulkanUrl -OutFile $installerPath
