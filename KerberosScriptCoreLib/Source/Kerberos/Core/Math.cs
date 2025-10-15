@@ -121,10 +121,10 @@ namespace Kerberos.Source.Kerberos.Core
 
     public struct Vector4
     {
-        private float X;
-        private float Y;
-        private float Z;
-        private float W;
+        public float X;
+        public float Y;
+        public float Z;
+        public float W;
 
         public Vector4(float x, float y, float z, float w)
         {

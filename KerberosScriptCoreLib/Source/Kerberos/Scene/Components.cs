@@ -104,7 +104,7 @@ namespace Kerberos.Source.Kerberos.Scene
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException("Font size must be greater than zero.");
+                    throw new ArgumentOutOfRangeException(nameof(value), "Font size must be greater than zero.");
                 InternalCalls.TextComponent_SetFontSize(Entity.ID, ref value);
             }
         }
