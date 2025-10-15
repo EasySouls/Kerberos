@@ -6,11 +6,24 @@
 //#include <mono/metadata/metadata.h>
 //#include <mono/metadata/blob.h>
 #include <mono/metadata/class.h>
+#include <mono/metadata/object.h>
 
 #include <unordered_map>
 
 namespace Kerberos
 {
+	std::string ScriptUtils::MonoStringToString(MonoString* monoStr)
+	{
+		if (monoStr == nullptr)
+			return std::string();
+
+		char* cStr = mono_string_to_utf8(monoStr);
+		std::string str(cStr);
+
+		mono_free(cStr);
+		return str;
+	}
+
 	static std::unordered_map<std::string, ScriptFieldType> s_ScriptFieldTypeMap = {
 		{ "System.Int16",								ScriptFieldType::Short },
 		{ "System.Int32",								ScriptFieldType::Int },

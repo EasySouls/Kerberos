@@ -71,4 +71,57 @@ namespace Kerberos.Source.Kerberos.Scene
 
         public void ApplyImpulse(Vector3 impulse, Vector3 point) => InternalCalls.Rigidbody3DComponent_ApplyImpulseAtPoint(Entity.ID, ref impulse, ref point);
     }
+
+    public class TextComponent : Component
+    {
+        public string Text
+        {
+            get
+            {
+                InternalCalls.TextComponent_GetText(Entity.ID, out string text);
+                return text;
+            }
+            set => InternalCalls.TextComponent_SetText(Entity.ID, ref value);
+        }
+
+        public Vector4 Color
+           {
+            get
+            {
+                InternalCalls.TextComponent_GetColor(Entity.ID, out Vector4 color);
+                return color;
+            }
+            set => InternalCalls.TextComponent_SetColor(Entity.ID, ref value);
+        }
+
+        public float FontSize
+        {
+            get
+            {
+                InternalCalls.TextComponent_GetFontSize(Entity.ID, out float fontSize);
+                return fontSize;
+            }
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentOutOfRangeException("Font size must be greater than zero.");
+                InternalCalls.TextComponent_SetFontSize(Entity.ID, ref value);
+            }
+        }
+
+        public string FontPath
+        {
+            get
+            {
+                InternalCalls.TextComponent_GetFontPath(Entity.ID, out string fontPath);
+                return fontPath;
+            }
+            set
+            {
+                if (!File.Exists(value))
+                    throw new FileNotFoundException($"Font file not found at path: {value}");
+                InternalCalls.TextComponent_SetFontPath(Entity.ID, ref value);
+            }
+        }
+    }
 }

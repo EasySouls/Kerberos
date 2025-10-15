@@ -13,6 +13,7 @@ extern "C" {
 	typedef struct _MonoMethod		MonoMethod;
 	typedef struct _MonoDomain		MonoDomain;
 	typedef struct _MonoImage		MonoImage;
+	typedef struct _MonoString		MonoString;
 }
 
 namespace filewatch { enum class Event; }
@@ -60,7 +61,11 @@ namespace Kerberos
 
 		static MonoImage* GetCoreAssemblyImage();
 
+		static MonoString* StringToMonoString(const std::string& str);
+
 		friend class ScriptClass;
 		friend class ScriptInterface;
+		friend void TextComponent_GetText(UUID entityID, const MonoString* outText);
+		friend void TextComponent_GetFontPath(UUID entityID, const MonoString* outFontPath);
 	};
 }

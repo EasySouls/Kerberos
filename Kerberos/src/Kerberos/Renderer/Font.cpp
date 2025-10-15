@@ -49,7 +49,7 @@ namespace Kerberos
 	}
 
 	Font::Font(std::string name, const std::filesystem::path& filepath)
-		: m_Name(std::move(name)), m_MSDFData(new MSDFData)
+		: m_Name(std::move(name)), m_Filepath(filepath), m_MSDFData(new MSDFData)
 	{
 		KBR_PROFILE_FUNCTION();
 

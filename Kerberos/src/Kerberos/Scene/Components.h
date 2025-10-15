@@ -252,8 +252,8 @@ namespace Kerberos
 		float FontSize = 12.0f;
 
 		TextComponent() = default;
-		explicit TextComponent(const Ref<Kerberos::Font>& font, const std::string& text)
-			: Font(font), Text(text)
+		explicit TextComponent(const Ref<Kerberos::Font>& font, std::string text)
+			: Font(font), Text(std::move(text))
 		{
 		}
 	};

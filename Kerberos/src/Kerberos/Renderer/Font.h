@@ -31,6 +31,7 @@ namespace Kerberos
 		Ref<Texture2D> GetAtlasTexture() const { return m_AtlasTexture; }
 		FontMetrics GetMetrics() const;
 		const std::string& GetName() const { return m_Name; }
+		const std::filesystem::path& GetFilepath() const { return m_Filepath; }
 
 		bool HasCharacter(char c) const;
 		void GetQuadAtlasBounds(char character, double& al, double& ab, double& ar, double& at) const;
@@ -42,6 +43,8 @@ namespace Kerberos
 
 	private:
 		std::string m_Name;
+		std::filesystem::path m_Filepath;
+
 		MSDFData* m_MSDFData = nullptr;
 		Ref<Texture2D> m_AtlasTexture;
 	};
