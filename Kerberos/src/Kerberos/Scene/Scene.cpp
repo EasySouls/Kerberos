@@ -432,7 +432,7 @@ namespace Kerberos
 		newScene->m_ViewportHeight = other->m_ViewportHeight;
 
 		auto& sourceRegistry = other->m_Registry;
-		auto& newRegistry = newScene->m_Registry;
+		//auto& newRegistry = newScene->m_Registry;
 
 		const auto idView = sourceRegistry.view<IDComponent>();
 		for (const auto& entity : idView)
@@ -515,6 +515,10 @@ namespace Kerberos
 			if (sourceRegistry.all_of<EnvironmentComponent>(entity))
 			{
 				newEntity.AddComponent<EnvironmentComponent>(sourceRegistry.get<EnvironmentComponent>(entity));
+			}
+			if (sourceRegistry.all_of<TextComponent>(entity))
+			{
+				newEntity.AddComponent<TextComponent>(sourceRegistry.get<TextComponent>(entity));
 			}
 		}
 

@@ -76,12 +76,8 @@ namespace Kerberos.Source.Kerberos.Scene
     {
         public string Text
         {
-            get
-            {
-                InternalCalls.TextComponent_GetText(Entity.ID, out string text);
-                return text;
-            }
-            set => InternalCalls.TextComponent_SetText(Entity.ID, ref value);
+            get => InternalCalls.TextComponent_GetText(Entity.ID);
+            set => InternalCalls.TextComponent_SetText(Entity.ID, value);
         }
 
         public Vector4 Color
@@ -96,31 +92,23 @@ namespace Kerberos.Source.Kerberos.Scene
 
         public float FontSize
         {
-            get
-            {
-                InternalCalls.TextComponent_GetFontSize(Entity.ID, out float fontSize);
-                return fontSize;
-            }
+            get => InternalCalls.TextComponent_GetFontSize(Entity.ID);
             set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException(nameof(value), "Font size must be greater than zero.");
-                InternalCalls.TextComponent_SetFontSize(Entity.ID, ref value);
+                InternalCalls.TextComponent_SetFontSize(Entity.ID, value);
             }
         }
 
         public string FontPath
         {
-            get
-            {
-                InternalCalls.TextComponent_GetFontPath(Entity.ID, out string fontPath);
-                return fontPath;
-            }
+            get => InternalCalls.TextComponent_GetFontPath(Entity.ID);
             set
             {
                 if (!File.Exists(value))
                     throw new FileNotFoundException($"Font file not found at path: {value}");
-                InternalCalls.TextComponent_SetFontPath(Entity.ID, ref value);
+                InternalCalls.TextComponent_SetFontPath(Entity.ID, value);
             }
         }
     }

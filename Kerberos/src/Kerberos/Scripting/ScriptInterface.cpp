@@ -180,16 +180,18 @@ namespace Kerberos
 		}
 	}
 
-	static void TextComponent_GetText(const UUID entityID, const MonoString* outText)
+	static MonoString* TextComponent_GetText(const UUID entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 		const TextComponent& textComponent = entity.GetComponent<TextComponent>();
-		outText = ScriptEngine::StringToMonoString(textComponent.Text);
+		return ScriptEngine::StringToMonoString(textComponent.Text);
 	}
 
 	static void TextComponent_SetText(const UUID entityID, MonoString* text)
 	{
+		KBR_CORE_ASSERT(text == nullptr, "Null pointer passed to text");
+
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
@@ -215,13 +217,11 @@ namespace Kerberos
 		currentColor = *color;
 	}
 
-	static void TextComponent_GetFontSize(const UUID entityID, float* outFontSize)
+	static float TextComponent_GetFontSize(const UUID entityID)
 	{
-		KBR_CORE_ASSERT(outFontSize, "Null pointer passed to outFontSize");
-
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const float fontSize = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().FontSize;
-		*outFontSize = fontSize;
+		return fontSize;
 	}
 
 	static void TextComponent_SetFontSize(const UUID entityID, const float fontSize)
@@ -231,16 +231,14 @@ namespace Kerberos
 		currentFontSize = fontSize;
 	}
 
-	static void TextComponent_GetFontPath(const UUID entityID, const MonoString* outFontPath)
+	static MonoString* TextComponent_GetFontPath(const UUID entityID)
 	{
-		KBR_CORE_ASSERT(outFontPath == nullptr, "Null pointer passed to outFontPath");
-
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
 		const TextComponent& textComponent = entity.GetComponent<TextComponent>();
 		const std::string fontPath = textComponent.Font->GetFilepath().string();
-		outFontPath = ScriptEngine::StringToMonoString(fontPath);
+		return ScriptEngine::StringToMonoString(fontPath);
 	}
 
 	static void TextComponent_SetFontPath(const UUID entityID, const MonoString* fontPath)

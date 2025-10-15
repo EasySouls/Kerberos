@@ -15,7 +15,7 @@ namespace Kerberos
 		float Ascender = 0.0f;
 		float Descender = 0.0f;
 		float LineHeight = 0.0f;
-	};;
+	};
 
 	class Font
 	{
@@ -23,9 +23,9 @@ namespace Kerberos
 		explicit Font(std::string name, const std::filesystem::path& filepath);
 		~Font();
 
-		Font(const Font& other) = default;
+		Font(const Font& other) = delete;
 		Font(Font&& other) noexcept = default;
-		Font& operator=(const Font& other) = default;
+		Font& operator=(const Font& other) = delete;
 		Font& operator=(Font&& other) noexcept = default;
 
 		Ref<Texture2D> GetAtlasTexture() const { return m_AtlasTexture; }

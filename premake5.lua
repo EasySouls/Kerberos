@@ -68,31 +68,20 @@ function getLatestWindowsSDK()
 	local latestVersion = ""
 	local latestVersionNum = 0
 
-	-- Premake doesn't have os.walk(), so we'll rely on checking common SDK locations
-	-- This is less robust than walking directories but more likely to work with Premake
-	local commonSdkVersions =
-	{
-		"10.0.26100.0",
-		"10.0.22621.0", -- Windows 11 22H2/23H2
-		"10.0.22000.0",
-		"10.0.19041.0", -- Windows 10 2004/20H2/21H1/21H2
-		"10.0.18362.0", -- Windows 10 1903/1909
-		-- Add other recent versions if needed
-	}
-
-	-- Check for the existence of common SDK versions in descending order
-	for _, version in ipairs(commonSdkVersions) do
-		local potentialIncludeDir = includeBaseDir .. version .. "/um"
-		local potentialLibDir = windowsSdkDir .. "/Lib/" .. version .. "/um/x64" -- Assuming x64
-
-		if os.isdir(potentialIncludeDir) and os.isdir(potentialLibDir) then
-			local buildNumStr = version:match("10%.0%.(%d+)%.0")
-			local buildNum = tonumber(buildNumStr)
-			if buildNum and buildNum > latestVersionNum then
-				latestVersionNum = buildNum
-				latestVersion = version
-			end
-		end
+	local candidates = os.matchdirs(includeBaseDir .. "10.0.*")
+	table.sort(candidates, function(a, b) return a > b end)
+	for _, dir in ipairs(candidates) do
+	  local version = path.getname(dir)
+	  local potentialIncludeDir = includeBaseDir .. version .. "/um"
+	  local potentialLibDir = windowsSdkDir .. "/Lib/" .. version .. "/um/x64"
+	  if os.isdir(potentialIncludeDir) and os.isdir(potentialLibDir) then
+	    local buildNumStr = version:match("10%.0%.(%d+)%.0")
+	    local buildNum = tonumber(buildNumStr)
+	    if buildNum and buildNum > latestVersionNum then
+	      latestVersionNum = buildNum
+	      latestVersion = version
+	    end
+	  end
 	end
 
 	if latestVersion == "" then

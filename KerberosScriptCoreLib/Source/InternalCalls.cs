@@ -53,10 +53,10 @@ namespace Kerberos.Source
         // ----------------------------- TextComponent --------------------------------------
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void TextComponent_SetText(ulong entityID, ref string text);
+        internal static extern void TextComponent_SetText(ulong entityID, string text);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void TextComponent_GetText(ulong entityID, out string text);
+        internal static extern string TextComponent_GetText(ulong entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void TextComponent_SetColor(ulong entityID, ref Vector4 color);
@@ -65,16 +65,16 @@ namespace Kerberos.Source
         internal static extern void TextComponent_GetColor(ulong entityID, out Vector4 color);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void TextComponent_SetFontSize(ulong entityID, ref float size);
+        internal static extern void TextComponent_SetFontSize(ulong entityID, float size);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void TextComponent_GetFontSize(ulong entityID, out float size);
+        internal static extern float TextComponent_GetFontSize(ulong entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void TextComponent_SetFontPath(ulong entityID, ref string path);
+        internal static extern void TextComponent_SetFontPath(ulong entityID, string path);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void TextComponent_GetFontPath(ulong entityID, out string path);
+        internal static extern string TextComponent_GetFontPath(ulong entityID);
 
         // ----------------------------- Input -----------------------------
 

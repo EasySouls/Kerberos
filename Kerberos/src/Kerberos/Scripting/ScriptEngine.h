@@ -47,6 +47,9 @@ namespace Kerberos
 		static Ref<ScriptInstance> GetEntityInstance(UUID entityID);
 		static const std::weak_ptr<Scene>& GetSceneContext();
 
+		static MonoString* StringToMonoString(const std::string& str);
+
+
 	private:
 		static void InitMono();
 		static void ShutdownMono();
@@ -61,11 +64,7 @@ namespace Kerberos
 
 		static MonoImage* GetCoreAssemblyImage();
 
-		static MonoString* StringToMonoString(const std::string& str);
-
 		friend class ScriptClass;
 		friend class ScriptInterface;
-		friend void TextComponent_GetText(UUID entityID, const MonoString* outText);
-		friend void TextComponent_GetFontPath(UUID entityID, const MonoString* outFontPath);
 	};
 }
