@@ -14,6 +14,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 VULKAN_DIR = os.getenv("VULKAN_SDK") or ""
 if VULKAN_DIR == "" then
 	VULKAN_DIR = "%{wks.location}/Kerberos/vendor/VulkanSDK/1.4.328.1"
+end
 
 
 print("Vulkan SDK Directory: " .. VULKAN_DIR)
