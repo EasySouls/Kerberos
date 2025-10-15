@@ -413,14 +413,14 @@ namespace Kerberos
 		s_RendererData.TextShader->SetInt("u_FontAtlas", fontAtlasTextureSlot);
 		fontAtlas->Bind(fontAtlasTextureSlot);
 
-		float textScale = fontSize * 0.001f;
+		float textScale = fontSize * 0.1f;
 		glm::mat4 scaledTransform = transform * glm::scale(glm::mat4(1.0f), glm::vec3(textScale));
 
 		s_RendererData.PerObjectData.ModelMatrix = scaledTransform;
 		s_RendererData.PerObjectData.EntityID = entityID; // Currently this is not used, we submit the entity ID per vertex
 
-		constexpr int modelMatrixOffset = offsetof(Renderer3DData::PerObjectDataUbo, ModelMatrix);
-		//s_RendererData.PerObjectUniformBuffer->SetData(&s_RendererData.PerObjectData, sizeof(Renderer3DData::PerObjectData.ModelMatrix), modelMatrixOffset);
+		/*constexpr int modelMatrixOffset = offsetof(Renderer3DData::PerObjectDataUbo, ModelMatrix);
+		s_RendererData.PerObjectUniformBuffer->SetData(&s_RendererData.PerObjectData, sizeof(Renderer3DData::PerObjectData.ModelMatrix), modelMatrixOffset);*/
 		s_RendererData.PerObjectUniformBuffer->SetData(&s_RendererData.PerObjectData, sizeof(Renderer3DData::PerObjectData), 0);
 
 		double x = 0.0;

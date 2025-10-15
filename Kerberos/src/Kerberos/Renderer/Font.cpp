@@ -188,7 +188,7 @@ namespace Kerberos
 		const auto& glyph = m_MSDFData->FontGeometry.getGlyph(character);
 		KBR_CORE_ASSERT(glyph, "Font does not contain character: {0}", character);
 
-		glyph->getQuadAtlasBounds(pl, pb, pr, pt);
+		glyph->getQuadPlaneBounds(pl, pb, pr, pt);
 	}
 
 	double Font::GetAdvance(char character) const 

@@ -76,8 +76,9 @@ void main()
 	if (opacity == 0.0)
 		discard;
 
-    //vec4 bgColor = vec4(0.0);
-    vec4 bgColor = vec4(0.7, 0.2, 0.12, 1.0);
+    // Make it blend in with the background, by setting it
+    // to transparent black where there is no text
+    vec4 bgColor = vec4(0.0);
     o_Color = mix(bgColor, v_Color, opacity);
 	if (o_Color.a == 0.0)
 		discard;
