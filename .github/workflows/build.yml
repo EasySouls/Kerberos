@@ -1,0 +1,175 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, text-rendering ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  VULKAN_SDK_VERSION: '1.4.313.0'
+  BUILD_TYPE: Release
+
+jobs:
+  build-windows:
+    name: Build on Windows
+    runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    
+    - name: Cache Vulkan SDK
+      id: cache-vulkan
+      uses: actions/cache@v4
+      with:
+        path: C:\VulkanSDK\${{ env.VULKAN_SDK_VERSION }}
+        key: vulkan-sdk-${{ env.VULKAN_SDK_VERSION }}-windows
+    
+    - name: Install Vulkan SDK
+      if: steps.cache-vulkan.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: |
+        $vulkanUrl = "https://sdk.lunarg.com/sdk/download/${{ env.VULKAN_SDK_VERSION }}/windows/VulkanSDK-${{ env.VULKAN_SDK_VERSION }}-Installer.exe"
+        $installerPath = "$env:TEMP\VulkanSDK-Installer.exe"
+        Write-Host "Downloading Vulkan SDK from $vulkanUrl"
+        Invoke-WebRequest -Uri $vulkanUrl -OutFile $installerPath
+        Write-Host "Installing Vulkan SDK..."
+        Start-Process -FilePath $installerPath -ArgumentList @("/S") -Wait
+        Write-Host "Vulkan SDK installed"
+    
+    - name: Set Vulkan SDK environment
+      shell: pwsh
+      run: |
+        echo "VULKAN_SDK=C:\VulkanSDK\${{ env.VULKAN_SDK_VERSION }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+    
+    - name: Cache Premake
+      id: cache-premake
+      uses: actions/cache@v4
+      with:
+        path: vendor/premake
+        key: premake-5.0.0-beta7-windows
+    
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Setup .NET Framework 4.7.2
+      uses: microsoft/setup-msbuild@v2
+      with:
+        vs-version: '[17.0,18.0)'
+    
+    - name: Run Setup Script
+      shell: cmd
+      run: |
+        cd scripts
+        python Setup.py
+        cd ..
+    
+    - name: Build Solution
+      shell: cmd
+      run: |
+        msbuild Kerberos.sln /p:Configuration=${{ matrix.configuration }} /p:Platform=x64 /m /verbosity:minimal
+    
+    - name: Upload Build Artifacts
+      if: matrix.configuration == 'Release'
+      uses: actions/upload-artifact@v4
+      with:
+        name: kerberos-windows-${{ matrix.configuration }}
+        path: |
+          bin/${{ matrix.configuration }}-windows-x86_64/KerberosEditor/*.exe
+          bin/${{ matrix.configuration }}-windows-x86_64/KerberosEditor/*.dll
+          KerberosEditor/Resources/
+        retention-days: 7
+    
+    - name: Upload C# Script Core Library
+      if: matrix.configuration == 'Release'
+      uses: actions/upload-artifact@v4
+      with:
+        name: kerberos-scriptcore-${{ matrix.configuration }}
+        path: |
+          KerberosEditor/Resources/Scripts/*.dll
+        retention-days: 7
+
+  build-linux:
+    name: Build on Linux
+    runs-on: ubuntu-latest
+    if: false # Disabled until Linux support is added
+    
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          libx11-dev \
+          libxrandr-dev \
+          libxinerama-dev \
+          libxcursor-dev \
+          libxi-dev \
+          libgl1-mesa-dev \
+          wget
+    
+    - name: Install Vulkan SDK
+      run: |
+        wget -qO - https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo apt-key add -
+        sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-${{ env.VULKAN_SDK_VERSION }}-jammy.list \
+          https://packages.lunarg.com/vulkan/${{ env.VULKAN_SDK_VERSION }}/lunarg-vulkan-${{ env.VULKAN_SDK_VERSION }}-jammy.list
+        sudo apt-get update
+        sudo apt-get install -y vulkan-sdk
+    
+    - name: Build
+      run: |
+        # Add Linux build commands here when supported
+        echo "Linux build not yet implemented"
+
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: false
+        fetch-depth: 0
+    
+    - name: Check file sizes
+      run: |
+        find . -type f -size +10M -not -path "./.git/*" -not -path "*/vendor/*" -not -path "*/bin/*" -not -path "*/bin-int/*"
+    
+    - name: Check line endings
+      run: |
+        ! find . -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.cs" \) -not -path "*/vendor/*" -exec file {} \; | grep CRLF
