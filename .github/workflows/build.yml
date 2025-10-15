@@ -37,7 +37,7 @@ jobs:
     - name: Generate Visual Studio Projects
       shell: pwsh
       run: |
-        .\vendor\GenerateProjects-Windows-VS22.bat
+        .\scripts\GenerateProjects-Windows-VS22.bat
     
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
