@@ -478,26 +478,22 @@ namespace Kerberos
 			texCoordMax *= glm::vec2(texelWidth, texelHeight);
 
 			std::array<TextVertex, 4> vertices;
-			//vertices[0].Position = glm::vec3(quadMin, 0.0f);
-			vertices[0].Position = glm::vec3(quadMin.x, quadMin.y, 1.0f);
+			vertices[0].Position = glm::vec3(quadMin, 0.0f);
 			vertices[0].Color = color;
 			vertices[0].TexCoord = texCoordMin;
 			vertices[0].EntityID = entityID;
 
-			//vertices[1].Position = glm::vec3(quadMin.x, quadMax.y, 0.0f);
-			vertices[1].Position = glm::vec3(quadMax.x, quadMin.y, 1.0f);
+			vertices[1].Position = glm::vec3(quadMin.x, quadMax.y, 0.0f);
 			vertices[1].Color = color;
 			vertices[1].TexCoord = { texCoordMin.x, texCoordMax.y };
 			vertices[1].EntityID = entityID;
 
-			//vertices[2].Position = glm::vec3(quadMax, 0.0f);
-			vertices[2].Position = glm::vec3(quadMax.x, quadMax.y, 1.0f);
+			vertices[2].Position = glm::vec3(quadMax, 0.0f);
 			vertices[2].Color = color;
 			vertices[2].TexCoord = texCoordMax;
 			vertices[2].EntityID = entityID;
 
-			//vertices[3].Position = glm::vec3(quadMax.x, quadMin.y, 0.0f);
-			vertices[3].Position = glm::vec3(quadMin.x, quadMax.y, 1.0f);
+			vertices[3].Position = glm::vec3(quadMax.x, quadMin.y, 0.0f);
 			vertices[3].Color = color;
 			vertices[3].TexCoord = { texCoordMax.x, texCoordMin.y };
 			vertices[3].EntityID = entityID;
