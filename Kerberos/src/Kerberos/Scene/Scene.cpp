@@ -287,6 +287,14 @@ namespace Kerberos
 		{
 			newEntity.AddComponent<SpotLightComponent>(entity.GetComponent<SpotLightComponent>());
 		}
+		if (entity.HasComponent<EnvironmentComponent>())
+		{
+			newEntity.AddComponent<EnvironmentComponent>(entity.GetComponent<EnvironmentComponent>());
+		}
+		if (entity.HasComponent<TextComponent>())
+		{
+			newEntity.AddComponent<TextComponent>(entity.GetComponent<TextComponent>());
+		}
 
 		if (duplicateChildren)
 		{
@@ -424,7 +432,7 @@ namespace Kerberos
 		newScene->m_ViewportHeight = other->m_ViewportHeight;
 
 		auto& sourceRegistry = other->m_Registry;
-		auto& newRegistry = newScene->m_Registry;
+		//auto& newRegistry = newScene->m_Registry;
 
 		const auto idView = sourceRegistry.view<IDComponent>();
 		for (const auto& entity : idView)
@@ -507,6 +515,10 @@ namespace Kerberos
 			if (sourceRegistry.all_of<EnvironmentComponent>(entity))
 			{
 				newEntity.AddComponent<EnvironmentComponent>(sourceRegistry.get<EnvironmentComponent>(entity));
+			}
+			if (sourceRegistry.all_of<TextComponent>(entity))
+			{
+				newEntity.AddComponent<TextComponent>(sourceRegistry.get<TextComponent>(entity));
 			}
 		}
 
@@ -627,6 +639,16 @@ namespace Kerberos
 			}
 		}
 
+		Renderer3D::EndPass();
+
+		const auto textView = m_Registry.view<TransformComponent, TextComponent>();
+		for (const auto entity : textView)
+		{
+			auto [transform, text] = textView.get<TransformComponent, TextComponent>(entity);
+
+			Renderer3D::SubmitText(text.Text, text.Font, transform.WorldTransform, text.Color, text.FontSize, static_cast<int>(entity));
+		}
+
 		Renderer3D::EndScene();
 	}
 
@@ -722,6 +744,15 @@ namespace Kerberos
 		}
 
 		Renderer3D::EndPass();
+
+		const auto textView = m_Registry.view<TransformComponent, TextComponent>();
+		for (const auto entity : textView)
+		{
+			auto [transform, text] = textView.get<TransformComponent, TextComponent>(entity);
+
+			Renderer3D::SubmitText(text.Text, text.Font, transform.WorldTransform, text.Color, text.FontSize, static_cast<int>(entity));
+		}
+
 		Renderer3D::EndScene();
 	}
 
@@ -920,4 +951,9 @@ namespace Kerberos
 	template <>
 	void Scene::OnComponentAdded<EnvironmentComponent>(Entity entity, EnvironmentComponent& component)
 	{}
+
+	template <>
+	void Scene::OnComponentAdded<TextComponent>(Entity entity, TextComponent& component)
+	{
+	}
 }

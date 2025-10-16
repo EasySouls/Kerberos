@@ -50,6 +50,32 @@ namespace Kerberos.Source
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Rigidbody3DComponent_ApplyImpulseAtPoint(ulong entityID, ref Vector3 impulse, ref Vector3 point);
 
+        // ----------------------------- TextComponent --------------------------------------
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void TextComponent_SetText(ulong entityID, string text);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern string TextComponent_GetText(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void TextComponent_SetColor(ulong entityID, ref Vector4 color);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void TextComponent_GetColor(ulong entityID, out Vector4 color);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void TextComponent_SetFontSize(ulong entityID, float size);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern float TextComponent_GetFontSize(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void TextComponent_SetFontPath(ulong entityID, string path);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern string TextComponent_GetFontPath(ulong entityID);
+
         // ----------------------------- Input -----------------------------
 
         [MethodImpl(MethodImplOptions.InternalCall)]

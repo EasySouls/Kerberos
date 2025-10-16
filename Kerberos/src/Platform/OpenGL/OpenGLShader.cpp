@@ -398,6 +398,8 @@ namespace Kerberos
 		if (constexpr bool optimize = false)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
+		options.SetVulkanRulesRelaxed(true);
+
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
 
 		/// Get source file modification time
@@ -602,7 +604,22 @@ namespace Kerberos
 				KBR_CORE_TRACE("Cross-compiling OpenGL SPIR-V for stage {0}", Utils::GLShaderStageToString(stage));
 
 				spirv_cross::CompilerGLSL glslCompiler(spirv);
-				m_OpenGLSourceCode[stage] = glslCompiler.compile();
+
+				spirv_cross::CompilerGLSL::Options glslOptions;
+				glslOptions.vulkan_semantics = true;
+
+				glslCompiler.set_common_options(glslOptions);
+
+				try 
+				{
+					m_OpenGLSourceCode[stage] = glslCompiler.compile();
+				} 
+				catch (const spirv_cross::CompilerError& e) 
+				{
+					KBR_CORE_ERROR("SPIRV-Cross compilation error: {0}", e.what());
+					KBR_CORE_ASSERT(false, "SPIRV-Cross compilation failure!");
+					return;
+				}
 				auto& source = m_OpenGLSourceCode[stage];
 
 				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str(), options);

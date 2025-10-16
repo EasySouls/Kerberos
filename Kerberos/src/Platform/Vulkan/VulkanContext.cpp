@@ -492,16 +492,27 @@ namespace Kerberos
 		}
 
 		/// Query the device features
-		VkPhysicalDeviceFeatures deviceFeatures{};
-		vkGetPhysicalDeviceFeatures(m_PhysicalDevice, &deviceFeatures);
+		VkPhysicalDeviceVulkan13Features deviceFeatures13 = {};
+		deviceFeatures13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+		deviceFeatures13.pNext = nullptr;
+		deviceFeatures13.synchronization2 = VK_TRUE;
+		deviceFeatures13.shaderDemoteToHelperInvocation = VK_TRUE;
+
+		VkPhysicalDeviceFeatures2 deviceFeatures2{};
+		deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+		deviceFeatures2.pNext = &deviceFeatures13;
+		vkGetPhysicalDeviceFeatures2(m_PhysicalDevice, &deviceFeatures2);
+
+		/// Handle logic here for enabling/disabling features based on what the GPU supports
 
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		createInfo.pNext = &deviceFeatures2;
 
 		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
-		createInfo.pEnabledFeatures = &deviceFeatures;
+		//createInfo.pEnabledFeatures = &deviceFeatures;
 
 		createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 		createInfo.ppEnabledExtensionNames = deviceExtensions.data();

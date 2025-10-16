@@ -9,6 +9,7 @@
 
 #include "Kerberos/Assets/Importers/MeshImporter.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"
+#include "Kerberos/Renderer/Font.h"
 #include "Kerberos/Scripting/ScriptEngine.h"
 
 #define PROFILE_SCOPE(name) Timer timer##__LINE__(name, 
@@ -16,8 +17,10 @@
 namespace Kerberos
 {
 	EditorLayer::EditorLayer()
-		: Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f)
-	{}
+		:	Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f), 
+			m_BasicFont(Font::GetDefaultFont())
+	{
+	}
 
 	void EditorLayer::OnAttach()
 	{
@@ -413,6 +416,13 @@ namespace Kerberos
 		ImGui::Image(shadowMapTextureID, ImVec2{ 256, 256 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 		ImGui::Checkbox("Only render shadow map if light has changed", &m_ActiveScene->GetOnlyRenderShadowMapIfLightHasChanged());
 
+		ImGui::Separator();
+
+		/// Render the font atlas
+		ImGui::Text("Font Atlas");
+		const uint64_t fontAtlasTextureID = m_BasicFont->GetAtlasTexture()->GetRendererID();
+		ImGui::Image(fontAtlasTextureID, ImVec2{ 256, 256 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
 		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -568,6 +578,13 @@ namespace Kerberos
 		case Key::R:
 			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
 			break;
+		case Key::F: {
+			if (const Entity& entity = m_HierarchyPanel.GetSelectedEntity())
+			{
+				m_EditorCamera.Focus(entity.GetComponent<TransformComponent>().Translation);
+			}
+			break;
+		}
 		default:
 			break;
 		}

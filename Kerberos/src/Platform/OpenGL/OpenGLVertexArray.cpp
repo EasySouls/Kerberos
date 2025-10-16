@@ -90,4 +90,9 @@ namespace Kerberos
 		indexBuffer->Bind();
 		m_IndexBuffer = indexBuffer;
 	}
+
+	void OpenGLVertexArray::SetDebugName(const std::string& name) 
+	{
+		glObjectLabel(GL_VERTEX_ARRAY, m_RendererID, static_cast<GLsizei>(name.size()), name.c_str());
+	}
 }

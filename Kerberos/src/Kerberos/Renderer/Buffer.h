@@ -124,6 +124,8 @@ namespace Kerberos
 			return *static_cast<T*>(this);
 		}
 
+		virtual void SetDebugName(const std::string& name) = 0;
+
 		static Ref<VertexBuffer> Create(const float* vertices, uint32_t size);
 		static Ref<VertexBuffer> Create(uint32_t size);
 	};
@@ -143,6 +145,8 @@ namespace Kerberos
 		{
 			return *static_cast<T*>(this);
 		}
+
+		virtual void SetDebugName(const std::string& name) = 0;
 
 		static Ref<IndexBuffer> Create(const uint32_t* indices, uint32_t count);
 	};

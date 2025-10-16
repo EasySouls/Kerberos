@@ -20,3 +20,6 @@
 [submodule "Kerberos/vendor/JoltPhysics"]
 	path = Kerberos/vendor/JoltPhysics
 	url = https://github.com/EasySouls/JoltPhysics
+[submodule "Kerberos/vendor/msdf-atlas-gen"]
+	path = Kerberos/vendor/msdf-atlas-gen
+	url = https://github.com/EasySouls/msdf-atlas-gen

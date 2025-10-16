@@ -13,6 +13,7 @@ extern "C" {
 	typedef struct _MonoMethod		MonoMethod;
 	typedef struct _MonoDomain		MonoDomain;
 	typedef struct _MonoImage		MonoImage;
+	typedef struct _MonoString		MonoString;
 }
 
 namespace filewatch { enum class Event; }
@@ -45,6 +46,9 @@ namespace Kerberos
 		static std::unordered_map<std::string, ScriptFieldInitializer>& GetScriptFieldInitializerMap(Entity entity);
 		static Ref<ScriptInstance> GetEntityInstance(UUID entityID);
 		static const std::weak_ptr<Scene>& GetSceneContext();
+
+		static MonoString* StringToMonoString(const std::string& str);
+
 
 	private:
 		static void InitMono();

@@ -3,24 +3,37 @@
 
 namespace Kerberos
 {
+	////////////////////// Vertex Buffer //////////////////////
 
 	D3D11VertexBuffer::D3D11VertexBuffer(const float* vertices, uint32_t size)
-	{}
+	{
+	}
 
 	D3D11VertexBuffer::D3D11VertexBuffer(uint32_t size)
-	{}
+	{
+	}
 
 	D3D11VertexBuffer::~D3D11VertexBuffer()
-	{}
+	{
+	}
 
 	void D3D11VertexBuffer::SetData(const void* data, uint32_t size)
-	{}
+	{
+	}
 
 	void D3D11VertexBuffer::Bind() const
-	{}
+	{
+	}
 
 	void D3D11VertexBuffer::Unbind() const
-	{}
+	{
+	}
+
+	void D3D11VertexBuffer::SetDebugName(const std::string& name) 
+	{
+	}
+
+	////////////////////// Index Buffer //////////////////////
 
 	D3D11IndexBuffer::D3D11IndexBuffer(const uint32_t* indices, uint32_t count)
 	{
@@ -35,6 +48,10 @@ namespace Kerberos
 	}
 
 	void D3D11IndexBuffer::Unbind() const
+	{
+	}
+
+	void D3D11IndexBuffer::SetDebugName(const std::string& name) 
 	{
 	}
 }

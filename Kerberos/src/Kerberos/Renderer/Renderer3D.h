@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Camera.h"
+#include "Font.h"
 #include "Framebuffer.h"
 #include "Mesh.h"
 #include "OrthographicCamera.h"
@@ -45,6 +46,7 @@ namespace Kerberos
         static void EndScene();
 
 		static void SubmitMesh(const Ref<Mesh>& mesh, const glm::mat4& transform, const Ref<Material>& material, const Ref<Texture2D>& texture = nullptr, float tilingFactor = 1.0f, int entityID = -1, bool castShadows = true);
+		static void SubmitText(const std::string& text, const Ref<Font>& font, const glm::mat4& transform, const glm::vec4& color, float fontSize, int entityID = -1);
 
 		static void SetGlobalAmbientLight(const glm::vec3& color, float intensity);
 		static void SetShowWireframe(bool showWireframe);

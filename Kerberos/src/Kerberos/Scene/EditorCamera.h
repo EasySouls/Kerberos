@@ -22,6 +22,8 @@ namespace Kerberos
 		float GetDistance() const { return m_Distance; }
 		void SetDistance(const float distance) { m_Distance = distance; }
 
+		void Focus(const glm::vec3& focusPoint);
+
 		void SetViewportSize(float width, float height);
 
 		const glm::mat4& GetViewMatrix() const { return m_View; }

@@ -6,6 +6,7 @@
 
 extern "C" {
 	typedef struct _MonoType	MonoType;
+	typedef struct _MonoString	MonoString;
 }
 
 namespace Kerberos
@@ -13,6 +14,8 @@ namespace Kerberos
 	class ScriptUtils
 	{
 	public:
+		static std::string MonoStringToString(MonoString* monoStr);
+
 		static ScriptFieldType MonoTypeToScriptFieldType(MonoType* type);
 
 		static std::string_view ScriptFieldTypeToString(ScriptFieldType type);

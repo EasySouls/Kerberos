@@ -255,6 +255,12 @@ namespace Kerberos
 				ImGui::CloseCurrentPopup();
 			}
 
+			if (ImGui::MenuItem("Text"))
+			{
+				entity.AddComponent<TextComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
 			ImGui::EndPopup();
 		}
 	}
@@ -1341,6 +1347,77 @@ namespace Kerberos
 						/// render the changed cube into the environment
 						/*m_CubemapFramebuffer->Bind();
 						m_CubemapFramebuffer->Unbind();*/
+					}
+					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::TreePop();
+			}
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<EnvironmentComponent>();
+			}
+		}
+		if (entity.HasComponent<TextComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(TextComponent).hash_code()), treeNodeFlags, "Text");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Text Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (opened)
+			{
+				auto& text = entity.GetComponent<TextComponent>();
+
+				char buffer[256];
+				strcpy_s(buffer, sizeof(buffer), text.Text.c_str());
+				if (ImGui::InputText("Text", buffer, sizeof(buffer)))
+				{
+					text.Text = buffer;
+				}
+
+				ImGui::Separator();
+
+				ImGui::DragFloat4("Color", &text.Color[0], 0.01f, 0.0f, 1.0f);
+
+				ImGui::Separator();
+
+				ImGui::DragFloat("FontSize", &text.FontSize);
+
+				ImGui::Separator();
+
+				ImGui::Text("Font: %s", text.Font->GetName().c_str());
+				ImGui::Image(text.Font->GetAtlasTexture()->GetRendererID(), ImVec2{ 128, 128 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+				/// Handle drag and drop for fonts
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_FONT"))
+					{
+						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
+						if (AssetManager::GetAssetType(handle) != AssetType::Texture2D) // TODO: Change to font type when it exists
+						{
+							KBR_ERROR("Asset is not a texture: {0}", handle);
+							/// TODO: Show a notification instead of an error log
+							m_NotificationManager.AddNotification("Asset is not a font", Notification::Type::Error);
+							return;
+						}
+						//text.Font = AssetManager::GetAsset<Font>(handle);
 					}
 					ImGui::EndDragDropTarget();
 				}

@@ -13,7 +13,10 @@ from SetupVulkan import VulkanConfiguration as VulkanRequirements
 os.chdir('./../') # Change from devtools/scripts directory to root
 
 premakeInstalled = PremakeRequirements.Validate()
-VulkanRequirements.Validate()
+
+# If we are in CI we do not need to validate the VulkanSDK
+if os.getenv('CI') is None:
+    VulkanRequirements.Validate()
 
 print("\nUpdating submodules...")
 subprocess.call(["git", "submodule", "update", "--init", "--recursive"])

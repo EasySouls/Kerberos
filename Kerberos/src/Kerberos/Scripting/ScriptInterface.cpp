@@ -19,6 +19,8 @@
 
 #include <memory>
 
+#include "ScriptUtils.h"
+
 namespace Kerberos
 {
 #define KBR_ADD_INTERNAL_CALL(name) mono_add_internal_call("Kerberos.Source.InternalCalls::" #name, reinterpret_cast<const void*>(name))
@@ -178,6 +180,74 @@ namespace Kerberos
 		}
 	}
 
+	static MonoString* TextComponent_GetText(const UUID entityID)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const TextComponent& textComponent = entity.GetComponent<TextComponent>();
+		return ScriptEngine::StringToMonoString(textComponent.Text);
+	}
+
+	static void TextComponent_SetText(const UUID entityID, MonoString* text)
+	{
+		KBR_CORE_ASSERT(text == nullptr, "Null pointer passed to text");
+
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		TextComponent& textComponent = entity.GetComponent<TextComponent>();
+		textComponent.Text = ScriptUtils::MonoStringToString(text);
+	}
+
+	static void TextComponent_GetColor(const UUID entityID, glm::vec4* outColor)
+	{
+		KBR_CORE_ASSERT(outColor, "Null pointer passed to outColor");
+
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const glm::vec4 color = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().Color;
+		*outColor = color;
+	}
+
+	static void TextComponent_SetColor(const UUID entityID, const glm::vec4* color)
+	{
+		KBR_CORE_ASSERT(color, "Null pointer passed to color");
+
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		glm::vec4& currentColor = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().Color;
+		currentColor = *color;
+	}
+
+	static float TextComponent_GetFontSize(const UUID entityID)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const float fontSize = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().FontSize;
+		return fontSize;
+	}
+
+	static void TextComponent_SetFontSize(const UUID entityID, const float fontSize)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		float& currentFontSize = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().FontSize;
+		currentFontSize = fontSize;
+	}
+
+	static MonoString* TextComponent_GetFontPath(const UUID entityID)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		const TextComponent& textComponent = entity.GetComponent<TextComponent>();
+		const std::string fontPath = textComponent.Font->GetFilepath().string();
+		return ScriptEngine::StringToMonoString(fontPath);
+	}
+
+	static void TextComponent_SetFontPath(const UUID entityID, const MonoString* fontPath)
+	{
+		KBR_CORE_ASSERT(fontPath == nullptr, "Null pointer passed to fontPath");
+		
+		throw std::runtime_error("TextComponent_SetFontPath is not implemented yet");
+	}
+
 	static bool Input_IsKeyDown(const KeyCode key)
 	{
 		return Input::IsKeyPressed(key);
@@ -200,6 +270,15 @@ namespace Kerberos
 
 		KBR_ADD_INTERNAL_CALL(Rigidbody3DComponent_ApplyImpulse);
 		KBR_ADD_INTERNAL_CALL(Rigidbody3DComponent_ApplyImpulseAtPoint);
+
+		KBR_ADD_INTERNAL_CALL(TextComponent_GetText);
+		KBR_ADD_INTERNAL_CALL(TextComponent_SetText);
+		KBR_ADD_INTERNAL_CALL(TextComponent_GetColor);
+		KBR_ADD_INTERNAL_CALL(TextComponent_SetColor);
+		KBR_ADD_INTERNAL_CALL(TextComponent_GetFontSize);
+		KBR_ADD_INTERNAL_CALL(TextComponent_SetFontSize);
+		KBR_ADD_INTERNAL_CALL(TextComponent_GetFontPath);
+		KBR_ADD_INTERNAL_CALL(TextComponent_SetFontPath);
 
 		KBR_ADD_INTERNAL_CALL(Input_IsKeyDown);
 	}

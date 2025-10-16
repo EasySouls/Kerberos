@@ -11,7 +11,11 @@ workspace "Kerberos"
 	
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-VULKAN_DIR = os.getenv("VULKAN_SDK")
+VULKAN_DIR = os.getenv("VULKAN_SDK") or ""
+if VULKAN_DIR == "" then
+	VULKAN_DIR = "%{wks.location}/Kerberos/vendor/VulkanSDK/1.4.328.1"
+end
+
 
 print("Vulkan SDK Directory: " .. VULKAN_DIR)
 
@@ -30,6 +34,8 @@ IncludeDir["Assimp"] = "%{wks.location}/Kerberos/vendor/Assimp/include"
 IncludeDir["JoltPhysics"] = "%{wks.location}/Kerberos/vendor/JoltPhysics"
 IncludeDir["Mono"] = "%{wks.location}/Kerberos/vendor/mono/include"
 IncludeDir["Filewatch"] = "%{wks.location}/Kerberos/vendor/filewatch"
+IncludeDir["msdfgen"] = "%{wks.location}/Kerberos/vendor/msdf-atlas-gen/msdfgen"
+IncludeDir["msdf_atlas_gen"] = "%{wks.location}/Kerberos/vendor/msdf-atlas-gen/msdf-atlas-gen"
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
@@ -66,31 +72,20 @@ function getLatestWindowsSDK()
 	local latestVersion = ""
 	local latestVersionNum = 0
 
-	-- Premake doesn't have os.walk(), so we'll rely on checking common SDK locations
-	-- This is less robust than walking directories but more likely to work with Premake
-	local commonSdkVersions =
-	{
-		"10.0.26100.0",
-		"10.0.22621.0", -- Windows 11 22H2/23H2
-		"10.0.22000.0",
-		"10.0.19041.0", -- Windows 10 2004/20H2/21H1/21H2
-		"10.0.18362.0", -- Windows 10 1903/1909
-		-- Add other recent versions if needed
-	}
-
-	-- Check for the existence of common SDK versions in descending order
-	for _, version in ipairs(commonSdkVersions) do
-		local potentialIncludeDir = includeBaseDir .. version .. "/um"
-		local potentialLibDir = windowsSdkDir .. "/Lib/" .. version .. "/um/x64" -- Assuming x64
-
-		if os.isdir(potentialIncludeDir) and os.isdir(potentialLibDir) then
-			local buildNumStr = version:match("10%.0%.(%d+)%.0")
-			local buildNum = tonumber(buildNumStr)
-			if buildNum and buildNum > latestVersionNum then
-				latestVersionNum = buildNum
-				latestVersion = version
-			end
-		end
+	local candidates = os.matchdirs(includeBaseDir .. "10.0.*")
+	table.sort(candidates, function(a, b) return a > b end)
+	for _, dir in ipairs(candidates) do
+	  local version = path.getname(dir)
+	  local potentialIncludeDir = includeBaseDir .. version .. "/um"
+	  local potentialLibDir = windowsSdkDir .. "/Lib/" .. version .. "/um/x64"
+	  if os.isdir(potentialIncludeDir) and os.isdir(potentialLibDir) then
+	    local buildNumStr = version:match("10%.0%.(%d+)%.0")
+	    local buildNum = tonumber(buildNumStr)
+	    if buildNum and buildNum > latestVersionNum then
+	      latestVersionNum = buildNum
+	      latestVersion = version
+	    end
+	  end
 	end
 
 	if latestVersion == "" then
@@ -110,6 +105,7 @@ group "Dependencies"
 	include "Kerberos/vendor/glad"
 	include "Kerberos/vendor/imgui"
 	include "Kerberos/vendor/yaml-cpp"
+	include "Kerberos/vendor/msdf-atlas-gen"
 	include "Kerberos/vendor/ImGuizmo"
 	include "Kerberos/vendor/Assimp"
 	include "Kerberos/vendor/JoltPhysics"
@@ -160,6 +156,8 @@ project "Kerberos"
 		IncludeDir.JoltPhysics,
 		IncludeDir.Mono,
 		IncludeDir.Filewatch,
+		IncludeDir.msdfgen,
+		IncludeDir.msdf_atlas_gen,
 	}
 
 	libdirs 
@@ -174,6 +172,7 @@ project "Kerberos"
 		"Glad",
 		"ImGui",
 		"yaml-cpp",
+		"msdf-atlas-gen",
 		"ImGuizmo",
 		"Assimp",
 		"JoltPhysics",

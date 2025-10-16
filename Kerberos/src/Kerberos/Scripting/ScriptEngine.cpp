@@ -440,4 +440,9 @@ namespace Kerberos
 	{
 		return s_ScriptData->CoreAssemblyImage;
 	}
+
+	MonoString* ScriptEngine::StringToMonoString(const std::string& str) 
+	{
+		return mono_string_new(s_ScriptData->AppDomain, str.c_str());
+	}
 }

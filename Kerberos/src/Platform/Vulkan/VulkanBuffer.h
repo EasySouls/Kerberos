@@ -25,6 +25,8 @@ namespace Kerberos
 		VkBuffer GetVkBuffer() const { return m_Buffer; }
 		uint32_t GetCount() const override { return 0; }
 
+		void SetDebugName(const std::string& name) override;
+
 	private:
 		void CreateBufferAndAllocateMemory(uint32_t size);
 
@@ -50,6 +52,8 @@ namespace Kerberos
 		int GetType() const { return VK_INDEX_TYPE_UINT16; }
 
 		VkBuffer GetVkBuffer() const { return m_Buffer; }
+
+		void SetDebugName(const std::string& name) override;
 
 	private:
 		VkBuffer m_Buffer = VK_NULL_HANDLE;

@@ -13,6 +13,7 @@
 #include "Kerberos/Renderer/Material.h"
 #include "Kerberos/Renderer/TextureCube.h"
 #include "Kerberos/Scene/SceneCamera.h"
+#include "Kerberos/Renderer/Font.h"
 #include "Kerberos/Core/UUID.h"
 
 namespace Kerberos
@@ -241,5 +242,19 @@ namespace Kerberos
 		explicit EnvironmentComponent(const AssetHandle& skyboxTexture, const bool isSkyboxEnabled = true)
 			: SkyboxTexture(skyboxTexture), IsSkyboxEnabled(isSkyboxEnabled)
 		{}
+	};
+
+	struct TextComponent
+	{
+		Ref<Font> Font = Font::GetDefaultFont();
+		std::string Text = "Sample Text";
+		glm::vec4 Color = glm::vec4(1.0f);
+		float FontSize = 12.0f;
+
+		TextComponent() = default;
+		explicit TextComponent(const Ref<Kerberos::Font>& font, std::string text)
+			: Font(font), Text(std::move(text))
+		{
+		}
 	};
 }

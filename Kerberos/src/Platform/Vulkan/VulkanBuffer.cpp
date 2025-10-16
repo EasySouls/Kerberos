@@ -72,6 +72,11 @@ namespace Kerberos
 		return m_Layout;
 	}
 
+	void VulkanVertexBuffer::SetDebugName(const std::string& name) 
+	{
+		VulkanHelpers::SetObjectDebugName(VulkanContext::Get().GetDevice(), VK_OBJECT_TYPE_BUFFER, reinterpret_cast<uint64_t>(m_Buffer), name);
+	}
+
 	void VulkanVertexBuffer::CreateBufferAndAllocateMemory(const uint32_t size) 
 	{
 		/// TODO: Add options for different usages and memory properties
@@ -193,5 +198,10 @@ namespace Kerberos
 	uint32_t VulkanIndexBuffer::GetCount() const
 	{
 		return m_Count;
+	}
+
+	void VulkanIndexBuffer::SetDebugName(const std::string& name) 
+	{
+		VulkanHelpers::SetObjectDebugName(VulkanContext::Get().GetDevice(), VK_OBJECT_TYPE_BUFFER, reinterpret_cast<uint64_t>(m_Buffer), name);
 	}
 }

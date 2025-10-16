@@ -32,4 +32,6 @@ namespace Kerberos
 	{
 
 	}
+
+	void VulkanVertexArray::SetDebugName(const std::string& name) {}
 }
