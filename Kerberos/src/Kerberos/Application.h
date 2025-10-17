@@ -10,6 +10,8 @@
 #include <functional>
 #include <vector>
 
+#include "Audio/AudioManager.h"
+
 namespace Kerberos
 {
 	struct ApplicationCommandLineArgs
@@ -40,6 +42,11 @@ namespace Kerberos
 		 */
 		explicit Application(const ApplicationSpecification& spec);
 		virtual ~Application();
+
+		Application(const Application& other) = delete;
+		Application(Application&& other) noexcept = delete;
+		Application& operator=(const Application& other) = delete;
+		Application& operator=(Application&& other) noexcept = delete;
 
 		void Run();
 		void Close();
@@ -74,6 +81,8 @@ namespace Kerberos
 
 		std::vector<std::function<void()>> m_MainThreadQueue;
 		std::mutex m_MainThreadQueueMutex;
+
+		AudioManager* m_AudioManager = nullptr;
 
 		static Application* s_Instance;
 	};

@@ -36,6 +36,9 @@ namespace Kerberos
 		m_Window = Window::Create(props);
 		m_Window->SetEventCallback(KBR_BIND_EVENT_FN(Application::OnEvent));
 
+		m_AudioManager = AudioManager::Create();
+		m_AudioManager->Init();
+
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 

@@ -1,0 +1,42 @@
+#pragma once
+
+#include "Kerberos/Audio/AudioManager.h"
+
+#include <xaudio2.h>
+#include <xaudio2fx.h>
+
+#include <unordered_map>
+
+namespace Kerberos
+{
+	struct WAVData 
+	{
+		WAVEFORMATEX wfx;
+		std::vector<uint8_t> buffer;
+	};
+
+	class XAudio2AudioManager : public AudioManager
+	{
+	public:
+		XAudio2AudioManager() = default;
+		~XAudio2AudioManager() override;
+
+		XAudio2AudioManager(const XAudio2AudioManager& other) = delete;
+		XAudio2AudioManager(XAudio2AudioManager&& other) noexcept = default;
+		XAudio2AudioManager& operator=(const XAudio2AudioManager& other) = delete;
+		XAudio2AudioManager& operator=(XAudio2AudioManager&& other) noexcept = default;
+
+		void Init() override;
+		void Update() override;
+		void Shutdown() override;
+
+		void LoadSound(const std::filesystem::path& filepath) override;
+		void PlaySound(const std::filesystem::path& filepath) override;
+
+	private:
+		IXAudio2* m_XAudio2 = nullptr;
+		IXAudio2MasteringVoice* m_MasteringVoice = nullptr;
+
+		std::unordered_map<std::filesystem::path, WAVData> m_LoadedWAVs;
+	};
+}
