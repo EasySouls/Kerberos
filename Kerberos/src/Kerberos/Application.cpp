@@ -44,6 +44,9 @@ namespace Kerberos
 
 		Renderer::Init();
 		ScriptEngine::Init();
+
+		m_AudioManager->Load(R"(C:\Users\retek\Music\Technoshock.wav)");
+		m_AudioManager->Play(R"(C:\Users\retek\Music\Technoshock.wav)");
 	}
 
 	Application::~Application() 

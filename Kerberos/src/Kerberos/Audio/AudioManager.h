@@ -21,8 +21,8 @@ namespace Kerberos
 		virtual void Update() = 0;
 		virtual void Shutdown() = 0;
 
-		virtual void LoadSound(const std::filesystem::path& filepath) = 0;
-		virtual void PlaySound(const std::filesystem::path& filepath) = 0;
+		virtual void Load(const std::filesystem::path& filepath) = 0;
+		virtual void Play(const std::filesystem::path& filepath) = 0;
 
 		static AudioManager* Create();
 	};

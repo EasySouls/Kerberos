@@ -13,6 +13,11 @@ namespace Kerberos
 	{
 		WAVEFORMATEX wfx;
 		std::vector<uint8_t> buffer;
+
+		WAVData() 
+		{
+			memset(&wfx, 0, sizeof(WAVEFORMATEX));
+		}
 	};
 
 	class XAudio2AudioManager : public AudioManager
@@ -30,8 +35,8 @@ namespace Kerberos
 		void Update() override;
 		void Shutdown() override;
 
-		void LoadSound(const std::filesystem::path& filepath) override;
-		void PlaySound(const std::filesystem::path& filepath) override;
+		void Load(const std::filesystem::path& filepath) override;
+		void Play(const std::filesystem::path& filepath) override;
 
 	private:
 		IXAudio2* m_XAudio2 = nullptr;

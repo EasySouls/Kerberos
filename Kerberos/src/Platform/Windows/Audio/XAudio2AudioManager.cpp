@@ -36,8 +36,8 @@ namespace Kerberos
 
 #ifdef KBR_DEBUG
 		XAUDIO2_DEBUG_CONFIGURATION debugConfig;
-		debugConfig.TraceMask = XAUDIO2_LOG_WARNINGS;
-		debugConfig.BreakMask = 0;
+		debugConfig.TraceMask = XAUDIO2_LOG_ERRORS;
+		debugConfig.BreakMask = XAUDIO2_LOG_ERRORS;
 		debugConfig.LogThreadID = TRUE;
 		debugConfig.LogFileline = TRUE;
 		debugConfig.LogFunctionName = TRUE;
@@ -53,11 +53,20 @@ namespace Kerberos
 
 	void XAudio2AudioManager::Shutdown() 
 	{
-		m_XAudio2->Release();
+		if (m_MasteringVoice)
+		{
+			m_MasteringVoice->DestroyVoice();
+			m_MasteringVoice = nullptr;
+		}
+		if (m_XAudio2) 
+		{
+			m_XAudio2->Release();
+			m_XAudio2 = nullptr;
+		}
 		CoUninitialize();
 	}
 
-	void XAudio2AudioManager::LoadSound(const std::filesystem::path& filepath) 
+	void XAudio2AudioManager::Load(const std::filesystem::path& filepath) 
 	{
 		std::ifstream file(filepath, std::ios::binary);
 		if (!file) {
@@ -72,36 +81,78 @@ namespace Kerberos
 			return;
 		}
 
-		WAVData soundData;
+		DWORD chunkSize;
 
-		file.seekg(22); // skip to channels
-		file.read((char*)&soundData.wfx.nChannels, 2);
-		file.read((char*)&soundData.wfx.nSamplesPerSec, 4);
-		file.seekg(34);
-		file.read((char*)&soundData.wfx.wBitsPerSample, 2);
+		file.read(reinterpret_cast<char*>(&chunkSize), 4);
 
-		// crude data find
-		file.seekg(0, std::ios::beg);
-		while (file.read(chunkId, 4)) {
-			DWORD chunkSize;
-			file.read((char*)&chunkSize, 4);
-			if (strncmp(chunkId, "data", 4) == 0) {
-				soundData.buffer.resize(chunkSize);
-				file.read((char*)soundData.buffer.data(), chunkSize);
-				break;
-			}
-
-			file.seekg(chunkSize, std::ios::cur);
+		file.read(chunkId, 4);
+		if (strncmp(chunkId, "WAVE", 4) != 0) {
+			KBR_CORE_ERROR("Invalid WAV file (missing WAVE): {0}", filepath.string());
+			return;
 		}
 
-		soundData.wfx.wFormatTag = WAVE_FORMAT_PCM;
-		soundData.wfx.nBlockAlign = soundData.wfx.nChannels * soundData.wfx.wBitsPerSample / 8;
-		soundData.wfx.nAvgBytesPerSec = soundData.wfx.nSamplesPerSec * soundData.wfx.nBlockAlign;
+		WAVData soundData;
+		bool foundFmt = false;
+		bool foundData = false;
+
+		// Parse chunks
+		while (file.read(chunkId, 4)) {
+			file.read(reinterpret_cast<char*>(&chunkSize), 4);
+
+			if (strncmp(chunkId, "fmt ", 4) == 0) {
+				// Read format chunk
+				file.read(reinterpret_cast<char*>(&soundData.wfx.wFormatTag), 2);
+				file.read(reinterpret_cast<char*>(&soundData.wfx.nChannels), 2);
+				file.read(reinterpret_cast<char*>(&soundData.wfx.nSamplesPerSec), 4);
+				file.read(reinterpret_cast<char*>(&soundData.wfx.nAvgBytesPerSec), 4);
+				file.read(reinterpret_cast<char*>(&soundData.wfx.nBlockAlign), 2);
+				file.read(reinterpret_cast<char*>(&soundData.wfx.wBitsPerSample), 2);
+
+				// Set cbSize to 0 for PCM format
+				soundData.wfx.cbSize = 0;
+
+				// Skip any extra format bytes
+				if (chunkSize > 16) {
+					file.seekg(chunkSize - 16, std::ios::cur);
+				}
+
+				foundFmt = true;
+				KBR_CORE_TRACE("WAV Format - Channels: {0}, SampleRate: {1}, BitsPerSample: {2}",
+					soundData.wfx.nChannels, soundData.wfx.nSamplesPerSec, soundData.wfx.wBitsPerSample);
+			}
+			else if (strncmp(chunkId, "data", 4) == 0) {
+				// Read audio data
+				soundData.buffer.resize(chunkSize);
+				file.read(reinterpret_cast<char*>(soundData.buffer.data()), chunkSize);
+				foundData = true;
+				KBR_CORE_TRACE("WAV Data - Size: {0} bytes", chunkSize);
+				break; // Data chunk is typically the last one we need
+			}
+			else {
+				// Skip unknown chunk
+				file.seekg(chunkSize, std::ios::cur);
+			}
+		}
+
+		if (!foundFmt) {
+			KBR_CORE_ERROR("WAV file missing 'fmt ' chunk: {0}", filepath.string());
+			return;
+		}
+
+		if (!foundData) {
+			KBR_CORE_ERROR("WAV file missing 'data' chunk: {0}", filepath.string());
+			return;
+		}
+
+		if (soundData.buffer.empty()) {
+			KBR_CORE_ERROR("WAV file has empty audio data: {0}", filepath.string());
+			return;
+		}
 
 		m_LoadedWAVs[filepath] = std::move(soundData);
 	}
 
-	void XAudio2AudioManager::PlaySoundW(const std::filesystem::path& filepath) 
+	void XAudio2AudioManager::Play(const std::filesystem::path& filepath) 
 	{
 		const auto it = m_LoadedWAVs.find(filepath);
 		if (it == m_LoadedWAVs.end()) {
@@ -112,25 +163,35 @@ namespace Kerberos
 		const WAVData& soundData = it->second;
 		IXAudio2SourceVoice* sourceVoice;
 
+		if (soundData.buffer.empty()) {
+			KBR_CORE_ERROR("WAV file has no audio data: {0}", filepath.string());
+			return;
+		}
+
 		HRESULT res = m_XAudio2->CreateSourceVoice(&sourceVoice, &soundData.wfx);
 		if (FAILED(res)) {
 			KBR_CORE_ERROR("Failed to create source voice for WAV file: {0}", filepath.string());
 			return;
 		}
 		XAUDIO2_BUFFER buffer = {};
-		buffer.AudioBytes = static_cast<UINT32>(soundData.buffer.size());
+		buffer.AudioBytes = static_cast<uint32_t>(soundData.buffer.size());
 		buffer.pAudioData = soundData.buffer.data();
 		buffer.Flags = XAUDIO2_END_OF_STREAM;
 
 		res = sourceVoice->SubmitSourceBuffer(&buffer);
 		if (FAILED(res)) {
 			KBR_CORE_ERROR("Failed to submit source buffer for WAV file: {0}", filepath.string());
-			//sourceVoice->DestroyVoice();
+			sourceVoice->DestroyVoice();
+			return;
 		}
 
 		res = sourceVoice->Start();
 		if (FAILED(res)) {
 			KBR_CORE_ERROR("Failed to start source voice for WAV file: {0}", filepath.string());
+			sourceVoice->DestroyVoice();
+			return;
 		}
+
+		KBR_CORE_TRACE("Playing WAV file: {0}", filepath.string());
 	}
 }
