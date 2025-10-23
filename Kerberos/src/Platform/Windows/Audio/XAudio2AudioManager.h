@@ -9,12 +9,21 @@
 
 namespace Kerberos
 {
-	struct WAVData 
+	enum class AudioFormat
+	{
+		FORMAT_UNKNOWN,
+		FORMAT_PCM,
+		FORMAT_ADPCM,
+		FORMAT_IEEE_FLOAT
+	};
+
+	struct AudioData 
 	{
 		WAVEFORMATEX wfx;
 		std::vector<uint8_t> buffer;
+		AudioFormat format = AudioFormat::FORMAT_UNKNOWN;
 
-		WAVData() 
+		AudioData() 
 		{
 			memset(&wfx, 0, sizeof(WAVEFORMATEX));
 		}
@@ -39,9 +48,14 @@ namespace Kerberos
 		void Play(const std::filesystem::path& filepath) override;
 
 	private:
+		static AudioFormat DetectAudioFormat(const std::filesystem::path& filepath);
+
+		void LoadWavFile(const std::filesystem::path& filepath);
+
+	private:
 		IXAudio2* m_XAudio2 = nullptr;
 		IXAudio2MasteringVoice* m_MasteringVoice = nullptr;
 
-		std::unordered_map<std::filesystem::path, WAVData> m_LoadedWAVs;
+		std::unordered_map<std::filesystem::path, AudioData> m_LoadedWAVs;
 	};
 }

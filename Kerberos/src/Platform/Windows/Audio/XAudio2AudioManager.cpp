@@ -68,6 +68,89 @@ namespace Kerberos
 
 	void XAudio2AudioManager::Load(const std::filesystem::path& filepath) 
 	{
+		const AudioFormat format = DetectAudioFormat(filepath);
+		if (format == AudioFormat::FORMAT_UNKNOWN) 
+		{
+			KBR_CORE_ERROR("Unsupported audio format for file: {0}", filepath.string());
+			return;
+		}
+		if (format == AudioFormat::FORMAT_PCM) 
+		{
+			LoadWavFile(filepath);
+		}
+		else 
+		{
+			KBR_CORE_ERROR("Audio format not implemented for file: {0}", filepath.string());
+		}
+	}
+
+	void XAudio2AudioManager::Play(const std::filesystem::path& filepath) 
+	{
+		const auto it = m_LoadedWAVs.find(filepath);
+		if (it == m_LoadedWAVs.end()) {
+			KBR_CORE_ERROR("WAV file not loaded: {0}", filepath.string());
+			return;
+		}
+
+		const AudioData& soundData = it->second;
+		IXAudio2SourceVoice* sourceVoice;
+
+		if (soundData.buffer.empty()) {
+			KBR_CORE_ERROR("WAV file has no audio data: {0}", filepath.string());
+			return;
+		}
+
+		HRESULT res = m_XAudio2->CreateSourceVoice(&sourceVoice, &soundData.wfx);
+		if (FAILED(res)) {
+			KBR_CORE_ERROR("Failed to create source voice for WAV file: {0}", filepath.string());
+			return;
+		}
+		XAUDIO2_BUFFER buffer = {};
+		buffer.AudioBytes = static_cast<uint32_t>(soundData.buffer.size());
+		buffer.pAudioData = soundData.buffer.data();
+		buffer.Flags = XAUDIO2_END_OF_STREAM;
+
+		res = sourceVoice->SubmitSourceBuffer(&buffer);
+		if (FAILED(res)) {
+			KBR_CORE_ERROR("Failed to submit source buffer for WAV file: {0}", filepath.string());
+			sourceVoice->DestroyVoice();
+			return;
+		}
+
+		res = sourceVoice->Start();
+		if (FAILED(res)) {
+			KBR_CORE_ERROR("Failed to start source voice for WAV file: {0}", filepath.string());
+			sourceVoice->DestroyVoice();
+			return;
+		}
+
+		KBR_CORE_TRACE("Playing WAV file: {0}", filepath.string());
+	}
+
+	AudioFormat XAudio2AudioManager::DetectAudioFormat(const std::filesystem::path& filepath) 
+	{
+		const std::string extension = filepath.extension().string();
+		if (extension == ".wav" || extension == ".WAV") 
+		{
+			return AudioFormat::FORMAT_PCM;
+		}
+		else if (extension == ".adpcm" || extension == ".ADPCM") 
+		{
+			return AudioFormat::FORMAT_ADPCM;
+		}
+		else if (extension == ".f32" || extension == ".F32") 
+		{
+			return AudioFormat::FORMAT_IEEE_FLOAT;
+		}
+		else 
+		{
+			return AudioFormat::FORMAT_UNKNOWN;
+		}
+
+	}
+
+	void XAudio2AudioManager::LoadWavFile(const std::filesystem::path& filepath) 
+	{
 		std::ifstream file(filepath, std::ios::binary);
 		if (!file) {
 			KBR_CORE_ERROR("Failed to open WAV file: {0}", filepath.string());
@@ -91,7 +174,7 @@ namespace Kerberos
 			return;
 		}
 
-		WAVData soundData;
+		AudioData soundData;
 		bool foundFmt = false;
 		bool foundData = false;
 
@@ -150,48 +233,5 @@ namespace Kerberos
 		}
 
 		m_LoadedWAVs[filepath] = std::move(soundData);
-	}
-
-	void XAudio2AudioManager::Play(const std::filesystem::path& filepath) 
-	{
-		const auto it = m_LoadedWAVs.find(filepath);
-		if (it == m_LoadedWAVs.end()) {
-			KBR_CORE_ERROR("WAV file not loaded: {0}", filepath.string());
-			return;
-		}
-
-		const WAVData& soundData = it->second;
-		IXAudio2SourceVoice* sourceVoice;
-
-		if (soundData.buffer.empty()) {
-			KBR_CORE_ERROR("WAV file has no audio data: {0}", filepath.string());
-			return;
-		}
-
-		HRESULT res = m_XAudio2->CreateSourceVoice(&sourceVoice, &soundData.wfx);
-		if (FAILED(res)) {
-			KBR_CORE_ERROR("Failed to create source voice for WAV file: {0}", filepath.string());
-			return;
-		}
-		XAUDIO2_BUFFER buffer = {};
-		buffer.AudioBytes = static_cast<uint32_t>(soundData.buffer.size());
-		buffer.pAudioData = soundData.buffer.data();
-		buffer.Flags = XAUDIO2_END_OF_STREAM;
-
-		res = sourceVoice->SubmitSourceBuffer(&buffer);
-		if (FAILED(res)) {
-			KBR_CORE_ERROR("Failed to submit source buffer for WAV file: {0}", filepath.string());
-			sourceVoice->DestroyVoice();
-			return;
-		}
-
-		res = sourceVoice->Start();
-		if (FAILED(res)) {
-			KBR_CORE_ERROR("Failed to start source voice for WAV file: {0}", filepath.string());
-			sourceVoice->DestroyVoice();
-			return;
-		}
-
-		KBR_CORE_TRACE("Playing WAV file: {0}", filepath.string());
 	}
 }
