@@ -16,6 +16,8 @@
 
 #include <filesystem>
 
+#include "Kerberos/Scene/Components/AudioComponents.h"
+
 namespace Kerberos
 {
 	HierarchyPanel::HierarchyPanel(const Ref<Scene>& context)
@@ -219,34 +221,40 @@ namespace Kerberos
 				ImGui::CloseCurrentPopup();
 			}
 
-			if (ImGui::MenuItem("Rigidbody3D"))
+			if (ImGui::BeginMenu("Physics"))
 			{
-				entity.AddComponent<RigidBody3DComponent>();
-				ImGui::CloseCurrentPopup();
-			}
 
-			if (ImGui::MenuItem("Box Collider 3D"))
-			{
-				entity.AddComponent<BoxCollider3DComponent>();
-				ImGui::CloseCurrentPopup();
-			}
+				if (ImGui::MenuItem("Rigidbody3D"))
+				{
+					entity.AddComponent<RigidBody3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
 
-			if (ImGui::MenuItem("Sphere Collider 3D"))
-			{
-				entity.AddComponent<SphereCollider3DComponent>();
-				ImGui::CloseCurrentPopup();
-			}
+				if (ImGui::MenuItem("Box Collider 3D"))
+				{
+					entity.AddComponent<BoxCollider3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
 
-			if (ImGui::MenuItem("Capsule Collider 3D"))
-			{
-				entity.AddComponent<CapsuleCollider3DComponent>();
-				ImGui::CloseCurrentPopup();
-			}
+				if (ImGui::MenuItem("Sphere Collider 3D"))
+				{
+					entity.AddComponent<SphereCollider3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
 
-			if (ImGui::MenuItem("Mesh Collider 3D"))
-			{
-				entity.AddComponent<MeshCollider3DComponent>();
-				ImGui::CloseCurrentPopup();
+				if (ImGui::MenuItem("Capsule Collider 3D"))
+				{
+					entity.AddComponent<CapsuleCollider3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Mesh Collider 3D"))
+				{
+					entity.AddComponent<MeshCollider3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndMenu();
 			}
 
 			if (ImGui::MenuItem("Environment"))
@@ -259,6 +267,29 @@ namespace Kerberos
 			{
 				entity.AddComponent<TextComponent>();
 				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::BeginMenu("Audio"))
+			{
+				if (ImGui::MenuItem("Audio Source 2D"))
+				{
+					entity.AddComponent<AudioSource2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Audio Source 3D"))
+				{
+					entity.AddComponent<AudioSource3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Audio Listener"))
+				{
+					entity.AddComponent<AudioListenerComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndMenu();
 			}
 
 			ImGui::EndPopup();
@@ -1338,7 +1369,6 @@ namespace Kerberos
 						if (AssetManager::GetAssetType(handle) != AssetType::TextureCube)
 						{
 							KBR_ERROR("Asset is not a texture: {0}", handle);
-							/// TODO: Show a notification instead of an error log
 							m_NotificationManager.AddNotification("Asset is not a cubemap", Notification::Type::Error);
 							return;
 						}
@@ -1427,6 +1457,159 @@ namespace Kerberos
 			if (componentDeleted)
 			{
 				entity.RemoveComponent<EnvironmentComponent>();
+			}
+		}
+		if (entity.HasComponent<AudioSource2DComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(AudioSource2DComponent).hash_code()), treeNodeFlags, "Audio Source 2D");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Audio Source 2D Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (opened)
+			{
+				auto& audioComp = entity.GetComponent<AudioSource2DComponent>();
+
+				std::string soundName = audioComp.SoundAsset ? audioComp.SoundAsset->GetName() : "None";
+				ImGui::Text("Source: %s", soundName.c_str());
+
+				/// Handle drag and drop for the audio asset
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_AUDIO"))
+					{
+						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
+						if (AssetManager::GetAssetType(handle) != AssetType::Sound)
+						{
+							KBR_ERROR("Asset is not a sound: {0}", handle);
+							m_NotificationManager.AddNotification("Asset is not a sound", Notification::Type::Error);
+							return;
+						}
+						audioComp.SoundAsset = AssetManager::GetAsset<Sound>(handle);
+					}
+					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::Separator();
+
+				ImGui::Checkbox("Loop", &audioComp.Loop);
+
+				ImGui::DragFloat("Volume", &audioComp.Volume, 0.01f, 0.0f, 1.0f);
+
+				ImGui::TreePop();
+			}
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<AudioSource2DComponent>();
+			}
+		}
+		if (entity.HasComponent<AudioSource3DComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(AudioSource3DComponent).hash_code()), treeNodeFlags, "Audio Source 3D");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Audio Source 3D Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (opened)
+			{
+				auto& audioComp = entity.GetComponent<AudioSource3DComponent>();
+
+				std::string soundName = audioComp.SoundAsset ? audioComp.SoundAsset->GetName() : "None";
+				ImGui::Text("Source: %s", soundName.c_str());
+
+				/// Handle drag and drop for the audio asset
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_AUDIO"))
+					{
+						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
+						if (AssetManager::GetAssetType(handle) != AssetType::Sound)
+						{
+							KBR_ERROR("Asset is not a sound: {0}", handle);
+							m_NotificationManager.AddNotification("Asset is not a sound", Notification::Type::Error);
+							return;
+						}
+						audioComp.SoundAsset = AssetManager::GetAsset<Sound>(handle);
+					}
+					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::Separator();
+
+				ImGui::Checkbox("Loop", &audioComp.Loop);
+
+				ImGui::DragFloat("Volume", &audioComp.Volume, 0.01f, 0.0f, 1.0f);
+
+				ImGui::TreePop();
+			}
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<AudioSource3DComponent>();
+			}
+		}
+		if (entity.HasComponent<AudioListenerComponent>())
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+			const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(typeid(AudioListenerComponent).hash_code()), treeNodeFlags, "Audio Listener");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+			ImGui::PopStyleVar();
+			bool componentDeleted = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				ImGui::Text("Audio Listener Settings");
+				ImGui::Separator();
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					componentDeleted = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (opened)
+			{
+				auto& listenerCOmp = entity.GetComponent<AudioListenerComponent>();
+
+				ImGui::DragFloat("Volume", &listenerCOmp.Volume, 0.01f, 0.0f, 1.0f);
+
+				ImGui::TreePop();
+			}
+			if (componentDeleted)
+			{
+				entity.RemoveComponent<AudioListenerComponent>();
 			}
 		}
 	}

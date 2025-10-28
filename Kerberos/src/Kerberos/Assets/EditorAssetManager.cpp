@@ -18,7 +18,8 @@ namespace Kerberos
 		{ ".fbx", AssetType::Mesh },
 		{ ".obj", AssetType::Mesh },
 		{ ".gltf", AssetType::Mesh },
-		{ ".kerberos", AssetType::Scene }
+		{ ".kerberos", AssetType::Scene },
+		{ ".wav", AssetType::Sound } // TODO: Add more audio file types when supported
 	};
 
 	static AssetType AssetTypeFromFileExtension(const std::filesystem::path& filepath)

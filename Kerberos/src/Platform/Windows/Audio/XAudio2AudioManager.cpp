@@ -69,12 +69,12 @@ namespace Kerberos
 	void XAudio2AudioManager::Load(const std::filesystem::path& filepath) 
 	{
 		const AudioFormat format = DetectAudioFormat(filepath);
-		if (format == AudioFormat::FORMAT_UNKNOWN) 
+		if (format == AudioFormat::FormatUnknown) 
 		{
 			KBR_CORE_ERROR("Unsupported audio format for file: {0}", filepath.string());
 			return;
 		}
-		if (format == AudioFormat::FORMAT_PCM) 
+		if (format == AudioFormat::FormatPcm) 
 		{
 			LoadWavFile(filepath);
 		}
@@ -132,19 +132,19 @@ namespace Kerberos
 		const std::string extension = filepath.extension().string();
 		if (extension == ".wav" || extension == ".WAV") 
 		{
-			return AudioFormat::FORMAT_PCM;
+			return AudioFormat::FormatPcm;
 		}
 		else if (extension == ".adpcm" || extension == ".ADPCM") 
 		{
-			return AudioFormat::FORMAT_ADPCM;
+			return AudioFormat::FormatAdpcm;
 		}
 		else if (extension == ".f32" || extension == ".F32") 
 		{
-			return AudioFormat::FORMAT_IEEE_FLOAT;
+			return AudioFormat::FormatIeeeFloat;
 		}
 		else 
 		{
-			return AudioFormat::FORMAT_UNKNOWN;
+			return AudioFormat::FormatUnknown;
 		}
 
 	}

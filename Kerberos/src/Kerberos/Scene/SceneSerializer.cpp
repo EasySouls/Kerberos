@@ -4,6 +4,7 @@
 #include "Kerberos/Scene/Entity.h"
 #include "Kerberos/Scene/Components.h"
 #include "Kerberos/Scene/Components/PhysicsComponents.h"
+#include "Kerberos/Scene/Components/AudioComponents.h"
 #include "Kerberos/Assets/AssetManager.h"
 #include "Kerberos/Scripting/ScriptEngine.h"
 #include "Kerberos/Scripting/ScriptUtils.h"
@@ -419,6 +420,37 @@ namespace Kerberos
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<AudioSource3DComponent>())
+		{
+			out << YAML::Key << "AudioSource3DComponent";
+			out << YAML::BeginMap;
+			const auto& audioSource = entity.GetComponent<AudioSource3DComponent>();
+			out << YAML::Key << "SoundAsset" << YAML::Value << (audioSource.SoundAsset ? audioSource.SoundAsset->GetHandle() : UUID::Invalid());
+			out << YAML::Key << "Loop" << YAML::Value << audioSource.Loop;
+			out << YAML::Key << "Volume" << YAML::Value << audioSource.Volume;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<AudioSource2DComponent>())
+		{
+			out << YAML::Key << "AudioSource2DComponent";
+			out << YAML::BeginMap;
+			const auto& audioSource = entity.GetComponent<AudioSource2DComponent>();
+			out << YAML::Key << "SoundAsset" << YAML::Value << (audioSource.SoundAsset ? audioSource.SoundAsset->GetHandle() : UUID::Invalid());
+			out << YAML::Key << "Loop" << YAML::Value << audioSource.Loop;
+			out << YAML::Key << "Volume" << YAML::Value << audioSource.Volume;
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<AudioListenerComponent>())
+		{
+			out << YAML::Key << "AudioListenerComponent";
+			out << YAML::BeginMap;
+			const auto& audioListener = entity.GetComponent<AudioListenerComponent>();
+			out << YAML::Key << "Volume" << YAML::Value << audioListener.Volume;
+			out << YAML::EndMap;
+		}
+
 		out << YAML::EndMap;
 
 	}
@@ -752,6 +784,28 @@ namespace Kerberos
 					text.Text = textComponent["Text"].as<std::string>();
 					text.Color = textComponent["Color"].as<glm::vec4>();
 					text.FontSize = textComponent["FontSize"].as<float>();
+				}
+
+				if (auto audioSource3DComponent = entity["AudioSource3DComponent"])
+				{
+					auto& audioSource3D = deserializedEntity.AddComponent<AudioSource3DComponent>();
+					audioSource3D.SoundAsset = AssetManager::GetAsset<Sound>(AssetHandle(audioSource3DComponent["SoundAsset"].as<uint64_t>()));
+					audioSource3D.Loop = audioSource3DComponent["Loop"].as<bool>();
+					audioSource3D.Volume = audioSource3DComponent["Volume"].as<float>();
+				}
+
+				if (auto audioSource2DComponent = entity["AudioSource2DComponent"])
+				{
+					auto& audioSource2D = deserializedEntity.AddComponent<AudioSource2DComponent>();
+					audioSource2D.SoundAsset = AssetManager::GetAsset<Sound>(AssetHandle(audioSource2DComponent["SoundAsset"].as<uint64_t>()));
+					audioSource2D.Loop = audioSource2DComponent["Loop"].as<bool>();
+					audioSource2D.Volume = audioSource2DComponent["Volume"].as<float>();
+				}
+
+				if (auto audioListenerComponent = entity["AudioListenerComponent"])
+				{
+					auto& audioListener = deserializedEntity.AddComponent<AudioListenerComponent>();
+					audioListener.Volume = audioListenerComponent["Volume"].as<float>();
 				}
 			}
 		}

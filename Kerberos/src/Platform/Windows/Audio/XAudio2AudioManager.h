@@ -11,17 +11,17 @@ namespace Kerberos
 {
 	enum class AudioFormat
 	{
-		FORMAT_UNKNOWN,
-		FORMAT_PCM,
-		FORMAT_ADPCM,
-		FORMAT_IEEE_FLOAT
+		FormatUnknown,
+		FormatPcm,
+		FormatAdpcm,
+		FormatIeeeFloat
 	};
 
 	struct AudioData 
 	{
 		WAVEFORMATEX wfx;
 		std::vector<uint8_t> buffer;
-		AudioFormat format = AudioFormat::FORMAT_UNKNOWN;
+		AudioFormat format = AudioFormat::FormatUnknown;
 
 		AudioData() 
 		{

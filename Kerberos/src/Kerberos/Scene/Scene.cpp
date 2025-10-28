@@ -6,6 +6,7 @@
 
 #include "Kerberos/Scene/Components.h"
 #include "Kerberos/Scene/Components/PhysicsComponents.h"
+#include "Kerberos/Scene/Components/AudioComponents.h"
 #include "Kerberos/Renderer/Renderer2D.h"
 #include "Kerberos/Renderer/Renderer3D.h"
 #include "Kerberos/Physics/Utils.h"
@@ -941,7 +942,7 @@ namespace Kerberos
 		const auto& smc = entity.GetComponent<StaticMeshComponent>();
 		if (smc.StaticMesh == nullptr)
 		{
-			KBR_CORE_ERROR("MeshCollider3DComponent on entity {} does not have a valid static mesh!", entity.GetComponent<TagComponent>().Tag);
+			KBR_CORE_WARN("MeshCollider3DComponent on entity {} does not have a valid static mesh!", entity.GetComponent<TagComponent>().Tag);
 			return;
 		}
 
@@ -954,6 +955,21 @@ namespace Kerberos
 
 	template <>
 	void Scene::OnComponentAdded<TextComponent>(Entity entity, TextComponent& component)
+	{
+	}
+
+	template <>
+	void Scene::OnComponentAdded<AudioSource3DComponent>(Entity entity, AudioSource3DComponent& component)
+	{
+	}
+
+	template <>
+	void Scene::OnComponentAdded<AudioSource2DComponent>(Entity entity, AudioSource2DComponent& component)
+	{
+	}
+
+	template <>
+	void Scene::OnComponentAdded<AudioListenerComponent>(Entity entity, AudioListenerComponent& component)
 	{
 	}
 }
