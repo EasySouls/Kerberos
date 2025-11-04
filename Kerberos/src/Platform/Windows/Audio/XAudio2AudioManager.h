@@ -7,6 +7,7 @@
 
 #include <unordered_map>
 
+
 namespace Kerberos
 {
 	enum class AudioFormat
@@ -44,8 +45,9 @@ namespace Kerberos
 		void Update() override;
 		void Shutdown() override;
 
-		void Load(const std::filesystem::path& filepath) override;
+		Ref<Sound> Load(const std::filesystem::path& filepath) override;
 		void Play(const std::filesystem::path& filepath) override;
+		void Play(const UUID& soundID) override;
 
 	private:
 		static AudioFormat DetectAudioFormat(const std::filesystem::path& filepath);
@@ -57,5 +59,6 @@ namespace Kerberos
 		IXAudio2MasteringVoice* m_MasteringVoice = nullptr;
 
 		std::unordered_map<std::filesystem::path, AudioData> m_LoadedWAVs;
+		std::unordered_map<UUID, std::filesystem::path> m_SoundUUIDToFilepath;
 	};
 }

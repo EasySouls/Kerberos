@@ -4,6 +4,7 @@
 #include "CubemapImporter.h"
 #include "TextureImporter.h"
 #include "MeshImporter.h"
+#include "SoundImporter.h"
 #include "Kerberos/Renderer/Texture.h"
 
 namespace Kerberos
@@ -33,6 +34,8 @@ namespace Kerberos
 		}
 		case AssetType::Scene:
 			break;
+		case AssetType::Sound:
+			return SoundImporter::ImportSound(handle, metadata);
 		}
 
 		KBR_CORE_ASSERT(false, "Unsupported asset type by AssetImporter!");

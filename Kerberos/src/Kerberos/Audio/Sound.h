@@ -19,16 +19,16 @@ namespace Kerberos
 		Sound& operator=(const Sound& other) = default;
 		Sound& operator=(Sound&& other) noexcept = default;
 
-		virtual void Play() = 0;
-		virtual void Stop() = 0;
-		virtual void SetVolume(float volume) = 0;
-		virtual float GetVolume() const = 0;
-		virtual bool IsPlaying() const = 0;
-
 		const std::string& GetName() const { return m_Name; }
 		AssetType GetType() override { return AssetType::Sound; }
+		UUID GetSoundID() const { return m_SoundID; }
 
 	private:
 		std::string m_Name;
+
+		/**
+		* The UUID of the sound asset in the Audio Manager.
+		*/
+		UUID m_SoundID;
 	};
 }

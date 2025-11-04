@@ -1,6 +1,8 @@
 #include "kbrpch.h"
 #include "XAudio2AudioManager.h"
 
+#include "Kerberos/Audio/Sound.h"
+
 namespace Kerberos
 {
 	XAudio2AudioManager::~XAudio2AudioManager() 
@@ -66,22 +68,30 @@ namespace Kerberos
 		CoUninitialize();
 	}
 
-	void XAudio2AudioManager::Load(const std::filesystem::path& filepath) 
+	Ref<Sound> XAudio2AudioManager::Load(const std::filesystem::path& filepath) 
 	{
 		const AudioFormat format = DetectAudioFormat(filepath);
 		if (format == AudioFormat::FormatUnknown) 
 		{
 			KBR_CORE_ERROR("Unsupported audio format for file: {0}", filepath.string());
-			return;
+			return nullptr;
 		}
 		if (format == AudioFormat::FormatPcm) 
 		{
 			LoadWavFile(filepath);
+
+			const std::string soundName = filepath.stem().string();
+
+			Sound sound{ soundName };
+			const UUID soundUUID = sound.GetSoundID();
+
+			m_SoundUUIDToFilepath[soundUUID] = filepath;
+
+			return CreateRef<Sound>(sound);
 		}
-		else 
-		{
-			KBR_CORE_ERROR("Audio format not implemented for file: {0}", filepath.string());
-		}
+
+		KBR_CORE_ERROR("Audio format not implemented for file: {0}", filepath.string());
+		return nullptr;
 	}
 
 	void XAudio2AudioManager::Play(const std::filesystem::path& filepath) 
@@ -125,6 +135,18 @@ namespace Kerberos
 		}
 
 		KBR_CORE_TRACE("Playing WAV file: {0}", filepath.string());
+	}
+
+	void XAudio2AudioManager::Play(const UUID& soundID) 
+	{
+		const auto filepath = m_SoundUUIDToFilepath.find(soundID);
+		if (filepath == m_SoundUUIDToFilepath.end()) 
+		{
+			KBR_CORE_ERROR("Sound ID not found: {0}", static_cast<uint64_t>(soundID));
+			return;
+		}
+
+		Play(filepath->second);
 	}
 
 	AudioFormat XAudio2AudioManager::DetectAudioFormat(const std::filesystem::path& filepath) 

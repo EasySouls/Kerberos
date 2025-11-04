@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Kerberos/Core.h"
+#include "Sound.h"
 
 #include <filesystem>
+
 
 namespace Kerberos
 {
@@ -21,8 +23,9 @@ namespace Kerberos
 		virtual void Update() = 0;
 		virtual void Shutdown() = 0;
 
-		virtual void Load(const std::filesystem::path& filepath) = 0;
+		virtual Ref<Sound> Load(const std::filesystem::path& filepath) = 0;
 		virtual void Play(const std::filesystem::path& filepath) = 0;
+		virtual void Play(const UUID& soundID) = 0;
 
 		static AudioManager* Create();
 	};

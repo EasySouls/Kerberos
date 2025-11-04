@@ -219,7 +219,8 @@ namespace Kerberos
 			const std::filesystem::path filepath = assetNode["Path"].as<std::string>();
 
 			const AssetType type = AssetTypeFromString(typeStr);
-			if (type == AssetType::Texture2D || type == AssetType::TextureCube || type == AssetType::Mesh)
+			// TODO: This check is not needed when every asset type is supported
+			if (type == AssetType::Texture2D || type == AssetType::TextureCube || type == AssetType::Mesh || type == AssetType::Sound)
 			{
 				m_AssetRegistry.Add(handle, { .Type = type, .Filepath = filepath });
 			}

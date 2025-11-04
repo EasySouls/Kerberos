@@ -62,6 +62,7 @@ namespace Kerberos
 		Window& GetWindow() const { return *m_Window; }
 		ImGuiLayer* GetImGuiLayer() const { return m_ImGuiLayer; }
 		const ApplicationSpecification& GetSpecification() const { return m_Specification; }
+		AudioManager* GetAudioManager() const { return m_AudioManager; }
 
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& e);

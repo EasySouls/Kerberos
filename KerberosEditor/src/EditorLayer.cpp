@@ -7,6 +7,7 @@
 #include "imgui/imgui.h"
 #include <ImGuizmo/ImGuizmo.h>
 
+#include "Editor/AssetConstants.h"
 #include "Kerberos/Assets/Importers/MeshImporter.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"
 #include "Kerberos/Renderer/Font.h"
@@ -653,7 +654,7 @@ namespace Kerberos
 	{
 		if (ImGui::BeginDragDropTarget())
 		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ASSET_BROWSER_ITEM))
 			{
 				const auto& path = static_cast<const char*>(payload->Data);
 				KBR_INFO("Drag and drop payload: {0}", path);

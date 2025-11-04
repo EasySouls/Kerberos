@@ -16,6 +16,7 @@
 
 #include <filesystem>
 
+#include "AssetConstants.h"
 #include "Kerberos/Scene/Components/AudioComponents.h"
 
 namespace Kerberos
@@ -993,7 +994,7 @@ namespace Kerberos
 				/// Handle drag and drop for meshes
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_MESH"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ASSET_BROWSER_MESH))
 					{
 						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
 						if (AssetManager::GetAssetType(handle) != AssetType::Mesh)
@@ -1067,7 +1068,7 @@ namespace Kerberos
 				/// Handle drag and drop for textures
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_TEXTURE"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ASSET_BROWSER_TEXTURE))
 					{
 						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
 						if (AssetManager::GetAssetType(handle) != AssetType::Texture2D)
@@ -1363,7 +1364,7 @@ namespace Kerberos
 				/// Handle drag and drop for textures
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_TEXTURE_CUBE"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ASSET_BROWSER_TEXTURE_CUBE))
 					{
 						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
 						if (AssetManager::GetAssetType(handle) != AssetType::TextureCube)
@@ -1437,7 +1438,7 @@ namespace Kerberos
 				/// Handle drag and drop for fonts
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_FONT"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ASSET_BROWSER_FONT))
 					{
 						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
 						if (AssetManager::GetAssetType(handle) != AssetType::Texture2D) // TODO: Change to font type when it exists
@@ -1491,7 +1492,7 @@ namespace Kerberos
 				/// Handle drag and drop for the audio asset
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_AUDIO"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ASSET_BROWSER_AUDIO))
 					{
 						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
 						if (AssetManager::GetAssetType(handle) != AssetType::Sound)
@@ -1550,7 +1551,7 @@ namespace Kerberos
 				/// Handle drag and drop for the audio asset
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_AUDIO"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ASSET_BROWSER_AUDIO))
 					{
 						const AssetHandle handle = *static_cast<AssetHandle*>(payload->Data);
 						if (AssetManager::GetAssetType(handle) != AssetType::Sound)
