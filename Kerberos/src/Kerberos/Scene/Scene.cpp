@@ -296,6 +296,18 @@ namespace Kerberos
 		{
 			newEntity.AddComponent<TextComponent>(entity.GetComponent<TextComponent>());
 		}
+		if (entity.HasComponent<AudioSource2DComponent>())
+		{
+			newEntity.AddComponent<AudioSource2DComponent>(entity.GetComponent<AudioSource2DComponent>());
+		}
+		if (entity.HasComponent<AudioSource3DComponent>())
+		{
+			newEntity.AddComponent<AudioSource3DComponent>(entity.GetComponent<AudioSource3DComponent>());
+		}
+		if (entity.HasComponent<AudioListenerComponent>())
+		{
+			newEntity.AddComponent<AudioListenerComponent>(entity.GetComponent<AudioListenerComponent>());
+		}
 
 		if (duplicateChildren)
 		{
@@ -520,6 +532,18 @@ namespace Kerberos
 			if (sourceRegistry.all_of<TextComponent>(entity))
 			{
 				newEntity.AddComponent<TextComponent>(sourceRegistry.get<TextComponent>(entity));
+			}
+			if (sourceRegistry.all_of<AudioSource2DComponent>(entity))
+			{
+				newEntity.AddComponent<AudioSource2DComponent>(sourceRegistry.get<AudioSource2DComponent>(entity));
+			}
+			if (sourceRegistry.all_of<AudioSource3DComponent>(entity))
+			{
+				newEntity.AddComponent<AudioSource3DComponent>(sourceRegistry.get<AudioSource3DComponent>(entity));
+			}
+			if (sourceRegistry.all_of<AudioListenerComponent>(entity))
+			{
+				newEntity.AddComponent<AudioListenerComponent>(sourceRegistry.get<AudioListenerComponent>(entity));
 			}
 		}
 

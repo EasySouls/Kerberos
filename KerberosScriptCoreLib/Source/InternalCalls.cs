@@ -81,5 +81,45 @@ namespace Kerberos.Source
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern bool Input_IsKeyDown(KeyCode key);
 
+        // ------------------------- AudioSource2DComponent --------------------------
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void AudioSource2DComponent_Play(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void AudioSource2DComponent_Stop(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void AudioSource2DComponent_SetVolume(ulong entityID, float volume);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern float AudioSource2DComponent_GetVolume(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void AudioSource2DComponent_SetLooping(ulong entityID, bool looping);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern bool AudioSource2DComponent_IsLooping(ulong entityID);
+
+        // ------------------------- AudioSource3DComponent --------------------------
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void AudioSource3DComponent_Play(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void AudioSource3DComponent_Stop(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void AudioSource3DComponent_SetVolume(ulong entityID, float volume);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern float AudioSource3DComponent_GetVolume(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void AudioSource3DComponent_SetLooping(ulong entityID, bool looping);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern bool AudioSource3DComponent_IsLooping(ulong entityID);
+
     }
 }
