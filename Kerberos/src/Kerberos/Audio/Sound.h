@@ -19,6 +19,9 @@ namespace Kerberos
 		Sound& operator=(const Sound& other) = default;
 		Sound& operator=(Sound&& other) noexcept = default;
 
+		void Play() const;
+		void Stop() const;
+
 		const std::string& GetName() const { return m_Name; }
 		AssetType GetType() override { return AssetType::Sound; }
 		UUID GetSoundID() const { return m_SoundID; }

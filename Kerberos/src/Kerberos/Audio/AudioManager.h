@@ -26,6 +26,7 @@ namespace Kerberos
 		virtual Ref<Sound> Load(const std::filesystem::path& filepath) = 0;
 		virtual void Play(const std::filesystem::path& filepath) = 0;
 		virtual void Play(const UUID& soundID) = 0;
+		virtual void Stop(const UUID& soundID) = 0;
 
 		static AudioManager* Create();
 	};

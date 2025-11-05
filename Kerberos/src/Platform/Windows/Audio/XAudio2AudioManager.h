@@ -48,6 +48,7 @@ namespace Kerberos
 		Ref<Sound> Load(const std::filesystem::path& filepath) override;
 		void Play(const std::filesystem::path& filepath) override;
 		void Play(const UUID& soundID) override;
+		void Stop(const UUID& soundID) override;
 
 	private:
 		static AudioFormat DetectAudioFormat(const std::filesystem::path& filepath);
@@ -60,5 +61,6 @@ namespace Kerberos
 
 		std::unordered_map<std::filesystem::path, AudioData> m_LoadedWAVs;
 		std::unordered_map<UUID, std::filesystem::path> m_SoundUUIDToFilepath;
+		std::unordered_map<std::filesystem::path, IXAudio2SourceVoice*> m_PlayingAudios;
 	};
 }

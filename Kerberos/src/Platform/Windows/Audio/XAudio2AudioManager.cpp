@@ -51,7 +51,30 @@ namespace Kerberos
 	}
 
 
-	void XAudio2AudioManager::Update() {}
+	void XAudio2AudioManager::Update() 
+	{
+		for (auto it = m_PlayingAudios.begin(); it != m_PlayingAudios.end(); ) 
+		{
+			IXAudio2SourceVoice* sourceVoice = it->second;
+			XAUDIO2_VOICE_STATE state;
+			sourceVoice->GetState(&state);
+			if (state.BuffersQueued == 0) 
+			{
+				const HRESULT res = sourceVoice->Stop();
+				if (FAILED(res))
+				{
+					KBR_CORE_ERROR("Failed to stop source voice for audio: {0}", it->first.string());
+				}
+				sourceVoice->DestroyVoice();
+				it = m_PlayingAudios.erase(it);
+				KBR_CORE_TRACE("Finished playing audio: {0}", it->first.string());
+			}
+			else 
+			{
+				++it;
+			}
+		}
+	}
 
 	void XAudio2AudioManager::Shutdown() 
 	{
@@ -134,6 +157,8 @@ namespace Kerberos
 			return;
 		}
 
+		m_PlayingAudios[filepath] = sourceVoice;
+
 		KBR_CORE_TRACE("Playing WAV file: {0}", filepath.string());
 	}
 
@@ -147,6 +172,31 @@ namespace Kerberos
 		}
 
 		Play(filepath->second);
+	}
+
+	void XAudio2AudioManager::Stop(const UUID& soundID) 
+	{
+		const auto filepath = m_SoundUUIDToFilepath.find(soundID);
+		if (filepath == m_SoundUUIDToFilepath.end()) 
+		{
+			KBR_CORE_ERROR("Sound ID not found: {0}", static_cast<uint64_t>(soundID));
+			return;
+		}
+
+		const auto it = m_PlayingAudios.find(filepath->second);
+		if (it == m_PlayingAudios.end()) 
+		{
+			KBR_CORE_ERROR("Sound is not currently playing: {0}", filepath->second.string());
+			return;
+		}
+
+		IXAudio2SourceVoice* sourceVoice = it->second;
+		const HRESULT res = sourceVoice->Stop();
+		if (FAILED(res))
+		{
+			KBR_CORE_ERROR("Failed to stop source voice for audio: {0}", filepath->second.string());
+		}
+		m_PlayingAudios.erase(it);
 	}
 
 	AudioFormat XAudio2AudioManager::DetectAudioFormat(const std::filesystem::path& filepath) 
