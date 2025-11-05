@@ -13,6 +13,7 @@
 
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "Kerberos/Application.h"
 #include "Kerberos/Assets/AssetManager.h"
 #include "Kerberos/Renderer/RenderCommand.h"
 #include "Kerberos/Scripting/ScriptEngine.h"
@@ -116,6 +117,8 @@ namespace Kerberos
 			UpdateScripts(ts);
 
 			m_PhysicsSystem->Update(ts);
+
+			Application::Get().GetAudioManager()->Update();
 		}
 
 		/// Render the scene
