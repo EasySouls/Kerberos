@@ -45,6 +45,7 @@ namespace Kerberos
 		debugConfig.LogFunctionName = TRUE;
 		debugConfig.LogTiming = TRUE;
 		m_XAudio2->SetDebugConfiguration(&debugConfig);
+
 #endif
 
 		KBR_CORE_INFO("XAudio2AudioManager initialized successfully.");
@@ -58,7 +59,7 @@ namespace Kerberos
 			IXAudio2SourceVoice* sourceVoice = it->second;
 			XAUDIO2_VOICE_STATE state;
 			sourceVoice->GetState(&state);
-			if (state.BuffersQueued == 0) 
+			if (state.BuffersQueued == 0)
 			{
 				const HRESULT res = sourceVoice->Stop();
 				if (FAILED(res))

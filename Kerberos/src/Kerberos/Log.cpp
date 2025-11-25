@@ -14,7 +14,7 @@ namespace Kerberos
 		// [Timestamp] [name of logger]: [message]
 		spdlog::set_pattern("%^[%T] %n: %v%$");
 
-		auto coreConsoleSink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
+		auto coreConsoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 		coreConsoleSink->set_level(spdlog::level::trace);
 		auto coreFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("Kerberos.log", true);
 		coreFileSink->set_level(spdlog::level::trace);
