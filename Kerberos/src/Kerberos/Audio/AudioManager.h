@@ -28,6 +28,12 @@ namespace Kerberos
 		virtual void Play(const UUID& soundID) = 0;
 		virtual void Stop(const UUID& soundID) = 0;
 
+		virtual void IncreaseVolume(const UUID& soundID, float delta) = 0;
+		virtual void DecreaseVolume(const UUID& soundID, float delta) = 0;
+		virtual void SetVolume(const UUID& soundID, float volume) = 0;
+		virtual void ResetVolume(const UUID& soundID) = 0;
+		virtual void Mute(const UUID& soundID) = 0;
+
 		static AudioManager* Create();
 	};
 }

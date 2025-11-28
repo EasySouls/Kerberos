@@ -200,6 +200,89 @@ namespace Kerberos
 		m_PlayingAudios.erase(it);
 	}
 
+	void XAudio2AudioManager::IncreaseVolume(const UUID& soundID, const float delta)
+	{
+		const auto filepath = m_SoundUUIDToFilepath.find(soundID);
+		if (filepath == m_SoundUUIDToFilepath.end()) 
+		{
+			KBR_CORE_ERROR("Sound ID not found: {0}", static_cast<uint64_t>(soundID));
+			return;
+		}
+
+		const auto audio = m_PlayingAudios.find(filepath->second);
+		if (audio == m_PlayingAudios.end()) 
+		{
+			KBR_CORE_ERROR("You can only increase the volume of a sound currently playing: {0}", filepath->second.string());
+			return;
+		}
+
+		float currentVolume = 0;
+		audio->second->GetVolume(&currentVolume);
+
+		if (const HRESULT res = audio->second->SetVolume(currentVolume + delta); FAILED(res)) 
+		{
+			KBR_CORE_ERROR("Failed to increase volume for sound: {0}", filepath->second.string());
+		}
+	}
+
+	void XAudio2AudioManager::DecreaseVolume(const UUID& soundID, const float delta)
+	{
+		const auto filepath = m_SoundUUIDToFilepath.find(soundID);
+		if (filepath == m_SoundUUIDToFilepath.end())
+		{
+			KBR_CORE_ERROR("Sound ID not found: {0}", static_cast<uint64_t>(soundID));
+			return;
+		}
+
+		const auto audio = m_PlayingAudios.find(filepath->second);
+		if (audio == m_PlayingAudios.end())
+		{
+			KBR_CORE_ERROR("You can only decrease the volume of a sound currently playing: {0}", filepath->second.string());
+			return;
+		}
+
+		float currentVolume = 0;
+		audio->second->GetVolume(&currentVolume);
+
+		if (const HRESULT res = audio->second->SetVolume(currentVolume - delta); FAILED(res))
+		{
+			KBR_CORE_ERROR("Failed to decrease volume for sound: {0}", filepath->second.string());
+		}
+	}
+
+	void XAudio2AudioManager::SetVolume(const UUID& soundID, const float volume)
+	{
+		const auto filepath = m_SoundUUIDToFilepath.find(soundID);
+		if (filepath == m_SoundUUIDToFilepath.end())
+		{
+			KBR_CORE_ERROR("Sound ID not found: {0}", static_cast<uint64_t>(soundID));
+			return;
+		}
+
+		const auto audio = m_PlayingAudios.find(filepath->second);
+		if (audio == m_PlayingAudios.end())
+		{
+			KBR_CORE_ERROR("You can only set the volume of a sound currently playing: {0}", filepath->second.string());
+			return;
+		}
+
+		if (const HRESULT res = audio->second->SetVolume(volume); FAILED(res))
+		{
+			KBR_CORE_ERROR("Failed to set volume for sound: {0}", filepath->second.string());
+		}
+	}
+
+	void XAudio2AudioManager::ResetVolume(const UUID& soundID)
+	{
+		SetVolume(soundID, 1.0f);
+	}
+
+	void XAudio2AudioManager::Mute(const UUID& soundID)
+	{
+		SetVolume(soundID, 0.0f);
+	}
+
+
 	AudioFormat XAudio2AudioManager::DetectAudioFormat(const std::filesystem::path& filepath) 
 	{
 		const std::string extension = filepath.extension().string();
@@ -207,19 +290,15 @@ namespace Kerberos
 		{
 			return AudioFormat::FormatPcm;
 		}
-		else if (extension == ".adpcm" || extension == ".ADPCM") 
+		if (extension == ".adpcm" || extension == ".ADPCM") 
 		{
 			return AudioFormat::FormatAdpcm;
 		}
-		else if (extension == ".f32" || extension == ".F32") 
+		if (extension == ".f32" || extension == ".F32") 
 		{
 			return AudioFormat::FormatIeeeFloat;
 		}
-		else 
-		{
-			return AudioFormat::FormatUnknown;
-		}
-
+		return AudioFormat::FormatUnknown;
 	}
 
 	void XAudio2AudioManager::LoadWavFile(const std::filesystem::path& filepath) 

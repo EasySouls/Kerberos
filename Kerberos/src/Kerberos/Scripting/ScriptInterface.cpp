@@ -350,6 +350,7 @@ namespace Kerberos
 
 		AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
 		audioComponent.Volume = volume;
+		audioComponent.SoundAsset->SetVolume(volume);
 	}
 
 	static void AudioSource3DComponent_SetLooping(const UUID entityID, const bool loop)

@@ -22,6 +22,12 @@ namespace Kerberos
 		void Play() const;
 		void Stop() const;
 
+		void IncreaseVolume(float delta) const;
+		void DecreaseVolume(float delta) const;
+		void SetVolume(float volume) const;
+		void ResetVolume() const;
+		void Mute() const;
+
 		const std::string& GetName() const { return m_Name; }
 		AssetType GetType() override { return AssetType::Sound; }
 		UUID GetSoundID() const { return m_SoundID; }

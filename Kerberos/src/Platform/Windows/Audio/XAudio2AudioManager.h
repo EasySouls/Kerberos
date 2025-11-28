@@ -50,6 +50,12 @@ namespace Kerberos
 		void Play(const UUID& soundID) override;
 		void Stop(const UUID& soundID) override;
 
+		void IncreaseVolume(const UUID& soundID, float delta) override;
+		void DecreaseVolume(const UUID& soundID, float delta) override;
+		void SetVolume(const UUID& soundID, float volume) override;
+		void ResetVolume(const UUID& soundID) override;
+		void Mute(const UUID& soundID) override;
+
 	private:
 		static AudioFormat DetectAudioFormat(const std::filesystem::path& filepath);
 
