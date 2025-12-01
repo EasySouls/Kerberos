@@ -10,7 +10,7 @@
 
 namespace Kerberos
 {
-	enum class AudioFormat
+	enum class AudioFormat : uint8_t
 	{
 		FormatUnknown,
 		FormatPcm,

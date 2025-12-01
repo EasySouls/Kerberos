@@ -13,6 +13,9 @@ namespace Kerberos.Source.Kerberos
         private AudioSource2DComponent _audioSource2DComponent;
         private Camera _mainCamera;
 
+        // Implement OnXButtonClicked methods for 
+        private bool _isPlayingAudio = false;
+
         internal Player() : base()
         {
         }
@@ -73,13 +76,15 @@ namespace Kerberos.Source.Kerberos
             if (Input.IsKeyDown(KeyCode.E))
                 _mainCamera.DistanceFromPlayer -= 1.0f * deltaTime;
 
-            if (Input.IsKeyDown(KeyCode.P) && _audioSource2DComponent != null)
+            if (Input.IsKeyDown(KeyCode.P) && _audioSource2DComponent != null && !_isPlayingAudio)
             {
                 _audioSource2DComponent.Play();
+                _isPlayingAudio = true;
             }
-            if (Input.IsKeyDown(KeyCode.O) && _audioSource2DComponent != null)
+            if (Input.IsKeyDown(KeyCode.O) && _audioSource2DComponent != null && _isPlayingAudio)
             {
                 _audioSource2DComponent.Stop();
+                _isPlayingAudio = false;
             }
         }
     }

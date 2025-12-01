@@ -59,17 +59,17 @@ namespace Kerberos
 			IXAudio2SourceVoice* sourceVoice = it->second;
 			XAUDIO2_VOICE_STATE state;
 			sourceVoice->GetState(&state);
-			if (state.BuffersQueued == 0)
+			if (state.BuffersQueued == 0) 
 			{
 				const HRESULT res = sourceVoice->Stop();
-				if (FAILED(res))
+				if (FAILED(res)) 
 				{
 					KBR_CORE_ERROR("Failed to stop source voice for audio: {0}", it->first.string());
 				}
 				sourceVoice->DestroyVoice();
-				it = m_PlayingAudios.erase(it);
 				KBR_CORE_TRACE("Finished playing audio: {0}", it->first.string());
-			}
+				it = m_PlayingAudios.erase(it);
+			} 
 			else 
 			{
 				++it;
@@ -160,7 +160,7 @@ namespace Kerberos
 
 		m_PlayingAudios[filepath] = sourceVoice;
 
-		KBR_CORE_TRACE("Playing WAV file: {0}", filepath.string());
+		KBR_CORE_INFO("Playing WAV file: {0}", filepath.string());
 	}
 
 	void XAudio2AudioManager::Play(const UUID& soundID) 
@@ -196,7 +196,10 @@ namespace Kerberos
 		if (FAILED(res))
 		{
 			KBR_CORE_ERROR("Failed to stop source voice for audio: {0}", filepath->second.string());
+			return;
 		}
+
+		sourceVoice->DestroyVoice();
 		m_PlayingAudios.erase(it);
 	}
 
