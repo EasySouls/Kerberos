@@ -29,7 +29,7 @@ namespace Kerberos
 
 		m_ActiveScene = CreateRef<Scene>();
 
-#define TESTING 1
+#define TESTING 0
 #if TESTING
 		OpenProject(R"(C:\Development\Kerberos\KerberosEditor\World3D.kbrproj)");
 #else
