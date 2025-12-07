@@ -69,7 +69,7 @@ namespace Kerberos
 		if (str == "Mesh")
 			return AssetType::Mesh;
 		if (str == "Scene")
-			return AssetType::Mesh;
+			return AssetType::Scene;
 		if (str == "Sound")
 			return AssetType::Sound;
 
