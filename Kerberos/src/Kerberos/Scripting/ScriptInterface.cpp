@@ -289,6 +289,7 @@ namespace Kerberos
 
 		AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
 		audioComponent.Volume = volume;
+		audioComponent.SoundAsset->SetVolume(volume);
 	}
 
 	static void AudioSource2DComponent_SetLooping(const UUID entityID, const bool loop)

@@ -126,6 +126,15 @@ namespace Kerberos
 			return;
 		}
 
+		if (const auto existingIt = m_PlayingAudios.find(filepath); existingIt != m_PlayingAudios.end())
+		{
+			const auto& existingAudio = existingIt->second;
+			existingAudio->Stop();
+			existingAudio->DestroyVoice();
+			m_PlayingAudios.erase(existingIt);
+			KBR_CORE_WARN("Stopping sound before playing it: {0}", filepath.string());
+		}
+
 		const AudioData& soundData = it->second;
 		IXAudio2SourceVoice* sourceVoice;
 

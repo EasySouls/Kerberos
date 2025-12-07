@@ -36,6 +36,7 @@ namespace Kerberos
 		XAudio2AudioManager() = default;
 		~XAudio2AudioManager() override;
 
+		// TODO: Implement proper move behaviour, since we are using COM pointers.
 		XAudio2AudioManager(const XAudio2AudioManager& other) = delete;
 		XAudio2AudioManager(XAudio2AudioManager&& other) noexcept = default;
 		XAudio2AudioManager& operator=(const XAudio2AudioManager& other) = delete;
