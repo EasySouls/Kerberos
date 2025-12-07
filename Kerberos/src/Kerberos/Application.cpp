@@ -44,13 +44,17 @@ namespace Kerberos
 
 		Renderer::Init();
 		ScriptEngine::Init();
-
-		m_AudioManager->Load(R"(C:\Users\retek\Music\Technoshock.wav)");
-		//m_AudioManager->Play(R"(C:\Users\retek\Music\Technoshock.wav)");
 	}
 
 	Application::~Application() 
 	{
+		if (m_AudioManager)
+		{
+			m_AudioManager->Shutdown();
+			delete m_AudioManager;
+			m_AudioManager = nullptr;
+		}
+
 		//Renderer::Shutdown();
 		ScriptEngine::Shutdown();
 	};
