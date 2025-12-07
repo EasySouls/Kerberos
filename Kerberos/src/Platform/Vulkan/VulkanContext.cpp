@@ -1060,6 +1060,17 @@ namespace Kerberos
 		return commandBuffer;
 	}
 
+	/**
+	 * @brief Submits a command buffer to the graphics queue and blocks until execution completes.
+	 *
+	 * Ends the provided primary command buffer, submits it to the context's graphics queue using a
+	 * temporary fence, waits for the fence to signal completion, and then destroys the fence.
+	 *
+	 * @param commandBuffer The primary command buffer to end, submit, and wait for.
+	 *
+	 * @throws std::runtime_error If ending the command buffer, creating the fence, submitting the
+	 *         queue, or waiting for the fence fails.
+	 */
 	void VulkanContext::SubmitCommandBuffer(const VkCommandBuffer commandBuffer) const 
 	{
 		constexpr uint64_t fenceWaitTimeout = 10000000000000;
@@ -1101,6 +1112,12 @@ namespace Kerberos
 		vkDestroyFence(m_Device, fence, nullptr);
 	}
 
+	/**
+	 * @brief Obtain the GPU device address of a Vulkan buffer.
+	 *
+	 * @param buffer Vulkan buffer whose device address will be queried.
+	 * @return uint64_t The device address associated with `buffer`.
+	 */
 	uint64_t VulkanContext::GetBufferDeviceAddress(const VkBuffer buffer) const 
 	{
 		// TODO: Store the enabled extensions and features and check if buffer device address is enabled
@@ -1111,6 +1128,14 @@ namespace Kerberos
 	}
 
 
+	/**
+	 * @brief Verifies that all requested Vulkan validation layers are available on the system.
+	 *
+	 * Queries the instance layer properties and checks each entry in the `validationLayers` list
+	 * is present among the available layers.
+	 *
+	 * @return `true` if every requested validation layer in `validationLayers` is supported, `false` otherwise.
+	 */
 	bool VulkanContext::CheckValidationLayerSupport()
 	{
 		uint32_t layerCount;

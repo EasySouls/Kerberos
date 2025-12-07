@@ -12,6 +12,17 @@ namespace Kerberos
 {
 	Application* Application::s_Instance = nullptr;
 
+	/**
+	 * @brief Constructs the Application singleton and initializes core subsystems.
+	 *
+	 * Initializes the global Application instance, sets the working directory if provided,
+	 * creates the main window and its event callback, initializes the audio manager and loads a default audio resource,
+	 * creates and registers the ImGui overlay, and initializes the renderer and scripting engine.
+	 *
+	 * @param spec Configuration used to initialize the application. Relevant fields:
+	 *   - spec.Name: window title.
+	 *   - spec.WorkingDirectory: if non-empty, sets the process working directory to this path; otherwise the current path is kept.
+	 */
 	Application::Application(const ApplicationSpecification& spec) 
 	{
 		KBR_PROFILE_FUNCTION();
@@ -49,6 +60,11 @@ namespace Kerberos
 		//m_AudioManager->Play(R"(C:\Users\retek\Music\Technoshock.wav)");
 	}
 
+	/**
+	 * @brief Destroys the Application and cleans up global subsystems.
+	 *
+	 * Performs application teardown tasks, including shutting down the scripting subsystem.
+	 */
 	Application::~Application() 
 	{
 		//Renderer::Shutdown();

@@ -23,6 +23,16 @@ namespace Kerberos
 	{
 	}
 
+	/**
+	 * @brief Initialize the editor layer, project, and editor scene state.
+	 *
+	 * Creates the active editor scene (or opens/creates a project based on command-line
+	 * arguments or user selection), configures the editor camera and viewport size,
+	 * imports editor assets (textures, sprite sheet, subtextures, toolbar icons), and
+	 * performs initial scene setup such as creating optional test entities, obtaining
+	 * the primary camera entity, setting the hierarchy context, calculating initial
+	 * world transforms, and setting the default gizmo operation.
+	 */
 	void EditorLayer::OnAttach()
 	{
 		KBR_PROFILE_FUNCTION();
@@ -650,6 +660,14 @@ namespace Kerberos
 		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 
+	/**
+	 * @brief Handles drag-and-drop payloads dropped onto the editor viewport.
+	 *
+	 * Detects ImGui drag-and-drop targets and accepts payloads matching ASSET_BROWSER_ITEM.
+	 * When a payload is accepted, logs and enqueues an informational notification containing
+	 * the payload path. If the payload corresponds to a Scene asset, retrieves the scene asset
+	 * (the function does not automatically open it).
+	 */
 	void EditorLayer::HandleDragAndDrop()
 	{
 		if (ImGui::BeginDragDropTarget())

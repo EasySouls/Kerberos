@@ -1,5 +1,30 @@
 #pragma once
 
+/**
+ * Open a system file-open dialog and return the selected file's absolute path.
+ * @param filter A file type filter in the form "Description (*.ext1;*.ext2)|*.ext1;*.ext2".
+ * @return An absolute path to the selected file, or an empty string if the dialog was cancelled.
+ */
+/**
+ * Open a system file-save dialog and return the selected file's absolute path.
+ * @param filter A file type filter in the form "Description (*.ext1;*.ext2)|*.ext1;*.ext2".
+ * @return An absolute path to the selected file, or an empty string if the dialog was cancelled.
+ */
+/**
+ * Open the specified file with the system's default associated application.
+ * @param path The path to the file to open.
+ * @return `true` if the file was successfully opened, `false` otherwise.
+ */
+/**
+ * Delete the file at the specified path.
+ * @param path A null-terminated string specifying the path of the file to delete.
+ * @return `true` if the file was successfully deleted, `false` otherwise.
+ */
+/**
+ * Reveal the specified path in the system file explorer.
+ * @param path The path to reveal.
+ * @return `true` if the path was successfully revealed, `false` otherwise.
+ */
 namespace Kerberos
 {
 	class FileDialog

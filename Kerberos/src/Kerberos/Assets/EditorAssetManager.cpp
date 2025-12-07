@@ -22,6 +22,12 @@ namespace Kerberos
 		{ ".wav", AssetType::Sound } // TODO: Add more audio file types when supported
 	};
 
+	/**
+	 * @brief Determines an AssetType based on a file's extension.
+	 *
+	 * @param filepath Filesystem path whose extension is used to infer the asset type.
+	 * @return AssetType The mapped AssetType for the extension, or `AssetType::Texture2D` if the extension is unrecognized (a warning is logged in that case).
+	 */
 	static AssetType AssetTypeFromFileExtension(const std::filesystem::path& filepath)
 	{
 		const std::string extension = filepath.extension().string();
@@ -173,6 +179,17 @@ namespace Kerberos
 		file << out.c_str();
 	}
 
+	/**
+	 * @brief Loads the project's AssetRegistry.kbrar and populates the in-memory asset registry.
+	 *
+	 * Attempts to read and parse the YAML asset registry file located in the project's asset directory
+	 * and restores entries into m_AssetRegistry. Valid registry entries must include Handle, Type, and Path.
+	 * Entries whose Type parses to Texture2D, TextureCube, Mesh, or Sound are added; entries with missing
+	 * fields or unsupported types are reported and skipped (assertions are triggered for invalid/unsupported entries).
+	 *
+	 * @return true if the registry file was loaded and processed successfully, false on file load/parsing errors
+	 *         or if the registry structure is invalid.
+	 */
 	bool EditorAssetManager::DeserializeAssetRegistry()
 	{
 		const std::filesystem::path& assetDirectoryPath = Project::GetAssetDirectory();

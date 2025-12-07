@@ -5,11 +5,26 @@
 
 namespace Kerberos
 {
+	/**
+	 * @brief Releases audio manager resources and performs shutdown.
+	 *
+	 * Ensures XAudio2 resources, mastering voice, and COM state managed by the audio
+	 * manager are cleaned up before destruction.
+	 */
 	XAudio2AudioManager::~XAudio2AudioManager() 
 	{
 		XAudio2AudioManager::Shutdown();
 	}
 
+	/**
+	 * @brief Initializes the XAudio2 audio subsystem and prepares a mastering voice.
+	 *
+	 * Initializes the COM library for multithreaded use, creates the XAudio2 engine instance,
+	 * and creates a mastering voice used for audio output. When built with KBR_DEBUG, applies
+	 * XAUDIO2 debug configuration to the engine. Logs success on completion.
+	 *
+	 * @throws std::runtime_error If COM initialization, XAudio2 creation, or mastering voice creation fails.
+	 */
 	void XAudio2AudioManager::Init() 
 	{
 		HRESULT res = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
@@ -52,6 +67,11 @@ namespace Kerberos
 	}
 
 
+	/**
+	 * @brief Updates playback state and cleans up finished source voices.
+	 *
+	 * Iterates through tracked playing audio source voices, stops and destroys any voice that has no queued buffers, removes its entry from the playing-audio map, and logs the outcome. Leaves voices with queued buffers unchanged.
+	 */
 	void XAudio2AudioManager::Update() 
 	{
 		for (auto it = m_PlayingAudios.begin(); it != m_PlayingAudios.end(); ) 
@@ -77,6 +97,12 @@ namespace Kerberos
 		}
 	}
 
+	/**
+	 * @brief Releases XAudio2 resources and uninitializes COM for the audio manager.
+	 *
+	 * Destroys the mastering voice if present, releases the XAudio2 instance, clears internal pointers,
+	 * and calls CoUninitialize to uninitialize the COM library.
+	 */
 	void XAudio2AudioManager::Shutdown() 
 	{
 		if (m_MasteringVoice)
@@ -92,6 +118,16 @@ namespace Kerberos
 		CoUninitialize();
 	}
 
+	/**
+	 * Loads an audio file, creates a Sound for PCM WAV files, and registers its ID-to-filepath mapping.
+	 *
+	 * Detects the audio format of `filepath`. If the file is PCM (WAV), creates a Sound using the file stem
+	 * as the name, stores the mapping from the Sound's UUID to `filepath`, and returns a Ref to the created Sound.
+	 * For unsupported or unimplemented formats, returns nullptr.
+	 *
+	 * @param filepath Filesystem path to the audio file to load.
+	 * @return Ref<Sound> Reference to the created Sound on success, or `nullptr` if the format is unsupported or loading failed.
+	 */
 	Ref<Sound> XAudio2AudioManager::Load(const std::filesystem::path& filepath) 
 	{
 		const AudioFormat format = DetectAudioFormat(filepath);
@@ -118,6 +154,16 @@ namespace Kerberos
 		return nullptr;
 	}
 
+	/**
+	 * Plays a previously loaded WAV file identified by its filesystem path.
+	 *
+	 * Looks up the WAV data that must have been loaded earlier; if the file is not loaded
+	 * or contains no audio data, the function logs an error and returns. Otherwise it
+	 * creates an XAudio2 source voice, submits the audio buffer, starts playback, and
+	 * records the voice in the manager's playing-audio map for later control and cleanup.
+	 *
+	 * @param filepath Filesystem path to the WAV file that was loaded into the manager.
+	 */
 	void XAudio2AudioManager::Play(const std::filesystem::path& filepath) 
 	{
 		const auto it = m_LoadedWAVs.find(filepath);
@@ -163,6 +209,13 @@ namespace Kerberos
 		KBR_CORE_INFO("Playing WAV file: {0}", filepath.string());
 	}
 
+	/**
+	 * Plays the sound associated with the given sound UUID.
+	 *
+	 * If the UUID is not mapped to a loaded file, the function logs an error and returns without playing.
+	 *
+	 * @param soundID UUID of the sound to play.
+	 */
 	void XAudio2AudioManager::Play(const UUID& soundID) 
 	{
 		const auto filepath = m_SoundUUIDToFilepath.find(soundID);
@@ -175,6 +228,13 @@ namespace Kerberos
 		Play(filepath->second);
 	}
 
+	/**
+	 * Stops playback of the sound identified by `soundID` and releases its associated source voice.
+	 *
+	 * If `soundID` is not mapped to a loaded filepath or the sound is not currently playing, the function logs an error and returns without side effects. On success, the source voice is stopped, destroyed, and the playing entry is removed.
+	 *
+	 * @param soundID UUID of the sound to stop.
+	 */
 	void XAudio2AudioManager::Stop(const UUID& soundID) 
 	{
 		const auto filepath = m_SoundUUIDToFilepath.find(soundID);
@@ -203,6 +263,15 @@ namespace Kerberos
 		m_PlayingAudios.erase(it);
 	}
 
+	/**
+	 * @brief Increases the playback volume for a currently playing sound by the specified delta.
+	 *
+	 * If the sound ID is unknown or the sound is not currently playing, the function logs an error and returns without changing volume.
+	 * If setting the new volume fails, the function logs an error.
+	 *
+	 * @param soundID UUID of the sound whose volume will be increased.
+	 * @param delta Amount to add to the current volume (linear scale).
+	 */
 	void XAudio2AudioManager::IncreaseVolume(const UUID& soundID, const float delta)
 	{
 		const auto filepath = m_SoundUUIDToFilepath.find(soundID);
@@ -228,6 +297,15 @@ namespace Kerberos
 		}
 	}
 
+	/**
+	 * @brief Decreases the playback volume of a currently playing sound.
+	 *
+	 * Looks up the sound by its UUID and subtracts `delta` from the sound's current volume.
+	 * If the UUID is unknown or the sound is not playing, the call has no effect.
+	 *
+	 * @param soundID UUID of the sound whose volume will be decreased.
+	 * @param delta Amount to subtract from the current volume (linear scale).
+	 */
 	void XAudio2AudioManager::DecreaseVolume(const UUID& soundID, const float delta)
 	{
 		const auto filepath = m_SoundUUIDToFilepath.find(soundID);
@@ -253,6 +331,16 @@ namespace Kerberos
 		}
 	}
 
+	/**
+	 * @brief Sets the playback volume for a currently playing sound.
+	 *
+	 * Sets the volume for the sound identified by `soundID` if that sound is currently playing.
+	 * The value is linear where 1.0 is the original (unmodified) volume and 0.0 is silence.
+	 * If `soundID` is not known or the sound is not currently playing, the call has no effect.
+	 *
+	 * @param soundID Unique identifier of the sound.
+	 * @param volume Linear volume multiplier to apply to the sound (1.0 = original, 0.0 = mute).
+	 */
 	void XAudio2AudioManager::SetVolume(const UUID& soundID, const float volume)
 	{
 		const auto filepath = m_SoundUUIDToFilepath.find(soundID);
@@ -275,17 +363,33 @@ namespace Kerberos
 		}
 	}
 
+	/**
+	 * @brief Resets the playback volume for a sound to the default level.
+	 *
+	 * @param soundID UUID identifying the sound whose volume will be set to 1.0f.
+	 */
 	void XAudio2AudioManager::ResetVolume(const UUID& soundID)
 	{
 		SetVolume(soundID, 1.0f);
 	}
 
+	/**
+	 * @brief Mutes the sound associated with the given ID by setting its volume to 0.
+	 *
+	 * @param soundID UUID of the sound to mute.
+	 */
 	void XAudio2AudioManager::Mute(const UUID& soundID)
 	{
 		SetVolume(soundID, 0.0f);
 	}
 
 
+	/**
+	 * @brief Determines the audio format of a file by its extension.
+	 *
+	 * @param filepath Filesystem path to the audio file whose format should be detected.
+	 * @return AudioFormat The detected format: `FormatPcm` for `.wav`, `FormatAdpcm` for `.adpcm`, `FormatIeeeFloat` for `.f32`, or `FormatUnknown` if the extension is unrecognized.
+	 */
 	AudioFormat XAudio2AudioManager::DetectAudioFormat(const std::filesystem::path& filepath) 
 	{
 		const std::string extension = filepath.extension().string();
@@ -304,6 +408,21 @@ namespace Kerberos
 		return AudioFormat::FormatUnknown;
 	}
 
+	/**
+	 * @brief Loads a PCM WAV file from disk and stores its parsed audio data for playback.
+	 *
+	 * Parses the RIFF/WAVE file at the given path, extracts the 'fmt ' chunk into a WAVEFORMATEX
+	 * structure and the 'data' chunk into a raw byte buffer, then stores the result in
+	 * m_LoadedWAVs keyed by the provided filepath.
+	 *
+	 * If the file cannot be opened, is not a valid RIFF/WAVE file, or is missing either the
+	 * 'fmt ' or 'data' chunk (or the data chunk is empty), the function logs an error and
+	 * returns without modifying m_LoadedWAVs.
+	 *
+	 * @param filepath Filesystem path to the WAV file to load. Only PCM/WAVE formats with a
+	 *                 standard 'fmt ' chunk are supported; extra format bytes (chunkSize > 16)
+	 *                 are skipped and cbSize is set to 0 for the parsed format.
+	 */
 	void XAudio2AudioManager::LoadWavFile(const std::filesystem::path& filepath) 
 	{
 		std::ifstream file(filepath, std::ios::binary);

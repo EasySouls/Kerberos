@@ -242,6 +242,14 @@ namespace Kerberos
 		return ScriptEngine::StringToMonoString(fontPath);
 	}
 
+	/**
+	 * @brief Sets the font file path for the TextComponent of the specified entity.
+	 *
+	 * @param entityID UUID of the entity whose TextComponent font path will be set.
+	 * @param fontPath Managed string containing the font file path.
+	 *
+	 * @throws std::runtime_error Always thrown because this function is not implemented yet.
+	 */
 	static void TextComponent_SetFontPath(const UUID entityID, const MonoString* fontPath)
 	{
 		KBR_CORE_ASSERT(fontPath == nullptr, "Null pointer passed to fontPath");
@@ -249,6 +257,13 @@ namespace Kerberos
 		throw std::runtime_error("TextComponent_SetFontPath is not implemented yet");
 	}
 
+	/**
+	 * @brief Starts playback of the AudioSource2DComponent attached to the specified entity.
+	 *
+	 * If the entity has an AudioSource2DComponent with a loaded SoundAsset, playback is initiated.
+	 *
+	 * @param entityID UUID of the entity whose AudioSource2DComponent should be played.
+	 */
 	static void AudioSource2DComponent_Play(const UUID entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -261,6 +276,13 @@ namespace Kerberos
 		}
 	}
 
+	/**
+	 * @brief Stops playback of the entity's 2D audio source, if one is attached.
+	 *
+	 * If the entity has an AudioSource2DComponent with a loaded SoundAsset, this will call Stop() on that asset.
+	 *
+	 * @param entityID UUID of the entity whose AudioSource2DComponent should be stopped.
+	 */
 	static void AudioSource2DComponent_Stop(const UUID entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -273,6 +295,12 @@ namespace Kerberos
 		}
 	}
 
+	/**
+	 * @brief Retrieves the playback volume for a 2D audio source on the specified entity.
+	 *
+	 * @param entityID UUID of the entity that owns the AudioSource2DComponent.
+	 * @return float Current volume of the audio source (typically in range 0.0 to 1.0).
+	 */
 	static float AudioSource2DComponent_GetVolume(const UUID entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -282,6 +310,14 @@ namespace Kerberos
 		return audioComponent.Volume;
 	}
 
+	/**
+	 * @brief Sets the playback volume on an entity's AudioSource2DComponent.
+	 *
+	 * Updates the AudioSource2DComponent::Volume for the entity identified by the given UUID.
+	 *
+	 * @param entityID UUID of the entity whose audio source volume will be set.
+	 * @param volume New volume value to assign to the audio source.
+	 */
 	static void AudioSource2DComponent_SetVolume(const UUID entityID, const float volume)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -291,6 +327,12 @@ namespace Kerberos
 		audioComponent.Volume = volume;
 	}
 
+	/**
+	 * @brief Set the looping state of an entity's AudioSource2DComponent.
+	 *
+	 * @param entityID UUID of the entity whose AudioSource2DComponent will be modified.
+	 * @param loop `true` to enable looping, `false` to disable looping.
+	 */
 	static void AudioSource2DComponent_SetLooping(const UUID entityID, const bool loop)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -300,6 +342,12 @@ namespace Kerberos
 		audioComponent.Loop = loop;
 	}
 
+	/**
+	 * @brief Retrieves whether the 2D audio source on the given entity is set to loop.
+	 *
+	 * @param entityID UUID of the entity to query.
+	 * @return `true` if the entity's AudioSource2DComponent has looping enabled, `false` otherwise.
+	 */
 	static bool AudioSource2DComponent_IsLooping(const UUID entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -310,6 +358,13 @@ namespace Kerberos
 	}
 
 
+	/**
+	 * @brief Plays the 3D audio clip attached to an entity's AudioSource3DComponent.
+	 *
+	 * Invokes Play() on the component's SoundAsset if the entity's AudioSource3DComponent has a valid SoundAsset; otherwise does nothing.
+	 *
+	 * @param entityID UUID of the target entity in the current scene.
+	 */
 	static void AudioSource3DComponent_Play(const UUID entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -322,6 +377,14 @@ namespace Kerberos
 		}
 	}
 
+	/**
+	 * @brief Stops playback of the 3D audio source attached to the given entity.
+	 *
+	 * If the entity's AudioSource3DComponent has an associated SoundAsset, that asset's
+	 * Stop() method is invoked. If no SoundAsset is present, the function has no effect.
+	 *
+	 * @param entityID UUID of the entity whose AudioSource3DComponent should be stopped.
+	 */
 	static void AudioSource3DComponent_Stop(const UUID entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -334,6 +397,12 @@ namespace Kerberos
 		}
 	}
 
+	/**
+	 * @brief Retrieves the playback volume of an entity's AudioSource3DComponent.
+	 *
+	 * @param entityID UUID of the entity whose audio volume is requested.
+	 * @return float Current volume of the AudioSource3DComponent.
+	 */
 	static float AudioSource3DComponent_GetVolume(const UUID entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -343,6 +412,14 @@ namespace Kerberos
 		return audioComponent.Volume;
 	}
 
+	/**
+	 * @brief Sets the playback volume for an entity's 3D audio source and applies it to the underlying sound asset.
+	 *
+	 * Updates the AudioSource3DComponent's Volume field for the specified entity and forwards the value to the associated SoundAsset.
+	 *
+	 * @param entityID UUID of the entity whose 3D audio source volume will be set.
+	 * @param volume New volume level to apply to the component and sound asset.
+	 */
 	static void AudioSource3DComponent_SetVolume(const UUID entityID, const float volume)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -353,6 +430,12 @@ namespace Kerberos
 		audioComponent.SoundAsset->SetVolume(volume);
 	}
 
+	/**
+	 * @brief Sets whether the AudioSource3DComponent on the entity should loop playback.
+	 *
+	 * @param entityID UUID of the entity whose AudioSource3DComponent will be modified.
+	 * @param loop `true` to enable looping, `false` to disable it.
+	 */
 	static void AudioSource3DComponent_SetLooping(const UUID entityID, const bool loop)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -362,6 +445,12 @@ namespace Kerberos
 		audioComponent.Loop = loop;
 	}
 
+	/**
+	 * @brief Determines whether the 3D audio source on the given entity is set to loop.
+	 *
+	 * @param entityID UUID of the entity to query.
+	 * @return `true` if the entity's AudioSource3DComponent is configured to loop playback, `false` otherwise.
+	 */
 	static bool AudioSource3DComponent_IsLooping(const UUID entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
@@ -373,11 +462,24 @@ namespace Kerberos
 
 
 
+	/**
+	 * @brief Checks whether the specified keyboard key is currently pressed.
+	 *
+	 * @param key KeyCode identifying the keyboard key to check.
+	 * @return true if the key is currently pressed, false otherwise.
+	 */
 	static bool Input_IsKeyDown(const KeyCode key)
 	{
 		return Input::IsKeyPressed(key);
 	}
 
+	/**
+	 * @brief Registers native functions as internal calls available to managed scripts.
+	 *
+	 * @details Binds the engine's native entry points (logging, entity queries, transform and
+	 * physics accessors, text and audio component accessors, and input queries) so they can be
+	 * invoked from the scripting runtime.
+	 */
 	void ScriptInterface::RegisterFunctions() 
 	{
 		KBR_ADD_INTERNAL_CALL(NativeLog);
@@ -438,6 +540,12 @@ namespace Kerberos
 		s_EntityHasComponentFunctions[managedType] = [](const Entity entity) { return entity.HasComponent<Component>(); };
 	}
 
+	/**
+	 * @brief Registers engine component types with the scripting runtime so managed code can identify and query them.
+	 *
+	 * Retrieves the core assembly image and registers the set of engine component types that are exposed to C# scripts.
+	 * Asserts that the core assembly image is available before registration.
+	 */
 	void ScriptInterface::RegisterComponentTypes()
 	{
 		MonoImage* coreImage = ScriptEngine::GetCoreAssemblyImage();
