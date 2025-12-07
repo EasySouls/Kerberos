@@ -41,10 +41,7 @@ namespace Kerberos
 					  m_ComputeInfo.MaxWorkGroupSize.y,
 					  m_ComputeInfo.MaxWorkGroupSize.z);
 
-		KBR_CORE_INFO("  Max Compute Work Group Invocations: {0}, {1}, {2}",
-					  m_ComputeInfo.MaxWorkGroupInvocations.x,
-					  m_ComputeInfo.MaxWorkGroupInvocations.y,
-					  m_ComputeInfo.MaxWorkGroupInvocations.z);
+		KBR_CORE_INFO("  Max Compute Work Group Invocations: {0}", m_ComputeInfo.MaxWorkGroupInvocations);
 	}
 
 	void OpenGLContext::SwapBuffers()
@@ -78,16 +75,10 @@ namespace Kerberos
 			static_cast<uint32_t>(maxWorkGroupSize[2])
 		);
 
-		int maxWorkGroupInvocations[3];
-		glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, 0, &maxWorkGroupInvocations[0]);
-		glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, 1, &maxWorkGroupInvocations[1]);
-		glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, 2, &maxWorkGroupInvocations[2]);
+		int maxWorkGroupInvocations;
+		glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &maxWorkGroupInvocations);
 
-		m_ComputeInfo.MaxWorkGroupInvocations = glm::vec3(
-			static_cast<uint32_t>(maxWorkGroupInvocations[0]),
-			static_cast<uint32_t>(maxWorkGroupInvocations[1]),
-			static_cast<uint32_t>(maxWorkGroupInvocations[2])
-		);
+		m_ComputeInfo.MaxWorkGroupInvocations = maxWorkGroupInvocations;
 	}
 }
 

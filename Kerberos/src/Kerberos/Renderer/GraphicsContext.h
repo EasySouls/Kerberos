@@ -8,7 +8,7 @@ namespace Kerberos
 	{
 		glm::vec3 MaxWorkGroupCount{0};
 		glm::vec3 MaxWorkGroupSize{0};
-		glm::vec3 MaxWorkGroupInvocations{0};
+		uint32_t  MaxWorkGroupInvocations{0};
 	};
 
 	class GraphicsContext
