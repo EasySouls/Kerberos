@@ -1,5 +1,32 @@
 #pragma once
 
+/**
+ * @brief Identifier for a generic asset browser item type.
+ */
+
+/**
+ * @brief Identifier for a 2D texture asset type in the asset browser.
+ */
+
+/**
+ * @brief Identifier for a cubemap (texture cube) asset type in the asset browser.
+ */
+
+/**
+ * @brief Identifier for a mesh asset type in the asset browser.
+ */
+
+/**
+ * @brief Identifier for a scene asset type in the asset browser.
+ */
+
+/**
+ * @brief Identifier for an audio asset type in the asset browser.
+ */
+
+/**
+ * @brief Identifier for a font asset type in the asset browser.
+ */
 namespace Kerberos
 {
 	constexpr const char* ASSET_BROWSER_ITEM = "ASSET_BROWSER_ITEM";

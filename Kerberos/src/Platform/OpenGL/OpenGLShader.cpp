@@ -31,6 +31,16 @@ namespace Kerberos
 			return 0;
 		}
 
+		/**
+		 * @brief Map an OpenGL shader stage value to the corresponding shaderc GLSL shader kind.
+		 *
+		 * Converts a GLenum representing an OpenGL shader stage (for example, GL_VERTEX_SHADER,
+		 * GL_FRAGMENT_SHADER, or GL_GEOMETRY_SHADER) into the matching shaderc_shader_kind.
+		 * The function asserts if an unsupported stage value is provided.
+		 *
+		 * @param stage OpenGL shader stage enum.
+		 * @return shaderc_shader_kind Corresponding shaderc GLSL shader kind.
+		 */
 		static shaderc_shader_kind GLShaderStageToShaderC(const GLenum stage)
 		{
 			switch (stage)
@@ -44,6 +54,12 @@ namespace Kerberos
 			return static_cast<shaderc_shader_kind>(0);
 		}
 
+		/**
+		 * @brief Convert an OpenGL shader stage enum to its string representation.
+		 *
+		 * @param stage OpenGL shader stage value; expected `GL_VERTEX_SHADER`, `GL_FRAGMENT_SHADER`, or `GL_GEOMETRY_SHADER`.
+		 * @return const char* String literal naming the provided stage (for example, `"GL_VERTEX_SHADER"`).
+		 */
 		static const char* GLShaderStageToString(const GLenum stage)
 		{
 			switch (stage)
@@ -389,6 +405,18 @@ namespace Kerberos
 		m_RendererID = program;
 	}
 
+	/**
+	 * @brief Compile GLSL sources to Vulkan SPIR-V or load them from the on-disk cache and reflect their resources.
+	 *
+	 * Compiles each provided shader source to Vulkan SPIR-V using shaderc when the cached binary is missing or older
+	 * than the source; otherwise loads the SPIR-V from the cache. Populates the object's m_VulkanSPIRV map, writes
+	 * newly compiled binaries to the cache directory, and invokes reflection for each stage.
+	 *
+	 * Side effects:
+	 * - Updates m_VulkanSPIRV with compiled or cached SPIR-V data.
+	 * - May write compiled SPIR-V files to the cache directory.
+	 * - Logs compilation/cache activity and asserts on compilation failures.
+	 */
 	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources) 
 	{
 		KBR_CORE_INFO("\nCompiling shader: {}", m_FilePath);
@@ -511,6 +539,18 @@ namespace Kerberos
 			Reflect(stage, data);
 	}
 
+	/**
+	 * @brief Ensures OpenGL-compatible SPIR-V binaries are available for each shader stage.
+	 *
+	 * Cross-compiles the stored Vulkan SPIR-V for each stage to OpenGL GLSL, compiles that GLSL
+	 * to OpenGL SPIR-V, and populates the shader object's OpenGL artifacts. Uses a cache directory
+	 * to load or store compiled OpenGL SPIR-V when available and up-to-date with the source file.
+	 *
+	 * Side effects:
+	 * - Updates the member containers `m_OpenGLSPIRV` and `m_OpenGLSourceCode`.
+	 * - Reads from and writes to the shader cache directory on disk.
+	 * - Logs status and may assert on fatal compilation or cross-compilation failures.
+	 */
 	void OpenGLShader::CompileOrGetOpenGLBinaries() 
 	{
 		auto& shaderData = m_OpenGLSPIRV;
@@ -655,6 +695,15 @@ namespace Kerberos
 			Reflect(stage, data);*/
 	}
 
+	/**
+	 * @brief Create and link an OpenGL program from cached SPIR-V shader binaries.
+	 *
+	 * Creates a GL program, loads each SPIR-V module in m_OpenGLSPIRV as a specialized shader,
+	 * attaches them, links the program, and on success stores the program id in m_RendererID.
+	 * Per-stage shader object IDs are recorded in m_OpenGLShaderIDs. Intermediate shader objects
+	 * are detached and deleted after linking. If linking fails, an error is logged, the program
+	 * and shader objects are deleted, and an assertion is triggered.
+	 */
 	void OpenGLShader::CreateProgram() 
 	{
 		const GLuint program = glCreateProgram();
@@ -707,6 +756,18 @@ namespace Kerberos
 		m_RendererID = program;
 	}
 
+	/**
+	 * @brief Reflects a SPIR-V shader module and emits its resource metadata for a given GL shader stage.
+	 *
+	 * Inspects the provided SPIR-V binary and reports information about uniform buffers, sampled images
+	 * (textures/samplers), storage buffers, storage images, and push constant blocks for the specified
+	 * shader stage. The reported metadata includes names, descriptor set, binding, sizes, array/descriptor
+	 * counts and member offsets where applicable.
+	 *
+	 * @param stage The OpenGL shader stage enum (e.g., GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_GEOMETRY_SHADER)
+	 *              that identifies which stage the SPIR-V module represents.
+	 * @param shaderData The SPIR-V binary data for the shader stage used as the source for reflection.
+	 */
 	void OpenGLShader::Reflect(const GLenum stage, const std::vector<uint32_t>& shaderData) 
 	{
 		const spirv_cross::Compiler compiler(shaderData);

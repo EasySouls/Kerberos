@@ -105,6 +105,20 @@ namespace Kerberos
 		return out;
 	}
 
+	/**
+	 * @brief Serializes an Entity and any of its present components into the given YAML emitter as a YAML map.
+	 *
+	 * The function writes the entity UUID and, for each component the entity has, emits a component-specific map
+	 * containing that component's properties. Supported components include:
+	 * TagComponent, TransformComponent, SpriteRendererComponent, CameraComponent, HierarchyComponent,
+	 * ScriptComponent, NativeScriptComponent (placeholder), DirectionalLightComponent, PointLightComponent,
+	 * SpotLightComponent, RigidBody3DComponent, BoxCollider3DComponent, SphereCollider3DComponent,
+	 * CapsuleCollider3DComponent, MeshCollider3DComponent, StaticMeshComponent, EnvironmentComponent,
+	 * TextComponent, AudioSource3DComponent, AudioSource2DComponent, and AudioListenerComponent.
+	 *
+	 * @param out YAML::Emitter to which the entity map will be written.
+	 * @param entity The Entity to serialize; only components present on this entity will be emitted.
+	 */
 	static void SerializeEntity(YAML::Emitter& out, const Entity entity)
 	{
 		out << YAML::BeginMap;
@@ -499,6 +513,17 @@ namespace Kerberos
 		throw std::logic_error("Not implemented");
 	}
 
+	/**
+	 * @brief Deserialize a scene from a YAML file and recreate its entities and components in the associated Scene.
+	 *
+	 * Reads the YAML at the given filesystem path, parses the scene name and the "Entities" sequence, and for each entity
+	 * reconstructs the entity with its UUID, tag, transform, and any present components (camera, sprite renderer, hierarchy,
+	 * script, lights, physics colliders, mesh/static mesh, environment, text, and audio components), loading referenced assets
+	 * when handles are present.
+	 *
+	 * @param filepath Path to the YAML scene file to deserialize.
+	 * @return true if the file was parsed and the scene deserialized; `false` if the file is invalid or does not contain a top-level "Scene" node.
+	 */
 	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath) const
 	{
 		const std::ifstream inFile(filepath);

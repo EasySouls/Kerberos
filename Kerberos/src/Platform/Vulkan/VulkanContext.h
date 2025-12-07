@@ -11,6 +11,22 @@
 
 #include "VulkanBuffer.h"
 
+/**
+ * Acquire a command buffer intended for single-use recording.
+ *
+ * @returns A command buffer ready for one-time command recording; caller must submit it after recording.
+ */
+/**
+ * Submit a recorded command buffer to the device for execution.
+ *
+ * @param commandBuffer The command buffer containing recorded commands to submit.
+ */
+/**
+ * Retrieve the device address for a buffer that supports shader device addresses.
+ *
+ * @param buffer The Vulkan buffer whose device address to query. The buffer must have been created with VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT and the VK_KHR_buffer_device_address feature/extension enabled.
+ * @returns The 64-bit device address of the specified buffer.
+ */
 namespace Kerberos
 {
 	class VulkanContext : public GraphicsContext

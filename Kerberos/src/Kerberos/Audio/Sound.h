@@ -3,6 +3,60 @@
 #include "Kerberos/Core.h"
 #include "Kerberos/Assets/Asset.h"
 
+/**
+ * Represents a sound asset and provides playback and volume controls.
+ */
+ 
+/**
+ * Construct a Sound with the given name.
+ * @param name Human-readable name of the sound asset.
+ */
+
+/**
+ * Begin playback of the sound.
+ */
+
+/**
+ * Stop playback of the sound.
+ */
+
+/**
+ * Increase the current volume by `delta`.
+ * @param delta Amount to increase the volume by (additive).
+ */
+
+/**
+ * Decrease the current volume by `delta`.
+ * @param delta Amount to decrease the volume by (subtractive).
+ */
+
+/**
+ * Set the current volume to `volume`.
+ * @param volume New volume level.
+ */
+
+/**
+ * Restore the volume to its default value.
+ */
+
+/**
+ * Mute the sound.
+ */
+
+/**
+ * Get the name of the sound asset.
+ * @returns Reference to the internal name string.
+ */
+
+/**
+ * Get the asset type for this asset.
+ * @returns The value `AssetType::Sound`.
+ */
+
+/**
+ * Get the UUID that identifies this sound in the Audio Manager.
+ * @returns UUID of the sound asset.
+ */
 namespace Kerberos 
 {
 	class Sound : public Asset

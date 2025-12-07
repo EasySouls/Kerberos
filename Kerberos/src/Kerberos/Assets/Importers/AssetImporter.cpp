@@ -17,6 +17,16 @@ namespace Kerberos
 			});
 	}
 
+	/**
+	 * @brief Imports an asset according to the provided metadata and returns the created asset.
+	 *
+	 * Selects the appropriate importer based on metadata.Type and delegates the import operation.
+	 * Asserts and returns `nullptr` if the asset type is unsupported.
+	 *
+	 * @param handle Handle to assign to the imported asset.
+	 * @param metadata Metadata describing the asset (includes type and filepath).
+	 * @return Ref<Asset> Reference to the imported asset, or `nullptr` if the asset type is unsupported.
+	 */
 	Ref<Asset> AssetImporter::ImportAsset(const AssetHandle handle, const AssetMetadata& metadata) 
 	{
 		switch (metadata.Type)

@@ -1,4 +1,4 @@
-﻿using Kerberos.Source.Kerberos.Core;
+using Kerberos.Source.Kerberos.Core;
 using System;
 using System.IO;
 
@@ -115,16 +115,28 @@ namespace Kerberos.Source.Kerberos.Scene
 
     public class AudioSource2DComponent : Component
     {
-        public void Play() => InternalCalls.AudioSource2DComponent_Play(Entity.ID);
+        /// <summary>
+/// Starts playing the audio clip attached to this component.
+/// </summary>
+public void Play() => InternalCalls.AudioSource2DComponent_Play(Entity.ID);
 
-        public void Stop() => InternalCalls.AudioSource2DComponent_Stop(Entity.ID);
+        /// <summary>
+/// Stops playback of the 2D audio source attached to this component.
+/// </summary>
+public void Stop() => InternalCalls.AudioSource2DComponent_Stop(Entity.ID);
     }
 
     public class AudioSource3DComponent : Component
     {
-        public void Play() => InternalCalls.AudioSource3DComponent_Play(Entity.ID);
+        /// <summary>
+/// Starts playback of the audio clip associated with this 3D audio source component.
+/// </summary>
+public void Play() => InternalCalls.AudioSource3DComponent_Play(Entity.ID);
 
-        public void Stop() => InternalCalls.AudioSource3DComponent_Stop(Entity.ID);
+        /// <summary>
+/// Stops playback of the 3D audio source attached to this component's entity.
+/// </summary>
+public void Stop() => InternalCalls.AudioSource3DComponent_Stop(Entity.ID);
     }
 
     public class AudioListenerComponent : Component

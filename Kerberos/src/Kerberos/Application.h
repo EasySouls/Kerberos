@@ -12,7 +12,26 @@
 
 #include "Audio/AudioManager.h"
 
-namespace Kerberos
+/**
+	 * Holds command-line arguments passed to the application.
+	 *
+	 * Count is the number of arguments; Args is a null-terminated string array of length Count.
+	 */
+	 
+	/**
+	 * Access a command-line argument by index.
+	 * @param index Index of the argument to retrieve; must be less than Count.
+	 * @returns The argument string at the given index.
+	 * @note Asserts that index < Count.
+	 */
+	
+	/**
+	 * Application creation configuration.
+	 *
+	 * Name is the application name. WorkingDirectory is the initial working directory.
+	 * CommandLineArgs contains the captured command-line arguments.
+	 */
+	namespace Kerberos
 {
 	struct ApplicationCommandLineArgs
 	{
@@ -33,6 +52,11 @@ namespace Kerberos
 		ApplicationCommandLineArgs CommandLineArgs;
 	};
 
+	/**
+	 * Create and initialize the application using the provided specification.
+	 * Initializes core systems including the window, renderer, and ImGui layer.
+	 * @param spec Configuration for the application including Name, WorkingDirectory, and CommandLineArgs.
+	 */
 	class Application
 	{
 	public:
@@ -96,4 +120,3 @@ namespace Kerberos
 	Application* CreateApplication(ApplicationCommandLineArgs args);
 
 }
-

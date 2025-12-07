@@ -27,6 +27,18 @@ namespace Kerberos
 	}
 
 
+	/**
+	 * @brief Render the Assets panel UI and handle user interactions.
+	 *
+	 * Displays the current assets directory and either an asset-mode view (hierarchical
+	 * assets) or a filesystem-mode view (folder contents), and processes user actions:
+	 * navigation (enter/back), toggling modes, refreshing the asset tree, importing files,
+	 * creating context menus, deleting files/folders, opening files, initiating drag-and-drop
+	 * payloads for assets, and caching image thumbnails for display.
+	 *
+	 * This function updates panel state such as the current directory, active mode, the
+	 * asset thumbnail cache, and the in-memory asset tree as users interact with the UI.
+	 */
 	void AssetsPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Assets");
@@ -370,6 +382,14 @@ namespace Kerberos
 		}
 	}
 
+	/**
+	 * @brief Starts an ImGui drag-and-drop source for an asset and sets the payload and preview according to the asset's file extension or type.
+	 *
+	 * Determines the payload type and preview shown during drag based on the file extension (".jpg", ".png", ".svg" => ASSET_BROWSER_TEXTURE; ".kbrcubemap" => ASSET_BROWSER_TEXTURE_CUBE; ".obj" => ASSET_BROWSER_MESH) or when the resolved AssetType is Sound (ASSET_BROWSER_AUDIO). The provided AssetHandle is used as the payload data; an available texture asset is shown as a 64×64 thumbnail for image payloads, otherwise the filename or "Invalid Texture" text is shown.
+	 *
+	 * @param handle AssetHandle to use as the drag payload.
+	 * @param filename Filesystem path of the asset; its extension is used to select payload type and preview behavior.
+	 */
 	void AssetsPanel::HandleAssetDragAndDrop(const AssetHandle handle, const std::filesystem::path& filename)
 	{
 		if (ImGui::BeginDragDropSource())

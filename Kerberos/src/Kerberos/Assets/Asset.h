@@ -5,6 +5,18 @@
 #include "Kerberos/Log.h"
 
 
+/**
+ * Convert an AssetType value to its corresponding string name.
+ * @param type The AssetType to convert.
+ * @returns A `std::string_view` with the name of the asset type (e.g., "Texture2D", "Mesh", "Scene", "Sound").
+ *          If `type` is not a known AssetType, the function triggers an assertion and returns an empty string.
+ */
+
+/**
+ * Parse a string name and return the corresponding AssetType enum value.
+ * @param str The string representation of the asset type (e.g., "Texture2D", "Mesh", "Scene", "Sound").
+ * @returns The matching `AssetType`. If `str` is unrecognized, the function triggers an assertion and returns `AssetType::Texture2D`.
+ */
 namespace Kerberos
 {
 	using AssetHandle = UUID;

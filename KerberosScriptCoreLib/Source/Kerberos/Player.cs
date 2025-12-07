@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Kerberos.Source.Kerberos.Core;
 using Kerberos.Source.Kerberos.Scene;
 
@@ -16,6 +16,9 @@ namespace Kerberos.Source.Kerberos
         // Implement OnXButtonClicked methods for 
         private bool _isPlayingAudio = false;
 
+        /// <summary>
+        /// Initializes a new Player instance with default field values.
+        /// </summary>
         internal Player() : base()
         {
         }
@@ -24,6 +27,12 @@ namespace Kerberos.Source.Kerberos
         {
         }
 
+        /// <summary>
+        /// Initialize the player after it is created by caching the TransformComponent, any present optional components (RigidBody3DComponent and AudioSource2DComponent), and resolving the scene Camera entity.
+        /// </summary>
+        /// <remarks>
+        /// Also writes a creation message containing the entity ID to the console.
+        /// </remarks>
         protected override void OnCreate()
         {
             Console.WriteLine($"Player::OnCreate - {ID}");
@@ -42,6 +51,13 @@ namespace Kerberos.Source.Kerberos
 
         }
 
+        /// <summary>
+        /// Processes player input each frame to move the player, optionally apply a physics impulse, adjust camera zoom, and control 2D audio playback.
+        /// </summary>
+        /// <param name="deltaTime">Time elapsed since the last update used to scale movement and camera zoom adjustments.</param>
+        /// <remarks>
+        /// If a rigidbody component is present and the impulse key is pressed, an impulse is applied and the rest of the update is skipped for that frame. Camera zoom and audio controls only take effect when their respective components are available.
+        /// </remarks>
         protected override void OnUpdate(float deltaTime)
         {
             Vector3 velocity = Vector3.Zero;

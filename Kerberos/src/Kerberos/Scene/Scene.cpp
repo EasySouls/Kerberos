@@ -108,6 +108,14 @@ namespace Kerberos
 		Render3DEditor(camera);
 	}
 
+	/**
+	 * @brief Advances the scene by a single timestep: updates subsystems and renders using the primary camera.
+	 *
+	 * Updates native and managed scripts, advances the physics system, updates the audio manager (when the scene is not paused),
+	 * then finds the scene's primary camera and renders either the 3D or 2D runtime view using that camera's transform.
+	 *
+	 * @param ts Time step duration (seconds) used to update scripts, physics, and audio.
+	 */
 	void Scene::OnUpdateRuntime(const Timestep ts)
 	{
 		KBR_PROFILE_FUNCTION();
@@ -213,6 +221,22 @@ namespace Kerberos
 		m_Registry.destroy(enttId);
 	}
 
+	/**
+	 * @brief Creates a duplicate of an entity within the scene.
+	 *
+	 * Creates a new entity whose tag is the original entity's tag suffixed with " Copy",
+	 * copies the transform and any present components from the source entity to the new one,
+	 * and optionally duplicates the source's child hierarchy under the new entity.
+	 *
+	 * Special behavior:
+	 * - CameraComponent on the new entity has its viewport size updated to the scene's current viewport.
+	 * - NativeScriptComponent instantiation and destroy callbacks are set on the copy so the script instance
+	 *   is preserved and properly cleaned up for the duplicated entity.
+	 * - RigidBody3DComponent on the copy has its runtime body pointer cleared.
+	 *
+	 * @param entity The entity to duplicate.
+	 * @param duplicateChildren If true, recursively duplicate the entity's children and re-parent them under the new copy.
+	 */
 	void Scene::DuplicateEntity(const Entity entity, const bool duplicateChildren)
 	{
 		KBR_PROFILE_FUNCTION();
@@ -440,6 +464,25 @@ namespace Kerberos
 		return *m_PhysicsSystem;
 	}
 
+	/**
+	 * @brief Creates a new Scene by duplicating the provided source Scene.
+	 *
+	 * Produces a new Scene that contains copies of all entities from the source scene
+	 * with their UUIDs and tags preserved. Copies a broad subset of components so
+	 * the resulting scene reproduces visual, physical, audio, scripting, and environment
+	 * state present in the source.
+	 *
+	 * @param other Source scene to copy.
+	 * @return Ref<Scene> A new Scene reference containing duplicated entities and components.
+	 *
+	 * The following components are copied when present on an entity:
+	 * TransformComponent, SpriteRendererComponent, CameraComponent (viewport resized to the new scene),
+	 * ScriptComponent, NativeScriptComponent (script instance transferred to the duplicate and lifecycle
+	 * handlers configured), StaticMeshComponent, RigidBody3DComponent (runtime body reset to nullptr),
+	 * BoxCollider3DComponent, SphereCollider3DComponent, CapsuleCollider3DComponent, MeshCollider3DComponent,
+	 * DirectionalLightComponent, PointLightComponent, SpotLightComponent, EnvironmentComponent,
+	 * TextComponent, AudioSource2DComponent, AudioSource3DComponent, and AudioListenerComponent.
+	 */
 	Ref<Scene> Scene::Copy(const Ref<Scene>& other)
 	{
 		Ref<Scene> newScene = CreateRef<Scene>();
@@ -964,6 +1007,16 @@ namespace Kerberos
 	{}
 
 	template <>
+	/**
+	 * @brief Initializes a MeshCollider3DComponent's mesh from the entity's StaticMeshComponent.
+	 *
+	 * If the entity has a valid StaticMesh in its StaticMeshComponent, assigns that mesh to
+	 * MeshCollider3DComponent::Mesh. If no valid StaticMesh is present, the collider's mesh
+	 * is left unchanged and a warning is emitted.
+	 *
+	 * @param entity The entity that owns the components.
+	 * @param component The MeshCollider3DComponent being initialized.
+	 */
 	void Scene::OnComponentAdded<MeshCollider3DComponent>(const Entity entity, MeshCollider3DComponent& component)
 	{
 		const auto& smc = entity.GetComponent<StaticMeshComponent>();
@@ -981,21 +1034,56 @@ namespace Kerberos
 	{}
 
 	template <>
+	/**
+	 * @brief Hook invoked when a TextComponent is added to an entity in the scene.
+	 *
+	 * This specialization is called by the scene when a TextComponent is attached to the given entity
+	 * and provides a place to initialize or configure the component for editor/runtime use.
+	 *
+	 * @param entity The entity that received the TextComponent.
+	 * @param component The TextComponent instance that was added.
+	 */
 	void Scene::OnComponentAdded<TextComponent>(Entity entity, TextComponent& component)
 	{
 	}
 
 	template <>
+	/**
+	 * @brief Invoked when an AudioSource3DComponent is attached to an entity.
+	 *
+	 * This specialization is called immediately after an AudioSource3DComponent is added to the given entity.
+	 * It is intentionally empty and serves as a placeholder for future initialization or registration logic.
+	 *
+	 * @param entity The entity that received the component.
+	 * @param component The newly added AudioSource3DComponent instance.
+	 */
 	void Scene::OnComponentAdded<AudioSource3DComponent>(Entity entity, AudioSource3DComponent& component)
 	{
 	}
 
 	template <>
+	/**
+	 * @brief Handler invoked when an AudioSource2DComponent is added to an entity; currently a no-op.
+	 *
+	 * This specialization is provided as a hook for future initialization or side effects required
+	 * when a 2D audio source component is attached to an entity. At present it performs no actions.
+	 *
+	 * @param entity The entity receiving the component.
+	 * @param component The added AudioSource2DComponent instance.
+	 */
 	void Scene::OnComponentAdded<AudioSource2DComponent>(Entity entity, AudioSource2DComponent& component)
 	{
 	}
 
 	template <>
+	/**
+	 * @brief Called when an AudioListenerComponent is added to an entity.
+	 *
+	 * Specialization hook provided for initializing or configuring audio listener state when the component is attached.
+	 *
+	 * @param entity The entity receiving the AudioListenerComponent.
+	 * @param component The newly added AudioListenerComponent.
+	 */
 	void Scene::OnComponentAdded<AudioListenerComponent>(Entity entity, AudioListenerComponent& component)
 	{
 	}

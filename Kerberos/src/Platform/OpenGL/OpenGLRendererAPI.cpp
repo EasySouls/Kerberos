@@ -5,6 +5,19 @@
 
 namespace Kerberos
 {
+	/**
+	 * @brief Formats an OpenGL debug message with source and type labels and logs it at a level corresponding to the message severity.
+	 *
+	 * Composes a human-readable message that prefixes the GL message with its source and type, then emits the composed string to the core logger using a severity-appropriate logging macro.
+	 *
+	 * @param source GL debug message source (GLenum).
+	 * @param type GL debug message type (GLenum).
+	 * @param id GL-assigned message ID.
+	 * @param severity GL debug message severity (GLenum).
+	 * @param length Length of the message string, in bytes.
+	 * @param message Pointer to the message text (null-terminated C string).
+	 * @param userParam User-supplied pointer passed through from glDebugMessageCallback.
+	 */
 	static void OpenGLMessageCallback(
 		unsigned source,
 		unsigned type,

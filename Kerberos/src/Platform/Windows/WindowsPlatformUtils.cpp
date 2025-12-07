@@ -56,6 +56,14 @@ namespace Kerberos
 		return {};
 	}
 
+	/**
+	 * @brief Open the specified file with the system default handler and wait for the launched process to exit.
+	 *
+	 * Attempts to launch the given file using the system "open" verb and blocks until the opened process terminates.
+	 *
+	 * @param path Path to the file to open. If `path` is null or empty, the function returns `false`.
+	 * @return true if the file was successfully launched and the launched process exited, `false` otherwise.
+	 */
 	bool FileOperations::OpenFile(const char* path)
 	{
 		if (!path || path[0] == '\0')
@@ -84,6 +92,12 @@ namespace Kerberos
 		return false;
 	}
 
+	/**
+	 * @brief Delete the file at the specified filesystem path.
+	 *
+	 * @param path Path to the file to delete.
+	 * @return true if the file was successfully removed, false otherwise.
+	 */
 	bool FileOperations::Delete(const char* path)
 	{
 		if (!path || path[0] == '\0')
@@ -100,6 +114,15 @@ namespace Kerberos
 		return false;
 	}
 
+	/**
+	 * @brief Opens Windows File Explorer and selects the specified file.
+	 *
+	 * Opens Explorer with the given path selected. If Explorer is launched successfully, this function
+	 * waits until the Explorer process terminates before returning.
+	 *
+	 * @param path Path to the file to reveal; must be a non-empty, null-terminated string.
+	 * @return true if Explorer was launched and the operation completed, false otherwise.
+	 */
 	bool FileOperations::RevealInFileExplorer(const char* path)
 	{
 		if (!path || path[0] == '\0')

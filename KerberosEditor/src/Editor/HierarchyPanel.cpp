@@ -21,6 +21,14 @@
 
 namespace Kerberos
 {
+	/**
+	 * @brief Creates a HierarchyPanel bound to a scene and initializes panel state.
+	 *
+	 * Initializes the panel with the provided scene context and loads editor state and assets
+	 * by calling SetContext with the given scene reference.
+	 *
+	 * @param context Reference to the Scene that this panel will display and operate on.
+	 */
 	HierarchyPanel::HierarchyPanel(const Ref<Scene>& context)
 		: m_Context(context)
 	{
@@ -177,6 +185,14 @@ namespace Kerberos
 		}
 	}
 
+	/**
+	 * @brief Renders an "Add Component" ImGui popup and adds the selected component to the given entity.
+	 *
+	 * Presents a popup menu with component categories (including Physics and Audio). When a menu item is chosen,
+	 * the corresponding component is added to the provided entity and the popup is closed.
+	 *
+	 * @param entity The entity to which the selected component will be added.
+	 */
 	void HierarchyPanel::AddComponentPopup(Entity entity)
 	{
 		if (ImGui::Button("Add Component"))
@@ -432,6 +448,17 @@ namespace Kerberos
 		ImGui::PopID();
 	}
 
+	/**
+	 * @brief Renders and exposes editable UI controls for all components attached to the given entity.
+	 *
+	 * Displays collapsible sections for each present component (Tag, Transform, Camera, Script, Sprite, lights,
+	 * Static Mesh, physics colliders/bodies, Environment, Text, audio components, etc.), providing controls to
+	 * view and modify their properties. Each component section includes a settings popup that can remove the
+	 * component. Changing transform values triggers recalculation of the entity's transform. Drag-and-drop handlers
+	 * allow assigning assets (meshes, textures, fonts, cubemaps, sounds) and will emit error notifications on type mismatch.
+	 *
+	 * @param entity The entity whose components are shown and edited.
+	 */
 	void HierarchyPanel::DrawComponents(const Entity entity)
 	{
 		if (entity.HasComponent<TagComponent>())

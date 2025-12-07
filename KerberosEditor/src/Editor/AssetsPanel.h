@@ -11,6 +11,31 @@
 #include "imgui/imgui.h"
 
 
+/**
+ * Set the current directory displayed by the assets panel.
+ * @param path Filesystem path to use as the current directory.
+ */
+
+/**
+ * Display a context menu for a file entry in the assets panel.
+ * @param path Iterator reference to the file's path within the current directory listing.
+ */
+
+/**
+ * Display a context menu for a folder entry in the assets panel.
+ * @param path Iterator reference to the folder's path within the current directory listing.
+ */
+
+/**
+ * Display a context menu for an empty area of the assets panel using the provided ImGui popup flags.
+ * @param popupFlags ImGui popup flags to control menu behavior when opened.
+ */
+
+/**
+ * Handle a drag-and-drop operation for an asset onto a target filename.
+ * @param handle Asset handle being dragged.
+ * @param filename Target filename or path the asset was dropped onto.
+ */
 namespace Kerberos
 {
 	class AssetsPanel
@@ -84,4 +109,3 @@ namespace Kerberos
 	};
 
 }
-

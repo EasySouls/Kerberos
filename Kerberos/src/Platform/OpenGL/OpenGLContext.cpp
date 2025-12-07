@@ -6,12 +6,29 @@
 
 namespace Kerberos
 {
+	/**
+	 * @brief Constructs an OpenGLContext bound to the given GLFW window.
+	 *
+	 * Associates this OpenGLContext with the provided GLFWwindow pointer so the context can be made current and used for GL operations.
+	 *
+	 * @param windowHandle Pointer to the GLFWwindow whose OpenGL context will be managed. Must not be null.
+	 *
+	 * The constructor asserts that `windowHandle` is not null. */
 	OpenGLContext::OpenGLContext(GLFWwindow* windowHandle)
 		: m_WindowHandle(windowHandle)
 	{
 		KBR_CORE_ASSERT(windowHandle, "Window handle is null!");
 	}
 
+	/**
+	 * @brief Initializes the OpenGL context associated with the stored GLFW window.
+	 *
+	 * Makes the window's OpenGL context current, loads GL function pointers, queries and stores
+	 * compute shader limits, and logs vendor, renderer, OpenGL and GLSL version information
+	 * along with the retrieved compute shader limits.
+	 *
+	 * @note This function will assert if the GL loader (Glad) fails to initialize.
+	 */
 	void OpenGLContext::Init()
 	{
 		KBR_PROFILE_FUNCTION();
@@ -44,6 +61,12 @@ namespace Kerberos
 		KBR_CORE_INFO("  Max Compute Work Group Invocations: {0}", m_ComputeInfo.MaxWorkGroupInvocations);
 	}
 
+	/**
+	 * @brief Presents the rendered frame by swapping the window's front and back buffers.
+	 *
+	 * Swaps the associated GLFW window's back buffer to the front so the most recently
+	 * rendered framebuffer becomes visible on screen.
+	 */
 	void OpenGLContext::SwapBuffers()
 	{
 		KBR_PROFILE_FUNCTION();
@@ -51,6 +74,19 @@ namespace Kerberos
 		glfwSwapBuffers(m_WindowHandle);
 	}
 
+	/**
+	 * @brief Queries and stores GPU compute shader work-group limits.
+	 *
+	 * Retrieves the per-dimension limits for compute shader dispatch from OpenGL
+	 * and writes them into the OpenGLContext's m_ComputeInfo structure. Specifically,
+	 * it populates:
+	 * - m_ComputeInfo.MaxWorkGroupCount  (GL_MAX_COMPUTE_WORK_GROUP_COUNT)
+	 * - m_ComputeInfo.MaxWorkGroupSize   (GL_MAX_COMPUTE_WORK_GROUP_SIZE)
+	 * - m_ComputeInfo.MaxWorkGroupInvocations (GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS)
+	 *
+	 * Each stored value is a glm::vec3 containing the x, y, and z components as
+	 * unsigned integers.
+	 */
 	void OpenGLContext::QueryComputeInfo()
 	{
 		int maxWorkGroupCount[3];
@@ -81,4 +117,3 @@ namespace Kerberos
 		m_ComputeInfo.MaxWorkGroupInvocations = maxWorkGroupInvocations;
 	}
 }
-

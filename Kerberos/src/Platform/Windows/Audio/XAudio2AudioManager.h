@@ -8,6 +8,100 @@
 #include <unordered_map>
 
 
+/**
+ * @enum AudioFormat
+ * @brief Supported audio data formats.
+ *
+ * Enumerates recognized container/codec types for loaded audio data.
+ */
+
+/**
+ * @struct AudioData
+ * @brief Holds decoded audio format metadata and raw sample bytes.
+ *
+ * Contains a WAVEFORMATEX describing the sample format, a contiguous buffer
+ * of raw audio bytes, and the detected AudioFormat.
+ */
+
+/**
+ * @class XAudio2AudioManager
+ * @brief Platform implementation of the AudioManager using XAudio2.
+ *
+ * Manages initialization and shutdown of the XAudio2 engine, loading of WAV
+ * assets, playback control, and per-sound volume management.
+ */
+
+/**
+ * @brief Initialize the XAudio2 engine and related resources.
+ */
+
+/**
+ * @brief Perform per-frame audio manager work (e.g., cleanup finished voices).
+ */
+
+/**
+ * @brief Shutdown the XAudio2 engine and release all audio resources.
+ */
+
+/**
+ * @brief Load a sound from disk and register it with the audio manager.
+ * @param filepath Filesystem path to the audio file to load.
+ * @returns Ref<Sound> Reference to the loaded sound resource.
+ */
+
+/**
+ * @brief Play a sound identified by a filesystem path.
+ * @param filepath Filesystem path of a previously loaded sound.
+ */
+
+/**
+ * @brief Play a sound identified by its UUID.
+ * @param soundID Unique identifier of the sound to play.
+ */
+
+/**
+ * @brief Stop playback of a sound identified by its UUID.
+ * @param soundID Unique identifier of the sound to stop.
+ */
+
+/**
+ * @brief Increase the playback volume of a sound by a delta.
+ * @param soundID Unique identifier of the sound.
+ * @param delta Amount to add to the current volume.
+ */
+
+/**
+ * @brief Decrease the playback volume of a sound by a delta.
+ * @param soundID Unique identifier of the sound.
+ * @param delta Amount to subtract from the current volume.
+ */
+
+/**
+ * @brief Set the playback volume of a sound.
+ * @param soundID Unique identifier of the sound.
+ * @param volume Absolute volume level to set.
+ */
+
+/**
+ * @brief Reset the playback volume of a sound to its default value.
+ * @param soundID Unique identifier of the sound.
+ */
+
+/**
+ * @brief Mute or unmute a sound.
+ * @param soundID Unique identifier of the sound.
+ */
+
+/**
+ * @brief Detect the audio format for a file based on its path or header.
+ * @param filepath Filesystem path to the audio file to inspect.
+ * @returns AudioFormat The detected audio format enum value.
+ */
+
+/**
+ * @brief Load WAV file contents into the manager's in-memory structures.
+ * @param filepath Filesystem path to the WAV file to load.
+ */
 namespace Kerberos
 {
 	enum class AudioFormat : uint8_t

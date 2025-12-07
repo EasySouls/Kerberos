@@ -9,6 +9,19 @@ namespace Kerberos
 	Ref<spdlog::logger> Log::s_CoreLogger;
 	Ref<spdlog::logger> Log::s_ClientLogger;
 
+	/**
+	 * @brief Initializes the logging subsystem and configures core and client loggers.
+	 *
+	 * Sets the global log format to "[HH:MM:SS] logger_name: message", creates colorized stdout and file sinks
+	 * for both the core ("KERBEROS") and client ("APP") loggers, and assigns them to the corresponding
+	 * global logger references.
+	 *
+	 * - Console sinks write to stdout and have their sink-level set to `trace`.
+	 * - File sinks write to "Kerberos.log" (core) and "KerberosClient.log" (client) in append mode and have
+	 *   their sink-level set to `trace`.
+	 * - Both global logger objects (`s_CoreLogger`, `s_ClientLogger`) are created with their sinks and
+	 *   have their logger-level set to `info`.
+	 */
 	void Log::Init()
 	{
 		// [Timestamp] [name of logger]: [message]
