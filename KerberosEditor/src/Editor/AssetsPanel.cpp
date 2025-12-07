@@ -5,6 +5,7 @@
 
 #include <algorithm>
 
+#include "AssetConstants.h"
 #include "Kerberos/Log.h"
 #include "Kerberos/Assets/AssetManager.h"
 #include "Kerberos/Assets/Importers/TextureImporter.h"
@@ -96,12 +97,14 @@ namespace Kerberos
 
 			for (const auto& [item, treeNodeIndex] : node->Children)
 			{
-				bool isDirectory = std::filesystem::is_directory(Project::GetAssetDirectory() / item);
+				const bool isDirectory = std::filesystem::is_directory(Project::GetAssetDirectory() / item);
 
 				std::string itemStr = item.generic_string();
 
 				ImGui::PushID(itemStr.c_str());
-				Ref<Texture2D> icon = isDirectory ? m_FolderIcon : m_FileIcon;
+				// TODO: Get icon based on asset type
+				
+				const Ref<Texture2D> icon = isDirectory ? m_FolderIcon : m_FileIcon;
 				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 				ImGui::ImageButton(item.string().c_str(), icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 
@@ -109,14 +112,14 @@ namespace Kerberos
 				{
 					if (ImGui::MenuItem("Delete"))
 					{
-						KBR_CORE_ASSERT(false, "Not implemented");
+						const bool success = FileOperations::Delete((m_AssetsDirectory / item).string().c_str());
 					}
 					ImGui::EndPopup();
 				}
 
 				if (!isDirectory)
 				{
-					AssetHandle handle = m_AssetTreeNodes[treeNodeIndex].Handle;
+					const AssetHandle handle = m_AssetTreeNodes[treeNodeIndex].Handle;
 					HandleAssetDragAndDrop(handle, item.filename());
 				}
 
@@ -169,6 +172,7 @@ namespace Kerberos
 						{
 							/// Load the image and store it in the map
 							const std::string fullPath = path.string();
+							// TODO: Load them asynchronously and show a placeholder until loaded
 							m_AssetImages[path] = TextureImporter::ImportTexture(fullPath);
 						}
 
@@ -191,7 +195,7 @@ namespace Kerberos
 					{
 						const auto itemPath = relativePath.string();
 
-						ImGui::SetDragDropPayload("ASSET_BROWSER_ITEM", itemPath.c_str(), itemPath.size() + 1, ImGuiCond_Once);
+						ImGui::SetDragDropPayload(ASSET_BROWSER_ITEM, itemPath.c_str(), itemPath.size() + 1, ImGuiCond_Once);
 						ImGui::Text("%s", fileName.c_str());
 						ImGui::EndDragDropSource();
 					}
@@ -370,10 +374,11 @@ namespace Kerberos
 	{
 		if (ImGui::BeginDragDropSource())
 		{
+			const AssetType assetType = Project::GetActive()->GetEditorAssetManager()->GetAssetType(handle);
 			const std::filesystem::path extension = filename.extension();
 			if (extension == ".jpg" || extension == ".png" || extension == ".svg")
 			{
-				ImGui::SetDragDropPayload("ASSET_BROWSER_TEXTURE", &handle, sizeof(AssetHandle), ImGuiCond_Once);
+				ImGui::SetDragDropPayload(ASSET_BROWSER_TEXTURE, &handle, sizeof(AssetHandle), ImGuiCond_Once);
 				if (const Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle))
 				{
 					ImGui::Image(texture->GetRendererID(), ImVec2(64, 64), ImVec2(0, 1), ImVec2(1, 0));
@@ -385,12 +390,17 @@ namespace Kerberos
 			}
 			else if (extension == ".kbrcubemap")
 			{
-				ImGui::SetDragDropPayload("ASSET_BROWSER_TEXTURE_CUBE", &handle, sizeof(AssetHandle), ImGuiCond_Once);
+				ImGui::SetDragDropPayload(ASSET_BROWSER_TEXTURE_CUBE, &handle, sizeof(AssetHandle), ImGuiCond_Once);
 				ImGui::Text("%s", filename.string().c_str());
 			}
 			else if (extension == ".obj") /// TODO: Meshes should also have their own kerberos type
 			{
-				ImGui::SetDragDropPayload("ASSET_BROWSER_MESH", &handle, sizeof(AssetHandle), ImGuiCond_Once);
+				ImGui::SetDragDropPayload(ASSET_BROWSER_MESH, &handle, sizeof(AssetHandle), ImGuiCond_Once);
+				ImGui::Text("%s", filename.string().c_str());
+			}
+			else if (assetType == AssetType::Sound) 
+			{
+				ImGui::SetDragDropPayload(ASSET_BROWSER_AUDIO, &handle, sizeof(AssetHandle), ImGuiCond_Once);
 				ImGui::Text("%s", filename.string().c_str());
 			}
 

@@ -18,7 +18,8 @@ namespace Kerberos
 		{ ".fbx", AssetType::Mesh },
 		{ ".obj", AssetType::Mesh },
 		{ ".gltf", AssetType::Mesh },
-		{ ".kerberos", AssetType::Scene }
+		{ ".kerberos", AssetType::Scene },
+		{ ".wav", AssetType::Sound } // TODO: Add more audio file types when supported
 	};
 
 	static AssetType AssetTypeFromFileExtension(const std::filesystem::path& filepath)
@@ -218,7 +219,8 @@ namespace Kerberos
 			const std::filesystem::path filepath = assetNode["Path"].as<std::string>();
 
 			const AssetType type = AssetTypeFromString(typeStr);
-			if (type == AssetType::Texture2D || type == AssetType::TextureCube || type == AssetType::Mesh)
+			// TODO: This check is not needed when every asset type is supported
+			if (type == AssetType::Texture2D || type == AssetType::TextureCube || type == AssetType::Mesh || type == AssetType::Sound)
 			{
 				m_AssetRegistry.Add(handle, { .Type = type, .Filepath = filepath });
 			}

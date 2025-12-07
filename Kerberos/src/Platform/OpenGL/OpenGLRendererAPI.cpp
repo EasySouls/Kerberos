@@ -14,12 +14,43 @@ namespace Kerberos
 		const char* message,
 		const void* userParam)
 	{
+		std::stringstream ss;
+
+		switch (source)
+		{
+		case GL_DEBUG_SOURCE_API:             ss << "Source: API, "; break;
+		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   ss << "Source: Window System, "; break;
+		case GL_DEBUG_SOURCE_SHADER_COMPILER: ss << "Source: Shader Compiler, "; break;
+		case GL_DEBUG_SOURCE_THIRD_PARTY:     ss << "Source: Third Party, "; break;
+		case GL_DEBUG_SOURCE_APPLICATION:     ss << "Source: Application, "; break;
+		case GL_DEBUG_SOURCE_OTHER:           ss << "Source: Other, "; break;
+		default: KBR_CORE_ASSERT(false, "Unknown source!");
+		}
+
+		switch (type)
+		{
+		case GL_DEBUG_TYPE_ERROR:               ss << "Type: Error, "; break;
+		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: ss << "Type: Deprecated Behaviour, "; break;
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  ss << "Type: Undefined Behaviour, "; break;
+		case GL_DEBUG_TYPE_PORTABILITY:         ss << "Type: Portability, "; break;
+		case GL_DEBUG_TYPE_PERFORMANCE:         ss << "Type: Performance, "; break;
+		case GL_DEBUG_TYPE_MARKER:              ss << "Type: Marker, "; break;
+		case GL_DEBUG_TYPE_PUSH_GROUP:          ss << "Type: Push Group, "; break;
+		case GL_DEBUG_TYPE_POP_GROUP:           ss << "Type: Pop Group, "; break;
+		case GL_DEBUG_TYPE_OTHER:               ss << "Type: Other, "; break;
+		default: KBR_CORE_ASSERT(false, "Unknown type!");
+		}
+
+		ss << '\n' << message;
+
+		const std::string msg = ss.str();
+
 		switch (severity)
 		{
-		case GL_DEBUG_SEVERITY_HIGH:         KBR_CORE_CRITICAL(message); return;
-		case GL_DEBUG_SEVERITY_MEDIUM:       KBR_CORE_ERROR(message); return;
-		case GL_DEBUG_SEVERITY_LOW:          KBR_CORE_WARN(message); return;
-		case GL_DEBUG_SEVERITY_NOTIFICATION: KBR_CORE_TRACE(message); return;
+		case GL_DEBUG_SEVERITY_HIGH:         KBR_CORE_CRITICAL(msg); return;
+		case GL_DEBUG_SEVERITY_MEDIUM:       KBR_CORE_ERROR(msg); return;
+		case GL_DEBUG_SEVERITY_LOW:          KBR_CORE_WARN(msg); return;
+		case GL_DEBUG_SEVERITY_NOTIFICATION: KBR_CORE_TRACE(msg); return;
 		default: KBR_CORE_ASSERT(false, "Unknown severity level!");
 		}
 	}

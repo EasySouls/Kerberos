@@ -66,6 +66,13 @@ namespace Kerberos
 		*/
 		void SubmitCommandBuffer(VkCommandBuffer commandBuffer) const;
 
+		/**
+		* @brief Get the device address of a buffer.
+		* The buffer must have been created with the VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT usage flag,
+		* and the VK_KHR_buffer_device_address extension must have been enabled.
+		*/
+		uint64_t GetBufferDeviceAddress(VkBuffer buffer) const;
+
 		static VulkanContext& Get() { return *s_Instance; }
 
 	private:

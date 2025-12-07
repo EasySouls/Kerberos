@@ -1101,6 +1101,16 @@ namespace Kerberos
 		vkDestroyFence(m_Device, fence, nullptr);
 	}
 
+	uint64_t VulkanContext::GetBufferDeviceAddress(const VkBuffer buffer) const 
+	{
+		// TODO: Store the enabled extensions and features and check if buffer device address is enabled
+		// TODO: Might have to look around VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT
+		VkBufferDeviceAddressInfo bufferDeviceAI{};
+		bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+		bufferDeviceAI.buffer = buffer;
+		return vkGetBufferDeviceAddress(m_Device, &bufferDeviceAI);
+	}
+
 
 	bool VulkanContext::CheckValidationLayerSupport()
 	{

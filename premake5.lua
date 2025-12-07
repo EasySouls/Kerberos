@@ -59,6 +59,7 @@ Library["WinSock"] = "Ws2_32.lib"
 Library["WinMM"] = "Winmm.lib"
 Library["WinVersion"] = "Version.lib"
 Library["BCrypt"] = "Bcrypt.lib"
+Library["XAudio2"] = "XAudio2.lib" 
 
 
 -- Function to find the latest Windows SDK

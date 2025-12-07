@@ -6,12 +6,14 @@
 
 #include "Kerberos/Scene/Components.h"
 #include "Kerberos/Scene/Components/PhysicsComponents.h"
+#include "Kerberos/Scene/Components/AudioComponents.h"
 #include "Kerberos/Renderer/Renderer2D.h"
 #include "Kerberos/Renderer/Renderer3D.h"
 #include "Kerberos/Physics/Utils.h"
 
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "Kerberos/Application.h"
 #include "Kerberos/Assets/AssetManager.h"
 #include "Kerberos/Renderer/RenderCommand.h"
 #include "Kerberos/Scripting/ScriptEngine.h"
@@ -115,6 +117,8 @@ namespace Kerberos
 			UpdateScripts(ts);
 
 			m_PhysicsSystem->Update(ts);
+
+			Application::Get().GetAudioManager()->Update();
 		}
 
 		/// Render the scene
@@ -294,6 +298,18 @@ namespace Kerberos
 		if (entity.HasComponent<TextComponent>())
 		{
 			newEntity.AddComponent<TextComponent>(entity.GetComponent<TextComponent>());
+		}
+		if (entity.HasComponent<AudioSource2DComponent>())
+		{
+			newEntity.AddComponent<AudioSource2DComponent>(entity.GetComponent<AudioSource2DComponent>());
+		}
+		if (entity.HasComponent<AudioSource3DComponent>())
+		{
+			newEntity.AddComponent<AudioSource3DComponent>(entity.GetComponent<AudioSource3DComponent>());
+		}
+		if (entity.HasComponent<AudioListenerComponent>())
+		{
+			newEntity.AddComponent<AudioListenerComponent>(entity.GetComponent<AudioListenerComponent>());
 		}
 
 		if (duplicateChildren)
@@ -519,6 +535,18 @@ namespace Kerberos
 			if (sourceRegistry.all_of<TextComponent>(entity))
 			{
 				newEntity.AddComponent<TextComponent>(sourceRegistry.get<TextComponent>(entity));
+			}
+			if (sourceRegistry.all_of<AudioSource2DComponent>(entity))
+			{
+				newEntity.AddComponent<AudioSource2DComponent>(sourceRegistry.get<AudioSource2DComponent>(entity));
+			}
+			if (sourceRegistry.all_of<AudioSource3DComponent>(entity))
+			{
+				newEntity.AddComponent<AudioSource3DComponent>(sourceRegistry.get<AudioSource3DComponent>(entity));
+			}
+			if (sourceRegistry.all_of<AudioListenerComponent>(entity))
+			{
+				newEntity.AddComponent<AudioListenerComponent>(sourceRegistry.get<AudioListenerComponent>(entity));
 			}
 		}
 
@@ -941,7 +969,7 @@ namespace Kerberos
 		const auto& smc = entity.GetComponent<StaticMeshComponent>();
 		if (smc.StaticMesh == nullptr)
 		{
-			KBR_CORE_ERROR("MeshCollider3DComponent on entity {} does not have a valid static mesh!", entity.GetComponent<TagComponent>().Tag);
+			KBR_CORE_WARN("MeshCollider3DComponent on entity {} does not have a valid static mesh!", entity.GetComponent<TagComponent>().Tag);
 			return;
 		}
 
@@ -954,6 +982,21 @@ namespace Kerberos
 
 	template <>
 	void Scene::OnComponentAdded<TextComponent>(Entity entity, TextComponent& component)
+	{
+	}
+
+	template <>
+	void Scene::OnComponentAdded<AudioSource3DComponent>(Entity entity, AudioSource3DComponent& component)
+	{
+	}
+
+	template <>
+	void Scene::OnComponentAdded<AudioSource2DComponent>(Entity entity, AudioSource2DComponent& component)
+	{
+	}
+
+	template <>
+	void Scene::OnComponentAdded<AudioListenerComponent>(Entity entity, AudioListenerComponent& component)
 	{
 	}
 }

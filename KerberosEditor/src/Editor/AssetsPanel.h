@@ -16,7 +16,7 @@ namespace Kerberos
 	class AssetsPanel
 	{
 	public:
-		AssetsPanel(NotificationManager notificationManager);
+		explicit AssetsPanel(NotificationManager notificationManager);
 		~AssetsPanel() = default;
 
 		/**

@@ -15,6 +15,9 @@ namespace Kerberos
 		void SwapBuffers() override;
 
 	private:
+		void QueryComputeInfo();
+
+	private:
 		GLFWwindow* m_WindowHandle;
 	};
 

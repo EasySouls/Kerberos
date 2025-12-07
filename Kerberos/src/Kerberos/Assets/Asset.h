@@ -15,7 +15,8 @@ namespace Kerberos
 		TextureCube,
 		Material,
 		Mesh,
-		Scene
+		Scene,
+		Sound
 	};
 
 	class Asset
@@ -49,6 +50,8 @@ namespace Kerberos
 			return "Mesh";
 		case AssetType::Scene:
 			return "Scene";
+		case AssetType::Sound:
+			return "Sound";
 		}
 
 		KBR_CORE_ASSERT(false, "Unknown Asset Type!");
@@ -66,7 +69,9 @@ namespace Kerberos
 		if (str == "Mesh")
 			return AssetType::Mesh;
 		if (str == "Scene")
-			return AssetType::Mesh;
+			return AssetType::Scene;
+		if (str == "Sound")
+			return AssetType::Sound;
 
 		KBR_CORE_ASSERT(false, "Unknown Asset Type as string!");
 		return AssetType::Texture2D;

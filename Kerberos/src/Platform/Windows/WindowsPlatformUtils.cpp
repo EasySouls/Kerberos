@@ -83,4 +83,49 @@ namespace Kerberos
 		
 		return false;
 	}
+
+	bool FileOperations::Delete(const char* path)
+	{
+		if (!path || path[0] == '\0')
+		{
+			KBR_CORE_WARN("FileOperations::DeleteFile called with an empty path.");
+			return false;
+		}
+		if (std::remove(path) == 0)
+		{
+			return true;
+		}
+
+		KBR_CORE_ERROR("Failed to delete file: {0}", path);
+		return false;
+	}
+
+	bool FileOperations::RevealInFileExplorer(const char* path)
+	{
+		if (!path || path[0] == '\0')
+		{
+			KBR_CORE_WARN("FileOperations::RevealInFileExplorer called with an empty path.");
+			return false;
+		}
+		std::string params = "/select,\"";
+		params += path;
+		params += "\"";
+		SHELLEXECUTEINFOA sei = { sizeof(sei) };
+		sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+		sei.hwnd = glfwGetWin32Window(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow()));
+		sei.lpVerb = "open";
+		sei.lpFile = "explorer.exe";
+		sei.lpParameters = params.c_str();
+		sei.nShow = SW_SHOWNORMAL;
+		if (ShellExecuteExA(&sei))
+		{
+			/// This will block until the opened process is closed
+			WaitForSingleObject(sei.hProcess, INFINITE);
+			CloseHandle(sei.hProcess);
+			return true;
+		}
+		DWORD error = GetLastError();
+		KBR_CORE_ERROR("Failed to reveal file in explorer: {0}, Error code: {1}", path, error);
+		return false;
+	}
 }

@@ -112,4 +112,22 @@ namespace Kerberos.Source.Kerberos.Scene
             }
         }
     }
+
+    public class AudioSource2DComponent : Component
+    {
+        public void Play() => InternalCalls.AudioSource2DComponent_Play(Entity.ID);
+
+        public void Stop() => InternalCalls.AudioSource2DComponent_Stop(Entity.ID);
+    }
+
+    public class AudioSource3DComponent : Component
+    {
+        public void Play() => InternalCalls.AudioSource3DComponent_Play(Entity.ID);
+
+        public void Stop() => InternalCalls.AudioSource3DComponent_Stop(Entity.ID);
+    }
+
+    public class AudioListenerComponent : Component
+    {
+    }
 }

@@ -10,6 +10,7 @@
 #include "Kerberos/Scripting/ScriptInstance.h"
 #include "Kerberos/Scene/Components.h"
 #include "Kerberos/Scene/Components/PhysicsComponents.h"
+#include "Kerberos/Scene/Components/AudioComponents.h"
 
 #include <mono/metadata/reflection.h>
 #include <glm/glm.hpp>
@@ -248,6 +249,131 @@ namespace Kerberos
 		throw std::runtime_error("TextComponent_SetFontPath is not implemented yet");
 	}
 
+	static void AudioSource2DComponent_Play(const UUID entityID)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		const AudioSource2DComponent& textComponent = entity.GetComponent<AudioSource2DComponent>();
+		if (textComponent.SoundAsset)
+		{
+			textComponent.SoundAsset->Play();
+		}
+	}
+
+	static void AudioSource2DComponent_Stop(const UUID entityID)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		const AudioSource2DComponent& textComponent = entity.GetComponent<AudioSource2DComponent>();
+		if (textComponent.SoundAsset)
+		{
+			textComponent.SoundAsset->Stop();
+		}
+	}
+
+	static float AudioSource2DComponent_GetVolume(const UUID entityID)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		const AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
+		return audioComponent.Volume;
+	}
+
+	static void AudioSource2DComponent_SetVolume(const UUID entityID, const float volume)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
+		audioComponent.Volume = volume;
+		audioComponent.SoundAsset->SetVolume(volume);
+	}
+
+	static void AudioSource2DComponent_SetLooping(const UUID entityID, const bool loop)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
+		audioComponent.Loop = loop;
+	}
+
+	static bool AudioSource2DComponent_IsLooping(const UUID entityID)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		const AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
+		return audioComponent.Loop;
+	}
+
+
+	static void AudioSource3DComponent_Play(const UUID entityID)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		const AudioSource3DComponent& textComponent = entity.GetComponent<AudioSource3DComponent>();
+		if (textComponent.SoundAsset)
+		{
+			textComponent.SoundAsset->Play();
+		}
+	}
+
+	static void AudioSource3DComponent_Stop(const UUID entityID)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		const AudioSource3DComponent& textComponent = entity.GetComponent<AudioSource3DComponent>();
+		if (textComponent.SoundAsset)
+		{
+			textComponent.SoundAsset->Stop();
+		}
+	}
+
+	static float AudioSource3DComponent_GetVolume(const UUID entityID)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		const AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
+		return audioComponent.Volume;
+	}
+
+	static void AudioSource3DComponent_SetVolume(const UUID entityID, const float volume)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
+		audioComponent.Volume = volume;
+		audioComponent.SoundAsset->SetVolume(volume);
+	}
+
+	static void AudioSource3DComponent_SetLooping(const UUID entityID, const bool loop)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
+		audioComponent.Loop = loop;
+	}
+
+	static bool AudioSource3DComponent_IsLooping(const UUID entityID)
+	{
+		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
+		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+
+		const AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
+		return audioComponent.Loop;
+	}
+
+
+
 	static bool Input_IsKeyDown(const KeyCode key)
 	{
 		return Input::IsKeyPressed(key);
@@ -279,6 +405,20 @@ namespace Kerberos
 		KBR_ADD_INTERNAL_CALL(TextComponent_SetFontSize);
 		KBR_ADD_INTERNAL_CALL(TextComponent_GetFontPath);
 		KBR_ADD_INTERNAL_CALL(TextComponent_SetFontPath);
+
+		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_Play);
+		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_Stop);
+		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_GetVolume);
+		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_SetVolume);
+		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_SetLooping);
+		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_IsLooping);
+
+		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_Play);
+		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_Stop);
+		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_GetVolume);
+		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_SetVolume);
+		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_SetLooping);
+		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_IsLooping);
 
 		KBR_ADD_INTERNAL_CALL(Input_IsKeyDown);
 	}
@@ -321,6 +461,10 @@ namespace Kerberos
 		//RegisterComponent<SphereCollider3DComponent>(coreImage);
 		//RegisterComponent<CapsuleCollider3DComponent>(coreImage);
 		//RegisterComponent<MeshCollider3DComponent>(coreImage);
+		RegisterComponent<TextComponent>(coreImage);
+		RegisterComponent<AudioSource2DComponent>(coreImage);
+		RegisterComponent<AudioSource3DComponent>(coreImage);
+		RegisterComponent<AudioListenerComponent>(coreImage);
 
 	}
 }

@@ -38,8 +38,9 @@ namespace Kerberos
 			case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
 			case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
 			case GL_GEOMETRY_SHADER: return shaderc_glsl_geometry_shader;
+			default:
+				KBR_CORE_ASSERT(false, "Not supported shader type");
 			}
-			KBR_CORE_ASSERT(false, "Not supported shader type");
 			return static_cast<shaderc_shader_kind>(0);
 		}
 
@@ -50,8 +51,9 @@ namespace Kerberos
 			case GL_VERTEX_SHADER:   return "GL_VERTEX_SHADER";
 			case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
 			case GL_GEOMETRY_SHADER: return "GL_GEOMETRY_SHADER";
+			default:
+				KBR_CORE_ASSERT(false, "Not supported shader type");
 			}
-			KBR_CORE_ASSERT(false, "Not supported shader type");
 			return nullptr;
 		}
 
@@ -453,8 +455,7 @@ namespace Kerberos
 			if (!needsCompilation)
 			{
 				/// Load from cache
-				std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
-				if (in.is_open())
+				if (std::ifstream in(cachedPath, std::ios::in | std::ios::binary); in.is_open())
 				{
 					in.seekg(0, std::ios::end);
 					auto size = in.tellg();
@@ -579,8 +580,7 @@ namespace Kerberos
 			if (!needsRecompile)
 			{
 				// Load from cache
-				std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
-				if (in.is_open())
+				if (std::ifstream in(cachedPath, std::ios::in | std::ios::binary); in.is_open())
 				{
 					in.seekg(0, std::ios::end);
 					auto size = in.tellg();
@@ -678,15 +678,24 @@ namespace Kerberos
 		{
 			GLint maxLength;
 			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-
-			std::vector<GLchar> infoLog(maxLength);
-			glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data());
-			KBR_CORE_ERROR("Shader linking failed ({0}):\n{1}", m_FilePath, infoLog.data());
+			if (maxLength > 0)
+			{
+				std::vector<GLchar> infoLog(maxLength);
+				glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data());
+				KBR_CORE_ERROR("Shader linking failed ({0}): {1}", m_FilePath, infoLog.data());
+			}
+			else
+			{
+				KBR_CORE_ERROR("Shader linking failed ({0}): No OpengGL info log was provided!", m_FilePath);
+			}
 
 			glDeleteProgram(program);
 
 			for (const auto id : shaderIDs)
 				glDeleteShader(id);
+
+			KBR_CORE_ASSERT(false, "Shader link failure!");
+			return;
 		}
 
 		for (const auto id : shaderIDs)
@@ -781,11 +790,10 @@ namespace Kerberos
 		{
 			uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-			uint32_t descriptorCount = 1;
 			const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
 			if (!type.array.empty())
 			{
-				descriptorCount = type.array[0];
+				uint32_t descriptorCount = type.array[0];
 				if (descriptorCount == 0)
 					//descriptorCount = VulkanContext::Get().GetCapabilities().maxStorageImageAllocationCount; // Or some max
 					descriptorCount = 1; // Default to 1 if unsized
@@ -800,7 +808,7 @@ namespace Kerberos
 			const auto& bufferType = compiler.get_type(resource.base_type_id);
 			uint32_t offset = 0; // Typically
 			// SPIRV-Cross might need a bit more work to get exact offset for members if it's a struct.
-		   // For a single push constant block, its range covers the whole block.
+		    // For a single push constant block, its range covers the whole block.
 			size_t size = compiler.get_declared_struct_size(bufferType);
 
 			// Get shader stage for this push constant more accurately

@@ -10,6 +10,8 @@
 #include <functional>
 #include <vector>
 
+#include "Audio/AudioManager.h"
+
 namespace Kerberos
 {
 	struct ApplicationCommandLineArgs
@@ -41,6 +43,11 @@ namespace Kerberos
 		explicit Application(const ApplicationSpecification& spec);
 		virtual ~Application();
 
+		Application(const Application& other) = delete;
+		Application(Application&& other) noexcept = delete;
+		Application& operator=(const Application& other) = delete;
+		Application& operator=(Application&& other) noexcept = delete;
+
 		void Run();
 		void Close();
 
@@ -55,6 +62,11 @@ namespace Kerberos
 		Window& GetWindow() const { return *m_Window; }
 		ImGuiLayer* GetImGuiLayer() const { return m_ImGuiLayer; }
 		const ApplicationSpecification& GetSpecification() const { return m_Specification; }
+		AudioManager* GetAudioManager() const
+		{
+			KBR_CORE_ASSERT(m_AudioManager, "AudioManager is not initialized!");
+			return m_AudioManager;
+		}
 
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& e);
@@ -74,6 +86,8 @@ namespace Kerberos
 
 		std::vector<std::function<void()>> m_MainThreadQueue;
 		std::mutex m_MainThreadQueueMutex;
+
+		AudioManager* m_AudioManager = nullptr;
 
 		static Application* s_Instance;
 	};
