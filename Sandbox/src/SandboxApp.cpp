@@ -6,11 +6,11 @@
 class Sandbox : public Kerberos::Application
 {
 public:
-	Sandbox(const Kerberos::ApplicationSpecification& spec)
+	explicit Sandbox(const Kerberos::ApplicationSpecification& spec)
 		: Application(spec)
 	{
-		//PushLayer(new ExampleLayer());
-		PushLayer(new Sandbox2D());
+		//PushLayer<ExampleLayer>();
+		PushLayer<Sandbox2D>();
 	}
 
 	~Sandbox() override = default;

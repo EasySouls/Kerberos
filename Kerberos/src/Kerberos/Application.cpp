@@ -40,7 +40,7 @@ namespace Kerberos
 		m_AudioManager->Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
-		PushOverlay(m_ImGuiLayer);
+		m_LayerStack.PushOverlay(LayerScope(m_ImGuiLayer, LayerDeleter()));
 
 		Renderer::Init();
 		ScriptEngine::Init();
@@ -73,11 +73,11 @@ namespace Kerberos
 			// TODO: Execute this on the render thread
 			if (!m_Minimized)
 			{
-				for (Layer* layer : m_LayerStack)
+				for (const LayerScope& layer : m_LayerStack.GetLayers())
 					layer->OnUpdate(deltaTime);
 			}
 			m_ImGuiLayer->Begin();
-			for (Layer* layer : m_LayerStack)
+			for (const LayerScope& layer : m_LayerStack.GetLayers())
 				layer->OnImGuiRender();
 			m_ImGuiLayer->End();
 
@@ -96,22 +96,12 @@ namespace Kerberos
 		dispatcher.Dispatch<WindowCloseEvent>(KBR_BIND_EVENT_FN(Application::OnWindowClosed));
 		dispatcher.Dispatch<WindowResizeEvent>(KBR_BIND_EVENT_FN(Application::OnWindowResize));
 
-		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
+		for (const auto& layer : m_LayerStack.GetLayers())
 		{
-			(*--it)->OnEvent(e);
+			layer->OnEvent(e);
 			if (e.Handled)
 				break;
 		}
-	}
-
-	void Application::PushLayer(Layer* layer)
-	{
-		m_LayerStack.PushLayer(layer);
-	}
-
-	void Application::PushOverlay(Layer* overlay)
-	{
-		m_LayerStack.PushOverlay(overlay);
 	}
 
 	void Application::SubmitToMainThread(const std::function<void()>& function) 

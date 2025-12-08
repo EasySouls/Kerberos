@@ -53,14 +53,36 @@ namespace Kerberos
 
 		void OnEvent(Event& e);
 
-		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* overlay);
+		template<typename TLayer>
+			requires std::derived_from<TLayer, Layer>
+		void PushLayer()
+		{
+			m_LayerStack.PushLayer(LayerScope(new TLayer(), LayerDeleter()));
+		}
+
+		template<typename TOverlay>
+			requires std::derived_from<TOverlay, Layer>
+		void PushOverlay()
+		{
+			m_LayerStack.PushOverlay(LayerScope(new TOverlay(), LayerDeleter()));
+		}
+
+		template<std::derived_from<Layer> TLayer>
+		TLayer* GetLayer() const
+		{
+			for (const auto& layer : m_LayerStack.GetLayers())
+			{
+				if (auto castedLayer = dynamic_cast<TLayer*>(layer.get()))
+					return castedLayer;
+			}
+			return nullptr;
+		}
 
 		void SubmitToMainThread(const std::function<void()>& function);
 
 		static Application& Get() { return *s_Instance; }
 		Window& GetWindow() const { return *m_Window; }
-		ImGuiLayer* GetImGuiLayer() const { return m_ImGuiLayer; }
+		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 		const ApplicationSpecification& GetSpecification() const { return m_Specification; }
 		AudioManager* GetAudioManager() const
 		{

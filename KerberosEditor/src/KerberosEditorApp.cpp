@@ -11,7 +11,7 @@ namespace Kerberos
 		explicit KerberosEditorApp(const ApplicationSpecification& spec)
 			: Application(spec)
 		{
-			PushLayer(new EditorLayer());
+			PushLayer<EditorLayer>();
 		}
 
 		~KerberosEditorApp() override = default;

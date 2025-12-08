@@ -6,6 +6,7 @@
 #include <xaudio2fx.h>
 
 #include <unordered_map>
+#include <string>
 
 
 namespace Kerberos
@@ -26,7 +27,7 @@ namespace Kerberos
 
 		AudioData() 
 		{
-			memset(&wfx, 0, sizeof(WAVEFORMATEX));
+			std::memset(&wfx, 0, sizeof(WAVEFORMATEX));
 		}
 	};
 
