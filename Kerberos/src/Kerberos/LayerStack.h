@@ -36,7 +36,7 @@ namespace Kerberos
 		void PopLayer(const LayerScope& layer);
 		void PopOverlay(const LayerScope& overlay);
 
-		//std::vector<Scope<Layer>>& GetLayers() { return m_Layers; }
+		std::vector<LayerScope>& GetLayers() { return m_Layers; }
 		const std::vector<LayerScope>& GetLayers() const { return m_Layers; }
 
 	private:
