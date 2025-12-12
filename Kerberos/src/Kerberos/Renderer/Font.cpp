@@ -39,7 +39,7 @@ namespace Kerberos
 		TextureSpecification spec;
 		spec.Width = bitmap.width;
 		spec.Height = bitmap.height;
-		spec.Format = ImageFormat::RGB8;
+		spec.Format = ImageFormat::RGBA8;
 		spec.GenerateMips = false;
 
 		const Ref<Texture2D> atlasTexture = Texture2D::Create(spec);
@@ -147,7 +147,7 @@ namespace Kerberos
 			}
 		}
 
-		m_AtlasTexture = GenerateAtlas<uint8_t, float, 3, msdf_atlas::msdfGenerator>(m_MSDFData->Glyphs, width, height);
+		m_AtlasTexture = GenerateAtlas<uint8_t, float, 4, msdf_atlas::mtsdfGenerator>(m_MSDFData->Glyphs, width, height);
 
 		msdfgen::destroyFont(font);
 		msdfgen::deinitializeFreetype(ft);

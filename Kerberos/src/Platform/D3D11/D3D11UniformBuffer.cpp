@@ -34,9 +34,8 @@ namespace Kerberos
 
 	void D3D11UniformBuffer::SetDebugName(const std::string& debugName)
 	{
-		const auto& context = D3D11Context::Get().GetImmediateContext();
-
-		D3D11Utils::SetDebugName(context.Get(), debugName);
+		//D3D11Utils::SetDebugName(context.Get(), debugName);
+		m_Buffer->SetPrivateData(WKPDID_D3DDebugObjectName, debugName.size(), debugName.c_str());
 	}
 
 }

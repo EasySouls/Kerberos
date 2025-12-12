@@ -5,12 +5,13 @@
 #include <d3d11.h>
 
 #include "D3D11Context.h"
+#include "Utils/TextureUtils.h"
 
 namespace Kerberos
 {
 	namespace Utils
 	{
-		uint32_t GetBytesPerPixel(const DXGI_FORMAT fmt)
+		static uint32_t GetBytesPerPixel(const DXGI_FORMAT fmt)
 		{
 			switch (fmt)
 			{
@@ -127,8 +128,7 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		/// For now, we will use RGBA format as a default
-		m_Format = DXGI_FORMAT_R8G8B8A8_UNORM; 
+		m_Format = TextureUtils::KBRImageFormatToDXGIFormat(m_Spec.Format);
 
 		D3D11_TEXTURE2D_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
@@ -161,13 +161,15 @@ namespace Kerberos
 		srvDesc.Texture2D.MipLevels = desc.MipLevels;
 		srvDesc.Texture2D.MostDetailedMip = 0;
 
-		hr = device->CreateShaderResourceView(m_Texture.Get(), &srvDesc, m_ShaderResourceView.ReleaseAndGetAddressOf());
+		hr = device->CreateShaderResourceView(m_Texture.Get(), &srvDesc, m_ShaderResourceView.GetAddressOf());
 		if (FAILED(hr))
 		{
 			KBR_ERROR("Failed to create shader resource view for D3D11Texture2D. HRESULT: 0x%X", hr);
 			m_Texture.Reset();
 			return;
 		}
+
+		//device->CreateSamplerState(TextureUtils::GetD3D11SamplerDesc(m_Spec.SamplerFilter, m_Spec.SamplerWrapMode), m_SamplerState.GetAddressOf());
 
 		m_RendererID = reinterpret_cast<RendererID>(m_ShaderResourceView.Get());
 
@@ -231,10 +233,18 @@ namespace Kerberos
 
 	void D3D11Texture2D::SetDebugName(const std::string& name) const 
 	{
-		const HRESULT res = D3D11Context::Get().GetDevice()->SetPrivateData(WKPDID_D3DDebugObjectName, static_cast<UINT>(name.size()), name.c_str());
-		if (FAILED(res))
+		const std::string textureName = name + " Texture";
+		m_Texture->SetPrivateData(WKPDID_D3DDebugObjectName, static_cast<uint32_t>(textureName.size()), textureName.c_str());
+
+		const std::string srvName = name + " Shader Resource View";
+		m_ShaderResourceView->SetPrivateData(WKPDID_D3DDebugObjectName, static_cast<uint32_t>(srvName.size()), srvName.c_str());
+
+		/*const std::string samplerName = name + " Sampler State";
+		m_SamplerState->SetPrivateData(WKPDID_D3DDebugObjectName, static_cast<uint32_t>(samplerName.size()), samplerName.c_str());*/
+
+		/*if (FAILED(res))
 		{
 			KBR_CORE_WARN("Failed to set texture debug name: {0}", name);
-		}
+		}*/
 	}
 }

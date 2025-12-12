@@ -91,7 +91,7 @@ namespace Kerberos
 		if (data)
 		{
 			/// Upload the texture data to the GPU
-			OpenGLTexture2D::SetData(data.Data, data.Size);
+			OpenGLTexture2D::SetData(data.Data, static_cast<uint32_t>(data.Size));
 		}
 	}
 
