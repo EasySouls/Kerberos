@@ -2,6 +2,8 @@
 
 #include "Kerberos/Core.h"
 
+#include <string>
+
 namespace Kerberos 
 {
 	class UniformBuffer

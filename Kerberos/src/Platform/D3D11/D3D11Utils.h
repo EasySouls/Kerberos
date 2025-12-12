@@ -57,8 +57,7 @@ namespace Kerberos::D3D11Utils
     inline std::string_view GetMessageIdName(const D3D11_MESSAGE_ID messageId)
     {
         const auto& map = GetD3D11MessageIdMap();
-        const auto it = map.find(messageId);
-        if (it != map.end())
+        if (const auto it = map.find(messageId); it != map.end())
         {
             return it->second;
         }
@@ -68,8 +67,7 @@ namespace Kerberos::D3D11Utils
     inline std::string_view GetMessageSeverityName(const D3D11_MESSAGE_SEVERITY severity)
     {
         const auto& map = GetD3D11SeverityMap();
-        const auto it = map.find(severity);
-        if (it != map.end())
+        if (const auto it = map.find(severity); it != map.end())
         {
             return it->second;
         }
@@ -79,8 +77,7 @@ namespace Kerberos::D3D11Utils
     inline std::string_view GetMessageCategoryName(const D3D11_MESSAGE_CATEGORY category)
     {
         const auto& map = GetD3D11MessageCategoryMap();
-        const auto it = map.find(category);
-        if (it != map.end())
+        if (const auto it = map.find(category); it != map.end())
         {
             return it->second;
         }
