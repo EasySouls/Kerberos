@@ -3,6 +3,7 @@
 #include "Kerberos/Renderer/TextureCube.h"
 
 #include <d3d11.h>
+#include <wrl/client.h>
 
 namespace Kerberos
 {
@@ -11,16 +12,16 @@ namespace Kerberos
 	public:
 		using RendererID = uint64_t;
 
-		explicit D3D11TextureCube(const CubemapData& data);
+		explicit D3D11TextureCube(CubemapData data);
 		~D3D11TextureCube() override;
 
 		void Bind(uint32_t slot = 0) const override;
 
 		uint64_t GetRendererID() const override { return m_RendererID; }
-		const std::string& GetName() const override { return m_Name; }
+		const std::string& GetName() const override { return m_Data.Name; }
 		uint32_t GetWidth() const override;
 		uint32_t GetHeight() const override;
-		const TextureSpecification& GetSpecification() const override { return m_Spec; }
+		const TextureSpecification& GetSpecification() const override { return m_Data.Faces[0].Specification; }
 
 		void SetData(void* data, uint32_t size) override;
 
@@ -32,11 +33,11 @@ namespace Kerberos
 		void SetDebugName(const std::string& name) const override;
 
 	private:
+		const CubemapData m_Data;
 		RendererID m_RendererID;
-		std::string m_Name;
-		bool m_GenerateMipmaps;
-		bool m_SRGB;
-		TextureSpecification m_Spec;
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_CubeTexture;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_SRV;
 	};
 }
 

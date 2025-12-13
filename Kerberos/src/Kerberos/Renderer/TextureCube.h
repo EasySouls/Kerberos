@@ -10,6 +10,7 @@ namespace Kerberos
 		TextureSpecification Specification;
 		Buffer Buffer;
 	};
+
 	struct CubemapData
 	{
 		std::string Name;

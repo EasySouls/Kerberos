@@ -7,7 +7,7 @@
 
 namespace Kerberos
 {
-	enum class ImageFormat
+	enum class ImageFormat : uint8_t
 	{
 		None = 0,
 		R8,

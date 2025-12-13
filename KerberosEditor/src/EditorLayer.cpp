@@ -29,9 +29,9 @@ namespace Kerberos
 
 		m_ActiveScene = CreateRef<Scene>();
 
-#define TESTING 0
+#define TESTING 1
 #if TESTING
-		OpenProject(R"(C:\Development\Kerberos\KerberosEditor\World3D.kbrproj)");
+		OpenProject(R"(E:\Development\Kerberos\KerberosEditor\World3D.kbrproj)");
 #else
 
 		/// If there is a command line argument, try to open the project specified in it

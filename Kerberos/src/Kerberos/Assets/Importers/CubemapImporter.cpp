@@ -62,9 +62,9 @@ namespace Kerberos
 				const auto& rendererApi = RendererAPI::GetAPI();
 
 				int desiredChannels = 0; /// Load as-is
-				if (rendererApi == RendererAPI::API::Vulkan)
+				if (rendererApi != RendererAPI::API::OpenGL)
 				{
-					desiredChannels = 4; /// Vulkan doesn't support 3-channel formats well, so we force 4 channels (RGBA)
+					desiredChannels = 4; /// Vulkan and DirectX doesn't support 3-channel formats well, so we force 4 channels (RGBA)
 				}
 
 				const bool flip = rendererApi == RendererAPI::API::Vulkan; /// Vulkan expects images to be loaded with the origin at the top-left corner.
