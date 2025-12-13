@@ -2,48 +2,17 @@
 #include "D3D11Framebuffer.h"
 
 #include "D3D11Context.h"
+#include "Utils/TextureUtils.h"
 
 namespace Kerberos
 {
-    namespace Utils
-    {
-        static DXGI_FORMAT FramebufferTextureFormatToDXGIFormat(const FramebufferTextureFormat format)
-        {
-            switch (format)
-            {
-            case FramebufferTextureFormat::RGBA8:           return DXGI_FORMAT_R8G8B8A8_UNORM;
-            case FramebufferTextureFormat::DEPTH24STENCIL8: return DXGI_FORMAT_D24_UNORM_S8_UINT;
-            case FramebufferTextureFormat::None:
-	            break;
-            }
-            KBR_CORE_ASSERT(false, "Unknown Framebuffer Texture Format!");
-            return DXGI_FORMAT_UNKNOWN;
-        }
-
-        static DXGI_FORMAT FramebufferTextureFormatToSRVFormat(const FramebufferTextureFormat format)
-        {
-            // Shader resource views might need different formats for depth/stencil
-            // e.g., DXGI_FORMAT_D24_UNORM_S8_UINT for DSV becomes DXGI_FORMAT_R24_UNORM_X8_TYPELESS or DXGI_FORMAT_R24_UNORM_S8_UINT for SRV
-            // Here, we'll keep it simple and assume the base format works for SRV.
-            // For depth, you often create a typeless resource and then a specific format SRV.
-            // For simplicity, we'll assume the DSV format is also usable as SRV for this example.
-            // If you need to sample depth, adjust this.
-            return FramebufferTextureFormatToDXGIFormat(format);
-        }
-
-        static bool IsDepthFormat(const FramebufferTextureFormat format)
-        {
-            return format == FramebufferTextureFormat::DEPTH24STENCIL8;
-        }
-    }
-
 	D3D11Framebuffer::D3D11Framebuffer(const FramebufferSpecification& spec)
 		: m_Specification(spec)
 	{
         // Populate color and depth attachment specs
         for (auto& format : spec.Attachments.Attachments)
         {
-            if (Utils::IsDepthFormat(format.TextureFormat))
+            if (IsDepthFormat(format.TextureFormat))
             {
                 m_DepthAttachmentSpec = format;
             }
@@ -84,8 +53,8 @@ namespace Kerberos
 
             for (size_t i = 0; i < m_ColorAttachmentSpecs.size(); ++i)
             {
-                DXGI_FORMAT textureFormat = Utils::FramebufferTextureFormatToDXGIFormat(m_ColorAttachmentSpecs[i].TextureFormat);
-                DXGI_FORMAT srvFormat = Utils::FramebufferTextureFormatToSRVFormat(m_ColorAttachmentSpecs[i].TextureFormat);
+                DXGI_FORMAT textureFormat = TextureUtils::GetTextureFormat(m_ColorAttachmentSpecs[i].TextureFormat);
+                DXGI_FORMAT srvFormat = TextureUtils::GetSRVFormat(m_ColorAttachmentSpecs[i].TextureFormat);
 
                 D3D11_TEXTURE2D_DESC textureDesc = {};
                 textureDesc.Width = m_Specification.Width;
@@ -108,7 +77,7 @@ namespace Kerberos
                 KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create color texture!");
 
                 D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-                rtvDesc.Format = textureFormat;
+                rtvDesc.Format = TextureUtils::GetRTVFormat(m_ColorAttachmentSpecs[i].TextureFormat);
                 rtvDesc.ViewDimension = (m_Specification.Samples > 1) ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
                 rtvDesc.Texture2D.MipSlice = 0;
 
@@ -151,18 +120,20 @@ namespace Kerberos
         // --- Create Depth/Stencil Attachment ---
         if (m_DepthAttachmentSpec.TextureFormat != FramebufferTextureFormat::None)
         {
-            DXGI_FORMAT depthFormat = Utils::FramebufferTextureFormatToDXGIFormat(m_DepthAttachmentSpec.TextureFormat);
+			const DXGI_FORMAT depthTextureFormat = TextureUtils::GetTextureFormat(m_DepthAttachmentSpec.TextureFormat);
+            const DXGI_FORMAT depthDsvFormat = TextureUtils::GetDSVFormat(m_DepthAttachmentSpec.TextureFormat);
+			const DXGI_FORMAT depthSrvFormat = TextureUtils::GetSRVFormat(m_DepthAttachmentSpec.TextureFormat);
 
             D3D11_TEXTURE2D_DESC depthStencilDesc = {};
             depthStencilDesc.Width = m_Specification.Width;
             depthStencilDesc.Height = m_Specification.Height;
             depthStencilDesc.MipLevels = 1;
             depthStencilDesc.ArraySize = 1;
-            depthStencilDesc.Format = depthFormat; // Use the direct format for the texture
+            depthStencilDesc.Format = depthTextureFormat;
             depthStencilDesc.SampleDesc.Count = m_Specification.Samples;
             depthStencilDesc.SampleDesc.Quality = 0;
             depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-            depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+            depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
             depthStencilDesc.CPUAccessFlags = 0;
             depthStencilDesc.MiscFlags = 0;
 
@@ -170,12 +141,20 @@ namespace Kerberos
             KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create depth texture!");
 
             D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-            dsvDesc.Format = depthFormat;
+            dsvDesc.Format = depthDsvFormat;
             dsvDesc.ViewDimension = (m_Specification.Samples > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
             dsvDesc.Texture2D.MipSlice = 0;
 
             hr = device->CreateDepthStencilView(m_DepthTexture.Get(), &dsvDesc, m_DepthStencilView.GetAddressOf());
             KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create DSV!");
+
+			D3D11_SHADER_RESOURCE_VIEW_DESC depthSrvDesc = {};
+			depthSrvDesc.Format = depthSrvFormat;
+			depthSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			depthSrvDesc.Texture2D.MipLevels = 1;
+
+			hr = device->CreateShaderResourceView(m_DepthTexture.Get(), &depthSrvDesc, m_DepthSRV.GetAddressOf());
+			KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create Depth SRV!");
         }
 
         KBR_CORE_INFO("D3D11 Framebuffer Invalidate complete: {0}x{1}, Samples: {2}", m_Specification.Width, m_Specification.Height, m_Specification.Samples);
@@ -207,7 +186,7 @@ namespace Kerberos
             m_DepthStencilView.Get());
 
         /// Set the viewport
-        D3D11_VIEWPORT viewport = {};
+        D3D11_VIEWPORT viewport;
         viewport.Width = static_cast<float>(m_Specification.Width);
         viewport.Height = static_cast<float>(m_Specification.Height);
         viewport.MinDepth = 0.0f;
@@ -240,7 +219,8 @@ namespace Kerberos
         {
             for (size_t i = 0; i < m_ColorTextures.size(); ++i)
             {
-                const DXGI_FORMAT format = Utils::FramebufferTextureFormatToDXGIFormat(m_ColorAttachmentSpecs[i].TextureFormat);
+                // TODO: check if this resolves to the correct format and subresource
+                const DXGI_FORMAT format = TextureUtils::GetTextureFormat(m_ColorAttachmentSpecs[i].TextureFormat);
                 deviceContext->ResolveSubresource(m_ResolvedColorTextures[i].Get(), 0, m_ColorTextures[i].Get(), 0, format);
             }
         }
@@ -283,8 +263,15 @@ namespace Kerberos
         return -1;
     }
 
-	void D3D11Framebuffer::BindColorTexture(uint32_t slot, uint32_t index) const {}
-	void D3D11Framebuffer::BindDepthTexture(uint32_t slot) const {}
+	void D3D11Framebuffer::BindColorTexture(uint32_t slot, uint32_t index) const
+	{
+
+	}
+
+	void D3D11Framebuffer::BindDepthTexture(uint32_t slot) const
+	{
+
+	}
 
 	void D3D11Framebuffer::ClearAttachment(uint32_t attachmentIndex, int value) 
     {
@@ -311,7 +298,7 @@ namespace Kerberos
 
 	uint64_t D3D11Framebuffer::GetDepthAttachmentRendererID() const 
     {
-		throw std::runtime_error("D3D11Framebuffer::GetDepthAttachmentRendererID is not implemented yet!");
+		return reinterpret_cast<uint64_t>(m_DepthSRV.Get());
     }
 
 	void D3D11Framebuffer::SetDebugName(const std::string& name) const 
@@ -319,16 +306,17 @@ namespace Kerberos
 		// TODO: Implement setting debug name for D3D11 resources
     }
 
-	void D3D11Framebuffer::ReleaseResources() const 
+	void D3D11Framebuffer::ReleaseResources() 
     {
-        for (auto & rtv : m_ColorRTVs) if (rtv) rtv->Release();
-        for (auto& srv : m_ColorSRVs) if (srv) srv->Release(); // This would be for non-multisampled textures directly
-        for (auto& tex : m_ColorTextures) if (tex) tex->Release();
+        for (auto & rtv : m_ColorRTVs) if (rtv) rtv.Reset();
+        for (auto& srv : m_ColorSRVs) if (srv) srv.Reset(); // This would be for non-multisampled textures directly
+        for (auto& tex : m_ColorTextures) if (tex) tex.Reset();
 
-        for (auto& srv : m_ResolvedColorSRVs) if (srv) srv->Release();
-        for (auto& tex : m_ResolvedColorTextures) if (tex) tex->Release();
+        for (auto& srv : m_ResolvedColorSRVs) if (srv) srv.Reset();
+        for (auto& tex : m_ResolvedColorTextures) if (tex) tex.Reset();
 
-        if (m_DepthStencilView) m_DepthStencilView->Release();
-        if (m_DepthTexture) m_DepthTexture->Release();
+        if (m_DepthStencilView) m_DepthStencilView.Reset();
+        if (m_DepthTexture) m_DepthTexture.Reset();
+		if (m_DepthSRV) m_DepthSRV.Reset();
 	}
 }

@@ -50,7 +50,7 @@ namespace Kerberos
 		FramebufferSpecification m_Specification;
 
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecs;
-		FramebufferTextureSpecification m_DepthAttachmentSpec = FramebufferTextureFormat::None;
+		FramebufferTextureSpecification m_DepthAttachmentSpec;
 
 		std::vector<RendererID> m_ColorAttachments;
 		RendererID m_DepthAttachment = 0;

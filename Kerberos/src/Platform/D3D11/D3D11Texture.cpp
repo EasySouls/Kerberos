@@ -128,7 +128,7 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		m_Format = TextureUtils::KBRImageFormatToDXGIFormat(m_Spec.Format);
+		m_Format = TextureUtils::KBRImageFormatToDXGITextureFormat(m_Spec.Format);
 
 		D3D11_TEXTURE2D_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));

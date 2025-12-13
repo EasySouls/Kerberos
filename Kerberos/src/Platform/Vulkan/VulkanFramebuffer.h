@@ -50,7 +50,7 @@ namespace Kerberos
 		glm::vec4 m_DepthClearValue;
 
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecs;
-		FramebufferTextureSpecification m_DepthAttachmentSpec = FramebufferTextureFormat::None;
+		FramebufferTextureSpecification m_DepthAttachmentSpec;
 
 		VkFramebuffer m_Framebuffer = VK_NULL_HANDLE;
 		VkRenderPass m_RenderPass = VK_NULL_HANDLE;

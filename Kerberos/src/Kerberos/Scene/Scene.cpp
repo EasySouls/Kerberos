@@ -31,7 +31,7 @@ namespace Kerberos
 			.Width = 1024,
 			.Height = 1024,
 			.Attachments = {
-				{FramebufferTextureFormat::DEPTH24}
+				{ FramebufferTextureFormat::DEPTH24 }
 			}
 		});
 		m_ShadowMapFramebuffer->SetDebugName("ShadowMapFramebuffer");

@@ -21,7 +21,7 @@ namespace Kerberos
 		void Unbind() override;
 
 		void Resize(uint32_t width, uint32_t height) override;
-		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
+		int	ReadPixel(uint32_t attachmentIndex, int x, int y) override;
 
 		void BindColorTexture(uint32_t slot, uint32_t index) const override;
 		void BindDepthTexture(uint32_t slot) const override;
@@ -38,13 +38,13 @@ namespace Kerberos
 		void SetDebugName(const std::string& name) const override;
 
 	private:
-		void ReleaseResources() const;
+		void ReleaseResources();
 
 	private:
 		FramebufferSpecification m_Specification;
 
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecs;
-		FramebufferTextureSpecification m_DepthAttachmentSpec = FramebufferTextureFormat::None;
+		FramebufferTextureSpecification m_DepthAttachmentSpec;
 
 		std::vector<ComPtr<ID3D11Texture2D>> m_ColorTextures;
 		std::vector<ComPtr<ID3D11RenderTargetView>> m_ColorRTVs;
@@ -57,11 +57,12 @@ namespace Kerberos
 
 		ComPtr<ID3D11Texture2D> m_DepthTexture;
 		ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
+		ComPtr<ID3D11ShaderResourceView> m_DepthSRV;
 
 		// Store original D3D state to restore on Unbind
 		ComPtr<ID3D11RenderTargetView> m_OriginalRTV = nullptr;
 		ComPtr<ID3D11DepthStencilView> m_OriginalDSV = nullptr;
 		D3D11_VIEWPORT m_OriginalViewport = {};
-		UINT m_OriginalNumViewports = 1;
+		uint32_t m_OriginalNumViewports = 1;
 	};
 }

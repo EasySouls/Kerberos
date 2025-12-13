@@ -27,4 +27,5 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=swapchain/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=TEXCOORD/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Timepoint/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=UNORM/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=unsized/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

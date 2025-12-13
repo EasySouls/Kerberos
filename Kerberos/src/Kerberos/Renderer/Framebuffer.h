@@ -9,17 +9,24 @@ namespace Kerberos
 		None = 0,
 
 		/// Color
-		RGBA8,
+		RGBA8 = 1,
 
-		RED_INTEGER, 
+		RED_INTEGER = 2, 
 
 		/// Depth and stencil
-		DEPTH24STENCIL8,
+		DEPTH24STENCIL8 = 3,
 
-		DEPTH24,
+		DEPTH24 = 4,
+
+		DEPTH32 = 5,
 		
 		Depth = DEPTH24STENCIL8,
 	};
+
+	static constexpr bool IsDepthFormat(const FramebufferTextureFormat format)
+	{
+		return format == FramebufferTextureFormat::DEPTH24STENCIL8 || format == FramebufferTextureFormat::DEPTH24;
+	}
 
 	struct FramebufferTextureSpecification
 	{
@@ -48,10 +55,10 @@ namespace Kerberos
 		uint32_t Width;
 		uint32_t Height;
 		FramebufferAttachmentSpecification Attachments;
-		uint32_t Samples = 1;
-		bool SwapChainTarget = false;
 		glm::vec4 ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 		glm::vec4 DepthClearValue = { 1.0f, 0.0f, 0.0f, 0.0f };
+		uint32_t Samples = 1;
+		bool SwapChainTarget = false;
 	};
 
 	class Framebuffer
