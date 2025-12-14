@@ -170,22 +170,9 @@ namespace Kerberos
 		{
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
-		else if (Renderer::GetAPI() == RendererAPI::API::D3D11)
-		{
-#ifdef KBR_PLATFORM_WINDOWS
-			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-#endif
-		}
-		else if (Renderer::GetAPI() == RendererAPI::API::Vulkan)
-		{
-			/// For Vulkan, the rendering is done inside VulkanContext::RecordCommandBuffer
-			/// Later the structure of the command might have to be rethought to better support D3D12 and Vulkan
-			const uint32_t currentFrame = VulkanContext::Get().GetCurrentFrameIndex();
-			/*ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), VulkanContext::Get().GetCommandBuffers()[currentFrame]);*/
-		}
 
 		// Update and Render additional Platform Windows
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable && Renderer::GetAPI() != RendererAPI::API::Vulkan)
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable && Renderer::GetAPI() == RendererAPI::API::OpenGL)
 		{
 			GLFWwindow* backupCurrentContext = glfwGetCurrentContext();
 			ImGui::UpdatePlatformWindows();

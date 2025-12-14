@@ -117,13 +117,12 @@ namespace Kerberos
 		CreateImGuiDescriptorPool();
 	}
 
-	void VulkanContext::SwapBuffers()
+	void VulkanContext::Render()
 	{
 		/// Wait for the fence to be signaled, then reset it
 		vkWaitForFences(m_Device, 1, &m_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
 
-		uint32_t imageIndex;
-		if (const VkResult result = vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphores[m_CurrentFrame], VK_NULL_HANDLE, &imageIndex); result != VK_SUCCESS)
+		if (const VkResult result = vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphores[m_CurrentFrame], VK_NULL_HANDLE, &m_CurrentImageIndex); result != VK_SUCCESS)
 		{
 			if (result == VK_ERROR_OUT_OF_DATE_KHR)
 			{
@@ -144,7 +143,7 @@ namespace Kerberos
 
 		vkResetCommandBuffer(m_CommandBuffers[m_CurrentFrame], 0);
 
-		RecordCommandBuffer(m_CommandBuffers[m_CurrentFrame], imageIndex);
+		RecordCommandBuffer(m_CommandBuffers[m_CurrentFrame], m_CurrentImageIndex);
 
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -168,15 +167,27 @@ namespace Kerberos
 			throw std::runtime_error("failed to submit draw command buffer!");
 		}
 
+		const ImGuiIO& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
+	}
+
+	void VulkanContext::Present()
+	{
+		const VkSemaphore waitSemaphores[] = { m_RenderFinishedSemaphores[m_CurrentFrame] };
+
 		VkPresentInfoKHR presentInfo{};
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 		presentInfo.waitSemaphoreCount = 1;
-		presentInfo.pWaitSemaphores = signalSemaphores;
+		presentInfo.pWaitSemaphores = waitSemaphores;
 
 		const VkSwapchainKHR swapChains[] = { m_SwapChain };
 		presentInfo.swapchainCount = 1;
 		presentInfo.pSwapchains = swapChains;
-		presentInfo.pImageIndices = &imageIndex;
+		presentInfo.pImageIndices = &m_CurrentImageIndex;
 
 		if (const VkResult result = vkQueuePresentKHR(m_PresentQueue, &presentInfo); result != VK_SUCCESS)
 		{
@@ -192,16 +203,12 @@ namespace Kerberos
 			}
 		}
 
-		const ImGuiIO& io = ImGui::GetIO();
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			//GLFWwindow* backupCurrentContext = glfwGetCurrentContext();
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-			//glfwMakeContextCurrent(backupCurrentContext);
-		}
-
 		m_CurrentFrame = (m_CurrentFrame + 1) % maxFramesInFlight;
+	}
+
+	void VulkanContext::SetVSync(const bool enabled)
+	{
+		m_VSyncEnabled = enabled;
 	}
 
 	void VulkanContext::CreateImGuiDescriptorPool()

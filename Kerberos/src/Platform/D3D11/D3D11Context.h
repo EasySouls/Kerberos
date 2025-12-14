@@ -20,7 +20,10 @@ namespace Kerberos
 		~D3D11Context() override;
 
 		void Init() override;
-		void SwapBuffers() override;
+		void Render() override;
+		void Present() override;
+
+		void SetVSync(bool enabled) override;
 
 		void OnWindowResize(uint32_t width, uint32_t height);
 
@@ -39,6 +42,8 @@ namespace Kerberos
 		bool CreateSwapChainResources();
 		void DestroySwapChainResources();
 		void ProcessInfoQueueMessages() const;
+
+	public:
 
 	private:
 		GLFWwindow* m_GlfwWindowHandle = nullptr;
@@ -62,6 +67,8 @@ namespace Kerberos
 
 		uint32_t m_WindowWidth = 0;
 		uint32_t m_WindowHeight = 0;
+
+		bool m_VSyncEnabled = true;
 
 		static D3D11Context* s_Instance;
 	};

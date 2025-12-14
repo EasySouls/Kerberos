@@ -27,7 +27,10 @@ namespace Kerberos
 		~VulkanContext() override;
 
 		void Init() override;
-		void SwapBuffers() override;
+		void Render() override;
+		void Present() override;
+
+		void SetVSync(bool enabled) override;
 
 		QueueFamilyIndices FindQueueFamilies() const;
 
@@ -151,9 +154,12 @@ namespace Kerberos
 		std::vector<VkFence> m_InFlightFences;
 
 		uint32_t m_CurrentFrame = 0;
+		uint32_t m_CurrentImageIndex = 0;
 
 		Scope<VertexBuffer> m_VertexBuffer;
 		Scope<IndexBuffer> m_IndexBuffer;
+
+		bool m_VSyncEnabled = false;
 
 		static VulkanContext* s_Instance;
 	};

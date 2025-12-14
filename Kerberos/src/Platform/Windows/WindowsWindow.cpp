@@ -223,25 +223,16 @@ namespace Kerberos
 		KBR_PROFILE_FUNCTION();
 
 		glfwPollEvents();
-		m_Context->SwapBuffers();
+
+		m_Context->Render();
+		m_Context->Present();
 	}
 
 	void WindowsWindow::SetVSync(const bool enabled) 
 	{
 		KBR_PROFILE_FUNCTION();
 
-		/// Ensure that VSync is only set for OpenGL, as other APIs have a different way of handling it
-		if (RendererAPI::GetAPI() != RendererAPI::API::OpenGL)
-			return;
-
-		if (enabled)
-		{
-			glfwSwapInterval(1);
-		}
-		else
-		{
-			glfwSwapInterval(0);
-		}
+		m_Context->SetVSync(enabled);
 		m_Data.VSync = enabled;
 	}
 

@@ -5,8 +5,11 @@
 #include "D3D11Utils.h"
 
 #define GLFW_EXPOSE_NATIVE_WIN32
+#include <backends/imgui_impl_dx11.h>
 #include <GLFW/glfw3native.h>
 #include <Platform/D3D11/D3D11Shader.h>
+
+#include "imgui.h"
 
 namespace Kerberos
 {
@@ -250,7 +253,7 @@ namespace Kerberos
 		m_ImmediateContext->OMSetRenderTargets(1, m_BackBufferRTV.GetAddressOf(), nullptr);
 	}
 
-	void D3D11Context::SwapBuffers()
+	void D3D11Context::Render()
 	{
 		constexpr UINT vertexStride = sizeof(Vertex);
 		constexpr UINT vertexOffset = 0;
@@ -278,14 +281,33 @@ namespace Kerberos
 
 		m_ImmediateContext->Draw(3, 0); // Draw 3 vertices
 
-		ProcessInfoQueueMessages();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-		if (FAILED(m_SwapChain->Present(1, 0)))
+		const ImGuiIO& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
+
+		ProcessInfoQueueMessages();
+	}
+
+	void D3D11Context::Present()
+	{
+		const uint32_t syncInterval = m_VSyncEnabled ? 1 : 0;
+
+		if (FAILED(m_SwapChain->Present(syncInterval, 0)))
 		{
 			KBR_CORE_ERROR("Failed to present swap chain!");
 		}
 
 		ProcessInfoQueueMessages();
+	}
+
+	void D3D11Context::SetVSync(const bool enabled)
+	{
+		m_VSyncEnabled = enabled;
 	}
 
 	void D3D11Context::OnWindowResize(const uint32_t width, const uint32_t height)

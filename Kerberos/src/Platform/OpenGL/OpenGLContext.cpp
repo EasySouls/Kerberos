@@ -44,11 +44,20 @@ namespace Kerberos
 		KBR_CORE_INFO("  Max Compute Work Group Invocations: {0}", m_ComputeInfo.MaxWorkGroupInvocations);
 	}
 
-	void OpenGLContext::SwapBuffers()
+	void OpenGLContext::Render()
+	{
+	}
+
+	void OpenGLContext::Present()
 	{
 		KBR_PROFILE_FUNCTION();
 
 		glfwSwapBuffers(m_WindowHandle);
+	}
+
+	void OpenGLContext::SetVSync(const bool enabled)
+	{
+		glfwSwapInterval(enabled ? 1 : 0);
 	}
 
 	void OpenGLContext::QueryComputeInfo()

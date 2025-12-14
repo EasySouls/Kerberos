@@ -225,7 +225,7 @@ namespace Kerberos
             }
         }
 
-        /// Since in the current setup Unbind is called before GraphicsContext::SwapBuffers,
+        /// Since in the current setup Unbind is called before GraphicsContext::Present,
 		/// we do not restore the original RTV/DSV here.
 
         // Restore original render targets and viewport

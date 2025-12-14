@@ -12,7 +12,10 @@ namespace Kerberos
 		explicit OpenGLContext(GLFWwindow* windowHandle);
 
 		void Init() override;
-		void SwapBuffers() override;
+		void Render() override;
+		void Present() override;
+
+		void SetVSync(bool enabled) override;
 
 	private:
 		void QueryComputeInfo();
