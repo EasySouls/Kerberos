@@ -25,7 +25,9 @@ namespace Kerberos
 
 	static constexpr bool IsDepthFormat(const FramebufferTextureFormat format)
 	{
-		return format == FramebufferTextureFormat::DEPTH24STENCIL8 || format == FramebufferTextureFormat::DEPTH24;
+		return format == FramebufferTextureFormat::DEPTH24STENCIL8 
+			|| format == FramebufferTextureFormat::DEPTH24
+			|| format == FramebufferTextureFormat::DEPTH32;
 	}
 
 	struct FramebufferTextureSpecification

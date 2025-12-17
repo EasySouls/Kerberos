@@ -166,11 +166,6 @@ namespace Kerberos
 
         KBR_CORE_ASSERT(deviceContext, "D3DContext not initialized!");
 
-        /// Save original RTV/DSV and viewport
-        m_OriginalNumViewports = 1; // Always query for at least one viewport
-        deviceContext->OMGetRenderTargets(1, m_OriginalRTV.ReleaseAndGetAddressOf(), m_OriginalDSV.ReleaseAndGetAddressOf());
-        deviceContext->RSGetViewports(&m_OriginalNumViewports, &m_OriginalViewport);
-
         std::vector<ID3D11RenderTargetView*> rtvPointers;
         rtvPointers.reserve(m_ColorRTVs.size());
         for (const auto& comPtrRtv : m_ColorRTVs)
@@ -180,7 +175,7 @@ namespace Kerberos
 
         /// Bind our RTVs and DSV
         deviceContext->OMSetRenderTargets(
-            static_cast<UINT>(
+            static_cast<uint32_t>(
                 rtvPointers.size()),
             rtvPointers.data(), 
             m_DepthStencilView.Get());
@@ -225,16 +220,14 @@ namespace Kerberos
             }
         }
 
-        /// Since in the current setup Unbind is called before GraphicsContext::Present,
-		/// we do not restore the original RTV/DSV here.
+        // Clear all shader resource views to prevent conflicts with subsequent rendering (like ImGui)
+        // This is necessary because ImGui's D3D11 backend only backs up/restores slot 0
+        ID3D11ShaderResourceView* nullSRVs[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { nullptr };
+        deviceContext->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullSRVs);
+        deviceContext->VSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullSRVs);
 
-        // Restore original render targets and viewport
-        deviceContext->OMSetRenderTargets(1, m_OriginalRTV.GetAddressOf(), m_OriginalDSV.Get());
-        deviceContext->RSSetViewports(m_OriginalNumViewports, &m_OriginalViewport);
-
-		/// Release the original RTV/DSV to avoid memory leaks
-        m_OriginalRTV.Reset();
-        m_OriginalDSV.Reset();
+        auto backBufferRTV = D3D11Context::Get().GetRenderTargetView();
+        deviceContext->OMSetRenderTargets(1, backBufferRTV.GetAddressOf(), nullptr);
 	}
 
 	void D3D11Framebuffer::Resize(uint32_t width, uint32_t height)
@@ -288,17 +281,34 @@ namespace Kerberos
         {
             /// For multisampled, return the SRV of the resolved texture
             KBR_CORE_ASSERT(index < m_ResolvedColorSRVs.size(), "Resolved SRV index out of bounds!");
-            return reinterpret_cast<uint64_t>(m_ResolvedColorSRVs[index].Get());
+
+			const auto& srv = m_ResolvedColorSRVs[index];
+            D3D11_SHADER_RESOURCE_VIEW_DESC d;
+            srv->GetDesc(&d);
+            KBR_CORE_ASSERT(d.Format == DXGI_FORMAT_R32_FLOAT || d.Format == DXGI_FORMAT_R8G8B8A8_UNORM, "The SRV format cannot be sampled by ImGui");
+
+            return reinterpret_cast<uint64_t>(srv.Get());
         }
 
         /// For non-multisampled, return the SRV of the main texture
         KBR_CORE_ASSERT(index < m_ColorSRVs.size(), "SRV index out of bounds!");
-        return reinterpret_cast<uint64_t>(m_ColorSRVs[index].Get());
+
+        const auto& srv = m_ColorSRVs[index];
+        D3D11_SHADER_RESOURCE_VIEW_DESC d;
+        srv->GetDesc(&d);
+        KBR_CORE_ASSERT(d.Format == DXGI_FORMAT_R32_FLOAT || d.Format == DXGI_FORMAT_R8G8B8A8_UNORM, "The SRV format cannot be sampled by ImGui");
+
+        return reinterpret_cast<uint64_t>(srv.Get());
 	}
 
 	uint64_t D3D11Framebuffer::GetDepthAttachmentRendererID() const 
     {
-		return reinterpret_cast<uint64_t>(m_DepthSRV.Get());
+        const auto& srv = m_DepthSRV;
+        D3D11_SHADER_RESOURCE_VIEW_DESC d;
+        srv->GetDesc(&d);
+        KBR_CORE_ASSERT(d.Format == DXGI_FORMAT_R32_FLOAT || d.Format == DXGI_FORMAT_R8G8B8A8_UNORM, "The SRV format cannot be sampled by ImGui");
+
+		return reinterpret_cast<uint64_t>(srv.Get());
     }
 
 	void D3D11Framebuffer::SetDebugName(const std::string& name) const 

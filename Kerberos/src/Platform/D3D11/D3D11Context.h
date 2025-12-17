@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Kerberos/Renderer/GraphicsContext.h"
-#include <d3d11.h>
-#include <dxgi1_3.h>
+#include <d3d11_4.h>
+#include <dxgi1_6.h>
 #include <wrl.h>
 #ifdef KBR_DEBUG
 #include <d3d11sdklayers.h>
@@ -35,6 +35,10 @@ namespace Kerberos
 		ComPtr<IDXGISwapChain> GetSwapChain() const { return m_SwapChain; }
 		[[nodiscard]] 
 		ComPtr<ID3D11RenderTargetView> GetRenderTargetView() const { return m_BackBufferRTV; }
+		[[nodiscard]]
+		D3D11_VIEWPORT GetViewport() const { return m_Viewport; }
+
+		uint32_t GetMSAASampleCount() const { return m_MSAASampleCount; }
 
 		static D3D11Context& Get() { return *s_Instance; }
 
@@ -43,14 +47,12 @@ namespace Kerberos
 		void DestroySwapChainResources();
 		void ProcessInfoQueueMessages() const;
 
-	public:
-
 	private:
 		GLFWwindow* m_GlfwWindowHandle = nullptr;
 		HWND m_WindowHandle = nullptr;
 
 		ComPtr<ID3D11Device> m_Device = nullptr;
-		ComPtr<IDXGIFactory2> m_DxgiFactory = nullptr;
+		ComPtr<IDXGIFactory1> m_DxgiFactory = nullptr;
 		ComPtr<ID3D11DeviceContext> m_ImmediateContext = nullptr;
 		ComPtr<IDXGISwapChain> m_SwapChain = nullptr;
 		ComPtr<ID3D11RenderTargetView> m_BackBufferRTV = nullptr;
@@ -67,6 +69,9 @@ namespace Kerberos
 
 		uint32_t m_WindowWidth = 0;
 		uint32_t m_WindowHeight = 0;
+
+		uint32_t m_MSAAQualityLevels = 0;
+		uint32_t m_MSAASampleCount = 1;
 
 		bool m_VSyncEnabled = true;
 

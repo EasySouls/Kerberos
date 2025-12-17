@@ -97,6 +97,7 @@ namespace Kerberos
 		sd.BufferDesc.RefreshRate.Numerator = 60;
 		sd.BufferDesc.RefreshRate.Denominator = 1;
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;   // How the back buffer will be used
+		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// Allow full-screen switching
 		sd.OutputWindow = m_WindowHandle;
 		sd.SampleDesc.Count = 4;							// MSAA
 		sd.SampleDesc.Quality = 0;
@@ -132,7 +133,7 @@ namespace Kerberos
 		for (const auto driverType : driverTypes)
 		{
 			const HRESULT hr = D3D11CreateDeviceAndSwapChain(
-				nullptr,
+				nullptr, // Use default adapter
 				driverType,
 				nullptr,
 				createDeviceFlags,
@@ -191,6 +192,16 @@ namespace Kerberos
 		m_SwapChain->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(swapChainName), swapChainName);
 
 		CreateSwapChainResources();
+
+		// TODO: Make MSAA settings configurable
+		// Gather infos about the supported MSAA quality levels
+		//m_MSAASampleCount = 4; // We requested 4 samples
+		//m_MSAAQualityLevels = 0;
+		//m_Device->CheckMultisampleQualityLevels(
+		//	DXGI_FORMAT_R8G8B8A8_UNORM,
+		//	m_MSAASampleCount,
+		//	&m_MSAAQualityLevels
+		//);
 
 		ComPtr<ID3DBlob> vertexShaderBlob = nullptr;
 		m_VertexShader = D3D11Shader::CreateVertexShader(L"assets/shaders/Main.vs.hlsl", vertexShaderBlob);
@@ -255,7 +266,7 @@ namespace Kerberos
 
 	void D3D11Context::Render()
 	{
-		constexpr UINT vertexStride = sizeof(Vertex);
+		constexpr UINT vertexStride = sizeof(Vertex);/*
 		constexpr UINT vertexOffset = 0;
 
 		m_ImmediateContext->IASetInputLayout(m_VertexLayout.Get());
@@ -266,7 +277,7 @@ namespace Kerberos
 		m_ImmediateContext->RSSetViewports(1, &m_Viewport);
 		m_ImmediateContext->PSSetShader(m_PixelShader.Get(), nullptr, 0);
 
-		m_ImmediateContext->OMSetRenderTargets(1, m_BackBufferRTV.GetAddressOf(), nullptr);
+		m_ImmediateContext->OMSetRenderTargets(1, m_BackBufferRTV.GetAddressOf(), nullptr);*/
 
 		/// This is only for debugging purposes, we should set the render target view before drawing
 
@@ -279,16 +290,16 @@ namespace Kerberos
 
 		/// End of debugging code
 
-		m_ImmediateContext->Draw(3, 0); // Draw 3 vertices
+		//m_ImmediateContext->Draw(3, 0); // Draw 3 vertices
 
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		//ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-		const ImGuiIO& io = ImGui::GetIO();
+		/*const ImGuiIO& io = ImGui::GetIO();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-		}
+		}*/
 
 		ProcessInfoQueueMessages();
 	}
@@ -324,9 +335,7 @@ namespace Kerberos
 
 		ProcessInfoQueueMessages();
 
-		const HRESULT hr = m_SwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
-
-		if (FAILED(hr))
+		if (FAILED(m_SwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0)))
 		{
 			KBR_CORE_ERROR("Failed to resize swapchain buffers!");
 		}

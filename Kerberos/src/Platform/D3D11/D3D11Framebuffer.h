@@ -51,18 +51,12 @@ namespace Kerberos
 		std::vector<ComPtr<ID3D11ShaderResourceView>> m_ColorSRVs;
 
 		// For multisampled textures, we need a separate set of textures
-	   // to resolve to, as ImGui typically expects non-multisampled textures.
+		// to resolve to, as ImGui typically expects non-multisampled textures.
 		std::vector<ComPtr<ID3D11Texture2D>> m_ResolvedColorTextures;
 		std::vector<ComPtr<ID3D11ShaderResourceView>> m_ResolvedColorSRVs; // SRVs for ImGui (for multisampled, these are returned)
 
 		ComPtr<ID3D11Texture2D> m_DepthTexture;
 		ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
 		ComPtr<ID3D11ShaderResourceView> m_DepthSRV;
-
-		// Store original D3D state to restore on Unbind
-		ComPtr<ID3D11RenderTargetView> m_OriginalRTV = nullptr;
-		ComPtr<ID3D11DepthStencilView> m_OriginalDSV = nullptr;
-		D3D11_VIEWPORT m_OriginalViewport = {};
-		uint32_t m_OriginalNumViewports = 1;
 	};
 }

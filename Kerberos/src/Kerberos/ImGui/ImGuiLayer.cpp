@@ -170,6 +170,18 @@ namespace Kerberos
 		{
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
+		else if (Renderer::GetAPI() == RendererAPI::API::D3D11)
+		{
+			const auto& d3d11Context = D3D11Context::Get();
+			const auto& context = d3d11Context.GetImmediateContext();
+			const auto viewport = d3d11Context.GetViewport();
+
+			context->ClearState();
+			context->OMSetRenderTargets(1, d3d11Context.GetRenderTargetView().GetAddressOf(), nullptr);
+			context->RSSetViewports(1, &viewport);
+
+			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		}
 
 		// Update and Render additional Platform Windows
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable && Renderer::GetAPI() == RendererAPI::API::OpenGL)
@@ -178,6 +190,11 @@ namespace Kerberos
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backupCurrentContext);
+		} 
+		else if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
 		}
 	}
 }
