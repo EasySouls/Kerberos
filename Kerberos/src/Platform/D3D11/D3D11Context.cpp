@@ -88,21 +88,24 @@ namespace Kerberos
 		constexpr int width = 1280;
 		constexpr int height = 720;
 
+		m_WindowWidth = width;
+		m_WindowHeight = height;
+
 		DXGI_SWAP_CHAIN_DESC sd = {};
 		ZeroMemory(&sd, sizeof(sd));
 		sd.BufferCount = 2;									// One back buffer
-		sd.BufferDesc.Width = width;
-		sd.BufferDesc.Height = height;
+		sd.BufferDesc.Width = m_WindowWidth;
+		sd.BufferDesc.Height = m_WindowHeight;
 		sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;  // Use 32-bit color
 		sd.BufferDesc.RefreshRate.Numerator = 60;
 		sd.BufferDesc.RefreshRate.Denominator = 1;
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;   // How the back buffer will be used
 		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// Allow full-screen switching
 		sd.OutputWindow = m_WindowHandle;
-		sd.SampleDesc.Count = 4;							// MSAA
+		sd.SampleDesc.Count = 1;							// TODO: Make MSAA settings configurable and do MSAA resolve in renderer
 		sd.SampleDesc.Quality = 0;
 		sd.Windowed = TRUE;
-		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;			// Discard old frames
+		sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;			// Discard old frames
 		//sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;		// Flip model doesn't support multisampling
 
 		UINT createDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
@@ -277,18 +280,8 @@ namespace Kerberos
 		m_ImmediateContext->RSSetViewports(1, &m_Viewport);
 		m_ImmediateContext->PSSetShader(m_PixelShader.Get(), nullptr, 0);
 
-		m_ImmediateContext->OMSetRenderTargets(1, m_BackBufferRTV.GetAddressOf(), nullptr);*/
+		m_ImmediateContext->OMSetRenderTargets(1, m_BackBufferRTV.GetAddressOf(), nullptr);
 
-		/// This is only for debugging purposes, we should set the render target view before drawing
-
-		ID3D11RenderTargetView* currentRenderTargetView = nullptr;
-		m_ImmediateContext->OMGetRenderTargets(1, &currentRenderTargetView, nullptr);
-		if (currentRenderTargetView == nullptr)
-		{
-			KBR_CORE_ERROR("The Render Target View was not set before presenting!");
-		}
-
-		/// End of debugging code
 
 		//m_ImmediateContext->Draw(3, 0); // Draw 3 vertices
 
@@ -306,6 +299,19 @@ namespace Kerberos
 
 	void D3D11Context::Present()
 	{
+		/// This is only for debugging purposes, we should set the render target view before drawing
+
+		ID3D11RenderTargetView* currentRenderTargetView = nullptr;
+		m_ImmediateContext->OMGetRenderTargets(1, &currentRenderTargetView, nullptr);
+		if (currentRenderTargetView == nullptr)
+		{
+			KBR_CORE_ERROR("The Render Target View was not set before presenting!");
+		}
+		else
+		{
+			currentRenderTargetView->Release();
+		}
+
 		const uint32_t syncInterval = m_VSyncEnabled ? 1 : 0;
 
 		if (FAILED(m_SwapChain->Present(syncInterval, 0)))
@@ -330,7 +336,7 @@ namespace Kerberos
 		m_ImmediateContext->Flush();
 
 #ifdef KBR_DEBUG
-		m_DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+		m_DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY);
 #endif
 
 		ProcessInfoQueueMessages();
@@ -346,6 +352,9 @@ namespace Kerberos
 		m_WindowHeight = height;
 
 		CreateSwapChainResources();
+
+		// Rebind the render target after resizing
+		m_ImmediateContext->OMSetRenderTargets(1, m_BackBufferRTV.GetAddressOf(), nullptr);
 	}
 
 	bool D3D11Context::CreateSwapChainResources()
