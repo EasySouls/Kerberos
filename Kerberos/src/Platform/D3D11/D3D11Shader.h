@@ -3,7 +3,10 @@
 #include "Kerberos/Renderer/Shader.h"
 
 #include <d3d11.h>
+#include <d3d11shader.h>
 #include <wrl.h>
+#include <unordered_map>
+#include <optional>
 
 namespace Kerberos
 {
@@ -31,6 +34,7 @@ namespace Kerberos
 		void SetMaterial(const std::string& name, const Ref<Material>& material) override {}
 
 		const std::string& GetName() const override { return m_Name; }
+		const ComPtr<ID3DBlob>& GetVertexShaderBlob() const { return m_VertexShaderBlob; }
 
 		void SetDebugName(const std::string& name) const override;
 
@@ -63,8 +67,19 @@ namespace Kerberos
 
 		static std::string ReadFile(const std::string& filepath);
 
+		static ComPtr<ID3D11ShaderReflection> ReflectShader(const ComPtr<ID3DBlob>& shaderBlob);
+		static void ReflectShaderInputs(const ComPtr<ID3D11ShaderReflection>& reflection);
+		static void ReflectShaderResources(const ComPtr<ID3D11ShaderReflection>& reflection);
+		static void ReflectConstantBuffers(const ComPtr<ID3D11ShaderReflection>& reflection);
+
 	private:
 		std::string m_Name;
+
+		ComPtr<ID3DBlob> m_VertexShaderBlob;
+
+		ComPtr<ID3D11VertexShader> m_VertexShader;
+		ComPtr<ID3D11PixelShader> m_FragmentShader;
+		std::optional<ComPtr<ID3D11GeometryShader>> m_GeometryShader;
 
 		friend class D3D11Context;
 	};

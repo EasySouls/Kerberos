@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace Kerberos
 {
 	class FileDialog
@@ -48,5 +50,16 @@ namespace Kerberos
 		 * @return Whether the operation was successful or not.
 		 */
 		static bool RevealInFileExplorer(const char* path);
+	};
+
+	class StringUtils
+	{
+	public:
+		/**
+		 * Converts a UTF-8 encoded std::string to a wide string (std::wstring).
+		 * @param str 
+		 * @return 
+		 */
+		static std::wstring Utf8ToWideString(const std::string& str);
 	};
 }

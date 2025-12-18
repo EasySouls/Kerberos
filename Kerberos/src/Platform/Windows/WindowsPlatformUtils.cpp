@@ -128,4 +128,29 @@ namespace Kerberos
 		KBR_CORE_ERROR("Failed to reveal file in explorer: {0}, Error code: {1}", path, error);
 		return false;
 	}
+
+	std::wstring StringUtils::Utf8ToWideString(const std::string& str)
+	{
+		if (str.empty())
+			return std::wstring();
+
+		const int size_needed = MultiByteToWideChar(
+			CP_UTF8, 
+			0, 
+			str.c_str(), 
+			static_cast<int>(str.size()), 
+			nullptr, 
+			0);
+
+		std::wstring wstrTo(size_needed, 0);
+
+		MultiByteToWideChar(
+			CP_UTF8, 0, 
+			str.c_str(), 
+			static_cast<int>(str.size()), 
+			&wstrTo[0], 
+			size_needed);
+
+		return wstrTo;
+	}
 }

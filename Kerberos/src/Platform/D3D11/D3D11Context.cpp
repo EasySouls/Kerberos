@@ -106,7 +106,6 @@ namespace Kerberos
 		sd.SampleDesc.Quality = 0;
 		sd.Windowed = TRUE;
 		sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;			// Discard old frames
-		//sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;		// Flip model doesn't support multisampling
 
 		UINT createDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 

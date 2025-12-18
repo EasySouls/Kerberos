@@ -14,7 +14,7 @@ struct Material
 
 struct DirectionalLight
 {
-    int enabled; // bool -> int (important!)
+    int enabled;
     float3 direction;
     float3 color;
     float intensity;
@@ -72,6 +72,25 @@ cbuffer ShadowData : register(b3)
     float2 _pad3;
 };
 
+float3x3 Inverse3x3(float3x3 m)
+{
+    float3 a = m[0];
+    float3 b = m[1];
+    float3 c = m[2];
+
+    float3 r0 = cross(b, c);
+    float3 r1 = cross(c, a);
+    float3 r2 = cross(a, b);
+
+    float invDet = 1.0 / dot(r2, c);
+
+    return float3x3(
+        r0 * invDet,
+        r1 * invDet,
+        r2 * invDet
+    );
+}
+
 // ==========================
 // Vertex shader
 // ==========================
@@ -99,7 +118,7 @@ VSOutput VS_Main(VSInput input)
     float4 worldPos = mul(float4(input.Position, 1.0f), u_Model);
     o.FragPos_WorldSpace = worldPos.xyz;
 
-    float3x3 normalMatrix = transpose(invert((float3x3) u_Model));
+    float3x3 normalMatrix = transpose(Inverse3x3((float3x3) u_Model));
     o.Normal_WorldSpace = normalize(mul(input.Normal, normalMatrix));
 
     o.FragPos_LightSpace = mul(float4(o.FragPos_WorldSpace, 1.0f), u_LightSpaceMatrix);

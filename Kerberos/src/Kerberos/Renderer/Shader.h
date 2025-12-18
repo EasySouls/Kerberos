@@ -9,6 +9,13 @@
 
 namespace Kerberos
 {
+	enum class ShaderStage
+	{
+		Vertex,
+		Geometry,
+		Fragment
+	};
+
 	class Shader
 	{
 	public:

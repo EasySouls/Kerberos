@@ -5,12 +5,14 @@
 
 namespace Kerberos::D3D11Utils
 {
-    template<UINT TDebugNameLength>
     inline void SetDebugName(
         _In_ ID3D11DeviceChild* deviceResource,
-        _In_z_ const char(&debugName)[TDebugNameLength])
+        _In_z_ const std::string& debugName)
     {
-        deviceResource->SetPrivateData(WKPDID_D3DDebugObjectName, TDebugNameLength - 1, debugName);
+        if (FAILED(deviceResource->SetPrivateData(WKPDID_D3DDebugObjectName, debugName.length(), debugName.c_str())))
+        {
+			KBR_CORE_ERROR("Failed to set debug name for {0}", debugName);
+        }
     }
 
 	inline const std::map<D3D11_MESSAGE_SEVERITY, std::string_view>& GetD3D11SeverityMap()
