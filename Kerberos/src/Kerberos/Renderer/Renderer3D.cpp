@@ -5,6 +5,7 @@
 #include "RenderCommand.h"
 #include "TextureCube.h"
 #include "UniformBuffer.h"
+#include "GraphicsPipeline.h"
 #include "Kerberos/Assets/AssetManager.h"
 
 static constexpr int MAX_POINT_LIGHTS = 10;
@@ -86,6 +87,13 @@ namespace Kerberos
 		/// The currently active texture, used for binding textures
 		/// This is used to avoid binding the same texture multiple times
 		Ref<Texture2D> ActiveTexture = nullptr;
+
+		Ref<GraphicsPipeline> ShadowMapPipeline = nullptr;
+		Ref<GraphicsPipeline> OpaquePipeline = nullptr;
+		Ref<GraphicsPipeline> WireframePipeline = nullptr;
+		Ref<GraphicsPipeline> TransparentPipeline = nullptr;
+		Ref<GraphicsPipeline> EnvironmentMapPipeline = nullptr;
+		Ref<GraphicsPipeline> PostprocessPipeline = nullptr;
 
 		constexpr static uint32_t MaterialTextureSlot = 0;
 		constexpr static uint32_t ShadowMapTextureSlot = 1;
@@ -199,6 +207,48 @@ namespace Kerberos
 
 		s_RendererData.ShadowUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::ShadowDataUbo), 3);
 		s_RendererData.ShadowUniformBuffer->SetDebugName("Shadow Uniform Buffer");
+
+		GraphicsPipeline::PipelineSpecification shadowPipelineSpec;
+		shadowPipelineSpec.Name = "Shadow Map Pipeline";
+		shadowPipelineSpec.Shader = s_RendererData.ShadowMapShader;
+		shadowPipelineSpec.DepthTest = GraphicsPipeline::DepthTest::LessEqual;
+		shadowPipelineSpec.CullMode = GraphicsPipeline::CullMode::Back;
+		shadowPipelineSpec.PrimitiveTopology = GraphicsPipeline::Topology::Triangles;
+		s_RendererData.ShadowMapPipeline = GraphicsPipeline::Create(shadowPipelineSpec);
+
+		GraphicsPipeline::PipelineSpecification wireframePipelineSpec;
+		wireframePipelineSpec.Name = "Wireframe Pipeline";
+		wireframePipelineSpec.Shader = s_RendererData.WireframeShader;
+		wireframePipelineSpec.Wireframe = true;
+		wireframePipelineSpec.DepthTest = GraphicsPipeline::DepthTest::LessEqual;
+		wireframePipelineSpec.CullMode = GraphicsPipeline::CullMode::Back;
+		wireframePipelineSpec.PrimitiveTopology = GraphicsPipeline::Topology::Triangles;
+		s_RendererData.WireframePipeline = GraphicsPipeline::Create(wireframePipelineSpec);
+
+		GraphicsPipeline::PipelineSpecification opaquePipelineSpec;
+		opaquePipelineSpec.Name = "Opaque Pipeline";
+		opaquePipelineSpec.Shader = s_RendererData.GeometryShader;
+		opaquePipelineSpec.DepthTest = GraphicsPipeline::DepthTest::LessEqual;
+		opaquePipelineSpec.CullMode = GraphicsPipeline::CullMode::Back;
+		opaquePipelineSpec.PrimitiveTopology = GraphicsPipeline::Topology::Triangles;
+		s_RendererData.OpaquePipeline = GraphicsPipeline::Create(opaquePipelineSpec);
+
+		GraphicsPipeline::PipelineSpecification transparentPipelineSpec;
+		transparentPipelineSpec.Name = "Transparent Pipeline";
+		transparentPipelineSpec.Shader = s_RendererData.GeometryShader;
+		transparentPipelineSpec.DepthTest = GraphicsPipeline::DepthTest::LessEqual;
+		transparentPipelineSpec.CullMode = GraphicsPipeline::CullMode::Back;
+		transparentPipelineSpec.PrimitiveTopology = GraphicsPipeline::Topology::Triangles;
+		s_RendererData.TransparentPipeline = GraphicsPipeline::Create(transparentPipelineSpec);
+
+		GraphicsPipeline::PipelineSpecification environmentMapPipelineSpec;
+		environmentMapPipelineSpec.Name = "Environment Map Pipeline";
+		environmentMapPipelineSpec.Shader = s_RendererData.SkyboxShader;
+		environmentMapPipelineSpec.DepthTest = GraphicsPipeline::DepthTest::LessEqual;
+		environmentMapPipelineSpec.CullMode = GraphicsPipeline::CullMode::Back;
+		environmentMapPipelineSpec.PrimitiveTopology = GraphicsPipeline::Topology::Triangles;
+		s_RendererData.EnvironmentMapPipeline = GraphicsPipeline::Create(environmentMapPipelineSpec);
+
 
 		ResetStatistics();
 	}

@@ -2,6 +2,8 @@
 #include "D3D11Shader.h"
 #include "D3D11Context.h"
 
+#include "D3D11Utils.h"
+#include "Utils/VertexUtils.h"
 #include "Kerberos/Utils/PlatformUtils.h"
 
 #include <d3dcompiler.h>
@@ -9,7 +11,6 @@
 #include <filesystem>
 #include <ranges>
 
-#include "D3D11Utils.h"
 
 namespace Kerberos
 {
@@ -91,10 +92,13 @@ namespace Kerberos
 			shaderBlobs[stage] = tempShaderBlob;
 		}
 
-		for (const auto& blob : shaderBlobs | std::views::values)
+		for (const auto& [stage, blob] : shaderBlobs)
 		{
 			const auto reflection = ReflectShader(blob);
-			ReflectShaderInputs(reflection);
+			if (stage == ShaderStage::Vertex)
+			{
+				ReflectShaderInputs(reflection);
+			}
 			ReflectShaderResources(reflection);
 			ReflectConstantBuffers(reflection);
 		}
@@ -145,6 +149,7 @@ namespace Kerberos
 		KBR_CORE_INFO("Shader {0} compiled successfully", m_Name);
 	}
 
+	[[noreturn]]
 	D3D11Shader::D3D11Shader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc,
 		const std::string& geometrySrc)
 		: m_Name(std::move(name))
@@ -314,12 +319,21 @@ namespace Kerberos
 		D3D11_SHADER_DESC shaderDesc;
 		reflection->GetDesc(&shaderDesc);
 
+		auto& inputs = m_ReflectionData.vertexInputs;
+
 		KBR_CORE_INFO("Shader Inputs:");
 
 		for (uint32_t i = 0; i < shaderDesc.InputParameters; ++i)
 		{
 			D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 			reflection->GetInputParameterDesc(i, &paramDesc);
+
+			ShaderVertexInput input{};
+			input.semantic = paramDesc.SemanticName;
+			input.semanticIndex = paramDesc.SemanticIndex;
+			input.location = paramDesc.Register;
+			input.format = VertexUtils::GetFormatFromComponentTypeAndMask(paramDesc.ComponentType, paramDesc.Mask);
+			inputs.push_back(input);
 
 			KBR_CORE_INFO("\tSemantic Name: {}, Semantic Index: {}, Register: {}, System Value Type: {}, Component Type: {}, Mask: {}",
 				paramDesc.SemanticName,
@@ -336,12 +350,21 @@ namespace Kerberos
 		D3D11_SHADER_DESC shaderDesc;
 		reflection->GetDesc(&shaderDesc);
 
+		auto& resources = m_ReflectionData.resources;
+
 		KBR_CORE_INFO("Shader Resources:");
 
 		for (uint32_t i = 0; i < shaderDesc.BoundResources; ++i)
 		{
 			D3D11_SHADER_INPUT_BIND_DESC bindDesc;
 			reflection->GetResourceBindingDesc(i, &bindDesc);
+
+			ShaderResourceBinding resource{};
+			resource.name = bindDesc.Name;
+			resource.type = VertexUtils::MapType(bindDesc.Type);
+			resource.bindPoint = bindDesc.BindPoint;
+			resource.bindCount = bindDesc.BindCount;
+			resources.insert(resource);
 
 			KBR_CORE_INFO("\tName: {}, Idx: {}, Type: {}, Bind Point: {}, Bind Count: {}, Flags: {}",
 				bindDesc.Name,
@@ -358,6 +381,8 @@ namespace Kerberos
 		D3D11_SHADER_DESC shaderDesc;
 		reflection->GetDesc(&shaderDesc);
 
+		auto& constantBuffers = m_ReflectionData.constantBuffers;
+
 		KBR_CORE_INFO("Constant Buffers:");
 
 		for (uint32_t i = 0; i < shaderDesc.ConstantBuffers; ++i)
@@ -365,6 +390,10 @@ namespace Kerberos
 			ID3D11ShaderReflectionConstantBuffer* constantBuffer = reflection->GetConstantBufferByIndex(i);
 			D3D11_SHADER_BUFFER_DESC bufferDesc;
 			constantBuffer->GetDesc(&bufferDesc);
+
+			ShaderConstantBuffer cb{};
+			cb.name = bufferDesc.Name;
+			cb.size = bufferDesc.Size;
 
 			KBR_CORE_INFO("\tName: {}, Variables: {}, Size: {}, Type: {}",
 				bufferDesc.Name,
@@ -378,11 +407,19 @@ namespace Kerberos
 				D3D11_SHADER_VARIABLE_DESC varDesc;
 				variable->GetDesc(&varDesc);
 
+				ShaderUniform var{};
+				var.name = varDesc.Name;
+				var.offset = varDesc.StartOffset;
+				var.size = varDesc.Size;
+				cb.uniforms.insert(var);
+
 				KBR_CORE_INFO("\t\tVariable Name: {}, Start Offset: {}, Size: {}",
 					varDesc.Name,
 					varDesc.StartOffset,
 					varDesc.Size);
 			}
+
+			constantBuffers.insert(cb);
 		}
 	}
 }

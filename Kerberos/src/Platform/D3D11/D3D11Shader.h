@@ -60,18 +60,12 @@ namespace Kerberos
 		*/
 		static bool CompileShaderFromSource(const std::string& source, const std::string& entryPoint, const std::string& profile, ComPtr<ID3DBlob>& shaderBlob);
 
-		[[nodiscard]] 
-		static ComPtr<ID3D11VertexShader> CreateVertexShader(const std::wstring& fileName, ComPtr<ID3DBlob>& vertexShaderBlob);
-
-		[[nodiscard]] 
-		static ComPtr<ID3D11PixelShader> CreatePixelShader(const std::wstring& fileName);
-
 		static std::string ReadFile(const std::string& filepath);
 
 		static ComPtr<ID3D11ShaderReflection> ReflectShader(const ComPtr<ID3DBlob>& shaderBlob);
-		static void ReflectShaderInputs(const ComPtr<ID3D11ShaderReflection>& reflection);
-		static void ReflectShaderResources(const ComPtr<ID3D11ShaderReflection>& reflection);
-		static void ReflectConstantBuffers(const ComPtr<ID3D11ShaderReflection>& reflection);
+		void ReflectShaderInputs(const ComPtr<ID3D11ShaderReflection>& reflection);
+		void ReflectShaderResources(const ComPtr<ID3D11ShaderReflection>& reflection);
+		void ReflectConstantBuffers(const ComPtr<ID3D11ShaderReflection>& reflection);
 
 	private:
 		std::string m_Name;
