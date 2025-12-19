@@ -16,6 +16,69 @@ namespace Kerberos
 		Fragment
 	};
 
+	enum class ShaderResourceType
+	{
+		Texture,
+		Sampler,
+		ConstantBuffer,
+		UnorderedAccessView,
+		StructuredBuffer
+	};
+
+	enum class VertexFormat
+	{
+		Float1,
+		Float2,
+		Float3,
+		Float4,
+		Int1,
+		Int2,
+		Int3,
+		Int4,
+		UInt1,
+		UInt2,
+		UInt3,
+		UInt4,
+	};
+
+	struct ShaderVertexInput
+	{
+		std::string semantic;   // POSITION, NORMAL, TEXCOORD
+		uint32_t    semanticIndex;
+		VertexFormat format;    // Float3, Float2, etc.
+		uint32_t    location;   // paramDesc.Register
+	};
+
+	struct ShaderResourceBinding
+	{
+		std::string name;
+		ShaderResourceType type; // Texture, Sampler, CB, UAV, etc.
+		uint32_t bindPoint;
+		uint32_t bindCount;
+	};
+
+	struct ShaderUniform
+	{
+		std::string name;
+		uint32_t offset;
+		uint32_t size;
+	};
+
+	struct ShaderConstantBuffer
+	{
+		std::string name;
+		uint32_t size;
+		uint32_t slot;
+		std::vector<ShaderUniform> uniforms;
+	};
+
+	struct ShaderReflectionData
+	{
+		std::vector<ShaderVertexInput>    vertexInputs;
+		std::vector<ShaderResourceBinding> resources;
+		std::vector<ShaderConstantBuffer> constantBuffers;
+	};
+
 	class Shader
 	{
 	public:
@@ -34,6 +97,7 @@ namespace Kerberos
 		virtual void SetMaterial(const std::string& name, const Ref<Material>& material) = 0;
 
 		virtual const std::string& GetName() const = 0;
+		virtual const ShaderReflectionData& GetReflectionData() const = 0;
 
 		virtual void SetDebugName(const std::string& name) const = 0;
 

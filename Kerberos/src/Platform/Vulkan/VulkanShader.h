@@ -18,7 +18,9 @@ namespace Kerberos
 
 		void Bind() const override;
 		void Unbind() const override;
+
 		const std::string& GetName() const override;
+		const ShaderReflectionData& GetReflectionData() const override { return m_ReflectionData; }
 
 		void SetInt(const std::string& name, int value) override;
 		void SetIntArray(const std::string& name, int* values, uint32_t count) override;
@@ -53,6 +55,8 @@ namespace Kerberos
 	private:
 		std::string m_Name;
 		std::string m_Filepath;
+
+		ShaderReflectionData m_ReflectionData;
 
 		std::unordered_map<GLenum, std::vector<uint32_t>> m_VulkanSPIRV;
 

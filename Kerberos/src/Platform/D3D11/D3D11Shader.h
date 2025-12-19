@@ -34,6 +34,7 @@ namespace Kerberos
 		void SetMaterial(const std::string& name, const Ref<Material>& material) override {}
 
 		const std::string& GetName() const override { return m_Name; }
+		const ShaderReflectionData& GetReflectionData() const override { return m_ReflectionData; }
 		const ComPtr<ID3DBlob>& GetVertexShaderBlob() const { return m_VertexShaderBlob; }
 
 		void SetDebugName(const std::string& name) const override;
@@ -80,6 +81,8 @@ namespace Kerberos
 		ComPtr<ID3D11VertexShader> m_VertexShader;
 		ComPtr<ID3D11PixelShader> m_FragmentShader;
 		std::optional<ComPtr<ID3D11GeometryShader>> m_GeometryShader;
+
+		ShaderReflectionData m_ReflectionData;
 
 		friend class D3D11Context;
 	};

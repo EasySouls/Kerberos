@@ -20,6 +20,7 @@ namespace Kerberos
 		void Unbind() const override;
 
 		const std::string& GetName() const override { return m_Name; }
+		const ShaderReflectionData& GetReflectionData() const override { return m_ReflectionData; }
 
 		void SetInt(const std::string& name, int value) override;
 		void SetIntArray(const std::string& name, int* values, uint32_t count) override;
@@ -63,5 +64,7 @@ namespace Kerberos
 		std::unordered_map<GLenum, uint32_t> m_OpenGLShaderIDs;
 
 		std::unordered_map<GLenum, std::string> m_OpenGLSourceCode;
+
+		ShaderReflectionData m_ReflectionData;
 	};
 }

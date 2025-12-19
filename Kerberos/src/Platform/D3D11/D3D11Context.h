@@ -11,6 +11,7 @@
 
 namespace Kerberos
 {
+	class Shader;
 	using Microsoft::WRL::ComPtr;
 
 	class D3D11Context final : public GraphicsContext
@@ -62,8 +63,7 @@ namespace Kerberos
 		ComPtr<ID3D11InfoQueue> m_InfoQueue = nullptr;
 #endif
 
-		ComPtr<ID3D11VertexShader> m_VertexShader = nullptr;
-		ComPtr<ID3D11PixelShader> m_PixelShader = nullptr;
+		Ref<Shader> m_Shader = nullptr;
 		ComPtr<ID3D11InputLayout> m_VertexLayout = nullptr;
 		ComPtr<ID3D11Buffer> m_VertexBuffer = nullptr;
 

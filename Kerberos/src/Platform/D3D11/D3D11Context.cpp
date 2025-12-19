@@ -56,8 +56,6 @@ namespace Kerberos
 		DestroySwapChainResources();
 		m_SwapChain.Reset();
 		m_DxgiFactory.Reset();
-		m_PixelShader.Reset();
-		m_VertexShader.Reset();
 		
 #ifdef KBR_DEBUG
 		if (FAILED(m_DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL)))
@@ -205,20 +203,8 @@ namespace Kerberos
 		//	&m_MSAAQualityLevels
 		//);
 
-		ComPtr<ID3DBlob> vertexShaderBlob = nullptr;
-		m_VertexShader = D3D11Shader::CreateVertexShader(L"assets/shaders/Main.vs.hlsl", vertexShaderBlob);
-		if (m_VertexShader == nullptr)
-		{
-			KBR_CORE_ERROR("Failed to create vertex shader!");
-			return;
-		}
-
-		m_PixelShader = D3D11Shader::CreatePixelShader(L"assets/shaders/Main.ps.hlsl");
-		if (m_PixelShader == nullptr)
-		{
-			KBR_CORE_ERROR("Failed to create pixel shader!");
-			return;
-		}
+		m_Shader = D3D11Shader::Create("assets/shaders/Main.hlsl");
+		const ComPtr<ID3DBlob> vertexShaderBlob = m_Shader->As<D3D11Shader>().GetVertexShaderBlob();
 		
 		// Create the Input Layout Descriptor
 		// TODO: Use ShaderDataType to create the input layout dynamically

@@ -13,7 +13,7 @@ struct VSOutput
 	float2 texcoord : TEXCOORD0;
 };
 
-VSOutput Main(VSInput input)
+VSOutput VS_Main(VSInput input)
 {
 	VSOutput output = (VSOutput)0;
 	output.position = float4(input.position, 1.0f);
@@ -21,4 +21,24 @@ VSOutput Main(VSInput input)
 	output.normal = input.normal;
 	output.texcoord = input.texcoord;
 	return output;
+}
+
+struct PSInput
+{
+    float4 position : SV_Position;
+    float3 color : COLOR0;
+    float3 normal : NORMAL0;
+    float2 texcoord : TEXCOORD0;
+};
+
+struct PSOutput
+{
+    float4 color : SV_Target0;
+};
+
+PSOutput PS_Main(PSInput input)
+{
+    PSOutput output = (PSOutput) 0;
+    output.color = float4(input.color, 1.0);
+    return output;
 }
