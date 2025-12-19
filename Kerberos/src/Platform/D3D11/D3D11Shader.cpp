@@ -33,9 +33,10 @@ namespace Kerberos
 		};
 
 		// TODO: We should be able to configure it, or automatically detect it
-		const std::array<ShaderInfo, 2> infos =
+		const std::array<ShaderInfo, 3> infos =
 		{ {
 			{ .stage = ShaderStage::Vertex, .entryPoint = "VS_Main", .profile ="vs_5_0" },
+			{. stage = ShaderStage::Geometry, .entryPoint = "GS_Main", .profile = "gs_5_0" },
 			{ .stage = ShaderStage::Fragment, .entryPoint = "PS_Main", .profile ="ps_5_0" }
 		} };
 
@@ -74,6 +75,12 @@ namespace Kerberos
 
 			if (FAILED(hr))
 			{
+				if (stage == ShaderStage::Geometry && hr == E_FAIL)
+				{
+					// Geometry shader is optional, so we can skip
+					continue;
+				}
+
 				if (errorBlob != nullptr)
 				{
 					KBR_CORE_ERROR("Shader error log: {0}", static_cast<const char*>(errorBlob->GetBufferPointer()));
