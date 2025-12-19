@@ -5,6 +5,9 @@
 #include "Kerberos/Core.h"
 #include "Kerberos/Renderer/Renderer.h"
 #include "Kerberos/Scripting/ScriptEngine.h"
+#include "Kerberos/Audio/AudioManager.h"
+#include "Kerberos/ImGui/ImGuiLayer.h"
+#include "Kerberos/Window.h"
 
 #include <GLFW/glfw3.h>
 
@@ -32,7 +35,7 @@ namespace Kerberos
 			KBR_CORE_WARN("No working directory specified, using current path: {0}", std::filesystem::current_path().string());
 		}
 
-		const WindowProps props{ spec.Name, true, 1280, 720 };
+		const WindowProps props{ spec.Name, true, 1920, 1080 };
 		m_Window = Window::Create(props);
 		m_Window->SetEventCallback(KBR_BIND_EVENT_FN(Application::OnEvent));
 

@@ -85,8 +85,8 @@ namespace Kerberos
 		constexpr char factoryName[] = "DXGI Factory";
 		m_DxgiFactory->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(factoryName), factoryName);
 
-		constexpr int width = 1280;
-		constexpr int height = 720;
+		constexpr int width = 1920;
+		constexpr int height = 1080;
 
 		m_WindowWidth = width;
 		m_WindowHeight = height;
@@ -334,9 +334,9 @@ namespace Kerberos
 
 		m_ImmediateContext->Flush();
 
-#ifdef KBR_DEBUG
-		m_DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY);
-#endif
+//#ifdef KBR_DEBUG
+//		m_DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY);
+//#endif
 
 		ProcessInfoQueueMessages();
 
@@ -344,6 +344,8 @@ namespace Kerberos
 		{
 			KBR_CORE_ERROR("Failed to resize swapchain buffers!");
 		}
+
+		KBR_CORE_INFO("Resized D3D11 swap chain to width: {0}, height: {1}", width, height);
 
 		ProcessInfoQueueMessages();
 

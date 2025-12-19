@@ -9,7 +9,7 @@ namespace Kerberos::D3D11Utils
         _In_ ID3D11DeviceChild* deviceResource,
         _In_z_ const std::string& debugName)
     {
-        if (FAILED(deviceResource->SetPrivateData(WKPDID_D3DDebugObjectName, debugName.length(), debugName.c_str())))
+        if (FAILED(deviceResource->SetPrivateData(WKPDID_D3DDebugObjectName, static_cast<uint32_t>(debugName.length()), debugName.c_str())))
         {
 			KBR_CORE_ERROR("Failed to set debug name for {0}", debugName);
         }
