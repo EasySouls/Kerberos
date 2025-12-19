@@ -103,56 +103,56 @@ namespace Kerberos
 		return VK_FORMAT_UNDEFINED;
 	}
 
-	VkPrimitiveTopology VulkanHelpers::GetVulkanPrimitiveTopology(const Pipeline::Topology topology)
+	VkPrimitiveTopology VulkanHelpers::GetVulkanPrimitiveTopology(const GraphicsPipeline::Topology topology)
 	{
 		switch (topology)
 		{
-		case Pipeline::Topology::Triangles:	return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-		case Pipeline::Topology::Lines:		return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
-		case Pipeline::Topology::LineStrip:	return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+		case GraphicsPipeline::Topology::Triangles:	return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+		case GraphicsPipeline::Topology::Lines:		return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+		case GraphicsPipeline::Topology::LineStrip:	return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
 		}
 		KBR_CORE_ASSERT(false, "Unknown Pipeline Topology!");
 		return VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;
 	}
 
-	VkCullModeFlagBits VulkanHelpers::GetVulkanCullMode(const Pipeline::CullMode cullMode)
+	VkCullModeFlagBits VulkanHelpers::GetVulkanCullMode(const GraphicsPipeline::CullMode cullMode)
 	{
 		switch (cullMode)
 		{
-		case Pipeline::CullMode::None:			return VK_CULL_MODE_NONE;
-		case Pipeline::CullMode::Front:			return VK_CULL_MODE_FRONT_BIT;
-		case Pipeline::CullMode::Back:			return VK_CULL_MODE_BACK_BIT;
-		case Pipeline::CullMode::FrontAndBack:	return VK_CULL_MODE_FRONT_AND_BACK;
+		case GraphicsPipeline::CullMode::None:			return VK_CULL_MODE_NONE;
+		case GraphicsPipeline::CullMode::Front:			return VK_CULL_MODE_FRONT_BIT;
+		case GraphicsPipeline::CullMode::Back:			return VK_CULL_MODE_BACK_BIT;
+		case GraphicsPipeline::CullMode::FrontAndBack:	return VK_CULL_MODE_FRONT_AND_BACK;
 		}
 		KBR_CORE_ASSERT(false, "Unknown Pipeline CullMode!");
 		return VK_CULL_MODE_FLAG_BITS_MAX_ENUM;
 	}
 
 
-	VkFrontFace VulkanHelpers::GetVulkanFrontFace(const Pipeline::WindingOrder frontFace)
+	VkFrontFace VulkanHelpers::GetVulkanFrontFace(const GraphicsPipeline::WindingOrder frontFace)
 	{
 		switch (frontFace)
 		{
-		case Pipeline::WindingOrder::Clockwise:		return VK_FRONT_FACE_CLOCKWISE;
-		case Pipeline::WindingOrder::CounterClockwise: return VK_FRONT_FACE_COUNTER_CLOCKWISE;
+		case GraphicsPipeline::WindingOrder::Clockwise:		return VK_FRONT_FACE_CLOCKWISE;
+		case GraphicsPipeline::WindingOrder::CounterClockwise: return VK_FRONT_FACE_COUNTER_CLOCKWISE;
 		}
 		KBR_CORE_ASSERT(false, "Unknown Pipeline WindingOrder!");
 		return VK_FRONT_FACE_MAX_ENUM;
 	}
 
-	VkCompareOp VulkanHelpers::GetVulkanDepthCompareOp(const Pipeline::DepthTest depthTest)
+	VkCompareOp VulkanHelpers::GetVulkanDepthCompareOp(const GraphicsPipeline::DepthTest depthTest)
 	{
 		switch (depthTest)
 		{
-		case Pipeline::DepthTest::None:			return VK_COMPARE_OP_NEVER;
-		case Pipeline::DepthTest::Less:			return VK_COMPARE_OP_LESS;
-		case Pipeline::DepthTest::LessEqual:	return VK_COMPARE_OP_LESS_OR_EQUAL;
-		case Pipeline::DepthTest::Equal:		return VK_COMPARE_OP_EQUAL;
-		case Pipeline::DepthTest::Greater:		return VK_COMPARE_OP_GREATER;
-		case Pipeline::DepthTest::GreaterEqual:	return VK_COMPARE_OP_GREATER_OR_EQUAL;
-		case Pipeline::DepthTest::NotEqual:		return VK_COMPARE_OP_NOT_EQUAL;
-		case Pipeline::DepthTest::Always:		return VK_COMPARE_OP_ALWAYS;
-		case Pipeline::DepthTest::Never:		return VK_COMPARE_OP_NEVER;
+		case GraphicsPipeline::DepthTest::None:			return VK_COMPARE_OP_NEVER;
+		case GraphicsPipeline::DepthTest::Less:			return VK_COMPARE_OP_LESS;
+		case GraphicsPipeline::DepthTest::LessEqual:	return VK_COMPARE_OP_LESS_OR_EQUAL;
+		case GraphicsPipeline::DepthTest::Equal:		return VK_COMPARE_OP_EQUAL;
+		case GraphicsPipeline::DepthTest::Greater:		return VK_COMPARE_OP_GREATER;
+		case GraphicsPipeline::DepthTest::GreaterEqual:	return VK_COMPARE_OP_GREATER_OR_EQUAL;
+		case GraphicsPipeline::DepthTest::NotEqual:		return VK_COMPARE_OP_NOT_EQUAL;
+		case GraphicsPipeline::DepthTest::Always:		return VK_COMPARE_OP_ALWAYS;
+		case GraphicsPipeline::DepthTest::Never:		return VK_COMPARE_OP_NEVER;
 		}
 		KBR_CORE_ASSERT(false, "Unknown Pipeline DepthTest!");
 		return VK_COMPARE_OP_MAX_ENUM;

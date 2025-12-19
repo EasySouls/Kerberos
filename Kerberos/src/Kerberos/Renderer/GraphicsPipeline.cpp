@@ -1,11 +1,13 @@
 #include "kbrpch.h"
-#include "Pipeline.h"
+#include "GraphicsPipeline.h"
 
 #include "RendererAPI.h"
+#include "Platform/D3D11/D3D11GraphicsPipeline.h"
+#include "Platform/Vulkan/VulkanGraphicsPipeline.h"
 
 namespace Kerberos
 {
-	Ref<Pipeline> Pipeline::Create(const PipelineSpecification& spec) 
+	Ref<GraphicsPipeline> GraphicsPipeline::Create(const PipelineSpecification& spec) 
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -14,14 +16,10 @@ namespace Kerberos
 			return nullptr;
 
 		case RendererAPI::API::Vulkan:
-			//return CreateRef<VulkanPipeline>(spec);
-			KBR_CORE_ASSERT(false, "Pipeline is not yet implemented for Vulkan");
-			return nullptr;
+			return CreateRef<VulkanGraphicsPipeline>(spec);
 
 		case RendererAPI::API::D3D11:
-			//return CreateRef<D3D11Pipeline>(spec);
-			KBR_CORE_ASSERT(false, "Pipeline is not yet implemented for D3D11");
-			return nullptr;
+			return CreateRef<D3D11GraphicsPipeline>(spec);
 
 		case RendererAPI::API::D3D12:
 			//return CreateRef<D3D12Pipeline>(spec);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Pipeline.h"
+#include "GraphicsPipeline.h"
 
 namespace Kerberos
 {
@@ -10,7 +10,7 @@ namespace Kerberos
 		struct RenderPassSpecification
 		{
 			std::string Name;
-			Ref<Pipeline> Pipeline;
+			Ref<GraphicsPipeline> Pipeline;
 		};
 
 		virtual ~RenderPass() = default;
@@ -20,13 +20,13 @@ namespace Kerberos
 		virtual Ref<Texture2D> GetOutputImage(uint32_t index) const = 0;
 
 		/**
-		 * @brief Checks whether the current renderpass is in a valid state.
+		 * @brief Checks whether the current render pass is in a valid state.
 		 * @return true if the object is valid; otherwise, false.
 		 */
 		virtual bool Validate() const = 0;
 
 		/**
-		 * @brief Bakes the renderpass, preparing it for execution.
+		 * @brief Bakes the render pass, preparing it for execution.
 		 * 
 		 * Creates descriptor sets, and ensures everything is ready for rendering.
 		 * Should be called after setting all inputs and outputs.

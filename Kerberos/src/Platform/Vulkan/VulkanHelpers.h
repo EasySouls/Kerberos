@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.h>
 #include <optional>
 
-#include "VulkanPipeline.h"
+#include "VulkanGraphicsPipeline.h"
 #include "Kerberos/Renderer/Buffer.h"
 
 namespace Kerberos
@@ -34,10 +34,10 @@ namespace Kerberos
 
         static VkFormat ShaderDataTypeToVulkanFormat(ShaderDataType type);
 
-        static VkPrimitiveTopology GetVulkanPrimitiveTopology(Pipeline::Topology topology);
-        static VkCullModeFlagBits GetVulkanCullMode(Pipeline::CullMode cullMode);
-        static VkFrontFace GetVulkanFrontFace(Pipeline::WindingOrder frontFace);
-        static VkCompareOp GetVulkanDepthCompareOp(Pipeline::DepthTest depthTest);
+        static VkPrimitiveTopology GetVulkanPrimitiveTopology(GraphicsPipeline::Topology topology);
+        static VkCullModeFlagBits GetVulkanCullMode(GraphicsPipeline::CullMode cullMode);
+        static VkFrontFace GetVulkanFrontFace(GraphicsPipeline::WindingOrder frontFace);
+        static VkCompareOp GetVulkanDepthCompareOp(GraphicsPipeline::DepthTest depthTest);
 
 
 		static const char* VkResultToString(const VkResult result)

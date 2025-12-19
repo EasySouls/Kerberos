@@ -1,5 +1,5 @@
 #include "kbrpch.h"
-#include "VulkanPipeline.h"
+#include "VulkanGraphicsPipeline.h"
 
 #include "VulkanContext.h"
 #include "VulkanFramebuffer.h"
@@ -7,19 +7,23 @@
 
 namespace Kerberos
 {
-	VulkanPipeline::VulkanPipeline(PipelineSpecification spec)
+	VulkanGraphicsPipeline::VulkanGraphicsPipeline(PipelineSpecification spec)
 		: m_Specification(std::move(spec))
 	{
 		CreateGraphicsPipeline();
 		SetDebugName(m_Specification.Name.empty() ? "VulkanPipeline" : m_Specification.Name);
 	}
 
-	VulkanPipeline::~VulkanPipeline() 
+	VulkanGraphicsPipeline::~VulkanGraphicsPipeline()
 	{
 		ReleaseResources();
 	}
 
-	void VulkanPipeline::CreateGraphicsPipeline() 
+	void VulkanGraphicsPipeline::Bind() const
+	{
+	}
+
+	void VulkanGraphicsPipeline::CreateGraphicsPipeline()
 	{
 		const VulkanShader& shader = m_Specification.Shader->As<VulkanShader>();
 
@@ -183,7 +187,7 @@ namespace Kerberos
 		}
 	}
 
-	void VulkanPipeline::ReleaseResources() const 
+	void VulkanGraphicsPipeline::ReleaseResources() const
 	{
 		const VkDevice& device = VulkanContext::Get().GetDevice();
 
@@ -191,7 +195,7 @@ namespace Kerberos
 		vkDestroyPipelineLayout(device, m_PipelineLayout, nullptr);
 	}
 
-	void VulkanPipeline::SetDebugName(const std::string& name) const 
+	void VulkanGraphicsPipeline::SetDebugName(const std::string& name) const
 	{
 		KBR_CORE_ASSERT(!name.empty(), "Pipeline name is empty!");
 		KBR_CORE_ASSERT(m_Pipeline != VK_NULL_HANDLE, "Pipeline is null!");

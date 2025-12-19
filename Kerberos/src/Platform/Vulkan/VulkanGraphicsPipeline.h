@@ -1,16 +1,18 @@
 #pragma once
 
-#include "Kerberos/Renderer/Pipeline.h"
+#include "Kerberos/Renderer/GraphicsPipeline.h"
 
 #include <vulkan/vulkan.h>
 
 namespace Kerberos
 {
-	class VulkanPipeline : public Pipeline
+	class VulkanGraphicsPipeline : public GraphicsPipeline
 	{
 	public:
-		explicit VulkanPipeline(PipelineSpecification spec);
-		~VulkanPipeline() override;
+		explicit VulkanGraphicsPipeline(PipelineSpecification spec);
+		~VulkanGraphicsPipeline() override;
+
+		void Bind() const override;
 
 		const PipelineSpecification& GetSpecification() const override { return m_Specification; }
 	private:

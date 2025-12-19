@@ -6,7 +6,7 @@
 
 namespace Kerberos
 {
-	class Pipeline
+	class GraphicsPipeline
 	{
 	public:
 		enum class Topology : uint8_t
@@ -50,13 +50,15 @@ namespace Kerberos
 			DepthTest DepthTest = DepthTest::None;
 		};
 
-		virtual ~Pipeline() = default;
+		virtual ~GraphicsPipeline() = default;
+
+		virtual void Bind() const = 0;
 
 		virtual const PipelineSpecification& GetSpecification() const = 0;
 
 		virtual Ref<Shader> GetShader() const { return GetSpecification().Shader; }
 		virtual Ref<Framebuffer> GetTargetFramebuffer() const { return GetSpecification().TargetFramebuffer; }
 
-		static Ref<Pipeline> Create(const PipelineSpecification& spec);
+		static Ref<GraphicsPipeline> Create(const PipelineSpecification& spec);
 	};
 }

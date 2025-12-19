@@ -9,14 +9,14 @@
 
 namespace Kerberos
 {
-	enum class ShaderStage
+	enum class ShaderStage : std::uint8_t
 	{
 		Vertex,
 		Geometry,
 		Fragment
 	};
 
-	enum class ShaderResourceType
+	enum class ShaderResourceType : std::uint8_t
 	{
 		Texture,
 		Sampler,
@@ -25,7 +25,7 @@ namespace Kerberos
 		StructuredBuffer
 	};
 
-	enum class VertexFormat
+	enum class VertexFormat : std::uint8_t
 	{
 		Float1,
 		Float2,

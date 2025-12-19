@@ -257,60 +257,6 @@ namespace Kerberos
 		return true;
 	}
 
-	ComPtr<ID3D11VertexShader> D3D11Shader::CreateVertexShader(const std::wstring& fileName,
-		ComPtr<ID3DBlob>& vertexShaderBlob)
-	{
-		const std::string vertexShaderSource = ReadFile(std::string(fileName.begin(), fileName.end()));
-
-		if (!CompileShaderFromSource(vertexShaderSource, "Main", "vs_5_0", vertexShaderBlob))
-		{
-			KBR_CORE_ERROR("Failed to compile vertex shader");
-			return nullptr;
-		}
-
-		ComPtr<ID3D11VertexShader> vertexShader;
-		const HRESULT hr = D3D11Context::Get().GetDevice()->CreateVertexShader(
-			vertexShaderBlob->GetBufferPointer(),
-			vertexShaderBlob->GetBufferSize(),
-			nullptr,
-			&vertexShader);
-
-		if (FAILED(hr))
-		{
-			KBR_CORE_ERROR("Failed to create vertex shader");
-			return nullptr;
-		}
-
-		return vertexShader;
-	}
-
-	ComPtr<ID3D11PixelShader> D3D11Shader::CreatePixelShader(const std::wstring& fileName) 
-	{
-		ComPtr<ID3DBlob> pixelShaderBlob = nullptr;
-		const std::string pixelShaderSource = ReadFile(std::string(fileName.begin(), fileName.end()));
-
-		if (!CompileShaderFromSource(pixelShaderSource, "Main", "ps_5_0", pixelShaderBlob))
-		{
-			KBR_CORE_ERROR("Failed to compile pixel shader");
-			return nullptr;
-		}
-
-		ComPtr<ID3D11PixelShader> pixelShader;
-		const HRESULT hr = D3D11Context::Get().GetDevice()->CreatePixelShader(
-			pixelShaderBlob->GetBufferPointer(),
-			pixelShaderBlob->GetBufferSize(),
-			nullptr,
-			&pixelShader);
-
-		if (FAILED(hr))
-		{
-			KBR_CORE_ERROR("Failed to create pixel shader");
-			return nullptr;
-		}
-
-		return pixelShader;
-	}
-
 	std::string D3D11Shader::ReadFile(const std::string& filepath)
 	{
 		std::ifstream in(filepath, std::ios::in | std::ios::binary);
