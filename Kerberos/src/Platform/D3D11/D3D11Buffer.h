@@ -2,6 +2,9 @@
 
 #include "Kerberos/Renderer/Buffer.h"
 
+#include <d3d11_2.h>
+#include <wrl/client.h>
+
 namespace Kerberos
 {
 	class D3D11VertexBuffer final : public VertexBuffer
@@ -23,8 +26,9 @@ namespace Kerberos
 		void SetDebugName(const std::string& name) override;
 
 	private:
-		uint32_t m_RendererID;
 		BufferLayout m_Layout;
+
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer = nullptr;
 	};
 
 	class D3D11IndexBuffer final : public IndexBuffer
@@ -41,8 +45,9 @@ namespace Kerberos
 		void SetDebugName(const std::string& name) override;
 
 	private:
-		uint32_t m_RendererID;
 		uint32_t m_Count;
+
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer = nullptr;
 	};
 	
 }

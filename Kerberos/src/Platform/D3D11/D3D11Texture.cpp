@@ -169,7 +169,25 @@ namespace Kerberos
 			return;
 		}
 
-		//device->CreateSamplerState(TextureUtils::GetD3D11SamplerDesc(m_Spec.SamplerFilter, m_Spec.SamplerWrapMode), m_SamplerState.GetAddressOf());
+		D3D11_SAMPLER_DESC samplerDesc {};
+		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.MinLOD = 0;
+		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+		samplerDesc.MipLODBias = 0.0f;
+		samplerDesc.MaxAnisotropy = 1;
+		samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+
+		hr = device->CreateSamplerState(&samplerDesc, m_SamplerState.GetAddressOf());
+		if (FAILED(hr))
+		{
+			KBR_ERROR("Failed to create sampler state for D3D11Texture2D. HRESULT: 0x%X", hr);
+			m_Texture.Reset();
+			m_ShaderResourceView.Reset();
+			return;
+		}
 
 		m_RendererID = reinterpret_cast<RendererID>(m_ShaderResourceView.Get());
 
@@ -206,7 +224,7 @@ namespace Kerberos
 
 		const auto context = D3D11Context::Get().GetImmediateContext();
 		context->PSSetShaderResources(slot, 1, m_ShaderResourceView.GetAddressOf());
-		//context->PSSetSamplers(slot, 1, m_SamplerState.GetAddressOf());
+		context->PSSetSamplers(slot, 1, m_SamplerState.GetAddressOf());
 	}
 
 	void D3D11Texture2D::SetData(void* data, const uint32_t size)

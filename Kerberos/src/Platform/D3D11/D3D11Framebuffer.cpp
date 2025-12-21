@@ -252,26 +252,109 @@ namespace Kerberos
 
 	int D3D11Framebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y) 
     {
-        // TODO
-        return -1;
+		const auto& device = D3D11Context::Get().GetDevice();
+		KBR_CORE_ASSERT(device, "D3DContext not initialized!");
+		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachmentSpecs.size(), "Index out of bounds for color attachment!");
+
+		const auto& texture = m_ColorTextures[attachmentIndex];
+
+		const auto width = m_Specification.Width;
+		const auto height = m_Specification.Height;
+
+        D3D11_TEXTURE2D_DESC stagingDesc;
+        stagingDesc.Width = width;
+        stagingDesc.Height = height;
+        stagingDesc.MipLevels = 1;
+        stagingDesc.ArraySize = 1;
+        stagingDesc.Format = DXGI_FORMAT_R32_SINT;
+        stagingDesc.SampleDesc.Count = 1;
+		stagingDesc.SampleDesc.Quality = 0;
+        stagingDesc.BindFlags = 0;
+		stagingDesc.MiscFlags = 0;
+        stagingDesc.Usage = D3D11_USAGE_STAGING;
+        stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+        ID3D11Texture2D* stagingTexture;
+        HRESULT hr = device->CreateTexture2D(&stagingDesc, nullptr, &stagingTexture);
+		KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create staging texture for ReadPixel!");
+
+        D3D11_BOX box{};
+        box.left = x;
+        box.top = y;
+        box.front = 0;
+        box.right = x + 1;
+        box.bottom = y + 1;
+        box.back = 1;
+
+		const auto& context = D3D11Context::Get().GetImmediateContext();
+
+        context->CopySubresourceRegion(
+            stagingTexture,
+            0,
+            0, 0, 0,
+            texture.Get(),
+            0,
+            &box
+        );
+
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        hr = context->Map(stagingTexture, 0, D3D11_MAP_READ, 0, &mapped);
+		KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to map staging texture for ReadPixel!");
+
+        const int pixel = *static_cast<int*>(mapped.pData);
+
+        context->Unmap(stagingTexture, 0);
+
+        return pixel;
     }
 
-	void D3D11Framebuffer::BindColorTexture(uint32_t slot, uint32_t index) const
+	void D3D11Framebuffer::BindColorTexture(const uint32_t slot, const uint32_t index) const
 	{
+		const auto& deviceContext = D3D11Context::Get().GetImmediateContext();
+        KBR_CORE_ASSERT(deviceContext, "D3DContext not initialized!");
+        KBR_CORE_ASSERT(index < m_ColorAttachmentSpecs.size(), "Index out of bounds for color attachment!");
 
+        ID3D11ShaderResourceView* srv = nullptr;
+        if (m_Specification.Samples > 1)
+        {
+            KBR_CORE_ASSERT(index < m_ResolvedColorSRVs.size(), "Resolved SRV index out of bounds!");
+            srv = m_ResolvedColorSRVs[index].Get();
+        }
+        else
+        {
+            KBR_CORE_ASSERT(index < m_ColorSRVs.size(), "SRV index out of bounds!");
+            srv = m_ColorSRVs[index].Get();
+        }
+		deviceContext->PSSetShaderResources(slot, 1, &srv);
 	}
 
-	void D3D11Framebuffer::BindDepthTexture(uint32_t slot) const
+	void D3D11Framebuffer::BindDepthTexture(const uint32_t slot) const
 	{
+		const auto deviceContext = D3D11Context::Get().GetImmediateContext();
+		KBR_CORE_ASSERT(deviceContext, "D3DContext not initialized!");
 
+		ID3D11ShaderResourceView* srv = m_DepthSRV.Get();
+		deviceContext->PSSetShaderResources(slot, 1, &srv);
 	}
 
-	void D3D11Framebuffer::ClearAttachment(uint32_t attachmentIndex, int value) 
+	void D3D11Framebuffer::ClearAttachment(const uint32_t attachmentIndex, const int value) 
     {
+        const auto& deviceContext = D3D11Context::Get().GetImmediateContext();
+		KBR_CORE_ASSERT(attachmentIndex < m_ColorRTVs.size(), "Index out of bounds for color attachment!");
+        KBR_CORE_ASSERT(deviceContext, "D3DContext not initialized!");
+
+        float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        clearColor[0] = static_cast<float>(value);
+		deviceContext->ClearRenderTargetView(m_ColorRTVs[attachmentIndex].Get(), clearColor);
     }
 
-	void D3D11Framebuffer::ClearDepthAttachment(float value) const 
+	void D3D11Framebuffer::ClearDepthAttachment(const float value) const 
     {
+        const auto& deviceContext = D3D11Context::Get().GetImmediateContext();
+        KBR_CORE_ASSERT(deviceContext, "D3DContext not initialized!");
+		KBR_CORE_ASSERT(m_DepthStencilView, "No depth stencil view to clear!");
+
+		deviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, value, 0);
     }
 
 	uint64_t D3D11Framebuffer::GetColorAttachmentRendererID(const uint32_t index) const

@@ -198,15 +198,19 @@ namespace Kerberos
 
 		s_RendererData.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::CameraData), 0);
 		s_RendererData.CameraUniformBuffer->SetDebugName("Camera Uniform Buffer");
+		s_RendererData.CameraUniformBuffer->Bind();
 
 		s_RendererData.LightsUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::LightsData), 1);
 		s_RendererData.LightsUniformBuffer->SetDebugName("Lights Uniform Buffer");
+		s_RendererData.LightsUniformBuffer->Bind();
 
 		s_RendererData.PerObjectUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::PerObjectData), 2);
 		s_RendererData.PerObjectUniformBuffer->SetDebugName("PerObject Uniform Buffer");
+		s_RendererData.PerObjectUniformBuffer->Bind();
 
 		s_RendererData.ShadowUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::ShadowDataUbo), 3);
 		s_RendererData.ShadowUniformBuffer->SetDebugName("Shadow Uniform Buffer");
+		s_RendererData.ShadowUniformBuffer->Bind();
 
 		GraphicsPipeline::PipelineSpecification shadowPipelineSpec;
 		shadowPipelineSpec.Name = "Shadow Map Pipeline";

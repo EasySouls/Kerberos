@@ -10,6 +10,7 @@ namespace Kerberos
 		~VulkanUniformBuffer() override;
 
 		void SetData(const void* data, uint32_t size, uint32_t offset = 0) override;
+		void Bind() override;
 
 		void SetDebugName(const std::string& debugName) override;
 	};

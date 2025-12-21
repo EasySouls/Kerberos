@@ -302,7 +302,7 @@ namespace Kerberos
 
 	int OpenGLFramebuffer::ReadPixel(const uint32_t attachmentIndex, const int x, const int y) 
 	{
-		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmenIndex is out of bounds");
+		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmentIndex is out of bounds");
 
 		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 
@@ -327,7 +327,7 @@ namespace Kerberos
 
 	void OpenGLFramebuffer::ClearAttachment(const uint32_t attachmentIndex, const int value) 
 	{
-		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmenIndex is out of bounds");
+		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmentIndex is out of bounds");
 
 		const auto& spec = m_ColorAttachmentSpecs[attachmentIndex];
 
