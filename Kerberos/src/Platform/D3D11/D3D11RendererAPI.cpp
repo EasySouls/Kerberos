@@ -56,9 +56,9 @@ namespace Kerberos
 		dsv->Release();
 	}
 
-	void D3D11RendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
+	void D3D11RendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, const uint32_t indexCount)
 	{
-		//const auto context = D3D11Context::Get().GetImmediateContext();
+		const auto context = D3D11Context::Get().GetImmediateContext();
 		//if (!context)
 		//{
 		//	KBR_CORE_ASSERT(false, "Device context is null!");
@@ -66,7 +66,14 @@ namespace Kerberos
 		//}
 		//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		/*context->IASetVertexBuffers(0, 1, vertexArray->GetVertexBuffer().GetAddressOf(), vertexArray->GetVertexBuffer()->GetStridePtr(), vertexArray->GetVertexBuffer()->GetOffsetPtr());
-		context->IASetIndexBuffer(vertexArray->GetIndexBuffer()->GetBuffer().Get(), vertexArray->GetIndexBuffer()->GetFormat(), 0);
-		context->DrawIndexed(indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount(), 0, 0);*/
+		context->IASetIndexBuffer(vertexArray->GetIndexBuffer()->GetBuffer().Get(), vertexArray->GetIndexBuffer()->GetFormat(), 0);*/
+		context->DrawIndexed(indexCount, 0, 0);
+	}
+
+	void D3D11RendererAPI::DrawArray(const Ref<VertexArray>& vertexArray, const uint32_t vertexCount)
+	{
+		const auto context = D3D11Context::Get().GetImmediateContext();
+
+		context->Draw(vertexCount, 0);
 	}
 }

@@ -47,6 +47,7 @@ namespace Kerberos
 		FramebufferTextureSpecification m_DepthAttachmentSpec;
 
 		std::vector<ComPtr<ID3D11Texture2D>> m_ColorTextures;
+		std::vector<ComPtr<ID3D11Texture2D>> m_ReadbackTextures;
 		std::vector<ComPtr<ID3D11RenderTargetView>> m_ColorRTVs;
 		std::vector<ComPtr<ID3D11ShaderResourceView>> m_ColorSRVs;
 

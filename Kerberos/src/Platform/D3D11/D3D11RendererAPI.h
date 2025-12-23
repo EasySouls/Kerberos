@@ -22,7 +22,7 @@ namespace Kerberos
 		void SetDepthFunc(DepthFunc func) override {}
 
 		void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) override;
-		void DrawArray(const Ref<VertexArray>& vertexArray, const uint32_t vertexCount) override {}
+		void DrawArray(const Ref<VertexArray>& vertexArray, const uint32_t vertexCount) override;
 
 	private:
 		glm::vec4 m_ClearColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);

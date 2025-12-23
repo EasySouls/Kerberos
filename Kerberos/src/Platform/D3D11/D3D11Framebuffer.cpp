@@ -37,6 +37,7 @@ namespace Kerberos
         if (!m_ColorAttachmentSpecs.empty())
         {
             m_ColorTextures.resize(m_ColorAttachmentSpecs.size(), nullptr);
+			m_ReadbackTextures.resize(m_ColorAttachmentSpecs.size(), nullptr);
             m_ColorRTVs.resize(m_ColorAttachmentSpecs.size(), nullptr);
 
             // Only create SRVs for non-multisampled textures directly
@@ -75,6 +76,14 @@ namespace Kerberos
 
                 hr = device->CreateTexture2D(&textureDesc, nullptr, m_ColorTextures[i].GetAddressOf());
                 KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create color texture!");
+
+				// Create staging textures for reading pixels
+				D3D11_TEXTURE2D_DESC stagingDesc = textureDesc;
+				stagingDesc.Usage = D3D11_USAGE_STAGING;
+				stagingDesc.BindFlags = 0;
+				stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+				hr = device->CreateTexture2D(&stagingDesc, nullptr, m_ReadbackTextures[i].GetAddressOf());
+				KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create readback texture!");
 
                 D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
                 rtvDesc.Format = TextureUtils::GetRTVFormat(m_ColorAttachmentSpecs[i].TextureFormat);
@@ -250,33 +259,17 @@ namespace Kerberos
         Invalidate(); 
 	}
 
-	int D3D11Framebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y) 
+	int D3D11Framebuffer::ReadPixel(const uint32_t attachmentIndex, int x, int y) 
     {
 		const auto& device = D3D11Context::Get().GetDevice();
 		KBR_CORE_ASSERT(device, "D3DContext not initialized!");
 		KBR_CORE_ASSERT(attachmentIndex < m_ColorAttachmentSpecs.size(), "Index out of bounds for color attachment!");
 
-		const auto& texture = m_ColorTextures[attachmentIndex];
+		const auto& src = m_ColorTextures[attachmentIndex];
+		const auto& dst = m_ReadbackTextures[attachmentIndex];
 
-		const auto width = m_Specification.Width;
-		const auto height = m_Specification.Height;
-
-        D3D11_TEXTURE2D_DESC stagingDesc;
-        stagingDesc.Width = width;
-        stagingDesc.Height = height;
-        stagingDesc.MipLevels = 1;
-        stagingDesc.ArraySize = 1;
-        stagingDesc.Format = DXGI_FORMAT_R32_SINT;
-        stagingDesc.SampleDesc.Count = 1;
-		stagingDesc.SampleDesc.Quality = 0;
-        stagingDesc.BindFlags = 0;
-		stagingDesc.MiscFlags = 0;
-        stagingDesc.Usage = D3D11_USAGE_STAGING;
-        stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-
-        ID3D11Texture2D* stagingTexture;
-        HRESULT hr = device->CreateTexture2D(&stagingDesc, nullptr, &stagingTexture);
-		KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to create staging texture for ReadPixel!");
+        x = std::clamp(x, 0, static_cast<int>(m_Specification.Width) - 1);
+        y = std::clamp(y, 0, static_cast<int>(m_Specification.Height) - 1);
 
         D3D11_BOX box{};
         box.left = x;
@@ -289,21 +282,21 @@ namespace Kerberos
 		const auto& context = D3D11Context::Get().GetImmediateContext();
 
         context->CopySubresourceRegion(
-            stagingTexture,
+            dst.Get(),
             0,
             0, 0, 0,
-            texture.Get(),
+            src.Get(),
             0,
             &box
         );
 
         D3D11_MAPPED_SUBRESOURCE mapped{};
-        hr = context->Map(stagingTexture, 0, D3D11_MAP_READ, 0, &mapped);
+        const HRESULT hr = context->Map(dst.Get(), 0, D3D11_MAP_READ, 0, &mapped);
 		KBR_CORE_ASSERT(SUCCEEDED(hr), "Failed to map staging texture for ReadPixel!");
 
         const int pixel = *static_cast<int*>(mapped.pData);
 
-        context->Unmap(stagingTexture, 0);
+        context->Unmap(dst.Get(), 0);
 
         return pixel;
     }

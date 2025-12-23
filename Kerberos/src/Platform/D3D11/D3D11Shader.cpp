@@ -177,6 +177,10 @@ namespace Kerberos
 		{
 			context->GSSetShader(m_GeometryShader->Get(), nullptr, 0);
 		}
+		else
+		{
+			context->GSSetShader(nullptr, nullptr, 0);
+		}
 	}
 
 	void D3D11Shader::Unbind() const {}
