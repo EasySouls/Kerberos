@@ -13,6 +13,7 @@ namespace Kerberos
 			{
 			case FramebufferTextureFormat::DEPTH24:
 			case FramebufferTextureFormat::DEPTH24STENCIL8:
+			case FramebufferTextureFormat::DEPTH32:
 				return true;
 			case FramebufferTextureFormat::None:
 			case FramebufferTextureFormat::RGBA8:
@@ -218,6 +219,11 @@ namespace Kerberos
 				case FramebufferTextureFormat::DEPTH24:
 				{
 					Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH_COMPONENT24, GL_DEPTH_ATTACHMENT, m_Specification.Width, m_Specification.Height);
+					break;
+				}
+				case FramebufferTextureFormat::DEPTH32:
+				{
+					Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT, m_Specification.Width, m_Specification.Height);
 					break;
 				}
 				default:

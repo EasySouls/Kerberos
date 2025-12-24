@@ -4,6 +4,7 @@
 #include "RendererAPI.h"
 #include "Platform/D3D11/D3D11GraphicsPipeline.h"
 #include "Platform/Vulkan/VulkanGraphicsPipeline.h"
+#include "Platform/OpenGL/OpenGLGraphicsPipeline.h"
 
 namespace Kerberos
 {
@@ -12,8 +13,7 @@ namespace Kerberos
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::OpenGL:
-			KBR_CORE_ASSERT(false, "Pipeline is not yet implemented for OpenGL");
-			return nullptr;
+			return CreateRef<OpenGLGraphicsPipeline>(spec);
 
 		case RendererAPI::API::Vulkan:
 			return CreateRef<VulkanGraphicsPipeline>(spec);

@@ -31,7 +31,7 @@ namespace Kerberos
 
 #define TESTING 1
 #if TESTING
-		OpenProject(R"(C:\Csanad\development\Kerberos\KerberosEditor\World3D.kbrproj)");
+		OpenProject(R"(C:\Development\Kerberos\KerberosEditor\World3D.kbrproj)");
 #else
 
 		/// If there is a command line argument, try to open the project specified in it
