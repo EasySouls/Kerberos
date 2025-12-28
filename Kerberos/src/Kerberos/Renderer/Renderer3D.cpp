@@ -6,6 +6,7 @@
 #include "TextureCube.h"
 #include "UniformBuffer.h"
 #include "GraphicsPipeline.h"
+#include "RenderPass.h"
 #include "Kerberos/Assets/AssetManager.h"
 
 static constexpr int MAX_POINT_LIGHTS = 10;
@@ -41,8 +42,6 @@ namespace Kerberos
 		Ref<VertexArray>	SkyboxVertexArray = nullptr;
 
 		Ref<Framebuffer> ShadowMapFramebuffer = nullptr;
-
-		RenderPass CurrentPass = RenderPass::Geometry;
 
 		struct ShadowDataUbo
 		{
@@ -94,6 +93,13 @@ namespace Kerberos
 		Ref<GraphicsPipeline> TransparentPipeline = nullptr;
 		Ref<GraphicsPipeline> EnvironmentMapPipeline = nullptr;
 		Ref<GraphicsPipeline> PostprocessPipeline = nullptr;
+
+		Ref<RenderPass> ShadowMapPass = nullptr;
+		Ref<RenderPass> OpaquePass = nullptr;
+		Ref<RenderPass> WireframePass = nullptr;
+		Ref<RenderPass> TransparentPass = nullptr;
+		Ref<RenderPass> EnvironmentMapPass = nullptr;
+		Ref<RenderPass> PostprocessPass = nullptr;
 
 		constexpr static uint32_t MaterialTextureSlot = 0;
 		constexpr static uint32_t ShadowMapTextureSlot = 1;
@@ -212,13 +218,28 @@ namespace Kerberos
 		s_RendererData.ShadowUniformBuffer->SetDebugName("Shadow Uniform Buffer");
 		s_RendererData.ShadowUniformBuffer->Bind();
 
+		FramebufferSpecification shadowMapFramebufferSpec;
+		shadowMapFramebufferSpec.Width = 1024;
+		shadowMapFramebufferSpec.Height = 1024;
+		shadowMapFramebufferSpec.Attachments = FramebufferAttachmentSpecification
+		{
+			{ FramebufferTextureFormat::DEPTH32 }
+		};
+		shadowMapFramebufferSpec.DepthClearValue = 1.0f;
+
 		GraphicsPipeline::PipelineSpecification shadowPipelineSpec;
 		shadowPipelineSpec.Name = "Shadow Map Pipeline";
 		shadowPipelineSpec.Shader = s_RendererData.ShadowMapShader;
 		shadowPipelineSpec.DepthTest = GraphicsPipeline::DepthTest::LessEqual;
 		shadowPipelineSpec.CullMode = GraphicsPipeline::CullMode::Back;
 		shadowPipelineSpec.PrimitiveTopology = GraphicsPipeline::Topology::Triangles;
+		shadowPipelineSpec.TargetFramebuffer = Framebuffer::Create(shadowMapFramebufferSpec);
 		s_RendererData.ShadowMapPipeline = GraphicsPipeline::Create(shadowPipelineSpec);
+
+		RenderPassSpecification shadowPassSpec;
+		shadowPassSpec.Name = "Shadow Map Pass";
+		shadowPassSpec.Pipeline = s_RendererData.ShadowMapPipeline;
+		s_RendererData.ShadowMapPass = RenderPass::Create(shadowPassSpec);
 
 		GraphicsPipeline::PipelineSpecification wireframePipelineSpec;
 		wireframePipelineSpec.Name = "Wireframe Pipeline";
@@ -266,8 +287,6 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		s_RendererData.CurrentPass = RenderPass::Shadow;
-
 		s_RendererData.ShadowMapFramebuffer = shadowMapFramebuffer;
 		shadowMapFramebuffer->Bind();
 
@@ -282,10 +301,10 @@ namespace Kerberos
 
 	void Renderer3D::EndPass() 
 	{
-		if (s_RendererData.CurrentPass == RenderPass::Shadow)
-		{
-			s_RendererData.ShadowMapFramebuffer->Unbind();
-		}
+		//if (s_RendererData.CurrentPass == RenderPass::Shadow)
+		//{
+		//	s_RendererData.ShadowMapFramebuffer->Unbind();
+		//}
 	}
 
 	void Renderer3D::BeginGeometryPass(const EditorCamera& camera, const DirectionalLight* sun,
@@ -293,7 +312,7 @@ namespace Kerberos
 	{
 		KBR_PROFILE_FUNCTION();
 
-		s_RendererData.CurrentPass = RenderPass::Geometry;
+		//s_RendererData.CurrentPass = RenderPass::Geometry;
 
 		const auto& viewProjection = camera.GetViewProjectionMatrix();
 		s_RendererData.CameraData.ViewMatrix = camera.GetViewMatrix();
@@ -335,8 +354,6 @@ namespace Kerberos
 	void Renderer3D::BeginGeometryPass(const Camera& camera, const glm::mat4& transform, const DirectionalLight* sun, const std::vector<PointLight>& pointLights, const Ref<TextureCube>& skyboxTexture)
 	{
 		KBR_PROFILE_FUNCTION();
-
-		s_RendererData.CurrentPass = RenderPass::Geometry;
 
 		const glm::mat4& viewProjection = camera.GetProjection() * glm::inverse(transform);
 		s_RendererData.CameraData.ViewMatrix = glm::inverse(transform);
@@ -420,11 +437,11 @@ namespace Kerberos
 			return;
 		}
 
-		if (s_RendererData.CurrentPass == RenderPass::Shadow && !castShadows)
+		/*if (s_RendererData.CurrentPass == RenderPass::Shadow && !castShadows)
 		{
 			/// Skip rendering this mesh in shadow pass if it doesn't cast shadows
 			return;
-		}
+		}*/
 
 		//const Ref<Shader> shaderToUse = material->MaterialShader ? material->MaterialShader : s_RendererData.ActiveShader;
 		const Ref<Shader> shaderToUse = s_RendererData.ActiveShader;

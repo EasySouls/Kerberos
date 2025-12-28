@@ -30,18 +30,20 @@ namespace Kerberos
 
 		QueryComputeInfo();
 
+		const auto& [MaxWorkGroupCount, MaxWorkGroupSize, MaxWorkGroupInvocations] = m_DeviceFeatures.ComputeInfo;
+
 		KBR_CORE_INFO("Compute Shader Limits:");
 		KBR_CORE_INFO("  Max Compute Work Group Count: {0}, {1}, {2}",
-					  m_ComputeInfo.MaxWorkGroupCount.x,
-					  m_ComputeInfo.MaxWorkGroupCount.y,
-					  m_ComputeInfo.MaxWorkGroupCount.z);
+					  MaxWorkGroupCount.x,
+					  MaxWorkGroupCount.y,
+					  MaxWorkGroupCount.z);
 
 		KBR_CORE_INFO("  Max Compute Work Group Size: {0}, {1}, {2}",
-					  m_ComputeInfo.MaxWorkGroupSize.x,
-					  m_ComputeInfo.MaxWorkGroupSize.y,
-					  m_ComputeInfo.MaxWorkGroupSize.z);
+					  MaxWorkGroupSize.x,
+					  MaxWorkGroupSize.y,
+					  MaxWorkGroupSize.z);
 
-		KBR_CORE_INFO("  Max Compute Work Group Invocations: {0}", m_ComputeInfo.MaxWorkGroupInvocations);
+		KBR_CORE_INFO("  Max Compute Work Group Invocations: {0}", MaxWorkGroupInvocations);
 	}
 
 	void OpenGLContext::Render()
@@ -67,7 +69,9 @@ namespace Kerberos
 		glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &maxWorkGroupCount[1]);
 		glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &maxWorkGroupCount[2]);
 
-		m_ComputeInfo.MaxWorkGroupCount = glm::vec3(
+		ComputeInfo& computeInfo = m_DeviceFeatures.ComputeInfo;
+
+		computeInfo.MaxWorkGroupCount = glm::vec3(
 			static_cast<uint32_t>(maxWorkGroupCount[0]),
 			static_cast<uint32_t>(maxWorkGroupCount[1]),
 			static_cast<uint32_t>(maxWorkGroupCount[2])
@@ -78,7 +82,7 @@ namespace Kerberos
 		glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1, &maxWorkGroupSize[1]);
 		glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &maxWorkGroupSize[2]);
 
-		m_ComputeInfo.MaxWorkGroupSize = glm::vec3(
+		computeInfo.MaxWorkGroupSize = glm::vec3(
 			static_cast<uint32_t>(maxWorkGroupSize[0]),
 			static_cast<uint32_t>(maxWorkGroupSize[1]),
 			static_cast<uint32_t>(maxWorkGroupSize[2])
@@ -87,7 +91,7 @@ namespace Kerberos
 		int maxWorkGroupInvocations;
 		glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &maxWorkGroupInvocations);
 
-		m_ComputeInfo.MaxWorkGroupInvocations = maxWorkGroupInvocations;
+		computeInfo.MaxWorkGroupInvocations = maxWorkGroupInvocations;
 	}
 }
 

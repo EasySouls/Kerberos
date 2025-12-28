@@ -11,6 +11,14 @@ namespace Kerberos
 		uint32_t  MaxWorkGroupInvocations{0};
 	};
 
+	struct DeviceFeatures
+	{
+		bool RayQueriesSupported = false;
+		bool RayTracingSupported = false;
+
+		ComputeInfo ComputeInfo;
+	};
+
 	class GraphicsContext
 	{
 	public:
@@ -23,6 +31,6 @@ namespace Kerberos
 		virtual void SetVSync(bool enabled) = 0;
 
 	protected:
-		ComputeInfo m_ComputeInfo;
+		DeviceFeatures m_DeviceFeatures;
 	};
 }

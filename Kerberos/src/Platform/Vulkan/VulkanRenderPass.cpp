@@ -70,6 +70,11 @@ namespace Kerberos
 		VulkanHelpers::SetObjectDebugName(VulkanContext::Get().GetDevice(), VK_OBJECT_TYPE_RENDER_PASS, reinterpret_cast<uint64_t>(m_RenderPass), name);
 	}
 
+	void VulkanRenderPass::SetInput(std::string_view name, const Ref<UniformBuffer>& uniformBuffer) 
+	{
+		throw std::runtime_error("VulkanRenderPass::SetInput() not implemented yet!");
+	}
+
 	void VulkanRenderPass::SetInput(std::string_view name, const Ref<Texture2D>& image) 
 	{
 		throw std::runtime_error("VulkanRenderPass::SetInput() not implemented yet!");

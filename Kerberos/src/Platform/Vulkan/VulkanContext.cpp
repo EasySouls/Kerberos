@@ -3,7 +3,6 @@
 #include "VulkanContext.h"
 #include "Kerberos/Core.h"
 
-#include <cstring>
 #include <backends/imgui_impl_vulkan.h>
 
 #include "imgui.h"
@@ -279,6 +278,8 @@ namespace Kerberos
 		constexpr VkCommandBufferBeginInfo beginInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 			.pNext = nullptr,
+			.flags = 0,
+			.pInheritanceInfo = nullptr
 		};
 
 		if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
@@ -465,11 +466,19 @@ namespace Kerberos
 			break;
 		}
 
+		m_VulkanVersion = {
+			.Major = VK_VERSION_MAJOR(deviceProperties.apiVersion),
+			.Minor = VK_VERSION_MINOR(deviceProperties.apiVersion),
+			.Patch = VK_VERSION_PATCH(deviceProperties.apiVersion)
+		};
+
+		const auto& [major, minor, patch] = m_VulkanVersion;
+
 		KBR_CORE_INFO("Vulkan Physical Device Properties:");
 		KBR_CORE_INFO("\tVulkan Device: {0}", deviceProperties.deviceName);
 		KBR_CORE_INFO("\tVulkan Device Type: {0}", deviceType);
 		KBR_CORE_INFO("\tVulkan Driver Version: {0}", deviceProperties.driverVersion);
-		KBR_CORE_INFO("\tVulkan API Version: {0}.{1}.{2}", VK_VERSION_MAJOR(deviceProperties.apiVersion), VK_VERSION_MINOR(deviceProperties.apiVersion), VK_VERSION_PATCH(deviceProperties.apiVersion));
+		KBR_CORE_INFO("\tVulkan API Version: {0}.{1}.{2}", major, minor, patch);
 	}
 
 	void VulkanContext::CreateLogicalDevice()
@@ -498,19 +507,44 @@ namespace Kerberos
 			queueCreateInfos.push_back(queueCreateInfo);
 		}
 
-		/// Query the device features
-		VkPhysicalDeviceVulkan13Features deviceFeatures13 = {};
-		deviceFeatures13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
-		deviceFeatures13.pNext = nullptr;
-		deviceFeatures13.synchronization2 = VK_TRUE;
-		deviceFeatures13.shaderDemoteToHelperInvocation = VK_TRUE;
+		QueryDeviceFeatures(m_PhysicalDevice);
+
+		VkPhysicalDeviceVulkan13Features features13{};
+		features13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+		features13.synchronization2 = m_VulkanFeatures.Synchronization2Supported ? VK_TRUE : VK_FALSE;
+		features13.shaderDemoteToHelperInvocation = VK_TRUE;
+
+		VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{};
+		rayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+		rayQueryFeatures.pNext = &features13;
+		rayQueryFeatures.rayQuery = m_DeviceFeatures.RayQueriesSupported ? VK_TRUE : VK_FALSE;
+
+		VkPhysicalDeviceAccelerationStructureFeaturesKHR accelFeatures{};
+		accelFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+		accelFeatures.pNext = &rayQueryFeatures;
+		accelFeatures.accelerationStructure = m_DeviceFeatures.RayTracingSupported ? VK_TRUE : VK_FALSE;
+
+		VkPhysicalDeviceRayTracingPipelineFeaturesKHR rtPipelineFeatures{};
+		rtPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+		rtPipelineFeatures.pNext = &accelFeatures;
+		rtPipelineFeatures.rayTracingPipeline = m_DeviceFeatures.RayTracingSupported ? VK_TRUE : VK_FALSE;
+
+		VkPhysicalDeviceBufferDeviceAddressFeatures bdaFeatures{};
+		bdaFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+		bdaFeatures.pNext = &rtPipelineFeatures;
+		bdaFeatures.bufferDeviceAddress = m_VulkanFeatures.BufferDeviceAddressSupported ? VK_TRUE : VK_FALSE;
+
+		/*VkPhysicalDeviceVulkan14Features features14{
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_4_FEATURES,
+			.pNext = &bdaFeatures,
+		};*/
 
 		VkPhysicalDeviceFeatures2 deviceFeatures2{};
 		deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-		deviceFeatures2.pNext = &deviceFeatures13;
-		vkGetPhysicalDeviceFeatures2(m_PhysicalDevice, &deviceFeatures2);
-
-		/// Handle logic here for enabling/disabling features based on what the GPU supports
+		deviceFeatures2.pNext = &bdaFeatures;
+		deviceFeatures2.features.tessellationShader = m_VulkanFeatures.TesselationShaderSupported ? VK_TRUE : VK_FALSE;
+		deviceFeatures2.features.robustBufferAccess = VK_TRUE;
+		deviceFeatures2.features.geometryShader = VK_TRUE;
 
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -518,8 +552,6 @@ namespace Kerberos
 
 		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		createInfo.pQueueCreateInfos = queueCreateInfos.data();
-
-		//createInfo.pEnabledFeatures = &deviceFeatures;
 
 		createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 		createInfo.ppEnabledExtensionNames = deviceExtensions.data();
@@ -542,6 +574,13 @@ namespace Kerberos
 
 		vkGetDeviceQueue(m_Device, graphicsFamily.value(), 0, &m_GraphicsQueue);
 		vkGetDeviceQueue(m_Device, presentFamily.value(), 0, &m_PresentQueue);
+
+		KBR_CORE_INFO("Vulkan logical device created successfully.");
+		KBR_CORE_INFO("\tRay Queries Supported: {0}", m_DeviceFeatures.RayQueriesSupported ? "Yes" : "No");
+		KBR_CORE_INFO("\tRay Tracing Supported: {0}", m_DeviceFeatures.RayTracingSupported ? "Yes" : "No");
+		KBR_CORE_INFO("\tBuffer Device Address Supported: {0}", m_VulkanFeatures.BufferDeviceAddressSupported ? "Yes" : "No");
+		KBR_CORE_INFO("\tSynchronization2 Supported: {0}", m_VulkanFeatures.Synchronization2Supported ? "Yes" : "No");
+		KBR_CORE_INFO("\tTesselation Shader Supported: {0}", m_VulkanFeatures.TesselationShaderSupported ? "Yes" : "No");
 	}
 
 	void VulkanContext::CreateVmaAllocator() 
@@ -1112,10 +1151,10 @@ namespace Kerberos
 	{
 		// TODO: Store the enabled extensions and features and check if buffer device address is enabled
 		// TODO: Might have to look around VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT
-		VkBufferDeviceAddressInfo bufferDeviceAI{};
-		bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
-		bufferDeviceAI.buffer = buffer;
-		return vkGetBufferDeviceAddress(m_Device, &bufferDeviceAI);
+		VkBufferDeviceAddressInfo bufferDeviceAi{};
+		bufferDeviceAi.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+		bufferDeviceAi.buffer = buffer;
+		return vkGetBufferDeviceAddress(m_Device, &bufferDeviceAi);
 	}
 
 
@@ -1199,9 +1238,9 @@ namespace Kerberos
 
 		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
-		for (const auto& extension : availableExtensions)
+		for (const auto& [extensionName, specVersion] : availableExtensions)
 		{
-			requiredExtensions.erase(extension.extensionName);
+			requiredExtensions.erase(extensionName);
 		}
 
 		return requiredExtensions.empty();
@@ -1274,6 +1313,52 @@ namespace Kerberos
 		}
 
 		return details;
+	}
+
+	void VulkanContext::QueryDeviceFeatures(VkPhysicalDevice device) 
+	{
+		VkPhysicalDeviceVulkan13Features deviceFeatures13 = {};
+		deviceFeatures13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+		deviceFeatures13.pNext = nullptr;
+
+		VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR,
+			.pNext = &deviceFeatures13
+		};
+
+		VkPhysicalDeviceAccelerationStructureFeaturesKHR accelFeatures{
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR,
+			.pNext = &rayQueryFeatures
+		};
+
+		VkPhysicalDeviceRayTracingPipelineFeaturesKHR rtPipelineFeatures{
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR,
+			.pNext = &accelFeatures
+		};
+
+		VkPhysicalDeviceBufferDeviceAddressFeatures bdaFeatures{
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES,
+			.pNext = &rtPipelineFeatures
+		};
+
+		VkPhysicalDeviceFeatures2 deviceFeatures2{
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+			.pNext = &bdaFeatures
+		};
+
+		vkGetPhysicalDeviceFeatures2(m_PhysicalDevice, &deviceFeatures2);
+
+		const bool rayQueriesSupported = rayQueryFeatures.rayQuery == VK_TRUE;
+		const bool rayTracingSupported = accelFeatures.accelerationStructure
+			&& rtPipelineFeatures.rayTracingPipeline
+			&& bdaFeatures.bufferDeviceAddress;
+
+		m_DeviceFeatures.RayQueriesSupported = rayQueriesSupported;
+		m_DeviceFeatures.RayTracingSupported = rayTracingSupported;
+
+		m_VulkanFeatures.BufferDeviceAddressSupported = bdaFeatures.bufferDeviceAddress == VK_TRUE;
+		m_VulkanFeatures.Synchronization2Supported = deviceFeatures13.synchronization2 == VK_TRUE;
+		m_VulkanFeatures.TesselationShaderSupported = deviceFeatures2.features.tessellationShader == VK_TRUE;
 	}
 
 	VkSurfaceFormatKHR VulkanContext::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)

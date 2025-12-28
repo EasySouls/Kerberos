@@ -13,6 +13,19 @@
 
 namespace Kerberos
 {
+	struct VulkanFeatures
+	{
+		bool BufferDeviceAddressSupported = false;
+		bool Synchronization2Supported = false;
+		bool TesselationShaderSupported = false;
+	};
+
+	struct VulkanVersion {
+		uint32_t Major = 1;
+		uint32_t Minor = 0;
+		uint32_t Patch = 0;
+	};
+
 	class VulkanContext : public GraphicsContext
 	{
 	public:
@@ -113,6 +126,7 @@ namespace Kerberos
 		static bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
 		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) const;
 		SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device) const;
+		void QueryDeviceFeatures(VkPhysicalDevice device);
 
 		static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 		static VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
@@ -160,6 +174,9 @@ namespace Kerberos
 		Scope<IndexBuffer> m_IndexBuffer;
 
 		bool m_VSyncEnabled = false;
+
+		VulkanVersion m_VulkanVersion{};
+		VulkanFeatures m_VulkanFeatures{};
 
 		static VulkanContext* s_Instance;
 	};

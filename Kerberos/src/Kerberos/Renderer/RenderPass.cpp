@@ -2,6 +2,9 @@
 
 #include "RenderPass.h"
 #include "RendererAPI.h"
+#include "Platform/Vulkan/VulkanRenderPass.h"
+#include "Platform/D3D11/D3D11RenderPass.h"
+#include "Platform/OpenGL/OpenGLRenderPass.h"
 
 namespace Kerberos
 {
@@ -9,19 +12,14 @@ namespace Kerberos
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:  
-			KBR_CORE_ASSERT(false, "RenderPass is not yet implemented for OpenGL"); 
-			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLRenderPass>(spec);
 
 		case RendererAPI::API::Vulkan:  
-			//return CreateRef<VulkanRenderPass>(spec);
-			KBR_CORE_ASSERT(false, "RenderPass is not yet implemented for Vulkan");
-			return nullptr;
+			return CreateRef<VulkanRenderPass>(spec);
 
 		case RendererAPI::API::D3D11:
-			//return CreateRef<D3D11RenderPass>(spec);
-			KBR_CORE_ASSERT(false, "RenderPass is not yet implemented for D3D11");
-			return nullptr;
+			return CreateRef<D3D11RenderPass>(spec);
 
 		case RendererAPI::API::D3D12:
 			//return CreateRef<D3D12RenderPass>(spec);

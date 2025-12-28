@@ -36,7 +36,7 @@ namespace Kerberos
 
 		FramebufferTextureSpecification() = default;
 
-		FramebufferTextureSpecification(const FramebufferTextureFormat format)
+		explicit(false) FramebufferTextureSpecification(const FramebufferTextureFormat format)
 			: TextureFormat(format)
 		{}
 	};
@@ -58,9 +58,8 @@ namespace Kerberos
 		uint32_t Height;
 		FramebufferAttachmentSpecification Attachments;
 		glm::vec4 ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
-		glm::vec4 DepthClearValue = { 1.0f, 0.0f, 0.0f, 0.0f };
+		float DepthClearValue = 1.0f;
 		uint32_t Samples = 1;
-		bool SwapChainTarget = false;
 	};
 
 	class Framebuffer

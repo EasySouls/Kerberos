@@ -13,14 +13,7 @@
 #include "Kerberos/Scene/EditorCamera.h"
 
 namespace Kerberos
-{
-	enum class RenderPass : uint8_t
-	{
-		Shadow,
-		Geometry,
-		Skybox,
-	};
-
+{ 
 	struct ShadowMapSettings
 	{
 		uint32_t Resolution = 1024;
