@@ -59,6 +59,12 @@ namespace Kerberos
 		virtual Ref<Shader> GetShader() const { return GetSpecification().Shader; }
 		virtual Ref<Framebuffer> GetTargetFramebuffer() const { return GetSpecification().TargetFramebuffer; }
 
+		template<typename T>
+		T& As()
+		{
+			return *static_cast<T*>(this);
+		}
+
 		static Ref<GraphicsPipeline> Create(const PipelineSpecification& spec);
 	};
 }

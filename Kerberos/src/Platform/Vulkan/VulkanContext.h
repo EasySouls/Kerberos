@@ -102,6 +102,7 @@ namespace Kerberos
 		void CreateVmaAllocator();
 		void CreateSwapChain();
 		void CreateImageViews();
+		void SetupPipelineStatsQueryResultBuffer();
 		void CreateRenderPass();
 		void CreateGraphicsPipeline();
 		void CreateVertexBuffer();
@@ -127,6 +128,7 @@ namespace Kerberos
 		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) const;
 		SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device) const;
 		void QueryDeviceFeatures(VkPhysicalDevice device);
+		void GetPipelineStatsQueryResult();
 
 		static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 		static VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
@@ -178,6 +180,16 @@ namespace Kerberos
 		VulkanVersion m_VulkanVersion{};
 		VulkanFeatures m_VulkanFeatures{};
 
+		// Pipeline stats
+		VkQueryPool m_PipelineStatsQueryPool = VK_NULL_HANDLE;
+		struct PipelineStats
+		{
+			uint64_t VertexShaderInvocations = 0;
+			uint64_t FragmentShaderInvocations = 0;
+		} m_PipelineStats;
+
+
+		// Singleton instance
 		static VulkanContext* s_Instance;
 	};
 }

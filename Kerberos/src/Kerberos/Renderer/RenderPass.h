@@ -22,6 +22,7 @@ namespace Kerberos
 		virtual void SetInput(std::string_view name, const Ref<UniformBuffer>& uniformBuffer) = 0;
 
 		virtual Ref<Texture2D> GetOutputImage(uint32_t index) const = 0;
+		virtual Ref<Texture2D> GetOutputDepthImage() const = 0;
 
 		/**
 		 * @brief Checks whether the current render pass is in a valid state.

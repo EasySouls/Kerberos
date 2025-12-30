@@ -230,7 +230,7 @@ namespace Kerberos
 		GraphicsPipeline::PipelineSpecification shadowPipelineSpec;
 		shadowPipelineSpec.Name = "Shadow Map Pipeline";
 		shadowPipelineSpec.Shader = s_RendererData.ShadowMapShader;
-		shadowPipelineSpec.DepthTest = GraphicsPipeline::DepthTest::LessEqual;
+		shadowPipelineSpec.DepthTest = GraphicsPipeline::DepthTest::Less;
 		shadowPipelineSpec.CullMode = GraphicsPipeline::CullMode::Back;
 		shadowPipelineSpec.PrimitiveTopology = GraphicsPipeline::Topology::Triangles;
 		shadowPipelineSpec.TargetFramebuffer = Framebuffer::Create(shadowMapFramebufferSpec);
@@ -245,7 +245,7 @@ namespace Kerberos
 		wireframePipelineSpec.Name = "Wireframe Pipeline";
 		wireframePipelineSpec.Shader = s_RendererData.WireframeShader;
 		wireframePipelineSpec.Wireframe = true;
-		wireframePipelineSpec.DepthTest = GraphicsPipeline::DepthTest::LessEqual;
+		wireframePipelineSpec.DepthTest = GraphicsPipeline::DepthTest::Less;
 		wireframePipelineSpec.CullMode = GraphicsPipeline::CullMode::Back;
 		wireframePipelineSpec.PrimitiveTopology = GraphicsPipeline::Topology::Triangles;
 		s_RendererData.WireframePipeline = GraphicsPipeline::Create(wireframePipelineSpec);
@@ -253,7 +253,7 @@ namespace Kerberos
 		GraphicsPipeline::PipelineSpecification opaquePipelineSpec;
 		opaquePipelineSpec.Name = "Opaque Pipeline";
 		opaquePipelineSpec.Shader = s_RendererData.GeometryShader;
-		opaquePipelineSpec.DepthTest = GraphicsPipeline::DepthTest::LessEqual;
+		opaquePipelineSpec.DepthTest = GraphicsPipeline::DepthTest::Less;
 		opaquePipelineSpec.CullMode = GraphicsPipeline::CullMode::Back;
 		opaquePipelineSpec.PrimitiveTopology = GraphicsPipeline::Topology::Triangles;
 		s_RendererData.OpaquePipeline = GraphicsPipeline::Create(opaquePipelineSpec);

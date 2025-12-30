@@ -15,6 +15,8 @@ namespace Kerberos
 		void Bind() const override;
 
 		const PipelineSpecification& GetSpecification() const override { return m_Specification; }
+		VkPipeline GetVkPipeline() const { return m_Pipeline; }
+
 	private:
 		void CreateGraphicsPipeline();
 		void ReleaseResources() const;

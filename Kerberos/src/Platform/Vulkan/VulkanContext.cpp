@@ -105,6 +105,7 @@ namespace Kerberos
 		CreateVmaAllocator();
 		CreateSwapChain();
 		CreateImageViews();
+		SetupPipelineStatsQueryResultBuffer();
 		CreateRenderPass();
 		CreateGraphicsPipeline();
 		CreateVertexBuffer();
@@ -165,6 +166,8 @@ namespace Kerberos
 			KBR_CORE_ASSERT(false, "Failed to submit draw command buffer!");
 			throw std::runtime_error("failed to submit draw command buffer!");
 		}
+
+		GetPipelineStatsQueryResult();
 
 		const ImGuiIO& io = ImGui::GetIO();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -543,8 +546,13 @@ namespace Kerberos
 		deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 		deviceFeatures2.pNext = &bdaFeatures;
 		deviceFeatures2.features.tessellationShader = m_VulkanFeatures.TesselationShaderSupported ? VK_TRUE : VK_FALSE;
+
+		// These features are always enabled
 		deviceFeatures2.features.robustBufferAccess = VK_TRUE;
 		deviceFeatures2.features.geometryShader = VK_TRUE;
+		deviceFeatures2.features.fillModeNonSolid = VK_TRUE;
+		deviceFeatures2.features.pipelineStatisticsQuery = VK_TRUE;
+		deviceFeatures2.features.samplerAnisotropy = VK_TRUE;
 
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -684,6 +692,22 @@ namespace Kerberos
 				KBR_CORE_ASSERT(false, "Failed to create image views! Result: {0}", VulkanHelpers::VkResultToString(result));
 				throw std::runtime_error("failed to create image views!");
 			}
+		}
+	}
+
+	void VulkanContext::SetupPipelineStatsQueryResultBuffer() 
+	{
+		VkQueryPoolCreateInfo queryPoolInfo{};
+		queryPoolInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
+		queryPoolInfo.queryType = VK_QUERY_TYPE_PIPELINE_STATISTICS;
+		queryPoolInfo.pipelineStatistics = VK_QUERY_PIPELINE_STATISTIC_FRAGMENT_SHADER_INVOCATIONS_BIT |
+			VK_QUERY_PIPELINE_STATISTIC_VERTEX_SHADER_INVOCATIONS_BIT;
+		queryPoolInfo.queryCount = 2;
+
+		if (const VkResult result = vkCreateQueryPool(m_Device, &queryPoolInfo, nullptr, &m_PipelineStatsQueryPool); result != VK_SUCCESS)
+		{
+			KBR_CORE_ASSERT(false, "Failed to create pipeline stats query pool! Result: {0}", VulkanHelpers::VkResultToString(result));
+			throw std::runtime_error("failed to create pipeline stats query pool!");
 		}
 	}
 
@@ -1359,6 +1383,20 @@ namespace Kerberos
 		m_VulkanFeatures.BufferDeviceAddressSupported = bdaFeatures.bufferDeviceAddress == VK_TRUE;
 		m_VulkanFeatures.Synchronization2Supported = deviceFeatures13.synchronization2 == VK_TRUE;
 		m_VulkanFeatures.TesselationShaderSupported = deviceFeatures2.features.tessellationShader == VK_TRUE;
+	}
+
+	void VulkanContext::GetPipelineStatsQueryResult() 
+	{
+		vkGetQueryPoolResults(
+			m_Device,
+			m_PipelineStatsQueryPool,
+			0,
+			1,
+			sizeof(PipelineStats),
+			&m_PipelineStats,
+			sizeof(uint64_t),
+			VK_QUERY_RESULT_64_BIT /* | VK_QUERY_RESULT_WAIT_BIT */
+		);
 	}
 
 	VkSurfaceFormatKHR VulkanContext::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
