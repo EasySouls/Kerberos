@@ -4,12 +4,19 @@
 namespace Kerberos 
 {
 	D3D11RenderPass::D3D11RenderPass(const RenderPassSpecification& spec)
-		: RenderPass()
+		: m_DebugName(spec.Name), m_Pipeline(spec.Pipeline)
 	{
-		KBR_CORE_ASSERT(false, "D3D11RenderPass is not yet implemented!");
+		
 	}
 
-	D3D11RenderPass::~D3D11RenderPass()
+	D3D11RenderPass::~D3D11RenderPass() = default;
+
+	void D3D11RenderPass::Begin() 
+	{
+		m_Pipeline->Bind();
+	}
+
+	void D3D11RenderPass::End() 
 	{
 	}
 

@@ -9,10 +9,19 @@ namespace Kerberos
 		explicit D3D11RenderPass(const RenderPassSpecification& spec);
 		~D3D11RenderPass() override;
 
+		void Begin() override;
+		void End() override;
+
 		void SetInput(std::string_view name, const Ref<Texture2D>& texture) override;
 		void SetInput(std::string_view name, const Ref<UniformBuffer>& uniformBuffer) override;
+
 		Ref<Texture2D> GetOutputImage(uint32_t index) const override;
+
 		bool Validate() const override;
 		void Bake() override;
+
+	private:
+		std::string m_DebugName;
+		Ref<GraphicsPipeline> m_Pipeline;
 	};
 }

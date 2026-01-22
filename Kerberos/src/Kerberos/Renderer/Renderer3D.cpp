@@ -274,6 +274,30 @@ namespace Kerberos
 		environmentMapPipelineSpec.PrimitiveTopology = GraphicsPipeline::Topology::Triangles;
 		s_RendererData.EnvironmentMapPipeline = GraphicsPipeline::Create(environmentMapPipelineSpec);
 
+		RenderPassSpecification shadowMapPassSpec;
+		shadowMapPassSpec.Name = "Shadow Map Pass";
+		shadowMapPassSpec.Pipeline = s_RendererData.ShadowMapPipeline;
+		s_RendererData.ShadowMapPass = RenderPass::Create(shadowMapPassSpec);
+
+		RenderPassSpecification opaquePassSpec;
+		opaquePassSpec.Name = "Opaque Pass";
+		opaquePassSpec.Pipeline = s_RendererData.OpaquePipeline;
+		s_RendererData.OpaquePass = RenderPass::Create(opaquePassSpec);
+
+		RenderPassSpecification wireframePassSpec;
+		wireframePassSpec.Name = "Wireframe Pass";
+		wireframePassSpec.Pipeline = s_RendererData.WireframePipeline;
+		s_RendererData.WireframePass = RenderPass::Create(wireframePassSpec);
+
+		RenderPassSpecification transparentPassSpec;
+		transparentPassSpec.Name = "Transparent Pass";
+		transparentPassSpec.Pipeline = s_RendererData.TransparentPipeline;
+		s_RendererData.TransparentPass = RenderPass::Create(transparentPassSpec);
+
+		RenderPassSpecification environmentMapPassSpec;
+		environmentMapPassSpec.Name = "Environment Map Pass";
+		environmentMapPassSpec.Pipeline = s_RendererData.EnvironmentMapPipeline;
+		s_RendererData.EnvironmentMapPass = RenderPass::Create(environmentMapPassSpec);
 
 		ResetStatistics();
 	}

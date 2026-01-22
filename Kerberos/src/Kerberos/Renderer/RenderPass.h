@@ -1,9 +1,12 @@
 #pragma once
 
 #include "GraphicsPipeline.h"
+#include "TextureCube.h"
+#include "Texture.h"
 #include "UniformBuffer.h"
 
 #include <string_view>
+
 
 namespace Kerberos
 {
@@ -18,7 +21,11 @@ namespace Kerberos
 	public:
 		virtual ~RenderPass() = default;
 
+		virtual void Begin() = 0;
+		virtual void End() = 0;
+
 		virtual void SetInput(std::string_view name, const Ref<Texture2D>& texture) = 0;
+		virtual void SetInput(std::string_view name, const Ref<TextureCube>& texture) = 0;
 		virtual void SetInput(std::string_view name, const Ref<UniformBuffer>& uniformBuffer) = 0;
 
 		virtual Ref<Texture2D> GetOutputImage(uint32_t index) const = 0;

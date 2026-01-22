@@ -9,9 +9,14 @@ namespace Kerberos
 		explicit OpenGLRenderPass(RenderPassSpecification spec);
 		~OpenGLRenderPass() override = default;
 
+		void Begin() override;
+		void End() override;
+
 		void SetInput(std::string_view name, const Ref<Texture2D>& texture) override;
 		void SetInput(std::string_view name, const Ref<UniformBuffer>& uniformBuffer) override;
+
 		Ref<Texture2D> GetOutputImage(uint32_t index) const override;
+
 		bool Validate() const override;
 		void Bake() override;
 

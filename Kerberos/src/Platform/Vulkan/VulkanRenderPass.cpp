@@ -5,14 +5,13 @@
 
 namespace Kerberos
 {
-	VulkanRenderPass::VulkanRenderPass(const RenderPassSpecification& spec) 
+	VulkanRenderPass::VulkanRenderPass(const RenderPassSpecification& spec)
+		: m_DebugName(spec.Name), m_Pipeline(spec.Pipeline)
 	{
-		CreateRenderPass(spec);
-
-		SetDebugName(spec.Name.empty() ? "VulkanRenderPass" : spec.Name);
+		
 	}
 
-	void VulkanRenderPass::CreateRenderPass(const RenderPassSpecification& spec) 
+	void VulkanRenderPass::CreateRenderPass() 
 	{
 		const VkDevice& device = VulkanContext::Get().GetDevice();
 
@@ -51,25 +50,6 @@ namespace Kerberos
 		}
 	}
 
-	void VulkanRenderPass::ReleaseResources() 
-	{
-		const VkDevice& device = VulkanContext::Get().GetDevice();
-
-		if (m_RenderPass != VK_NULL_HANDLE)
-		{
-			vkDestroyRenderPass(device, m_RenderPass, nullptr);
-			m_RenderPass = VK_NULL_HANDLE;
-		}
-	}
-
-	void VulkanRenderPass::SetDebugName(const std::string& name) const 
-	{
-		KBR_CORE_ASSERT(!name.empty(), "RenderPass name is empty!");
-		KBR_CORE_ASSERT(m_RenderPass != VK_NULL_HANDLE, "RenderPass is null!");
-
-		VulkanHelpers::SetObjectDebugName(VulkanContext::Get().GetDevice(), VK_OBJECT_TYPE_RENDER_PASS, reinterpret_cast<uint64_t>(m_RenderPass), name);
-	}
-
 	void VulkanRenderPass::SetInput(std::string_view name, const Ref<UniformBuffer>& uniformBuffer) 
 	{
 		throw std::runtime_error("VulkanRenderPass::SetInput() not implemented yet!");
@@ -78,6 +58,11 @@ namespace Kerberos
 	void VulkanRenderPass::SetInput(std::string_view name, const Ref<Texture2D>& image) 
 	{
 		throw std::runtime_error("VulkanRenderPass::SetInput() not implemented yet!");
+	}
+
+	void VulkanRenderPass::SetInput(std::string_view name, const Ref<TextureCube>& cubeImage) 
+	{
+
 	}
 
 	Ref<Texture2D> VulkanRenderPass::GetOutputImage(uint32_t index) const 
@@ -92,6 +77,27 @@ namespace Kerberos
 
 	void VulkanRenderPass::Bake() 
 	{
-		throw std::runtime_error("VulkanRenderPass::Bake() not implemented yet!");
+		CreateRenderPass();
+
+		SetDebugName(m_DebugName.empty() ? "VulkanRenderPass" : m_DebugName);
+	}
+
+	void VulkanRenderPass::ReleaseResources()
+	{
+		const VkDevice& device = VulkanContext::Get().GetDevice();
+
+		if (m_RenderPass != VK_NULL_HANDLE)
+		{
+			vkDestroyRenderPass(device, m_RenderPass, nullptr);
+			m_RenderPass = VK_NULL_HANDLE;
+		}
+	}
+
+	void VulkanRenderPass::SetDebugName(const std::string& name) const
+	{
+		KBR_CORE_ASSERT(!name.empty(), "RenderPass name is empty!");
+		KBR_CORE_ASSERT(m_RenderPass != VK_NULL_HANDLE, "RenderPass is null!");
+
+		VulkanHelpers::SetObjectDebugName(VulkanContext::Get().GetDevice(), VK_OBJECT_TYPE_RENDER_PASS, reinterpret_cast<uint64_t>(m_RenderPass), name);
 	}
 }

@@ -8,6 +8,15 @@ namespace Kerberos
 	{
 	}
 
+	void OpenGLRenderPass::Begin() 
+	{
+		m_Specification.Pipeline->Bind();
+	}
+
+	void OpenGLRenderPass::End() 
+	{
+	}
+
 	void OpenGLRenderPass::SetInput(std::string_view name, const Ref<Texture2D>& texture)
 	{
 		KBR_CORE_ASSERT(false, "OpenGLRenderPass::SetInput is not yet implemented!");
