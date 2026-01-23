@@ -17,6 +17,7 @@ namespace Kerberos
 			case FramebufferTextureFormat::RGBA8:           return VK_FORMAT_R8G8B8A8_UNORM;
 			case FramebufferTextureFormat::DEPTH24STENCIL8:
 			case FramebufferTextureFormat::DEPTH24:         return VK_FORMAT_D24_UNORM_S8_UINT; // Vulkan doesn't have a separate format for DEPTH24
+			case FramebufferTextureFormat::DEPTH32:         return VK_FORMAT_D32_SFLOAT;
 			case FramebufferTextureFormat::RED_INTEGER:     return VK_FORMAT_R32_SINT;
 			case FramebufferTextureFormat::None:            return VK_FORMAT_UNDEFINED;
 			}
@@ -26,7 +27,7 @@ namespace Kerberos
 
 		static bool IsDepthFormat(const FramebufferTextureFormat format)
 		{
-			return format == FramebufferTextureFormat::DEPTH24STENCIL8 || format == FramebufferTextureFormat::DEPTH24;
+			return format == FramebufferTextureFormat::DEPTH24STENCIL8 || format == FramebufferTextureFormat::DEPTH24 || format == FramebufferTextureFormat::DEPTH32;
 		}
 	}
 

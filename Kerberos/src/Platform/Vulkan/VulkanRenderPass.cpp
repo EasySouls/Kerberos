@@ -11,6 +11,9 @@ namespace Kerberos
 		
 	}
 
+	void VulkanRenderPass::Begin() {}
+	void VulkanRenderPass::End() {}
+
 	void VulkanRenderPass::CreateRenderPass() 
 	{
 		const VkDevice& device = VulkanContext::Get().GetDevice();
@@ -68,6 +71,11 @@ namespace Kerberos
 	Ref<Texture2D> VulkanRenderPass::GetOutputImage(uint32_t index) const 
 	{
 		throw std::runtime_error("VulkanRenderPass::GetOutputImage() not implemented yet!");
+	}
+
+	Ref<Texture2D> VulkanRenderPass::GetOutputDepthImage() const 
+	{
+		throw std::runtime_error("VulkanRenderPass::GetOutputDepthImage() not implemented yet!");
 	}
 
 	bool VulkanRenderPass::Validate() const 

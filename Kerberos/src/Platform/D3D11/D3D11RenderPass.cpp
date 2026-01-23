@@ -30,9 +30,20 @@ namespace Kerberos
 		KBR_CORE_ASSERT(false, "D3D11RenderPass::SetInput(UniformBuffer) is not yet implemented!");
 	}
 
+	void D3D11RenderPass::SetInput(std::string_view name, const Ref<TextureCube>& texture) 
+	{
+		KBR_CORE_ASSERT(false, "D3D11RenderPass::SetInput(TextureCube) is not yet implemented!");
+	}
+
 	Ref<Texture2D> D3D11RenderPass::GetOutputImage(uint32_t index) const
 	{
 		KBR_CORE_ASSERT(false, "D3D11RenderPass::GetOutputImage is not yet implemented!");
+		return nullptr;
+	}
+
+	Ref<Texture2D> D3D11RenderPass::GetOutputDepthImage() const 
+	{
+		KBR_CORE_ASSERT(false, "D3D11RenderPass::GetOutputDepthImage is not yet implemented!");
 		return nullptr;
 	}
 

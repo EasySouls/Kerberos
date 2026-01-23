@@ -15,11 +15,15 @@ namespace Kerberos
 		explicit VulkanRenderPass(const RenderPassSpecification& spec);
 		~VulkanRenderPass() override = default;
 
+		void Begin() override;
+		void End() override;
+
 		void SetInput(std::string_view name, const Ref<Texture2D>& image) override;
 		void SetInput(std::string_view name, const Ref<TextureCube>& cubeImage) override;
 		void SetInput(std::string_view name, const Ref<UniformBuffer>& uniformBuffer) override;
 
 		Ref<Texture2D> GetOutputImage(uint32_t index) const override;
+		Ref<Texture2D> GetOutputDepthImage() const override;
 
 		bool Validate() const override;
 		void Bake() override;

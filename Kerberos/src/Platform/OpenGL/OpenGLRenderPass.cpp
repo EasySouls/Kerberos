@@ -22,11 +22,25 @@ namespace Kerberos
 		KBR_CORE_ASSERT(false, "OpenGLRenderPass::SetInput is not yet implemented!");
 	}
 
-	void OpenGLRenderPass::SetInput(std::string_view name, const Ref<UniformBuffer>& uniformBuffer) {}
+	void OpenGLRenderPass::SetInput(std::string_view name, const Ref<UniformBuffer>& uniformBuffer) 
+	{
+		KBR_CORE_ASSERT(false, "OpenGLRenderPass::SetInput is not yet implemented!");
+	}
+
+	void OpenGLRenderPass::SetInput(std::string_view name, const Ref<TextureCube>& texture) 
+	{
+		KBR_CORE_ASSERT(false, "OpenGLRenderPass::SetInput is not yet implemented!");
+	}
 
 	Ref<Texture2D> OpenGLRenderPass::GetOutputImage(uint32_t index) const
 	{
 		KBR_CORE_ASSERT(false, "OpenGLRenderPass::GetOutputImage is not yet implemented!");
+		return nullptr;
+	}
+
+	Ref<Texture2D> OpenGLRenderPass::GetOutputDepthImage() const 
+	{
+		KBR_CORE_ASSERT(false, "OpenGLRenderPass::GetOutputDepthImage is not yet implemented!");
 		return nullptr;
 	}
 

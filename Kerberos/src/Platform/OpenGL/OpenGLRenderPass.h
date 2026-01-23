@@ -14,8 +14,10 @@ namespace Kerberos
 
 		void SetInput(std::string_view name, const Ref<Texture2D>& texture) override;
 		void SetInput(std::string_view name, const Ref<UniformBuffer>& uniformBuffer) override;
+		void SetInput(std::string_view name, const Ref<TextureCube>& texture) override;
 
 		Ref<Texture2D> GetOutputImage(uint32_t index) const override;
+		Ref<Texture2D> GetOutputDepthImage() const override;
 
 		bool Validate() const override;
 		void Bake() override;
