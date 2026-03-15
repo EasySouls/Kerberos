@@ -10,6 +10,7 @@ PythonRequirements.Validate()
 
 from SetupPremake import PremakeConfiguration as PremakeRequirements
 from SetupVulkan import VulkanConfiguration as VulkanRequirements
+from SetupDotNet import DotNetConfiguration as DotNetRequirements
 os.chdir('./../') # Change from devtools/scripts directory to root
 
 premakeInstalled = PremakeRequirements.Validate()
@@ -17,6 +18,8 @@ premakeInstalled = PremakeRequirements.Validate()
 # If we are in CI we do not need to validate the VulkanSDK
 if os.getenv('CI') is None:
     VulkanRequirements.Validate()
+
+DotNetRequirements.Validate()
 
 print("\nUpdating submodules...")
 subprocess.call(["git", "submodule", "update", "--init", "--recursive"])

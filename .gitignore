@@ -21,6 +21,9 @@ KerberosEditor/Resources/Scripts/Intermediates
 KerberosScriptCoreLib/bin/
 KerberosScriptCoreLib/obj/
 
+# .NET host libraries (copied from SDK by scripts/SetupDotNet.py)
+Kerberos/vendor/dotnet/lib/
+
 scripts/__pycache__
 
 # Solution files
