@@ -305,6 +305,7 @@ project "Sandbox"
 
 		IncludeDir.glm,
 		IncludeDir.entt,
+		IncludeDir.DotNet,
 		--IncludeDir.Assimp,
 	}
 	
@@ -357,6 +358,7 @@ project "KerberosEditor"
 
 		IncludeDir.glm,
 		IncludeDir.entt,
+		IncludeDir.DotNet,
 		--IncludeDir.Assimp
 	}
 	
