@@ -4,19 +4,12 @@
 #include "Kerberos/Scene/Entity.h"
 #include "ScriptClass.h"
 
-extern "C" {
-	typedef struct _MonoClass		MonoClass;
-	typedef struct _MonoObject		MonoObject;
-	typedef struct _MonoMethod		MonoMethod;
-}
-
-constexpr int maxFieldSize = 16;
-
 namespace Kerberos 
 {
 	/*
 	* A runtime instance of a ScriptClass.
-	* Two instances of the same ScriptClass will have different field values.
+	* In the .NET hosting model, instance management is delegated to the managed ScriptGlue bridge.
+	* The C++ side holds metadata and the entity ID used to communicate with the managed side.
 	*/
 	class ScriptInstance
 	{
@@ -47,7 +40,6 @@ namespace Kerberos
 		}
 
 		const Ref<ScriptClass>& GetScriptClass() const { return m_ScriptClass; }
-		const MonoObject* GetManagedObject() const { return m_Instance; }
 
 	private:
 		void InitializeValues(const std::unordered_map<std::string, ScriptFieldInitializer>& values) const;
@@ -57,13 +49,8 @@ namespace Kerberos
 
 	private:
 		Entity m_Entity;
+		UUID m_EntityID;
 		Ref<ScriptClass> m_ScriptClass = nullptr;
-
-		MonoObject* m_Instance = nullptr;
-		MonoMethod* m_OnCreateMethod = nullptr;
-		MonoMethod* m_OnUpdateMethod = nullptr;
-		/// Constructor with the UUID parameter
-		MonoMethod* m_Constructor = nullptr;
 
 		/// 16 is the size of the largest supported field type (double, long, ulong, vec4)
 		/// When lists are supported, this will need to be changed
