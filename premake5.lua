@@ -321,6 +321,11 @@ project "Sandbox"
 		{
 			"KBR_PLATFORM_WINDOWS"
 		}
+
+		postbuildcommands
+		{
+			'{COPYFILE} "%{LibraryDir.DotNet}/nethost.dll" "%{cfg.targetdir}"'
+		}
 		
 	filter "configurations:Debug"
 		defines "KBR_DEBUG"
@@ -373,6 +378,11 @@ project "KerberosEditor"
 		defines
 		{
 			"KBR_PLATFORM_WINDOWS"
+		}
+
+		postbuildcommands
+		{
+			'{COPYFILE} "%{LibraryDir.DotNet}/nethost.dll" "%{cfg.targetdir}"'
 		}
 		
 	filter "configurations:Debug"
