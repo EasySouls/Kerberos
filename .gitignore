@@ -16,6 +16,7 @@ KerberosEditor/*.log
 
 # KerberosScriptCoreLib intermediates
 KerberosEditor/Resources/Scripts/Intermediates
+KerberosEditor/Resources/Scripts/*.deps.json
 
 # .NET build artifacts
 KerberosScriptCoreLib/bin/
