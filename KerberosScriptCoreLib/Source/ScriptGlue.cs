@@ -22,10 +22,6 @@ namespace Kerberos.Source
         private static readonly Dictionary<Type, MethodInfo?> s_OnUpdateMethods = new();
         private static readonly Dictionary<Type, ConstructorInfo?> s_UlongConstructors = new();
 
-        // Native function pointers (set by C++ during initialization)
-        // These replace the old Mono InternalCall mechanism
-        private static IntPtr s_NativeFunctionPointers = IntPtr.Zero;
-
         // ====================================================================
         // Assembly Loading
         // ====================================================================
@@ -398,20 +394,6 @@ namespace Kerberos.Source
                 return 0;
             }
         }
-
-        // ====================================================================
-        // Component Type Registration (bridge for HasComponent checks)
-        // ====================================================================
-
-        // Function pointer types for native callbacks
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void NativeLogDelegate(IntPtr message);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate int EntityHasComponentDelegate(ulong entityID, IntPtr componentTypeName);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate ulong EntityFindByNameDelegate(IntPtr name);
 
         // ====================================================================
         // Helpers

@@ -350,6 +350,12 @@ namespace Kerberos
 		return false;
 	}
 
+	void ScriptEngine::SetManagedNativeCallbacks(void* callbackTable)
+	{
+		if (s_ScriptData->ManagedSetNativeCallbacks)
+			s_ScriptData->ManagedSetNativeCallbacks(callbackTable);
+	}
+
 	void ScriptEngine::InitDotNet() 
 	{
 		if (!LoadHostFxr())

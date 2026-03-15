@@ -476,7 +476,7 @@ namespace Kerberos
 		callbackTable.AudioSource3DComponent_SetLooping = reinterpret_cast<void*>(&AudioSource3DComponent_SetLooping);
 		callbackTable.AudioSource3DComponent_IsLooping = reinterpret_cast<void*>(&AudioSource3DComponent_IsLooping);
 
-		/// TODO: Pass the callback table to the managed side via ManagedSetNativeCallbacks
-		/// This is done after LoadManagedFunctions() is called in ScriptEngine::LoadAssembly
+		/// Pass the callback table to the managed side
+		ScriptEngine::SetManagedNativeCallbacks(&callbackTable);
 	}
 }

@@ -65,6 +65,9 @@ namespace Kerberos
 		static bool GetManagedFieldValue(uint64_t entityID, const std::string& fieldName, void* outValue, int bufferSize);
 		static bool SetManagedFieldValue(uint64_t entityID, const std::string& fieldName, void* value, int valueSize);
 
+		/// Passes the native callback table to the managed side
+		static void SetManagedNativeCallbacks(void* callbackTable);
+
 
 	private:
 		static void InitDotNet();
