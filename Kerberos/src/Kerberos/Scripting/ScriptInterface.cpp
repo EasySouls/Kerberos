@@ -88,7 +88,7 @@ namespace Kerberos
 
 		if (const std::shared_ptr<Scene> scene = ScriptEngine::GetSceneContext().lock())
 		{
-			const Entity entity = scene->GetEntityByUUID(entityID);
+			const Entity entity = scene->GetEntityByUUID(UUID(entityID));
 			const std::string typeName(componentTypeName);
 
 			if (s_EntityHasComponentFunctions.contains(typeName))
@@ -119,7 +119,7 @@ namespace Kerberos
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		if (outTranslation)
 		{
-			const glm::vec3 translation = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Translation;
+			const glm::vec3 translation = scene.lock()->GetEntityByUUID(UUID(entityID)).GetComponent<TransformComponent>().Translation;
 			*outTranslation = translation;
 		}
 	}
@@ -129,7 +129,7 @@ namespace Kerberos
 		if (translation)
 		{
 			const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-			glm::vec3& currentTranslation = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Translation;
+			glm::vec3& currentTranslation = scene.lock()->GetEntityByUUID(UUID(entityID)).GetComponent<TransformComponent>().Translation;
 			currentTranslation = *translation;
 		}
 	}
@@ -139,7 +139,7 @@ namespace Kerberos
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		if (outRotation)
 		{
-			const glm::vec3 rotation = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Rotation;
+			const glm::vec3 rotation = scene.lock()->GetEntityByUUID(UUID(entityID)).GetComponent<TransformComponent>().Rotation;
 			*outRotation = rotation;
 		}
 	}
@@ -149,7 +149,7 @@ namespace Kerberos
 		if (rotation)
 		{
 			const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-			glm::vec3& currentRotation = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Rotation;
+			glm::vec3& currentRotation = scene.lock()->GetEntityByUUID(UUID(entityID)).GetComponent<TransformComponent>().Rotation;
 			currentRotation = *rotation;
 		}
 	}
@@ -159,7 +159,7 @@ namespace Kerberos
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		if (outScale)
 		{
-			const glm::vec3 scale = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Scale;
+			const glm::vec3 scale = scene.lock()->GetEntityByUUID(UUID(entityID)).GetComponent<TransformComponent>().Scale;
 			*outScale = scale;
 		}
 	}
@@ -169,7 +169,7 @@ namespace Kerberos
 		if (scale)
 		{
 			const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-			glm::vec3& currentScale = scene.lock()->GetEntityByUUID(entityID).GetComponent<TransformComponent>().Scale;
+			glm::vec3& currentScale = scene.lock()->GetEntityByUUID(UUID(entityID)).GetComponent<TransformComponent>().Scale;
 			currentScale = *scale;
 		}
 	}
@@ -180,7 +180,7 @@ namespace Kerberos
 		{
 			const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 			const Ref<Scene> currentScene = scene.lock();
-			const Entity entity = currentScene->GetEntityByUUID(entityID);
+			const Entity entity = currentScene->GetEntityByUUID(UUID(entityID));
 
 			KBR_CORE_ASSERT(entity.HasComponent<RigidBody3DComponent>(), "Entity doesn't have a Rigidbody3DComponent.");
 
@@ -202,7 +202,7 @@ namespace Kerberos
 		{
 			const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 			const Ref<Scene> currentScene = scene.lock();
-			const Entity entity = currentScene->GetEntityByUUID(entityID);
+			const Entity entity = currentScene->GetEntityByUUID(UUID(entityID));
 
 			KBR_CORE_ASSERT(entity.HasComponent<RigidBody3DComponent>(), "Entity doesn't have a Rigidbody3DComponent.");
 
@@ -224,7 +224,7 @@ namespace Kerberos
 	static const char* TextComponent_GetText(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 		const TextComponent& textComponent = entity.GetComponent<TextComponent>();
 		s_StringReturnBuffer = textComponent.Text;
 		return s_StringReturnBuffer.c_str();
@@ -236,7 +236,7 @@ namespace Kerberos
 			return;
 
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		TextComponent& textComponent = entity.GetComponent<TextComponent>();
 		textComponent.Text = std::string(text);
@@ -248,7 +248,7 @@ namespace Kerberos
 			return;
 
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const glm::vec4 color = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().Color;
+		const glm::vec4 color = scene.lock()->GetEntityByUUID(UUID(entityID)).GetComponent<TextComponent>().Color;
 		*outColor = color;
 	}
 
@@ -258,28 +258,28 @@ namespace Kerberos
 			return;
 
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		glm::vec4& currentColor = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().Color;
+		glm::vec4& currentColor = scene.lock()->GetEntityByUUID(UUID(entityID)).GetComponent<TextComponent>().Color;
 		currentColor = *color;
 	}
 
 	static float TextComponent_GetFontSize(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const float fontSize = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().FontSize;
+		const float fontSize = scene.lock()->GetEntityByUUID(UUID(entityID)).GetComponent<TextComponent>().FontSize;
 		return fontSize;
 	}
 
 	static void TextComponent_SetFontSize(const uint64_t entityID, const float fontSize)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		float& currentFontSize = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().FontSize;
+		float& currentFontSize = scene.lock()->GetEntityByUUID(UUID(entityID)).GetComponent<TextComponent>().FontSize;
 		currentFontSize = fontSize;
 	}
 
 	static const char* TextComponent_GetFontPath(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		const TextComponent& textComponent = entity.GetComponent<TextComponent>();
 		s_StringReturnBuffer = textComponent.Font->GetFilepath().string();
@@ -297,7 +297,7 @@ namespace Kerberos
 	static void AudioSource2DComponent_Play(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		const AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
 		if (audioComponent.SoundAsset)
@@ -307,7 +307,7 @@ namespace Kerberos
 	static void AudioSource2DComponent_Stop(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		const AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
 		if (audioComponent.SoundAsset)
@@ -317,7 +317,7 @@ namespace Kerberos
 	static float AudioSource2DComponent_GetVolume(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		const AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
 		return audioComponent.Volume;
@@ -326,7 +326,7 @@ namespace Kerberos
 	static void AudioSource2DComponent_SetVolume(const uint64_t entityID, const float volume)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
 		audioComponent.Volume = volume;
@@ -336,7 +336,7 @@ namespace Kerberos
 	static void AudioSource2DComponent_SetLooping(const uint64_t entityID, const uint8_t loop)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
 		audioComponent.Loop = loop != 0;
@@ -345,7 +345,7 @@ namespace Kerberos
 	static uint8_t AudioSource2DComponent_IsLooping(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		const AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
 		return audioComponent.Loop ? 1 : 0;
@@ -354,7 +354,7 @@ namespace Kerberos
 	static void AudioSource3DComponent_Play(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		const AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
 		if (audioComponent.SoundAsset)
@@ -364,7 +364,7 @@ namespace Kerberos
 	static void AudioSource3DComponent_Stop(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		const AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
 		if (audioComponent.SoundAsset)
@@ -374,7 +374,7 @@ namespace Kerberos
 	static float AudioSource3DComponent_GetVolume(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		const AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
 		return audioComponent.Volume;
@@ -383,7 +383,7 @@ namespace Kerberos
 	static void AudioSource3DComponent_SetVolume(const uint64_t entityID, const float volume)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
 		audioComponent.Volume = volume;
@@ -393,7 +393,7 @@ namespace Kerberos
 	static void AudioSource3DComponent_SetLooping(const uint64_t entityID, const uint8_t loop)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
 		audioComponent.Loop = loop != 0;
@@ -402,7 +402,7 @@ namespace Kerberos
 	static uint8_t AudioSource3DComponent_IsLooping(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
-		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
+		const Entity entity = scene.lock()->GetEntityByUUID(UUID(entityID));
 
 		const AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
 		return audioComponent.Loop ? 1 : 0;
