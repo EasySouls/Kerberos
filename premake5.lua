@@ -4,10 +4,7 @@ workspace "Kerberos"
 
 	startproject "KerberosEditor"
 
-	flags
-	{
-		"MultiProcessorCompile"
-	}
+	multiprocessorcompile "On"
 	
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -194,7 +191,7 @@ project "Kerberos"
 	}
 
 	filter "files:vendor/ImGuizmo/ImGuizmo.cpp"
-		flags { "NoPCH" }
+		enablepch "Off"
 	
 	filter "system:windows"
 		systemversion "latest"

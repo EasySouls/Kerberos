@@ -14,13 +14,16 @@ project "KerberosScriptCoreLib"
 	}
 
 	filter "configurations:Debug"
+		runtime "Debug"
 		optimize "Off"
 		symbols "Default"
 
 	filter "configurations:Release"
+		runtime "Release"
 		optimize "On"
 		symbols "Default"
 
 	filter "configurations:Dist"
+		runtime "Release"
 		optimize "Full"
 		symbols "Off"
