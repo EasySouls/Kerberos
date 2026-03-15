@@ -17,6 +17,10 @@ KerberosEditor/*.log
 # KerberosScriptCoreLib intermediates
 KerberosEditor/Resources/Scripts/Intermediates
 
+# .NET build artifacts
+KerberosScriptCoreLib/bin/
+KerberosScriptCoreLib/obj/
+
 scripts/__pycache__
 
 # Solution files

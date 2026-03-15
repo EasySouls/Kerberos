@@ -12,51 +12,97 @@
 #include "Kerberos/Scene/Components/PhysicsComponents.h"
 #include "Kerberos/Scene/Components/AudioComponents.h"
 
-#include <mono/metadata/reflection.h>
 #include <glm/glm.hpp>
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/Body.h>
 
 #include <memory>
+#include <cstring>
 
 #include "ScriptUtils.h"
 
 namespace Kerberos
 {
-#define KBR_ADD_INTERNAL_CALL(name) mono_add_internal_call("Kerberos.Source.InternalCalls::" #name, reinterpret_cast<const void*>(name))
-
-	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFunctions;
-
-	static void NativeLog(MonoString* message)
+	/// Structure matching the layout expected by C# SetNativeCallbacks.
+	/// Each entry is a function pointer to a native callback.
+	struct NativeCallbackTable
 	{
-		char* messageCStr = mono_string_to_utf8(message);
-		std::string messageStr(messageCStr);
-		mono_free(messageCStr);
-		KBR_CORE_INFO("C# Log: {0}", messageStr);
+		void* NativeLog;
+		void* Entity_HasComponent;
+		void* Entity_FindEntityByName;
+
+		void* TransformComponent_GetTranslation;
+		void* TransformComponent_SetTranslation;
+		void* TransformComponent_GetRotation;
+		void* TransformComponent_SetRotation;
+		void* TransformComponent_GetScale;
+		void* TransformComponent_SetScale;
+
+		void* Rigidbody3DComponent_ApplyImpulse;
+		void* Rigidbody3DComponent_ApplyImpulseAtPoint;
+
+		void* TextComponent_SetText;
+		void* TextComponent_GetText;
+		void* TextComponent_SetColor;
+		void* TextComponent_GetColor;
+		void* TextComponent_SetFontSize;
+		void* TextComponent_GetFontSize;
+		void* TextComponent_SetFontPath;
+		void* TextComponent_GetFontPath;
+
+		void* Input_IsKeyDown;
+
+		void* AudioSource2DComponent_Play;
+		void* AudioSource2DComponent_Stop;
+		void* AudioSource2DComponent_SetVolume;
+		void* AudioSource2DComponent_GetVolume;
+		void* AudioSource2DComponent_SetLooping;
+		void* AudioSource2DComponent_IsLooping;
+
+		void* AudioSource3DComponent_Play;
+		void* AudioSource3DComponent_Stop;
+		void* AudioSource3DComponent_SetVolume;
+		void* AudioSource3DComponent_GetVolume;
+		void* AudioSource3DComponent_SetLooping;
+		void* AudioSource3DComponent_IsLooping;
+	};
+
+	/// Component type name to HasComponent check mapping
+	static std::unordered_map<std::string, std::function<bool(Entity)>> s_EntityHasComponentFunctions;
+
+	// ====================================================================
+	// Native callback implementations (called from C# via function pointers)
+	// ====================================================================
+
+	static void NativeLog(const char* message)
+	{
+		if (message)
+			KBR_CORE_INFO("C# Log: {0}", message);
 	}
 
-	static bool Entity_HasComponent(const UUID entityID, MonoReflectionType* componentType)
+	static uint8_t Entity_HasComponent(const uint64_t entityID, const char* componentTypeName)
 	{
+		if (!componentTypeName)
+			return 0;
 
 		if (const std::shared_ptr<Scene> scene = ScriptEngine::GetSceneContext().lock())
 		{
 			const Entity entity = scene->GetEntityByUUID(entityID);
+			const std::string typeName(componentTypeName);
 
-			MonoType* monoType = mono_reflection_type_get_type(componentType);
-			KBR_CORE_ASSERT(monoType && s_EntityHasComponentFunctions.contains(monoType), "Component doesn't exist or hasn't been registered!");
-
-			const auto& hasComponentFunc = s_EntityHasComponentFunctions.at(monoType);
-			return hasComponentFunc(entity);
+			if (s_EntityHasComponentFunctions.contains(typeName))
+				return s_EntityHasComponentFunctions.at(typeName)(entity) ? 1 : 0;
 		}
-		return false;
+		return 0;
 	}
 
-	static uint64_t Entity_FindEntityByName(MonoString* name)
+	static uint64_t Entity_FindEntityByName(const char* name)
 	{
-		char* nameCStr = mono_string_to_utf8(name);
-		const std::string nameStr(nameCStr);
-		mono_free(nameCStr);
+		if (!name)
+			return UUID::Invalid();
+
+		const std::string nameStr(name);
 
 		if (const std::shared_ptr<Scene> scene = ScriptEngine::GetSceneContext().lock())
 		{
@@ -68,15 +114,7 @@ namespace Kerberos
 		return UUID::Invalid();
 	}
 
-	static MonoObject* Entity_GetScriptInstance(const UUID entityID)
-	{
-		const Ref<ScriptInstance> instance = ScriptEngine::GetEntityInstance(entityID);
-		KBR_CORE_ASSERT(instance, "No script instance found for entity!");
-
-		return const_cast<MonoObject*>(instance->GetManagedObject());
-	}
-
-	static void TransformComponent_GetTranslation(const UUID entityID, glm::vec3* outTranslation)
+	static void TransformComponent_GetTranslation(const uint64_t entityID, glm::vec3* outTranslation)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		if (outTranslation)
@@ -86,7 +124,7 @@ namespace Kerberos
 		}
 	}
 
-	static void TransformComponent_SetTranslation(const UUID entityID, const glm::vec3* translation)
+	static void TransformComponent_SetTranslation(const uint64_t entityID, const glm::vec3* translation)
 	{
 		if (translation)
 		{
@@ -96,7 +134,7 @@ namespace Kerberos
 		}
 	}
 
-	static void TransformComponent_GetRotation(const UUID entityID, glm::vec3* outRotation)
+	static void TransformComponent_GetRotation(const uint64_t entityID, glm::vec3* outRotation)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		if (outRotation)
@@ -106,7 +144,7 @@ namespace Kerberos
 		}
 	}
 
-	static void TransformComponent_SetRotation(const UUID entityID, const glm::vec3* rotation)
+	static void TransformComponent_SetRotation(const uint64_t entityID, const glm::vec3* rotation)
 	{
 		if (rotation)
 		{
@@ -116,7 +154,7 @@ namespace Kerberos
 		}
 	}
 
-	static void TransformComponent_GetScale(const UUID entityID, glm::vec3* outScale)
+	static void TransformComponent_GetScale(const uint64_t entityID, glm::vec3* outScale)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		if (outScale)
@@ -126,7 +164,7 @@ namespace Kerberos
 		}
 	}
 
-	static void TransformComponent_SetScale(const UUID entityID, const glm::vec3* scale)
+	static void TransformComponent_SetScale(const uint64_t entityID, const glm::vec3* scale)
 	{
 		if (scale)
 		{
@@ -136,7 +174,7 @@ namespace Kerberos
 		}
 	}
 
-	static void Rigidbody3DComponent_ApplyImpulse(const UUID entityID, const glm::vec3* force)
+	static void Rigidbody3DComponent_ApplyImpulse(const uint64_t entityID, const glm::vec3* force)
 	{
 		if (force)
 		{
@@ -145,7 +183,6 @@ namespace Kerberos
 			const Entity entity = currentScene->GetEntityByUUID(entityID);
 
 			KBR_CORE_ASSERT(entity.HasComponent<RigidBody3DComponent>(), "Entity doesn't have a Rigidbody3DComponent.");
-
 
 			const RigidBody3DComponent& rb3d = entity.GetComponent<RigidBody3DComponent>();
 			KBR_CORE_ASSERT(rb3d.RuntimeBody, "Rigidbody3DComponent doesn't have a runtime body.");
@@ -159,7 +196,7 @@ namespace Kerberos
 		}
 	}
 
-	static void Rigidbody3DComponent_ApplyImpulseAtPoint(const UUID entityID, const glm::vec3* force, const glm::vec3* inPoint)
+	static void Rigidbody3DComponent_ApplyImpulseAtPoint(const uint64_t entityID, const glm::vec3* force, const glm::vec3* inPoint)
 	{
 		if (force)
 		{
@@ -181,99 +218,103 @@ namespace Kerberos
 		}
 	}
 
-	static MonoString* TextComponent_GetText(const UUID entityID)
+	/// String return buffer (managed side will read from this pointer)
+	static std::string s_StringReturnBuffer;
+
+	static const char* TextComponent_GetText(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 		const TextComponent& textComponent = entity.GetComponent<TextComponent>();
-		return ScriptEngine::StringToMonoString(textComponent.Text);
+		s_StringReturnBuffer = textComponent.Text;
+		return s_StringReturnBuffer.c_str();
 	}
 
-	static void TextComponent_SetText(const UUID entityID, MonoString* text)
+	static void TextComponent_SetText(const uint64_t entityID, const char* text)
 	{
-		KBR_CORE_ASSERT(text == nullptr, "Null pointer passed to text");
+		if (!text)
+			return;
 
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
 		TextComponent& textComponent = entity.GetComponent<TextComponent>();
-		textComponent.Text = ScriptUtils::MonoStringToString(text);
+		textComponent.Text = std::string(text);
 	}
 
-	static void TextComponent_GetColor(const UUID entityID, glm::vec4* outColor)
+	static void TextComponent_GetColor(const uint64_t entityID, glm::vec4* outColor)
 	{
-		KBR_CORE_ASSERT(outColor, "Null pointer passed to outColor");
+		if (!outColor)
+			return;
 
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const glm::vec4 color = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().Color;
 		*outColor = color;
 	}
 
-	static void TextComponent_SetColor(const UUID entityID, const glm::vec4* color)
+	static void TextComponent_SetColor(const uint64_t entityID, const glm::vec4* color)
 	{
-		KBR_CORE_ASSERT(color, "Null pointer passed to color");
+		if (!color)
+			return;
 
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		glm::vec4& currentColor = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().Color;
 		currentColor = *color;
 	}
 
-	static float TextComponent_GetFontSize(const UUID entityID)
+	static float TextComponent_GetFontSize(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const float fontSize = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().FontSize;
 		return fontSize;
 	}
 
-	static void TextComponent_SetFontSize(const UUID entityID, const float fontSize)
+	static void TextComponent_SetFontSize(const uint64_t entityID, const float fontSize)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		float& currentFontSize = scene.lock()->GetEntityByUUID(entityID).GetComponent<TextComponent>().FontSize;
 		currentFontSize = fontSize;
 	}
 
-	static MonoString* TextComponent_GetFontPath(const UUID entityID)
+	static const char* TextComponent_GetFontPath(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
 		const TextComponent& textComponent = entity.GetComponent<TextComponent>();
-		const std::string fontPath = textComponent.Font->GetFilepath().string();
-		return ScriptEngine::StringToMonoString(fontPath);
+		s_StringReturnBuffer = textComponent.Font->GetFilepath().string();
+		return s_StringReturnBuffer.c_str();
 	}
 
-	static void TextComponent_SetFontPath(const UUID entityID, const MonoString* fontPath)
+	static void TextComponent_SetFontPath(const uint64_t entityID, const char* fontPath)
 	{
-		KBR_CORE_ASSERT(fontPath == nullptr, "Null pointer passed to fontPath");
+		if (!fontPath)
+			return;
 		
 		throw std::runtime_error("TextComponent_SetFontPath is not implemented yet");
 	}
 
-	static void AudioSource2DComponent_Play(const UUID entityID)
+	static void AudioSource2DComponent_Play(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
-		const AudioSource2DComponent& textComponent = entity.GetComponent<AudioSource2DComponent>();
-		if (textComponent.SoundAsset)
-		{
-			textComponent.SoundAsset->Play();
-		}
+		const AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
+		if (audioComponent.SoundAsset)
+			audioComponent.SoundAsset->Play();
 	}
 
-	static void AudioSource2DComponent_Stop(const UUID entityID)
+	static void AudioSource2DComponent_Stop(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
-		const AudioSource2DComponent& textComponent = entity.GetComponent<AudioSource2DComponent>();
-		if (textComponent.SoundAsset)
-		{
-			textComponent.SoundAsset->Stop();
-		}
+		const AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
+		if (audioComponent.SoundAsset)
+			audioComponent.SoundAsset->Stop();
 	}
 
-	static float AudioSource2DComponent_GetVolume(const UUID entityID)
+	static float AudioSource2DComponent_GetVolume(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
@@ -282,7 +323,7 @@ namespace Kerberos
 		return audioComponent.Volume;
 	}
 
-	static void AudioSource2DComponent_SetVolume(const UUID entityID, const float volume)
+	static void AudioSource2DComponent_SetVolume(const uint64_t entityID, const float volume)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
@@ -292,50 +333,45 @@ namespace Kerberos
 		audioComponent.SoundAsset->SetVolume(volume);
 	}
 
-	static void AudioSource2DComponent_SetLooping(const UUID entityID, const bool loop)
+	static void AudioSource2DComponent_SetLooping(const uint64_t entityID, const uint8_t loop)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
 		AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
-		audioComponent.Loop = loop;
+		audioComponent.Loop = loop != 0;
 	}
 
-	static bool AudioSource2DComponent_IsLooping(const UUID entityID)
+	static uint8_t AudioSource2DComponent_IsLooping(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
 		const AudioSource2DComponent& audioComponent = entity.GetComponent<AudioSource2DComponent>();
-		return audioComponent.Loop;
+		return audioComponent.Loop ? 1 : 0;
 	}
 
-
-	static void AudioSource3DComponent_Play(const UUID entityID)
+	static void AudioSource3DComponent_Play(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
-		const AudioSource3DComponent& textComponent = entity.GetComponent<AudioSource3DComponent>();
-		if (textComponent.SoundAsset)
-		{
-			textComponent.SoundAsset->Play();
-		}
+		const AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
+		if (audioComponent.SoundAsset)
+			audioComponent.SoundAsset->Play();
 	}
 
-	static void AudioSource3DComponent_Stop(const UUID entityID)
+	static void AudioSource3DComponent_Stop(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
-		const AudioSource3DComponent& textComponent = entity.GetComponent<AudioSource3DComponent>();
-		if (textComponent.SoundAsset)
-		{
-			textComponent.SoundAsset->Stop();
-		}
+		const AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
+		if (audioComponent.SoundAsset)
+			audioComponent.SoundAsset->Stop();
 	}
 
-	static float AudioSource3DComponent_GetVolume(const UUID entityID)
+	static float AudioSource3DComponent_GetVolume(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
@@ -344,7 +380,7 @@ namespace Kerberos
 		return audioComponent.Volume;
 	}
 
-	static void AudioSource3DComponent_SetVolume(const UUID entityID, const float volume)
+	static void AudioSource3DComponent_SetVolume(const uint64_t entityID, const float volume)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
@@ -354,117 +390,93 @@ namespace Kerberos
 		audioComponent.SoundAsset->SetVolume(volume);
 	}
 
-	static void AudioSource3DComponent_SetLooping(const UUID entityID, const bool loop)
+	static void AudioSource3DComponent_SetLooping(const uint64_t entityID, const uint8_t loop)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
 		AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
-		audioComponent.Loop = loop;
+		audioComponent.Loop = loop != 0;
 	}
 
-	static bool AudioSource3DComponent_IsLooping(const UUID entityID)
+	static uint8_t AudioSource3DComponent_IsLooping(const uint64_t entityID)
 	{
 		const std::weak_ptr<Scene>& scene = ScriptEngine::GetSceneContext();
 		const Entity entity = scene.lock()->GetEntityByUUID(entityID);
 
 		const AudioSource3DComponent& audioComponent = entity.GetComponent<AudioSource3DComponent>();
-		return audioComponent.Loop;
+		return audioComponent.Loop ? 1 : 0;
 	}
 
-
-
-	static bool Input_IsKeyDown(const KeyCode key)
+	static uint8_t Input_IsKeyDown(const int key)
 	{
-		return Input::IsKeyPressed(key);
+		return Input::IsKeyPressed(static_cast<KeyCode>(key)) ? 1 : 0;
+	}
+
+	// ====================================================================
+	// Component Registration
+	// ====================================================================
+
+	template<typename Component>
+	static void RegisterComponent(const std::string& managedTypeName)
+	{
+		s_EntityHasComponentFunctions[managedTypeName] = [](const Entity entity) { return entity.HasComponent<Component>(); };
 	}
 
 	void ScriptInterface::RegisterFunctions() 
 	{
-		KBR_ADD_INTERNAL_CALL(NativeLog);
+		/// Register component types for HasComponent checks
+		RegisterComponent<TransformComponent>("Kerberos.Source.Kerberos.Scene.TransformComponent");
+		RegisterComponent<TagComponent>("Kerberos.Source.Kerberos.Scene.TagComponent");
+		RegisterComponent<RigidBody3DComponent>("Kerberos.Source.Kerberos.Scene.RigidBody3DComponent");
+		RegisterComponent<TextComponent>("Kerberos.Source.Kerberos.Scene.TextComponent");
+		RegisterComponent<AudioSource2DComponent>("Kerberos.Source.Kerberos.Scene.AudioSource2DComponent");
+		RegisterComponent<AudioSource3DComponent>("Kerberos.Source.Kerberos.Scene.AudioSource3DComponent");
+		RegisterComponent<AudioListenerComponent>("Kerberos.Source.Kerberos.Scene.AudioListenerComponent");
 
-		KBR_ADD_INTERNAL_CALL(Entity_HasComponent);
-		KBR_ADD_INTERNAL_CALL(Entity_FindEntityByName);
-		KBR_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
+		/// Build the native callback table and pass it to the managed side
+		static NativeCallbackTable callbackTable = {};
 
-		KBR_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
-		KBR_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
-		KBR_ADD_INTERNAL_CALL(TransformComponent_GetRotation);
-		KBR_ADD_INTERNAL_CALL(TransformComponent_SetRotation);
-		KBR_ADD_INTERNAL_CALL(TransformComponent_GetScale);
-		KBR_ADD_INTERNAL_CALL(TransformComponent_SetScale);
+		callbackTable.NativeLog = reinterpret_cast<void*>(&NativeLog);
+		callbackTable.Entity_HasComponent = reinterpret_cast<void*>(&Entity_HasComponent);
+		callbackTable.Entity_FindEntityByName = reinterpret_cast<void*>(&Entity_FindEntityByName);
 
-		KBR_ADD_INTERNAL_CALL(Rigidbody3DComponent_ApplyImpulse);
-		KBR_ADD_INTERNAL_CALL(Rigidbody3DComponent_ApplyImpulseAtPoint);
+		callbackTable.TransformComponent_GetTranslation = reinterpret_cast<void*>(&TransformComponent_GetTranslation);
+		callbackTable.TransformComponent_SetTranslation = reinterpret_cast<void*>(&TransformComponent_SetTranslation);
+		callbackTable.TransformComponent_GetRotation = reinterpret_cast<void*>(&TransformComponent_GetRotation);
+		callbackTable.TransformComponent_SetRotation = reinterpret_cast<void*>(&TransformComponent_SetRotation);
+		callbackTable.TransformComponent_GetScale = reinterpret_cast<void*>(&TransformComponent_GetScale);
+		callbackTable.TransformComponent_SetScale = reinterpret_cast<void*>(&TransformComponent_SetScale);
 
-		KBR_ADD_INTERNAL_CALL(TextComponent_GetText);
-		KBR_ADD_INTERNAL_CALL(TextComponent_SetText);
-		KBR_ADD_INTERNAL_CALL(TextComponent_GetColor);
-		KBR_ADD_INTERNAL_CALL(TextComponent_SetColor);
-		KBR_ADD_INTERNAL_CALL(TextComponent_GetFontSize);
-		KBR_ADD_INTERNAL_CALL(TextComponent_SetFontSize);
-		KBR_ADD_INTERNAL_CALL(TextComponent_GetFontPath);
-		KBR_ADD_INTERNAL_CALL(TextComponent_SetFontPath);
+		callbackTable.Rigidbody3DComponent_ApplyImpulse = reinterpret_cast<void*>(&Rigidbody3DComponent_ApplyImpulse);
+		callbackTable.Rigidbody3DComponent_ApplyImpulseAtPoint = reinterpret_cast<void*>(&Rigidbody3DComponent_ApplyImpulseAtPoint);
 
-		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_Play);
-		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_Stop);
-		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_GetVolume);
-		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_SetVolume);
-		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_SetLooping);
-		KBR_ADD_INTERNAL_CALL(AudioSource2DComponent_IsLooping);
+		callbackTable.TextComponent_SetText = reinterpret_cast<void*>(&TextComponent_SetText);
+		callbackTable.TextComponent_GetText = reinterpret_cast<void*>(&TextComponent_GetText);
+		callbackTable.TextComponent_SetColor = reinterpret_cast<void*>(&TextComponent_SetColor);
+		callbackTable.TextComponent_GetColor = reinterpret_cast<void*>(&TextComponent_GetColor);
+		callbackTable.TextComponent_SetFontSize = reinterpret_cast<void*>(&TextComponent_SetFontSize);
+		callbackTable.TextComponent_GetFontSize = reinterpret_cast<void*>(&TextComponent_GetFontSize);
+		callbackTable.TextComponent_SetFontPath = reinterpret_cast<void*>(&TextComponent_SetFontPath);
+		callbackTable.TextComponent_GetFontPath = reinterpret_cast<void*>(&TextComponent_GetFontPath);
 
-		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_Play);
-		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_Stop);
-		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_GetVolume);
-		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_SetVolume);
-		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_SetLooping);
-		KBR_ADD_INTERNAL_CALL(AudioSource3DComponent_IsLooping);
+		callbackTable.Input_IsKeyDown = reinterpret_cast<void*>(&Input_IsKeyDown);
 
-		KBR_ADD_INTERNAL_CALL(Input_IsKeyDown);
-	}
+		callbackTable.AudioSource2DComponent_Play = reinterpret_cast<void*>(&AudioSource2DComponent_Play);
+		callbackTable.AudioSource2DComponent_Stop = reinterpret_cast<void*>(&AudioSource2DComponent_Stop);
+		callbackTable.AudioSource2DComponent_SetVolume = reinterpret_cast<void*>(&AudioSource2DComponent_SetVolume);
+		callbackTable.AudioSource2DComponent_GetVolume = reinterpret_cast<void*>(&AudioSource2DComponent_GetVolume);
+		callbackTable.AudioSource2DComponent_SetLooping = reinterpret_cast<void*>(&AudioSource2DComponent_SetLooping);
+		callbackTable.AudioSource2DComponent_IsLooping = reinterpret_cast<void*>(&AudioSource2DComponent_IsLooping);
 
-	template<typename Component>
-	static void RegisterComponent(MonoImage* coreImage)
-	{
-		std::string componentName = typeid(Component).name();
-		/// TODO: Will only work with MSVC
-		componentName = componentName.substr(componentName.find_last_of("::") + 1);
-		const std::string componentNamespace = "Kerberos.Source.Kerberos.Scene";
-		KBR_CORE_TRACE("Registering component: {0}", componentName);
+		callbackTable.AudioSource3DComponent_Play = reinterpret_cast<void*>(&AudioSource3DComponent_Play);
+		callbackTable.AudioSource3DComponent_Stop = reinterpret_cast<void*>(&AudioSource3DComponent_Stop);
+		callbackTable.AudioSource3DComponent_SetVolume = reinterpret_cast<void*>(&AudioSource3DComponent_SetVolume);
+		callbackTable.AudioSource3DComponent_GetVolume = reinterpret_cast<void*>(&AudioSource3DComponent_GetVolume);
+		callbackTable.AudioSource3DComponent_SetLooping = reinterpret_cast<void*>(&AudioSource3DComponent_SetLooping);
+		callbackTable.AudioSource3DComponent_IsLooping = reinterpret_cast<void*>(&AudioSource3DComponent_IsLooping);
 
-		const std::string fullName = componentNamespace + "." + componentName;
-		MonoType* managedType = mono_reflection_type_from_name(const_cast<char*>(fullName.c_str()), coreImage);
-		KBR_CORE_ASSERT(managedType, "Failed to get managed type for {0}", componentName);
-
-		s_EntityHasComponentFunctions[managedType] = [](const Entity entity) { return entity.HasComponent<Component>(); };
-	}
-
-	void ScriptInterface::RegisterComponentTypes()
-	{
-		MonoImage* coreImage = ScriptEngine::GetCoreAssemblyImage();
-		KBR_CORE_ASSERT(coreImage, "Core assembly image is null!");
-
-		RegisterComponent<TransformComponent>(coreImage);
-		//RegisterComponent<IDComponent>(coreImage);
-		//RegisterComponent<SpriteRendererComponent>(coreImage);
-		RegisterComponent<TagComponent>(coreImage);
-		//RegisterComponent<CameraComponent>(coreImage);
-		//RegisterComponent<NativeScriptComponent>(coreImage);
-		//RegisterComponent<StaticMeshComponent>(coreImage);
-		//RegisterComponent<DirectionalLightComponent>(coreImage);
-		//RegisterComponent<PointLightComponent>(coreImage);
-		//RegisterComponent<SpotLightComponent>(coreImage);
-		//RegisterComponent<HierarchyComponent>(coreImage);
-		//RegisterComponent<EnvironmentComponent>(coreImage);
-		RegisterComponent<RigidBody3DComponent>(coreImage);
-		//RegisterComponent<BoxCollider3DComponent>(coreImage);
-		//RegisterComponent<SphereCollider3DComponent>(coreImage);
-		//RegisterComponent<CapsuleCollider3DComponent>(coreImage);
-		//RegisterComponent<MeshCollider3DComponent>(coreImage);
-		RegisterComponent<TextComponent>(coreImage);
-		RegisterComponent<AudioSource2DComponent>(coreImage);
-		RegisterComponent<AudioSource3DComponent>(coreImage);
-		RegisterComponent<AudioListenerComponent>(coreImage);
-
+		/// TODO: Pass the callback table to the managed side via ManagedSetNativeCallbacks
+		/// This is done after LoadManagedFunctions() is called in ScriptEngine::LoadAssembly
 	}
 }

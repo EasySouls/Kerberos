@@ -32,17 +32,17 @@ IncludeDir["yaml_cpp"] = "%{wks.location}/Kerberos/vendor/yaml-cpp/include"
 IncludeDir["ImGuizmo"] = "%{wks.location}/Kerberos/vendor/ImGuizmo"
 IncludeDir["Assimp"] = "%{wks.location}/Kerberos/vendor/Assimp/include"
 IncludeDir["JoltPhysics"] = "%{wks.location}/Kerberos/vendor/JoltPhysics"
-IncludeDir["Mono"] = "%{wks.location}/Kerberos/vendor/mono/include"
+IncludeDir["DotNet"] = "%{wks.location}/Kerberos/vendor/dotnet/include"
 IncludeDir["Filewatch"] = "%{wks.location}/Kerberos/vendor/filewatch"
 IncludeDir["msdfgen"] = "%{wks.location}/Kerberos/vendor/msdf-atlas-gen/msdfgen"
 IncludeDir["msdf_atlas_gen"] = "%{wks.location}/Kerberos/vendor/msdf-atlas-gen/msdf-atlas-gen"
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = "%{VULKAN_DIR}/Lib"
-LibraryDir["Mono"] = "%{wks.location}/Kerberos/vendor/mono/lib/%{cfg.buildcfg}"
+LibraryDir["DotNet"] = "%{wks.location}/Kerberos/vendor/dotnet/lib/%{cfg.buildcfg}"
 
 Library = {}
-Library["Mono"] = "%{LibraryDir.Mono}/libmono-static-sgen.lib"
+Library["DotNet"] = "%{LibraryDir.DotNet}/nethost.lib"
 Library["Vulkan"] = "%{LibraryDir.VulkanSDK}/vulkan-1.lib"
 
 Library["ShaderC_Debug"] = "%{LibraryDir.VulkanSDK}/shaderc_sharedd.lib"
@@ -155,7 +155,7 @@ project "Kerberos"
 		IncludeDir.ImGuizmo,
 		IncludeDir.Assimp,
 		IncludeDir.JoltPhysics,
-		IncludeDir.Mono,
+		IncludeDir.DotNet,
 		IncludeDir.Filewatch,
 		IncludeDir.msdfgen,
 		IncludeDir.msdf_atlas_gen,
@@ -164,7 +164,7 @@ project "Kerberos"
 	libdirs 
 	{
 		LibraryDir.VulkanSDK,
-		LibraryDir.Mono
+		LibraryDir.DotNet
 	}
 
 	links
@@ -178,11 +178,9 @@ project "Kerberos"
 		"Assimp",
 		"JoltPhysics",
 
-		"KerberosScriptCoreLib",
-
 		"opengl32.lib",
 		Library.Vulkan,
-		Library.Mono,
+		Library.DotNet,
 	}
 
 	defines 

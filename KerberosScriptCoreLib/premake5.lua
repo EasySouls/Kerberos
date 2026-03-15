@@ -1,7 +1,7 @@
 project "KerberosScriptCoreLib"
 	kind "SharedLib"
 	language "C#"
-	dotnetframework "4.7.2"
+	dotnetframework "net8.0"
 	namespace "Kerberos"
 
 	targetdir ("%{wks.location}/KerberosEditor/Resources/Scripts")

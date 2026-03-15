@@ -5,7 +5,8 @@ namespace Kerberos
 	class ScriptInterface
 	{
 	public:
-		static void RegisterComponentTypes();
+		/// Registers native function pointers with the managed scripting system.
+		/// This replaces the old Mono internal call registration.
 		static void RegisterFunctions();
 	};
 }

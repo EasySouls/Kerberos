@@ -12,19 +12,26 @@
 #include "Kerberos/Project/Project.h"
 #include "Kerberos/Core/Timer.h"
 
-#include <mono/jit/jit.h>
-#include <mono/metadata/assembly.h>
-#include <mono/metadata/image.h>
-#include <mono/metadata/object.h>
-#include <mono/metadata/class.h>
-#include <mono/metadata/attrdefs.h>
-#include <mono/metadata/mono-debug.h>
-#include <mono/metadata/threads.h>
+#include <nethost.h>
+#include <hostfxr.h>
+#include <coreclr_delegates.h>
 
 #include <filewatch/FileWatch.hpp>
 
 #include <string_view>
 
+#ifdef _WIN32
+#include <Windows.h>
+#define STR(s) L ## s
+#define CH(c) L ## c
+#define DOTNET_STR(s) L ## s
+using dotnet_string = std::wstring;
+#else
+#define STR(s) s
+#define CH(c) c
+#define DOTNET_STR(s) s
+using dotnet_string = std::string;
+#endif
 
 using namespace std::literals;
 
@@ -32,12 +39,15 @@ namespace Kerberos
 {
 	struct ScriptEngineData
 	{
-		MonoDomain* RootDomain = nullptr;
-		MonoDomain* AppDomain = nullptr;
+		/// .NET hosting state
+		hostfxr_handle HostContext = nullptr;
+		hostfxr_initialize_for_runtime_config_fn InitForConfigFn = nullptr;
+		hostfxr_get_runtime_delegate_fn GetDelegateFn = nullptr;
+		hostfxr_close_fn CloseFn = nullptr;
+		load_assembly_and_get_function_pointer_fn LoadAssemblyFn = nullptr;
 
-		MonoAssembly* CoreAssembly = nullptr;
-		MonoImage* CoreAssemblyImage = nullptr;
 		std::filesystem::path CoreAssemblyPath;
+		std::filesystem::path RuntimeConfigPath;
 
 		ScriptClass EntityClass;
 
@@ -48,45 +58,126 @@ namespace Kerberos
 		std::unordered_map<UUID, FieldInitializerMap> EntityFieldInitializers;
 
 		/// Runtime data
-
 		std::weak_ptr<Scene> SceneContext;
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 
-		bool EnableDebugging = true;
+		/// Managed function pointers (from ScriptGlue bridge)
+		ManagedLoadAssemblyClassesFn LoadAssemblyClasses = nullptr;
+		ManagedClassExistsFn ManagedClassExists = nullptr;
+		ManagedCreateInstanceFn ManagedCreateInstance = nullptr;
+		ManagedDestroyInstanceFn ManagedDestroyInstance = nullptr;
+		ManagedClearInstancesFn ManagedClearInstances = nullptr;
+		ManagedInvokeOnCreateFn ManagedInvokeOnCreate = nullptr;
+		ManagedInvokeOnUpdateFn ManagedInvokeOnUpdate = nullptr;
+		ManagedGetFieldCountFn ManagedGetFieldCount = nullptr;
+		ManagedGetFieldsFn ManagedGetFields = nullptr;
+		ManagedGetFieldValueFn ManagedGetFieldValue = nullptr;
+		ManagedSetFieldValueFn ManagedSetFieldValue = nullptr;
+		ManagedGetEntityClassCountFn ManagedGetEntityClassCount = nullptr;
+		ManagedGetEntityClassNamesFn ManagedGetEntityClassNames = nullptr;
+		ManagedSetNativeCallbacksFn ManagedSetNativeCallbacks = nullptr;
 	};
 
 	static ScriptEngineData* s_ScriptData = nullptr;
 	static Scope<filewatch::FileWatch<std::string>> s_Filewatcher = nullptr;
 
+	// ====================================================================
+	// Helpers for loading hostfxr
+	// ====================================================================
+
+#ifdef _WIN32
+	static void* LoadLibraryHelper(const char_t* path)
+	{
+		HMODULE h = ::LoadLibraryW(path);
+		return static_cast<void*>(h);
+	}
+
+	template<typename T>
+	static T GetExportHelper(void* lib, const char* name)
+	{
+		return reinterpret_cast<T>(::GetProcAddress(static_cast<HMODULE>(lib), name));
+	}
+#else
+	#include <dlfcn.h>
+	static void* LoadLibraryHelper(const char_t* path)
+	{
+		return dlopen(path, RTLD_LAZY | RTLD_LOCAL);
+	}
+
+	template<typename T>
+	static T GetExportHelper(void* lib, const char* name)
+	{
+		return reinterpret_cast<T>(dlsym(lib, name));
+	}
+#endif
+
+	static bool LoadHostFxr()
+	{
+		/// Get the path to the hostfxr library
+		char_t buffer[4096];
+		size_t bufferSize = sizeof(buffer) / sizeof(char_t);
+		int rc = get_hostfxr_path(buffer, &bufferSize, nullptr);
+		if (rc != 0)
+		{
+			KBR_CORE_ERROR("Failed to find hostfxr library. Ensure .NET SDK is installed. Error: 0x{:x}", rc);
+			return false;
+		}
+
+		/// Load hostfxr and get the exported functions
+		void* lib = LoadLibraryHelper(buffer);
+		if (!lib)
+		{
+			KBR_CORE_ERROR("Failed to load hostfxr library");
+			return false;
+		}
+
+		s_ScriptData->InitForConfigFn = GetExportHelper<hostfxr_initialize_for_runtime_config_fn>(lib, "hostfxr_initialize_for_runtime_config");
+		s_ScriptData->GetDelegateFn = GetExportHelper<hostfxr_get_runtime_delegate_fn>(lib, "hostfxr_get_runtime_delegate");
+		s_ScriptData->CloseFn = GetExportHelper<hostfxr_close_fn>(lib, "hostfxr_close");
+
+		return s_ScriptData->InitForConfigFn && s_ScriptData->GetDelegateFn && s_ScriptData->CloseFn;
+	}
+
+	static dotnet_string ToDotNetString(const std::string& str)
+	{
+#ifdef _WIN32
+		if (str.empty()) return {};
+		int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), nullptr, 0);
+		dotnet_string wstr(sizeNeeded, 0);
+		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), &wstr[0], sizeNeeded);
+		return wstr;
+#else
+		return str;
+#endif
+	}
+
+	// ====================================================================
+	// ScriptEngine Implementation
+	// ====================================================================
+
 	void ScriptEngine::Init()
 	{
 		s_ScriptData = new ScriptEngineData();
 
-		InitMono();
-		LoadAssembly("Resources/Scripts/KerberosScriptCoreLib.dll");
-		LoadAssemblyClasses(s_ScriptData->CoreAssembly, s_ScriptData->CoreAssemblyImage);
+		InitDotNet();
 
-		ScriptInterface::RegisterComponentTypes();
+		const std::filesystem::path assemblyPath = std::filesystem::current_path() / "Resources"sv / "Scripts"sv / "KerberosScriptCoreLib.dll"sv;
+		LoadAssembly(assemblyPath);
+		LoadAssemblyClasses();
+
 		ScriptInterface::RegisterFunctions();
 
-		s_ScriptData->EntityClass = ScriptClass(s_ScriptData->CoreAssemblyImage, "Kerberos.Source.Kerberos.Scene", "Entity");
-
 		/// Setup filewatcher to reload assembly on changes
-		/// TODO: Use the relative path from the project directory
-
-		/// TODO: FIX Project is not initialized at this point :C
-		//const std::filesystem::path scriptDir = Project::GetAssetDirectory () / ".."sv / "Resources"sv / "Scripts"sv;
-
-		const std::filesystem::path assemblyPath = std::filesystem::current_path() / "Resources"sv / "Scripts"sv;
+		const std::filesystem::path watchPath = std::filesystem::current_path() / "Resources"sv / "Scripts"sv;
 		s_Filewatcher = CreateScope<filewatch::FileWatch<std::string>>(
-			assemblyPath.string(),
+			watchPath.string(),
 			OnAssemblyFileChanged
 		);
 	}
 
 	void ScriptEngine::Shutdown()
 	{
-		ShutdownMono();
+		ShutdownDotNet();
 
 		delete s_ScriptData;
 		s_ScriptData = nullptr;
@@ -99,15 +190,8 @@ namespace Kerberos
 			KBR_CORE_INFO("Reloading C# assemblies took {:.2f} ms", data.DurationMs);
 		});
 
-		mono_domain_set(mono_get_root_domain(), false);
-		mono_domain_unload(s_ScriptData->AppDomain);
-		s_ScriptData->AppDomain = nullptr;
-
 		LoadAssembly(s_ScriptData->CoreAssemblyPath);
-		LoadAssemblyClasses(s_ScriptData->CoreAssembly, s_ScriptData->CoreAssemblyImage);
-
-		/// The registered classes use the MonoImage, so they have to be reloaded with the new image
-		ScriptInterface::RegisterComponentTypes();
+		LoadAssemblyClasses();
 	}
 
 	void ScriptEngine::OnRuntimeStart(const Ref<Scene>& scene)
@@ -119,6 +203,9 @@ namespace Kerberos
 	{
 		s_ScriptData->SceneContext.reset();
 		s_ScriptData->EntityInstances.clear();
+
+		if (s_ScriptData->ManagedClearInstances)
+			s_ScriptData->ManagedClearInstances();
 	}
 
 	void ScriptEngine::OnCreateEntity(const Entity entity) 
@@ -170,11 +257,8 @@ namespace Kerberos
 		const std::string_view currentClassName = entity.GetComponent<ScriptComponent>().ClassName;
 		if (s_ScriptData->EntityFieldInitializers.contains(entityID) && currentClassName == className)
 		{
-			/// Initializers already exist for this entity, don't overwrite them
 			return;
 		}
-
-		/// TODO: if the entity has a script class and the name is the same, but the fields are not, it doesn't update the initializers
 
 		const Ref<ScriptClass>& scriptClass = s_ScriptData->EntityClasses.at(className);
 		const auto& serializedFields = scriptClass->GetSerializedFields();
@@ -204,7 +288,6 @@ namespace Kerberos
 			const std::string_view entityName = entity.GetName();
 			KBR_CORE_TRACE("No field initializers found for entity {}"sv, entityName);
 
-			/// Create an empty map for this entity if it doesn't exist
 			return s_ScriptData->EntityFieldInitializers[entityID];
 		}
 
@@ -215,13 +298,7 @@ namespace Kerberos
 	{
 		if (!s_ScriptData->EntityInstances.contains(entityID))
 		{
-			/// We return nullptr instaed of asserting, since this can be called when the game isn't running,
-			/// thus no instance exist
-			
-			/// TODO: Design a more robust system, where the user can still see and set the available fields of the script in the editor,
-			/// and those are applied when the game starts.
 			return nullptr;
-			//KBR_CORE_ASSERT(s_ScriptData->EntityInstances.contains(entityID), "No script instance found for entity!");
 		}
 
 		return s_ScriptData->EntityInstances.at(entityID);
@@ -232,179 +309,245 @@ namespace Kerberos
 		return s_ScriptData->SceneContext;
 	}
 
-	void ScriptEngine::InitMono() 
+	bool ScriptEngine::CreateManagedInstance(const uint64_t entityID, const std::string& className)
 	{
-		mono_set_assemblies_path("mono/lib");
+		if (s_ScriptData->ManagedCreateInstance)
+			return s_ScriptData->ManagedCreateInstance(entityID, className.c_str()) != 0;
+		return false;
+	}
 
-		if (s_ScriptData->EnableDebugging)
+	void ScriptEngine::DestroyManagedInstance(const uint64_t entityID)
+	{
+		if (s_ScriptData->ManagedDestroyInstance)
+			s_ScriptData->ManagedDestroyInstance(entityID);
+	}
+
+	bool ScriptEngine::InvokeManagedOnCreate(const uint64_t entityID)
+	{
+		if (s_ScriptData->ManagedInvokeOnCreate)
+			return s_ScriptData->ManagedInvokeOnCreate(entityID) != 0;
+		return false;
+	}
+
+	bool ScriptEngine::InvokeManagedOnUpdate(const uint64_t entityID, const float deltaTime)
+	{
+		if (s_ScriptData->ManagedInvokeOnUpdate)
+			return s_ScriptData->ManagedInvokeOnUpdate(entityID, deltaTime) != 0;
+		return false;
+	}
+
+	bool ScriptEngine::GetManagedFieldValue(const uint64_t entityID, const std::string& fieldName, void* outValue, const int bufferSize)
+	{
+		if (s_ScriptData->ManagedGetFieldValue)
+			return s_ScriptData->ManagedGetFieldValue(entityID, fieldName.c_str(), outValue, bufferSize) != 0;
+		return false;
+	}
+
+	bool ScriptEngine::SetManagedFieldValue(const uint64_t entityID, const std::string& fieldName, void* value, const int valueSize)
+	{
+		if (s_ScriptData->ManagedSetFieldValue)
+			return s_ScriptData->ManagedSetFieldValue(entityID, fieldName.c_str(), value, valueSize) != 0;
+		return false;
+	}
+
+	void ScriptEngine::InitDotNet() 
+	{
+		if (!LoadHostFxr())
 		{
-			const char* argv[2] = {
-				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.log",
-				"--soft-breakpoints"
-			};
-
-			mono_jit_parse_options(2, const_cast<char**>(argv));
-			mono_debug_init(MONO_DEBUG_FORMAT_MONO);
-		}
-
-		MonoDomain* rootDomain = mono_jit_init("KerberosJITRuntime");
-		if (rootDomain == nullptr)
-		{
-			KBR_CORE_ASSERT(rootDomain, "Failed to initialize Mono JIT");
+			KBR_CORE_ASSERT(false, "Failed to load hostfxr");
 			return;
 		}
 
-		s_ScriptData->RootDomain = rootDomain;
-
-		if (s_ScriptData->EnableDebugging)
-			mono_debug_domain_create(s_ScriptData->RootDomain);
-
-		mono_thread_set_main(mono_thread_current());
+		KBR_CORE_INFO("Successfully loaded .NET hostfxr");
 	}
 
-	void ScriptEngine::ShutdownMono() 
+	void ScriptEngine::ShutdownDotNet() 
 	{
-		if (s_ScriptData->AppDomain)
+		if (s_ScriptData->HostContext)
 		{
-			mono_domain_set(mono_get_root_domain(), false);
-			mono_domain_unload(s_ScriptData->AppDomain);
-			s_ScriptData->AppDomain = nullptr;
+			s_ScriptData->CloseFn(s_ScriptData->HostContext);
+			s_ScriptData->HostContext = nullptr;
 		}
-
-		if (s_ScriptData->RootDomain)
-		{
-			mono_jit_cleanup(s_ScriptData->RootDomain);
-			s_ScriptData->RootDomain = nullptr;
-		}
-	}
-
-	MonoObject* ScriptEngine::InstantiateClass(MonoClass* klass) 
-	{
-		MonoObject* instance = mono_object_new(s_ScriptData->AppDomain, klass);
-		mono_runtime_object_init(instance);
-
-		return instance;
 	}
 
 	void ScriptEngine::LoadAssembly(const std::filesystem::path& assemblyPath) 
 	{
-		s_ScriptData->AppDomain = mono_domain_create_appdomain(const_cast<char*>("KerberosScriptRuntime"), nullptr);
-		mono_domain_set(s_ScriptData->AppDomain, true);
-
-		s_ScriptData->CoreAssembly = LoadMonoAssembly(assemblyPath, s_ScriptData->EnableDebugging);
-		s_ScriptData->CoreAssemblyImage = mono_assembly_get_image(s_ScriptData->CoreAssembly);
 		s_ScriptData->CoreAssemblyPath = assemblyPath;
+
+		/// Derive the runtime config path from the assembly path
+		std::filesystem::path runtimeConfigPath = assemblyPath;
+		runtimeConfigPath.replace_extension("");
+		runtimeConfigPath = runtimeConfigPath.string() + ".runtimeconfig.json";
+		s_ScriptData->RuntimeConfigPath = runtimeConfigPath;
+
+		if (!std::filesystem::exists(runtimeConfigPath))
+		{
+			KBR_CORE_ERROR("Runtime config not found: {}", runtimeConfigPath);
+			KBR_CORE_ASSERT(false, "Runtime config not found!");
+			return;
+		}
+
+		/// Close any existing host context before reinitializing
+		if (s_ScriptData->HostContext)
+		{
+			s_ScriptData->CloseFn(s_ScriptData->HostContext);
+			s_ScriptData->HostContext = nullptr;
+		}
+
+		/// Initialize the .NET runtime with the runtime config
+		dotnet_string configPath = ToDotNetString(runtimeConfigPath.string());
+		int rc = s_ScriptData->InitForConfigFn(configPath.c_str(), nullptr, &s_ScriptData->HostContext);
+		if (rc != 0 && rc != 1) // 0 = success, 1 = already initialized (secondary context)
+		{
+			KBR_CORE_ERROR("Failed to initialize .NET runtime. Error: 0x{:x}", rc);
+			KBR_CORE_ASSERT(false, "Failed to initialize .NET runtime!");
+			return;
+		}
+
+		/// Get the load_assembly_and_get_function_pointer delegate
+		rc = s_ScriptData->GetDelegateFn(
+			s_ScriptData->HostContext,
+			hdt_load_assembly_and_get_function_pointer,
+			reinterpret_cast<void**>(&s_ScriptData->LoadAssemblyFn));
+
+		if (rc != 0 || !s_ScriptData->LoadAssemblyFn)
+		{
+			KBR_CORE_ERROR("Failed to get load_assembly_and_get_function_pointer delegate. Error: 0x{:x}", rc);
+			KBR_CORE_ASSERT(false, "Failed to get .NET runtime delegate!");
+			return;
+		}
+
+		/// Load managed function pointers from the bridge
+		LoadManagedFunctions();
+
+		KBR_CORE_INFO("Successfully loaded .NET assembly: {}", assemblyPath);
 	}
 
-	MonoAssembly* ScriptEngine::LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPdb) 
+	template<typename T>
+	T ScriptEngine::LoadManagedFunction(const char* typeName, const char* methodName)
 	{
-		uint32_t fileSize = 0;
-		char* fileData = Filesystem::ReadBytes(assemblyPath, &fileSize);
+		T fn = nullptr;
+		dotnet_string assemblyPath = ToDotNetString(s_ScriptData->CoreAssemblyPath.string());
+		dotnet_string type = ToDotNetString(typeName);
+		dotnet_string method = ToDotNetString(methodName);
 
-		/// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
-		MonoImageOpenStatus status;
-		MonoImage* image = mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
+		int rc = s_ScriptData->LoadAssemblyFn(
+			assemblyPath.c_str(),
+			type.c_str(),
+			method.c_str(),
+			UNMANAGEDCALLERSONLY_METHOD,
+			nullptr,
+			reinterpret_cast<void**>(&fn));
 
-		if (status != MONO_IMAGE_OK)
+		if (rc != 0)
 		{
-			const char* errorMessage = mono_image_strerror(status);
-			KBR_CORE_ASSERT(false, "Failed to load assembly from file {0}: {1}", assemblyPath, errorMessage);
-			return nullptr;
+			KBR_CORE_ERROR("Failed to load managed function {}.{}. Error: 0x{:x}", typeName, methodName, rc);
 		}
 
-		if (loadPdb)
-		{
-			std::filesystem::path pdbPath = assemblyPath;
-
-			pdbPath.replace_extension(".pdb");
-
-			if (std::filesystem::exists(pdbPath))
-			{
-				uint32_t pdbFileSize = 0;
-				const char* pdbFileData = Filesystem::ReadBytes(pdbPath, &pdbFileSize);
-				mono_debug_open_image_from_memory(image, reinterpret_cast<const mono_byte*>(pdbFileData), static_cast<int>(pdbFileSize));
-				KBR_CORE_INFO("Loaded PDB {}", pdbPath);
-				delete[] pdbFileData;
-			}
-		}
-
-		MonoAssembly* assembly = mono_assembly_load_from_full(image, assemblyPath.string().c_str(), &status, 0);
-		mono_image_close(image);
-
-		delete[] fileData;
-
-		return assembly;
+		return fn;
 	}
 
-	void ScriptEngine::LoadAssemblyClasses(const MonoAssembly* assembly, MonoImage* image)
+	void ScriptEngine::LoadManagedFunctions()
 	{
-		KBR_CORE_ASSERT(assembly, "Assembly is null!");
-		KBR_CORE_ASSERT(image, "Image is null!");
+		const char* glueType = "Kerberos.Source.ScriptGlue, KerberosScriptCoreLib";
+		const char* callbacksType = "Kerberos.Source.InternalCalls, KerberosScriptCoreLib";
 
-		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
-		const int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
+		s_ScriptData->LoadAssemblyClasses = LoadManagedFunction<ManagedLoadAssemblyClassesFn>(glueType, "LoadAssemblyClasses");
+		s_ScriptData->ManagedClassExists = LoadManagedFunction<ManagedClassExistsFn>(glueType, "ClassExists");
+		s_ScriptData->ManagedCreateInstance = LoadManagedFunction<ManagedCreateInstanceFn>(glueType, "CreateInstance");
+		s_ScriptData->ManagedDestroyInstance = LoadManagedFunction<ManagedDestroyInstanceFn>(glueType, "DestroyInstance");
+		s_ScriptData->ManagedClearInstances = LoadManagedFunction<ManagedClearInstancesFn>(glueType, "ClearInstances");
+		s_ScriptData->ManagedInvokeOnCreate = LoadManagedFunction<ManagedInvokeOnCreateFn>(glueType, "InvokeOnCreate");
+		s_ScriptData->ManagedInvokeOnUpdate = LoadManagedFunction<ManagedInvokeOnUpdateFn>(glueType, "InvokeOnUpdate");
+		s_ScriptData->ManagedGetFieldCount = LoadManagedFunction<ManagedGetFieldCountFn>(glueType, "GetClassFieldCount");
+		s_ScriptData->ManagedGetFields = LoadManagedFunction<ManagedGetFieldsFn>(glueType, "GetClassFields");
+		s_ScriptData->ManagedGetFieldValue = LoadManagedFunction<ManagedGetFieldValueFn>(glueType, "GetFieldValue");
+		s_ScriptData->ManagedSetFieldValue = LoadManagedFunction<ManagedSetFieldValueFn>(glueType, "SetFieldValue");
+		s_ScriptData->ManagedGetEntityClassCount = LoadManagedFunction<ManagedGetEntityClassCountFn>(glueType, "GetEntityClassCount");
+		s_ScriptData->ManagedGetEntityClassNames = LoadManagedFunction<ManagedGetEntityClassNamesFn>(glueType, "GetEntityClassNames");
+		s_ScriptData->ManagedSetNativeCallbacks = LoadManagedFunction<ManagedSetNativeCallbacksFn>(callbacksType, "SetNativeCallbacks");
+	}
 
-		MonoClass* entityClass = mono_class_from_name(image, "Kerberos.Source.Kerberos.Scene", "Entity");
+	void ScriptEngine::LoadAssemblyClasses()
+	{
+		s_ScriptData->EntityClasses.clear();
 
-		for (int32_t i = 0; i < numTypes; i++)
+		if (!s_ScriptData->LoadAssemblyClasses)
 		{
-			uint32_t cols[MONO_TYPEDEF_SIZE];
-			mono_metadata_decode_row(typeDefinitionsTable, (int)i, cols, MONO_TYPEDEF_SIZE);
+			KBR_CORE_ERROR("LoadAssemblyClasses managed function not loaded!");
+			return;
+		}
 
-			const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
-			const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
+		const std::string assemblyPath = s_ScriptData->CoreAssemblyPath.string();
+		int result = s_ScriptData->LoadAssemblyClasses(assemblyPath.c_str());
+		if (!result)
+		{
+			KBR_CORE_ERROR("Failed to load assembly classes from {}", assemblyPath);
+			return;
+		}
 
-			const std::string fullname = fmt::format("{}.{}", nameSpace, name);
+		/// Enumerate discovered classes and build ScriptClass objects
+		constexpr int maxNames = 256;
+		constexpr int bufferSize = 512;
 
-			KBR_CORE_TRACE("Loaded C# class: {}.{}", nameSpace, name);
+		char nameBuffers[maxNames][bufferSize] = {};
+		void* namePtrs[maxNames];
+		for (int i = 0; i < maxNames; i++)
+			namePtrs[i] = nameBuffers[i];
 
-			if (strcmp(name, "<Module>") == 0)
-				continue;
+		int classCount = s_ScriptData->ManagedGetEntityClassNames(namePtrs, maxNames, bufferSize);
 
-			MonoClass* klass = mono_class_from_name(image, nameSpace, name);
+		for (int i = 0; i < classCount; i++)
+		{
+			std::string fullName = nameBuffers[i];
+			KBR_CORE_TRACE("Loaded C# class: {}", fullName);
 
-			void* iter = nullptr;
-			MonoMethod* method = mono_class_get_methods(klass, &iter);
-			while (method != nullptr)
+			/// Parse namespace and class name from full name (e.g. "Kerberos.Source.Kerberos.Player" -> ns="Kerberos.Source.Kerberos", name="Player")
+			std::string nameSpace;
+			std::string className;
+			const size_t lastDot = fullName.rfind('.');
+			if (lastDot != std::string::npos)
 			{
-				KBR_CORE_TRACE("\t{}", mono_method_get_name(method));
-				method = mono_class_get_methods(klass, &iter);
+				nameSpace = fullName.substr(0, lastDot);
+				className = fullName.substr(lastDot + 1);
+			}
+			else
+			{
+				className = fullName;
 			}
 
-			if (entityClass == klass)
-				continue;
+			const Ref<ScriptClass> scriptClass = CreateRef<ScriptClass>(nameSpace, className, fullName);
+			s_ScriptData->EntityClasses[fullName] = scriptClass;
 
-			if (!mono_class_is_subclass_of(klass, entityClass, false))
-				continue;
-
-			/// If the class is a subclass of Entity, store it in the entities map
-			const Ref<ScriptClass> scriptClass = CreateRef<ScriptClass>(image, nameSpace, name);
-			s_ScriptData->EntityClasses[fullname] = scriptClass;
-
-			void* fieldIterator = nullptr;
-			MonoClassField* field;
-			while ((field = mono_class_get_fields(klass, &fieldIterator)) != nullptr)
+			/// Query fields from the managed side
+			constexpr int maxFields = 64;
+			char fieldNameBuffers[maxFields][bufferSize] = {};
+			char fieldTypeBuffers[maxFields][bufferSize] = {};
+			void* fieldNamePtrs[maxFields];
+			void* fieldTypePtrs[maxFields];
+			for (int j = 0; j < maxFields; j++)
 			{
-				const uint32_t flags = mono_field_get_flags(field);
-				if (flags == MONO_FIELD_ATTR_PUBLIC)
-				{
-					/// TODO: Filter by custom C# attribute [ShowInEditor]
+				fieldNamePtrs[j] = fieldNameBuffers[j];
+				fieldTypePtrs[j] = fieldTypeBuffers[j];
+			}
 
-					const std::string fieldName = mono_field_get_name(field);
-					MonoType* type = mono_field_get_type(field);
-					const char* typeName = mono_type_get_name(type);
+			int fieldCount = s_ScriptData->ManagedGetFields(fullName.c_str(), fieldNamePtrs, fieldTypePtrs, maxFields, bufferSize);
+			for (int j = 0; j < fieldCount; j++)
+			{
+				const std::string fieldName = fieldNameBuffers[j];
+				const std::string fieldTypeName = fieldTypeBuffers[j];
 
-					KBR_CORE_TRACE("\n\tPublic field: {0}, type: {1}", fieldName, typeName);
+				KBR_CORE_TRACE("\tPublic field: {0}, type: {1}", fieldName, fieldTypeName);
 
-					const ScriptFieldType fieldType = ScriptUtils::MonoTypeToScriptFieldType(type);
-					const ScriptField fieldInfo = { .Name = fieldName, .Type = fieldType, .ClassField = field };
+				const ScriptFieldType fieldType = ScriptUtils::DotNetTypeToScriptFieldType(fieldTypeName);
+				const ScriptField fieldInfo = { .Name = fieldName, .Type = fieldType };
 
-					scriptClass->m_SerializedFields[fieldName] = fieldInfo;
-					
-					/// TODO: Handle default values from C# attributes
-				}
+				scriptClass->m_SerializedFields[fieldName] = fieldInfo;
 			}
 		}
+
+		/// Register the Entity base class reference
+		s_ScriptData->EntityClass = ScriptClass("Kerberos.Source.Kerberos.Scene", "Entity", "Kerberos.Source.Kerberos.Scene.Entity");
 	}
 
 	static std::string_view FileWatchEventToString(const filewatch::Event event)
@@ -434,15 +577,5 @@ namespace Kerberos
 				});
 			}
 		}
-	}
-
-	MonoImage* ScriptEngine::GetCoreAssemblyImage() 
-	{
-		return s_ScriptData->CoreAssemblyImage;
-	}
-
-	MonoString* ScriptEngine::StringToMonoString(const std::string& str) 
-	{
-		return mono_string_new(s_ScriptData->AppDomain, str.c_str());
 	}
 }
